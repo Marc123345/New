@@ -12,6 +12,9 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
+const BOUNDS_X = 16;
+const BOUNDS_Y = 12;
+
 const PARALLAX_LAYERS = [-3.5, -2, -0.8, 0.8, 2, 3.5];
 
 interface PhysicsObject {
@@ -33,18 +36,8 @@ export function Hero3D() {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    
-    // Dynamic bounds and scaling based on screen size
-    let boundsX = window.innerWidth < 768 ? 8 : 16;
-    let boundsY = window.innerWidth < 768 ? 10 : 12;
-    let scaleMult = window.innerWidth < 768 ? 0.7 : 1;
-
-    // Safe dimensions to prevent divide-by-zero white screens
-    const safeWidth = container.clientWidth || window.innerWidth;
-    const safeHeight = container.clientHeight || window.innerHeight;
-
     const scene = new THREE.Scene();
-    const aspect = safeWidth / safeHeight;
+    const aspect = container.clientWidth / container.clientHeight;
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
     camera.position.set(0, 0, 35);
 
@@ -53,8 +46,8 @@ export function Hero3D() {
       alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setSize(safeWidth, safeHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
@@ -92,7 +85,6 @@ export function Hero3D() {
 
     const createToken = (url: string, size: number, index: number, total: number) => {
       const group = new THREE.Group();
-      const actualSize = size * scaleMult; // Apply mobile scaling
 
       const texture = textureLoader.load(
         url,
@@ -117,12 +109,12 @@ export function Hero3D() {
 
       const coin = new THREE.Mesh(coinGeometry, [sideMaterial, faceMaterial, faceMaterial]);
       coin.rotation.x = Math.PI / 2;
-      coin.scale.set(actualSize, 1, actualSize);
+      coin.scale.set(size, 1, size);
       group.add(coin);
 
       const angle = (index / total) * Math.PI * 2;
-      const spreadX = boundsX * 0.7;
-      const spreadY = boundsY * 0.7;
+      const spreadX = BOUNDS_X * 0.7;
+      const spreadY = BOUNDS_Y * 0.7;
       const x = Math.cos(angle) * spreadX * (0.5 + Math.random() * 0.5);
       const y = Math.sin(angle) * spreadY * (0.5 + Math.random() * 0.5);
       const z = (Math.random() - 0.5) * 3;
@@ -138,7 +130,7 @@ export function Hero3D() {
         mesh: group,
         velocity: new THREE.Vector3(0, 0, 0),
         position: new THREE.Vector3(x, y, z),
-        radius: actualSize, 
+        radius: size,
         baseRotationSpeed: (Math.random() - 0.5) * 0.3,
         parallaxStrength,
         floatPhase: Math.random() * Math.PI * 2,
@@ -348,18 +340,18 @@ export function Hero3D() {
         tmpVel.copy(obj.velocity).multiplyScalar(delta * 12);
         obj.position.add(tmpVel);
 
-        if (obj.position.x > boundsX) {
-          obj.position.x = boundsX;
+        if (obj.position.x > BOUNDS_X) {
+          obj.position.x = BOUNDS_X;
           obj.velocity.x *= -0.5;
-        } else if (obj.position.x < -boundsX) {
-          obj.position.x = -boundsX;
+        } else if (obj.position.x < -BOUNDS_X) {
+          obj.position.x = -BOUNDS_X;
           obj.velocity.x *= -0.5;
         }
-        if (obj.position.y > boundsY) {
-          obj.position.y = boundsY;
+        if (obj.position.y > BOUNDS_Y) {
+          obj.position.y = BOUNDS_Y;
           obj.velocity.y *= -0.5;
-        } else if (obj.position.y < -boundsY) {
-          obj.position.y = -boundsY;
+        } else if (obj.position.y < -BOUNDS_Y) {
+          obj.position.y = -BOUNDS_Y;
           obj.velocity.y *= -0.5;
         }
 
@@ -401,16 +393,9 @@ export function Hero3D() {
 
     const handleResize = () => {
       if (!container) return;
-      
-      boundsX = window.innerWidth < 768 ? 8 : 16;
-      boundsY = window.innerWidth < 768 ? 10 : 12;
-      
-      const newWidth = container.clientWidth || window.innerWidth;
-      const newHeight = container.clientHeight || window.innerHeight;
-      
-      camera.aspect = newWidth / newHeight;
+      camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(newWidth, newHeight);
+      renderer.setSize(container.clientWidth, container.clientHeight);
     };
     window.addEventListener("resize", handleResize);
 
@@ -447,12 +432,5 @@ export function Hero3D() {
     };
   }, []);
 
-  // FIXED: Explicit min-height ensures container does not collapse on mobile!
-  return (
-    <div 
-      ref={containerRef} 
-      className="absolute inset-0 w-full h-full min-h-[100dvh] pointer-events-auto" 
-      style={{ zIndex: 1 }}
-    />
-  );
+  return <div ref={containerRef} className="w-full h-full" />;
 }

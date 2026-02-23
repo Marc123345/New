@@ -48,10 +48,10 @@ const Section = ({
 }: SectionProps) => (
   <section
     id={id}
-    className={`${className} px-4 md:px-8`}
+    className={className}
     style={noPadding ? {} : {
-      paddingTop: 'clamp(var(--space-4x), 6vw, var(--space-8x))',
-      paddingBottom: 'clamp(var(--space-4x), 6vw, var(--space-8x))',
+      paddingTop: 'var(--space-8x)',
+      paddingBottom: 'var(--space-8x)'
     }}
   >
     <LazySection>
@@ -65,20 +65,20 @@ const Section = ({
 function AppContent() {
 
   return (
-    <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white overflow-x-hidden w-full">
+    <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
       <Navigation />
       <ScrollProgress />
 
       <section
         id="hero"
-        className="relative min-h-screen overflow-hidden w-full"
+        className="relative min-h-screen overflow-hidden"
         style={{ background: '#000' }}
       >
         <HeroWebGL />
 
         <div
-          className="relative z-10 px-4 sm:px-6 md:px-12"
+          className="relative z-10 px-6 md:px-12"
           style={{
             paddingTop: 'var(--space-8x)',
             paddingBottom: 'var(--space-8x)',
@@ -86,31 +86,35 @@ function AppContent() {
         >
           <div className="max-w-7xl mx-auto">
             <HeroTitle>
-              <div
-                className="relative mx-auto w-full h-[240px] sm:h-[360px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
-                style={{
-                  border: "3px solid var(--color-text-dark)",
-                  boxShadow: "none",
-                  background: "#000",
-                }}
-              >
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                  src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214"
-                />
-                <HeroWebGLPanel />
-              </div>
+              <ScrollReveal mode="blur" delay={0.2} className="w-full">
+                <div
+                  className="relative mx-auto w-full h-[520px] md:h-[700px] lg:h-[820px] overflow-hidden"
+                  style={{
+                    border: "3px solid var(--color-text-dark)",
+                    boxShadow: "10px 10px 0 var(--color-surface-dark)",
+                    background: "#000",
+                  }}
+                >
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                    src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214"
+                  />
+                  <div className="absolute inset-0">
+                    <HeroWebGLPanel />
+                  </div>
+                </div>
+              </ScrollReveal>
             </HeroTitle>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
-            className="text-xs tracking-[0.2em] uppercase text-center whitespace-nowrap"
+            className="text-xs tracking-[0.2em] uppercase"
             style={{ color: 'var(--color-secondary)', fontFamily: 'var(--font-stack-heading)' }}
           >
             Scroll to Explore
@@ -134,35 +138,31 @@ function AppContent() {
         <EcosystemServices />
       </div>
 
-      <div style={{ background: '#ffffff', color: '#1a1a2e' }}>
-        <div id="about" className="relative" style={{ zIndex: 2 }}>
-          <Suspense fallback={<SectionLoader />}>
-            <AboutStory />
-          </Suspense>
-        </div>
-
-        <Section id="services" className="" noPadding={true}>
-          <ArcSlider />
-        </Section>
-
-        <section id="testimonials">
-          <LazySection>
-            <Testimonials />
-          </LazySection>
-        </section>
-
-        <div id="blog">
-          <LazySection>
-            <Suspense fallback={<SectionLoader />}>
-              <BlogSection />
-            </Suspense>
-          </LazySection>
-        </div>
-
-        <Section id="contact" className="" delay={0.2} noPadding={true}>
-          <ContactForm />
-        </Section>
+      <div id="about" className="relative" style={{ zIndex: 2 }}>
+        <Suspense fallback={<SectionLoader />}>
+          <AboutStory />
+        </Suspense>
       </div>
+
+      <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
+        <ArcSlider />
+      </Section>
+
+      <Section id="testimonials" className="bg-[var(--color-background-light)]">
+        <Testimonials />
+      </Section>
+
+      <div id="blog">
+        <LazySection>
+          <Suspense fallback={<SectionLoader />}>
+            <BlogSection />
+          </Suspense>
+        </LazySection>
+      </div>
+
+      <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
+        <ContactForm />
+      </Section>
 
       <Footer />
     </main>

@@ -145,25 +145,11 @@ export function EcosystemServices() {
       </div>
 
       <div
-        className="absolute inset-0 z-20 overflow-hidden pointer-events-none flex items-center justify-center"
+        className="absolute inset-0 z-20 overflow-visible pointer-events-none flex items-center justify-center"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >
-        <div
-          className="relative flex items-center justify-center"
-          style={{
-            width: 600,
-            height: 600,
-            transform: 'scale(var(--orbit-scale, 1))',
-            transformOrigin: 'center center',
-          }}
-        >
-          <style>{`
-            :root { --orbit-scale: 0.55; }
-            @media (min-width: 480px) { :root { --orbit-scale: 0.7; } }
-            @media (min-width: 768px) { :root { --orbit-scale: 1; } }
-            @media (min-width: 1024px) { :root { --orbit-scale: 1.5; } }
-          `}</style>
+        <div className="relative w-[600px] h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             animate={{ rotate: 360 }}

@@ -11,8 +11,8 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-const BASE_BOUNDS_X = 14;
-const BASE_BOUNDS_Y = 10;
+const BOUNDS_X = 14;
+const BOUNDS_Y = 10;
 const RESTITUTION = 0.62;
 const FRICTION = 0.992;
 const CURSOR_RADIUS = 2.2;
@@ -113,66 +113,20 @@ export function HeroWebGLPanel() {
     const container = containerRef.current;
     if (!container) return;
 
-    let cleanupFn: (() => void) | null = null;
-
-    const init = () => {
-      const rawW = container.getBoundingClientRect().width || container.offsetWidth || container.clientWidth;
-      const rawH = container.getBoundingClientRect().height || container.offsetHeight || container.clientHeight;
-      if (rawW < 10 || rawH < 10) {
-        requestAnimationFrame(init);
-        return;
-      }
-      cleanupFn = setupScene(container, rawW, rawH);
-    };
-
-    requestAnimationFrame(init);
-
-    return () => {
-      cleanupFn?.();
-    };
-  }, []);
-
-  return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-      }}
-    />
-  );
-}
-
-function setupScene(container: HTMLDivElement, initW: number, initH: number): () => void {
     const scene = new THREE.Scene();
-    const aspect = initW / initH;
-
-    const isMobile = window.innerWidth < 768;
-    const scaleFactor = isMobile ? Math.min(aspect, 0.75) : 1;
-
-    let BOUNDS_X = BASE_BOUNDS_X * scaleFactor;
-    let BOUNDS_Y = BASE_BOUNDS_Y * scaleFactor;
-
+    const aspect = container.clientWidth / container.clientHeight;
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    camera.position.set(0, 0, isMobile ? 28 : 35);
+    camera.position.set(0, 0, 35);
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
+      antialias: true,
       alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setSize(initW, initH);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.top = '0';
-    renderer.domElement.style.left = '0';
-    renderer.domElement.style.width = '100%';
-    renderer.domElement.style.height = '100%';
     container.appendChild(renderer.domElement);
 
     const mainGroup = new THREE.Group();
@@ -301,10 +255,9 @@ function setupScene(container: HTMLDivElement, initW: number, initH: number): ()
       requestAnimationFrame(springIn);
     };
 
-    const ballScale = isMobile ? 0.6 : 1;
     const totalTokens = PEOPLE_IMAGES.length + brandLogos.length;
-    PEOPLE_IMAGES.forEach((url, i) => createBall(url, 2.8 * ballScale, i, totalTokens));
-    brandLogos.forEach((url, i) => createBall(url, 2.2 * ballScale, i + PEOPLE_IMAGES.length, totalTokens));
+    PEOPLE_IMAGES.forEach((url, i) => createBall(url, 2.8, i, totalTokens));
+    brandLogos.forEach((url, i) => createBall(url, 2.2, i + PEOPLE_IMAGES.length, totalTokens));
 
     const mouse = new THREE.Vector2(-999, -999);
     const smoothMouse = new THREE.Vector2(-999, -999);
@@ -535,26 +488,13 @@ function setupScene(container: HTMLDivElement, initW: number, initH: number): ()
 
     const handleResize = () => {
       if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      if (w === 0 || h === 0) return;
-      const newAspect = w / h;
-      const newIsMobile = window.innerWidth < 768;
-      const newScale = newIsMobile ? Math.min(newAspect, 0.75) : 1;
-      BOUNDS_X = BASE_BOUNDS_X * newScale;
-      BOUNDS_Y = BASE_BOUNDS_Y * newScale;
-      camera.aspect = newAspect;
-      camera.position.z = newIsMobile ? 28 : 35;
+      camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      renderer.setSize(container.clientWidth, container.clientHeight);
     };
-
-    const ro = new ResizeObserver(handleResize);
-    ro.observe(container);
     window.addEventListener("resize", handleResize);
 
     return () => {
-      ro.disconnect();
       window.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("touchmove", handleTouchMove);
       container.removeEventListener("mouseleave", handleMouseLeave);
@@ -579,4 +519,7 @@ function setupScene(container: HTMLDivElement, initW: number, initH: number): ()
       renderer.dispose();
       if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
     };
+  }, []);
+
+  return <div ref={containerRef} className="w-full h-full" />;
 }

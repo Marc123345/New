@@ -99,6 +99,7 @@ export function Navigation() {
             className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
+          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
           >
             <span
               className="hidden sm:block text-[10px] uppercase tracking-[0.3em] font-medium transition-colors duration-500"
@@ -120,7 +121,7 @@ export function Navigation() {
 
       {/* Fullscreen overlay */}
       <div
-        className={`fixed inset-0 z-[105] transition-opacity duration-700 ${
+        className={`fixed inset-0 z-[110] transition-opacity duration-700 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         style={{ backgroundColor: "#0c0c0c" }}
@@ -142,7 +143,8 @@ export function Navigation() {
         {/* Close button */}
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-6 right-6 md:top-8 md:right-10 z-20 group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+          className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
           aria-label="Close menu"
         >
           <span

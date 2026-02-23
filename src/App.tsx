@@ -72,7 +72,7 @@ function AppContent() {
 
       <section
         id="hero"
-        className="relative min-h-screen overflow-hidden"
+        className="relative min-h-screen overflow-x-hidden"
         style={{ background: '#000' }}
       >
         <HeroWebGL />
@@ -88,7 +88,7 @@ function AppContent() {
             <HeroTitle>
               <ScrollReveal mode="blur" delay={0.2} className="w-full">
                 <div
-                  className="relative mx-auto w-full h-[520px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
+                  className="relative mx-auto w-full h-[300px] sm:h-[420px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
                   style={{
                     border: "3px solid var(--color-text-dark)",
                     boxShadow: "10px 10px 0 var(--color-surface-dark)",

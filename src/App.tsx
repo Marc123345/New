@@ -145,9 +145,11 @@ function AppContent() {
           <ArcSlider />
         </Section>
 
-        <Section id="testimonials" className="">
-          <Testimonials />
-        </Section>
+        <section id="testimonials">
+          <LazySection>
+            <Testimonials />
+          </LazySection>
+        </section>
 
         <div id="blog">
           <LazySection>

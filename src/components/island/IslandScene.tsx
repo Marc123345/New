@@ -60,7 +60,7 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
       <div className="relative" aria-hidden="true">
         <div
           className="relative w-full overflow-hidden"
-          style={{ height: 'clamp(340px, 44vw, 540px)' }}
+          style={{ height: 'clamp(200px, 44vw, 540px)' }}
         >
           <img
             src="https://ik.imagekit.io/qcvroy8xpd/Rectangle%20(1).png"
@@ -85,13 +85,13 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
       </div>
 
       <nav
-        className="relative flex items-center px-6 lg:px-16"
-        style={{ height: 48, marginTop: -24 }}
+        className="relative flex items-center px-4 sm:px-6 lg:px-16"
+        style={{ height: 40, marginTop: -20 }}
         role="group"
         aria-label="Core service navigation"
       >
         <div
-          className="absolute top-1/2 left-6 right-6 lg:left-16 lg:right-16 h-px"
+          className="absolute top-1/2 left-4 right-4 sm:left-6 sm:right-6 lg:left-16 lg:right-16 h-px"
           aria-hidden="true"
           style={{ background: 'rgba(164,108,252,0.15)' }}
         />
@@ -145,7 +145,7 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
       </nav>
 
       <div
-        className="grid grid-cols-1 md:grid-cols-3 px-6 lg:px-16"
+        className="grid grid-cols-1 md:grid-cols-3 px-4 sm:px-6 lg:px-16"
         style={{ gap: 0, marginTop: 4 }}
         role="group"
         aria-label="Core services overview"
@@ -161,7 +161,7 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
               aria-label={`View details for ${label}`}
               className="relative text-left cursor-pointer border-none bg-transparent group focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
               style={{
-                padding: 'clamp(20px, 2.5vw, 32px) clamp(16px, 2vw, 24px)',
+                padding: '20px 16px',
                 outlineColor: PILLAR_COLORS_HEX[i],
               }}
             >
@@ -177,7 +177,7 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
               />
 
               <div
-                className="absolute left-0 top-0 bottom-0 w-[2px]"
+                className="absolute left-0 top-0 bottom-0 w-[2px] md:block hidden"
                 aria-hidden="true"
                 style={{
                   background: isActive ? PILLAR_COLORS_HEX[i] : 'transparent',
@@ -186,55 +186,82 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
                 }}
               />
 
-              <div
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
-                  fontWeight: 700,
-                  color: isActive ? 'var(--color-text-dark)' : 'rgba(35,35,35,0.55)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.2,
-                  marginBottom: 10,
-                  transition: `color ${TRANSITION_MICRO}`,
-                }}
-              >
-                {label}
-              </div>
-
-              <p
-                className="hidden sm:block"
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  color: isActive ? 'rgba(35,35,35,0.55)' : 'rgba(35,35,35,0.3)',
-                  marginBottom: 16,
-                  transition: `color ${TRANSITION_MACRO}`,
-                }}
-              >
-                {PILLAR_SUMMARIES[i]}
-              </p>
-
-              <span
-                className="inline-flex items-center gap-1.5"
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: 10,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase' as const,
-                  color: isActive ? PILLAR_COLORS_HEX[i] : 'rgba(35,35,35,0.15)',
-                  transition: `color ${TRANSITION_MICRO}`,
-                }}
-              >
-                View details
-                <ArrowRight
-                  size={11}
+              <div className="flex items-start gap-3 md:block">
+                <div
+                  className="flex-shrink-0 flex items-center justify-center md:hidden"
                   style={{
-                    transform: isActive ? 'translateX(3px)' : 'translateX(0)',
-                    transition: `transform ${TRANSITION_MICRO}`,
+                    width: 32,
+                    height: 32,
+                    border: `1px solid ${isActive ? PILLAR_COLORS_HEX[i] : 'rgba(35,35,35,0.1)'}`,
+                    backgroundColor: isActive ? PILLAR_COLORS_HEX[i] + '15' : 'rgba(35,35,35,0.03)',
+                    transition: `all ${TRANSITION_MICRO}`,
+                    flexShrink: 0,
+                    marginTop: 2,
                   }}
-                />
-              </span>
+                >
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-stack-heading)',
+                      fontSize: 10,
+                      letterSpacing: '0.05em',
+                      color: isActive ? PILLAR_COLORS_HEX[i] : 'rgba(35,35,35,0.25)',
+                    }}
+                  >
+                    0{i + 1}
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-stack-heading)',
+                      fontSize: 'clamp(1rem, 3.5vw, 1.25rem)',
+                      fontWeight: 700,
+                      color: isActive ? 'var(--color-text-dark)' : 'rgba(35,35,35,0.55)',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.2,
+                      marginBottom: 8,
+                      transition: `color ${TRANSITION_MICRO}`,
+                    }}
+                  >
+                    {label}
+                  </div>
+
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-stack-body)',
+                      fontSize: 13,
+                      lineHeight: 1.7,
+                      color: isActive ? 'rgba(35,35,35,0.55)' : 'rgba(35,35,35,0.35)',
+                      marginBottom: 12,
+                      transition: `color ${TRANSITION_MACRO}`,
+                    }}
+                  >
+                    {PILLAR_SUMMARIES[i]}
+                  </p>
+
+                  <span
+                    className="inline-flex items-center gap-1.5"
+                    style={{
+                      fontFamily: 'var(--font-stack-heading)',
+                      fontSize: 10,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase' as const,
+                      color: isActive ? PILLAR_COLORS_HEX[i] : 'rgba(35,35,35,0.2)',
+                      transition: `color ${TRANSITION_MICRO}`,
+                    }}
+                  >
+                    View details
+                    <ArrowRight
+                      size={11}
+                      style={{
+                        transform: isActive ? 'translateX(3px)' : 'translateX(0)',
+                        transition: `transform ${TRANSITION_MICRO}`,
+                      }}
+                    />
+                  </span>
+                </div>
+              </div>
             </motion.button>
           );
         })}

@@ -66,7 +66,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -85,7 +85,8 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                 className="relative w-full focus:outline-none flex flex-col"
                 style={{
                   maxWidth: 760,
-                  maxHeight: '88vh',
+                  maxHeight: '92dvh',
+                  borderRadius: '0',
                   background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
                   border: `1px solid ${accent.border}`,
                   boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px -16px rgba(0,0,0,0.8), 0 0 60px -20px ${accent.from}55`,
@@ -102,7 +103,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
 
                 {/* Header zone */}
                 <div
-                  className="relative flex-shrink-0 px-8 pt-8 pb-7"
+                  className="relative flex-shrink-0 px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-7"
                   style={{ borderBottom: `1px solid rgba(255,255,255,0.06)` }}
                 >
                   {/* Decorative number */}
@@ -143,7 +144,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.12, duration: 0.45 }}
-                    className="flex items-center gap-3 mb-5"
+                    className="flex items-center gap-3 mb-4 sm:mb-5"
                     style={{ paddingLeft: '44px' }}
                   >
                     <span
@@ -205,7 +206,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   className="flex-1 overflow-y-auto"
                   style={{ scrollbarWidth: 'thin', scrollbarColor: `${accent.border} transparent` }}
                 >
-                  <div className="px-8 py-7 space-y-8">
+                  <div className="px-5 py-5 sm:px-8 sm:py-7 space-y-6 sm:space-y-8">
 
                     {/* Description */}
                     <motion.p
@@ -232,13 +233,13 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.4 + i * 0.07, type: 'spring', stiffness: 300, damping: 22 }}
-                          className="flex flex-col items-center justify-center py-5 px-4 text-center"
+                          className="flex flex-col items-center justify-center py-4 px-2 sm:py-5 sm:px-4 text-center"
                           style={{ background: '#0d0d14' }}
                         >
                           <div
-                            className="font-extrabold leading-none tracking-[-0.03em] mb-2"
+                            className="font-extrabold leading-none tracking-[-0.03em] mb-1.5"
                             style={{
-                              fontSize: 'clamp(1.4rem, 3.5vw, 1.85rem)',
+                              fontSize: 'clamp(1.1rem, 4vw, 1.85rem)',
                               color: accent.dot,
                               fontFamily: 'var(--font-stack-heading)',
                             }}
@@ -246,7 +247,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                             {stat.value}
                           </div>
                           <div
-                            className="text-[11px] leading-[1.4] tracking-[0.03em]"
+                            className="text-[10px] sm:text-[11px] leading-[1.4] tracking-[0.03em]"
                             style={{ color: 'rgba(255,255,255,0.32)', fontFamily: 'var(--font-stack-body)' }}
                           >
                             {stat.label}
@@ -331,7 +332,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
-                  className="flex-shrink-0 flex items-center justify-between px-8 py-5"
+                  className="flex-shrink-0 flex items-center justify-between px-4 py-4 sm:px-8 sm:py-5"
                   style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.25)' }}
                 >
                   <button

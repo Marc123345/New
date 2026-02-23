@@ -23,7 +23,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-[150]"
             style={{
               backgroundColor: 'rgba(5,5,5,0.95)',
               backdropFilter: 'blur(28px)'

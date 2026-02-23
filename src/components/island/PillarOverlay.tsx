@@ -57,7 +57,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             onClick={onClose}
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-[150]"
             style={{ background: 'rgba(4,4,8,0.82)', backdropFilter: 'blur(20px)' }}
           />
 

@@ -45,7 +45,7 @@ export function VideoOverlay({ isOpen, onClose }: VideoOverlayProps) {
             transition={{ duration: 0.35 }}
             onClick={onClose}
             className="fixed inset-0"
-            style={{ zIndex: 200, background: 'rgba(5,5,5,0.92)', backdropFilter: 'blur(20px)' }}
+            style={{ zIndex: 150, background: 'rgba(5,5,5,0.92)', backdropFilter: 'blur(20px)' }}
           />
 
           <motion.div
@@ -55,7 +55,7 @@ export function VideoOverlay({ isOpen, onClose }: VideoOverlayProps) {
             exit={{ opacity: 0, scale: 0.97, y: -12 }}
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
             className="fixed inset-0 flex items-center justify-center p-4 md:p-10"
-            style={{ zIndex: 201, pointerEvents: 'none' }}
+            style={{ zIndex: 151, pointerEvents: 'none' }}
           >
             <div
               className="relative w-full"

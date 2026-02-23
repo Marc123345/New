@@ -42,7 +42,7 @@ export function BlogOverlay({ post, onClose, onNavigate }: BlogOverlayProps) {
 
   return (
     <div
-      className="blog-overlay fixed inset-0 z-[9999] flex items-center justify-center"
+      className="blog-overlay fixed inset-0 z-[150] flex items-center justify-center"
       style={{ backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)" }}
       onClick={handleOverlayClick}
     >

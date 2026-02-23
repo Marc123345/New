@@ -39,7 +39,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-[150]"
             style={{ background: 'rgba(4,4,8,0.80)', backdropFilter: 'blur(18px)' }}
           />
 
@@ -48,7 +48,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+            className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-6"
             onClick={onClose}
             role="dialog"
             aria-modal="true"

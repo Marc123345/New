@@ -50,8 +50,8 @@ const Section = ({
     id={id}
     className={`${className} px-4 md:px-8`}
     style={noPadding ? {} : {
-      paddingTop: 'var(--space-8x)',
-      paddingBottom: 'var(--space-8x)'
+      paddingTop: 'clamp(var(--space-4x), 6vw, var(--space-8x))',
+      paddingBottom: 'clamp(var(--space-4x), 6vw, var(--space-8x))',
     }}
   >
     <LazySection>
@@ -102,9 +102,7 @@ function AppContent() {
                   className="absolute inset-0 w-full h-full object-cover"
                   src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214"
                 />
-                <div className="absolute inset-0">
-                  <HeroWebGLPanel />
-                </div>
+                <HeroWebGLPanel />
               </div>
             </HeroTitle>
           </div>

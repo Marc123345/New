@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   motion,
   useScroll,
@@ -226,6 +226,13 @@ const ChapterSlide = ({
 export function HeroStory() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // 1. Set up Framer Motion scroll hook
   const { scrollYProgress } = useScroll({
@@ -266,7 +273,10 @@ export function HeroStory() {
     <div
       ref={containerRef}
       className="relative"
-      style={{ height: `${chapters.length * 100}vh`, background: '#000' }}
+      style={{
+        height: `${chapters.length * (isMobile ? 75 : 100)}vh`,
+        background: '#000',
+      }}
     >
       <div className="sticky top-0 h-screen overflow-hidden">
         <HeroWebGL />

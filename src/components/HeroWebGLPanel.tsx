@@ -113,9 +113,41 @@ export function HeroWebGLPanel() {
     const container = containerRef.current;
     if (!container) return;
 
+    let cleanupFn: (() => void) | null = null;
+
+    const init = () => {
+      const rawW = container.getBoundingClientRect().width || container.offsetWidth || container.clientWidth;
+      const rawH = container.getBoundingClientRect().height || container.offsetHeight || container.clientHeight;
+      if (rawW < 10 || rawH < 10) {
+        requestAnimationFrame(init);
+        return;
+      }
+      cleanupFn = setupScene(container, rawW, rawH);
+    };
+
+    requestAnimationFrame(init);
+
+    return () => {
+      cleanupFn?.();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+      }}
+    />
+  );
+}
+
+function setupScene(container: HTMLDivElement, initW: number, initH: number): () => void {
     const scene = new THREE.Scene();
-    const initW = container.clientWidth || container.offsetWidth || window.innerWidth;
-    const initH = container.clientHeight || container.offsetHeight || window.innerHeight;
     const aspect = initW / initH;
 
     const isMobile = window.innerWidth < 768;
@@ -136,6 +168,11 @@ export function HeroWebGLPanel() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
     container.appendChild(renderer.domElement);
 
     const mainGroup = new THREE.Group();
@@ -542,7 +579,4 @@ export function HeroWebGLPanel() {
       renderer.dispose();
       if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement);
     };
-  }, []);
-
-  return <div ref={containerRef} className="w-full h-full" />;
 }

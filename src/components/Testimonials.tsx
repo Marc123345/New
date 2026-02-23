@@ -61,13 +61,21 @@ const TESTIMONIALS = [
 
 export function Testimonials() {
   const containerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
   return (
-    <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
+    <div ref={containerRef} className="relative bg-[var(--color-surface-dark)]" style={{ height: isMobile ? '200vh' : '250vh' }}>
       {/* STICKY CANVAS */}
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
 

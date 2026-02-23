@@ -11,122 +11,79 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-// Physics - tuned to match Lusion's exact feel
+const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
+const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.8 : 2.2));
+const N = ALL_URLS.length;
+
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
-
-// Centralized attractor - strong enough to pull objects into a tight cluster
 const ATTRACTOR_BASE = 1.8;
-// Scales with distance so far-away objects accelerate hard back toward center
 const ATTRACTOR_SCALE = 0.14;
-
-// High restitution = lofty, buoyant bounces between objects
 const RESTITUTION = 0.82;
-
-// Low damping = objects stay energetic for a long time (lofty feeling)
-const DAMPING = 0.994;
-
-// Hard contact radius for cursor collision push
-const CURSOR_CONTACT_RADIUS = 2.8;
-// Soft field radius - objects feel the cursor before contact (Lusion feel)
-const CURSOR_FIELD_RADIUS = 6.5;
-// Soft field strength multiplier
-const CURSOR_FIELD_STRENGTH = 22.0;
-
-// Max velocity
-const MAX_SPEED = 11.0;
-
-// Micro-impulse to keep cluster alive at all times
+const DAMPING_PER_60 = 0.994;
+const CURSOR_CONTACT_R = 2.8;
+const CURSOR_FIELD_R = 6.5;
+const CURSOR_FIELD_STR = 22.0;
+const MAX_SPEED_SQ = 11.0 * 11.0;
 const MICRO_IMPULSE = 1.4;
-const MICRO_INTERVAL_MIN = 0.3;
-const MICRO_INTERVAL_MAX = 0.8;
-
-interface PhysicsBall {
-  mesh: THREE.Group;
-  innerGroup: THREE.Group;
-  velocity: THREE.Vector3;
-  position: THREE.Vector3;
-  radius: number;
-  mass: number;
-  squishX: number;
-  squishY: number;
-  spawned: boolean;
-  rotSpeedX: number;
-  rotSpeedY: number;
-  rotSpeedZ: number;
-  nextImpulseTime: number;
-}
+const MICRO_INT_MIN = 0.3;
+const MICRO_INT_RNG = 0.5;
 
 const CUBE_VERT = `
 varying vec3 vNormal;
 varying vec3 vViewDir;
 varying vec2 vUv;
-
 void main() {
   vUv = uv;
-  vec4 worldPos = modelMatrix * vec4(position, 1.0);
-  vec4 viewPos = viewMatrix * worldPos;
-  vViewDir = normalize(-viewPos.xyz);
+  vec4 wp = modelMatrix * vec4(position, 1.0);
+  vec4 vp = viewMatrix * wp;
+  vViewDir = normalize(-vp.xyz);
   vNormal = normalize(normalMatrix * normal);
-  gl_Position = projectionMatrix * viewPos;
-}
-`;
+  gl_Position = projectionMatrix * vp;
+}`;
 
 const CUBE_FRAG = `
 uniform sampler2D uMap;
-uniform float uFresnelPower;
 uniform vec3 uRimColor;
-uniform float uRimStrength;
-uniform float uGlossiness;
-
+uniform float uRimStr;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 varying vec2 vUv;
-
 void main() {
-  vec4 texColor = texture2D(uMap, vUv);
+  vec4 tex = texture2D(uMap, vUv);
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.2);
+  vec3 rim = uRimColor * fr * uRimStr;
+  vec3 L = normalize(vec3(0.6, 0.8, 1.0));
+  float diff = max(dot(vNormal, L), 0.0);
+  vec3 H = normalize(L + vViewDir);
+  float spec = pow(max(dot(vNormal, H), 0.0), 90.0);
+  gl_FragColor = vec4(tex.rgb * (0.6 + diff * 0.4) + spec * 0.85 + rim, 1.0);
+}`;
 
-  float fresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), uFresnelPower);
-  vec3 rimGlow = uRimColor * fresnel * uRimStrength;
-
-  vec3 lightDir = normalize(vec3(0.6, 0.8, 1.0));
-  float diff = max(dot(vNormal, lightDir), 0.0);
-  vec3 halfVec = normalize(lightDir + vViewDir);
-  float spec = pow(max(dot(vNormal, halfVec), 0.0), uGlossiness);
-
-  vec3 col = texColor.rgb * (0.6 + diff * 0.4) + vec3(spec * 0.85) + rimGlow;
-
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
-
-const EDGE_VERT = `
+const SHELL_VERT = `
 varying vec3 vNormal;
 varying vec3 vViewDir;
-
 void main() {
-  vec4 worldPos = modelMatrix * vec4(position, 1.0);
-  vec4 viewPos = viewMatrix * worldPos;
-  vViewDir = normalize(-viewPos.xyz);
+  vec4 vp = viewMatrix * modelMatrix * vec4(position, 1.0);
+  vViewDir = normalize(-vp.xyz);
   vNormal = normalize(normalMatrix * normal);
-  gl_Position = projectionMatrix * viewPos;
-}
-`;
+  gl_Position = projectionMatrix * vp;
+}`;
 
-const EDGE_FRAG = `
-uniform vec3 uShellColor;
-uniform float uFresnelPower;
-uniform float uOpacity;
-
+const SHELL_FRAG = `
+uniform vec3 uColor;
 varying vec3 vNormal;
 varying vec3 vViewDir;
-
 void main() {
-  float fresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), uFresnelPower);
-  float alpha = fresnel * uOpacity;
-  gl_FragColor = vec4(uShellColor * fresnel, alpha);
-}
-`;
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
+  gl_FragColor = vec4(uColor * fr, fr * 0.5);
+}`;
+
+const SHELL_COLORS = [
+  new THREE.Color(0x88ccff), new THREE.Color(0xffd0a0),
+  new THREE.Color(0xaaffcc), new THREE.Color(0xffaacc),
+  new THREE.Color(0xccddff), new THREE.Color(0xffeebb),
+];
 
 export function HeroWebGLPanel() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -136,15 +93,10 @@ export function HeroWebGLPanel() {
     if (!container) return;
 
     const scene = new THREE.Scene();
-    const aspect = container.clientWidth / container.clientHeight;
-    const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 35);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance",
-    });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -154,404 +106,331 @@ export function HeroWebGLPanel() {
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
 
-    const objects: PhysicsBall[] = [];
+    // Shared geometries - one per unique size to avoid redundant GPU uploads
+    const geoCache = new Map<number, [THREE.BoxGeometry, THREE.BoxGeometry]>();
+    const getGeos = (r: number) => {
+      const key = Math.round(r * 10);
+      if (!geoCache.has(key)) {
+        const s = r * 2;
+        geoCache.set(key, [new THREE.BoxGeometry(s, s, s), new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07)]);
+      }
+      return geoCache.get(key)!;
+    };
+
+    // Flat typed arrays for all physics state - eliminates per-frame GC from THREE.Vector3
+    const px = new Float32Array(N);   // position x
+    const py = new Float32Array(N);   // position y
+    const pz = new Float32Array(N);   // position z
+    const vx = new Float32Array(N);   // velocity x
+    const vy = new Float32Array(N);   // velocity y
+    const vz = new Float32Array(N);   // velocity z
+    const radii = new Float32Array(RADII);
+    const masses = new Float32Array(N);
+    const sqX = new Float32Array(N).fill(1);  // squish x
+    const sqY = new Float32Array(N).fill(1);  // squish y
+    const rotX = new Float32Array(N); // rotation speeds
+    const rotY = new Float32Array(N);
+    const rotZ = new Float32Array(N);
+    const nextImpulse = new Float32Array(N);
+    const spawned = new Uint8Array(N);
+    const spawnStart = new Float32Array(N);
+
+    const meshes: THREE.Group[] = [];
+    const innerGroups: THREE.Group[] = [];
     const loadedTextures: THREE.Texture[] = [];
     const textureLoader = new THREE.TextureLoader();
     textureLoader.setCrossOrigin("anonymous");
 
-    const SHELL_COLORS = [
-      new THREE.Color(0x88ccff),
-      new THREE.Color(0xffd0a0),
-      new THREE.Color(0xaaffcc),
-      new THREE.Color(0xffaacc),
-      new THREE.Color(0xccddff),
-      new THREE.Color(0xffeebb),
-    ];
+    for (let i = 0; i < N; i++) {
+      const r = radii[i];
+      masses[i] = r * r;
+      rotX[i] = (Math.random() - 0.5) * 0.7;
+      rotY[i] = (Math.random() - 0.5) * 0.7;
+      rotZ[i] = (Math.random() - 0.5) * 0.3;
+      nextImpulse[i] = Math.random() * MICRO_INT_RNG;
+      spawnStart[i] = i * 0.06;
 
-    const createBall = (url: string, radius: number, index: number, total: number) => {
+      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+      const dist = 0.55 + Math.random() * 0.4;
+      px[i] = Math.cos(angle) * BOUNDS_X * dist;
+      py[i] = Math.sin(angle) * BOUNDS_Y * dist;
+      pz[i] = (Math.random() - 0.5) * 2.5;
+
       const group = new THREE.Group();
-      const innerGroup = new THREE.Group();
-      group.add(innerGroup);
+      const inner = new THREE.Group();
+      group.add(inner);
+      group.position.set(px[i], py[i], pz[i]);
+      group.scale.setScalar(0);
+      mainGroup.add(group);
+      meshes.push(group);
+      innerGroups.push(inner);
 
-      const texture = textureLoader.load(url, (tex) => {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        tex.needsUpdate = true;
+      inner.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+
+      const rimColor = SHELL_COLORS[i % SHELL_COLORS.length];
+      const [cubeGeo, shellGeo] = getGeos(r);
+
+      const tex = textureLoader.load(ALL_URLS[i], (t) => {
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+        t.needsUpdate = true;
       }, undefined, () => {});
-      loadedTextures.push(texture);
+      loadedTextures.push(tex);
 
-      const rimColor = SHELL_COLORS[index % SHELL_COLORS.length];
-      const side = radius * 2;
-      const cubeGeo = new THREE.BoxGeometry(side, side, side);
-
-      const faceMats = Array.from({ length: 6 }, () => new THREE.ShaderMaterial({
+      // Single shared material per cube (not 6 separate ones)
+      const cubeMat = new THREE.ShaderMaterial({
         vertexShader: CUBE_VERT,
         fragmentShader: CUBE_FRAG,
-        uniforms: {
-          uMap: { value: texture },
-          uFresnelPower: { value: 2.2 },
-          uRimColor: { value: rimColor },
-          uRimStrength: { value: 1.4 },
-          uGlossiness: { value: 90.0 },
-        },
-      }));
+        uniforms: { uMap: { value: tex }, uRimColor: { value: rimColor }, uRimStr: { value: 1.4 } },
+      });
+      inner.add(new THREE.Mesh(cubeGeo, cubeMat));
 
-      const cube = new THREE.Mesh(cubeGeo, faceMats);
-      innerGroup.add(cube);
-
-      const shellGeo = new THREE.BoxGeometry(side * 1.07, side * 1.07, side * 1.07);
       const shellMat = new THREE.ShaderMaterial({
-        vertexShader: EDGE_VERT,
-        fragmentShader: EDGE_FRAG,
-        uniforms: {
-          uShellColor: { value: rimColor },
-          uFresnelPower: { value: 3.0 },
-          uOpacity: { value: 0.5 },
-        },
-        transparent: true,
-        side: THREE.BackSide,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        vertexShader: SHELL_VERT,
+        fragmentShader: SHELL_FRAG,
+        uniforms: { uColor: { value: rimColor } },
+        transparent: true, side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending,
       });
-      const shell = new THREE.Mesh(shellGeo, shellMat);
-      innerGroup.add(shell);
+      inner.add(new THREE.Mesh(shellGeo, shellMat));
+    }
 
-      innerGroup.rotation.set(
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2
-      );
-
-      // Spawn from edges so they visibly fall into cluster at start
-      const angle = (index / total) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
-      const spawnDist = 0.55 + Math.random() * 0.4;
-      const x = Math.cos(angle) * BOUNDS_X * spawnDist;
-      const y = Math.sin(angle) * BOUNDS_Y * spawnDist;
-      const z = (Math.random() - 0.5) * 2.5;
-
-      group.position.set(x, y, z);
-      group.scale.set(0, 0, 0);
-      mainGroup.add(group);
-
-      objects.push({
-        mesh: group,
-        innerGroup,
-        velocity: new THREE.Vector3(
-          (Math.random() - 0.5) * 0.3,
-          (Math.random() - 0.5) * 0.3,
-          0
-        ),
-        position: new THREE.Vector3(x, y, z),
-        radius,
-        mass: radius * radius,
-        squishX: 1,
-        squishY: 1,
-        spawned: false,
-        rotSpeedX: (Math.random() - 0.5) * 0.7,
-        rotSpeedY: (Math.random() - 0.5) * 0.7,
-        rotSpeedZ: (Math.random() - 0.5) * 0.3,
-        nextImpulseTime: Math.random() * MICRO_INTERVAL_MAX,
-      });
-
-      const thisObj = objects[objects.length - 1];
-      const delay = 0.06 * index;
-      const startTime = performance.now() + delay * 1000;
-      const springIn = () => {
-        const elapsed = (performance.now() - startTime) / 1000;
-        if (elapsed < 0) { requestAnimationFrame(springIn); return; }
-        const t = Math.min(elapsed / 1.0, 1);
-        const ease = t < 0.5
-          ? 4 * t * t * t
-          : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        const bounce = ease * (1 + 0.1 * Math.sin(elapsed * 10) * Math.max(0, 1 - t * 1.8));
-        group.scale.setScalar(bounce);
-        if (t < 1) {
-          requestAnimationFrame(springIn);
-        } else {
-          group.scale.setScalar(1);
-          thisObj.spawned = true;
-        }
-      };
-      requestAnimationFrame(springIn);
-    };
-
-    const totalTokens = PEOPLE_IMAGES.length + brandLogos.length;
-    PEOPLE_IMAGES.forEach((url, i) => createBall(url, 2.8, i, totalTokens));
-    brandLogos.forEach((url, i) => createBall(url, 2.2, i + PEOPLE_IMAGES.length, totalTokens));
-
-    const mouse = new THREE.Vector2(-999, -999);
-    const smoothMouse = new THREE.Vector2(-999, -999);
-    const raycaster = new THREE.Raycaster();
-    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    const mouse3D = new THREE.Vector3();
-    const smoothMouse3D = new THREE.Vector3(-9999, -9999, 0);
-    const prevSmooth3D = new THREE.Vector3(-9999, -9999, 0);
-    const cursorVelocity = new THREE.Vector3();
-
+    // Cursor state
+    let cx3d = -9999, cy3d = -9999;
+    let prevCx = -9999, prevCy = -9999;
+    let cvx = 0, cvy = 0;
     let mouseActive = false;
+    let mouseSmoothX = -999, mouseSmoothY = -999;
+    const rawMouseX = { v: -999 }, rawMouseY = { v: -999 };
+
+    const raycaster = new THREE.Raycaster();
+    const mouse2D = new THREE.Vector2();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const hitPt = new THREE.Vector3();
 
     const updateMouse = (clientX: number, clientY: number) => {
       const rect = container.getBoundingClientRect();
-      mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      raycaster.ray.intersectPlane(plane, mouse3D);
+      mouse2D.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      mouse2D.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse2D, camera);
+      raycaster.ray.intersectPlane(plane, hitPt);
+      rawMouseX.v = hitPt.x;
+      rawMouseY.v = hitPt.y;
+      mouseSmoothX = mouse2D.x;
+      mouseSmoothY = mouse2D.y;
       mouseActive = true;
     };
 
     const handleMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!e.touches[0]) return;
-      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
-    };
+    const handleTouchMove = (e: TouchEvent) => { if (e.touches[0]) updateMouse(e.touches[0].clientX, e.touches[0].clientY); };
     const handleMouseLeave = () => { mouseActive = false; };
 
     window.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("touchmove", handleTouchMove, { passive: true });
     container.addEventListener("mouseleave", handleMouseLeave);
 
-    const tmpN = new THREE.Vector3();
-    const tmpRelVel = new THREE.Vector3();
+    let hidden = false;
+    const handleVisibility = () => { hidden = document.hidden; };
+    document.addEventListener("visibilitychange", handleVisibility);
 
-    const applySquish = (obj: PhysicsBall, nx: number, ny: number, strength: number) => {
-      const amount = Math.min(strength * 0.075, 0.45);
-      obj.squishX = 1 + Math.abs(ny) * amount - Math.abs(nx) * amount * 0.6;
-      obj.squishY = 1 + Math.abs(nx) * amount - Math.abs(ny) * amount * 0.6;
-    };
-
-    const resolveCollision = (a: PhysicsBall, b: PhysicsBall) => {
-      const dx = b.position.x - a.position.x;
-      const dy = b.position.y - a.position.y;
-      const dz = b.position.z - a.position.z;
-      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-      const minDist = a.radius + b.radius;
-      if (dist >= minDist || dist < 0.001) return;
-
-      const nx = dx / dist;
-      const ny = dy / dist;
-      const nz = dz / dist;
-      const overlap = minDist - dist;
-      const totalMass = a.mass + b.mass;
-
-      a.position.x -= nx * overlap * (b.mass / totalMass);
-      a.position.y -= ny * overlap * (b.mass / totalMass);
-      a.position.z -= nz * overlap * (b.mass / totalMass);
-      b.position.x += nx * overlap * (a.mass / totalMass);
-      b.position.y += ny * overlap * (a.mass / totalMass);
-      b.position.z += nz * overlap * (a.mass / totalMass);
-
-      tmpN.set(nx, ny, nz);
-      tmpRelVel.set(
-        a.velocity.x - b.velocity.x,
-        a.velocity.y - b.velocity.y,
-        a.velocity.z - b.velocity.z
-      );
-      const relVelAlongN = tmpRelVel.dot(tmpN);
-      if (relVelAlongN > 0) return;
-
-      const impulse = (-(1 + RESTITUTION) * relVelAlongN) / totalMass;
-      a.velocity.x += nx * impulse * b.mass;
-      a.velocity.y += ny * impulse * b.mass;
-      a.velocity.z += nz * impulse * b.mass;
-      b.velocity.x -= nx * impulse * a.mass;
-      b.velocity.y -= ny * impulse * a.mass;
-      b.velocity.z -= nz * impulse * a.mass;
-
-      const impact = Math.abs(relVelAlongN);
-      if (impact > 0.1) {
-        applySquish(a, nx, ny, impact);
-        applySquish(b, -nx, -ny, impact);
-      }
-    };
-
-    // Lusion cursor: soft radial field + hard contact push
-    // Soft field: objects within CURSOR_FIELD_RADIUS feel a smooth inverse-square repulsion
-    // This is what gives Lusion that "objects feel you coming" quality before you touch them
-    const applyCursorForce = (obj: PhysicsBall, cx: number, cy: number, cvx: number, cvy: number, subDt: number) => {
-      const dx = obj.position.x - cx;
-      const dy = obj.position.y - cy;
-      const distSq = dx * dx + dy * dy;
-      const dist = Math.sqrt(distSq);
-
-      // Soft field: smooth falloff over CURSOR_FIELD_RADIUS
-      if (dist < CURSOR_FIELD_RADIUS && dist > 0.01) {
-        const t = 1.0 - dist / CURSOR_FIELD_RADIUS;
-        // Cubic ease for smooth falloff
-        const fieldMag = t * t * t * CURSOR_FIELD_STRENGTH;
-        const nx = dx / dist;
-        const ny = dy / dist;
-        obj.velocity.x += nx * fieldMag * subDt;
-        obj.velocity.y += ny * fieldMag * subDt;
-      }
-
-      // Hard contact: rigid body push with velocity transfer
-      const contactMin = obj.radius + CURSOR_CONTACT_RADIUS;
-      if (dist < contactMin && dist > 0.001) {
-        const nx = dx / dist;
-        const ny = dy / dist;
-        const overlap = contactMin - dist;
-
-        // Positional correction
-        obj.position.x += nx * overlap * 1.05;
-        obj.position.y += ny * overlap * 1.05;
-
-        const cursorSpeed = Math.sqrt(cvx * cvx + cvy * cvy);
-        const boost = Math.min(cursorSpeed * 0.7 + 1.5, 5.0);
-
-        const relVx = obj.velocity.x - cvx;
-        const relVy = obj.velocity.y - cvy;
-        const relVn = relVx * nx + relVy * ny;
-
-        const baseImpulse = Math.max(-(1 + RESTITUTION) * relVn, 1.5);
-        const impulse = baseImpulse * boost;
-
-        obj.velocity.x += nx * impulse;
-        obj.velocity.y += ny * impulse;
-
-        applySquish(obj, nx, ny, impulse * 0.4);
-      }
-    };
+    let tiltX = 0, tiltY = 0;
+    let time = 0;
 
     const clock = new THREE.Clock();
     let animId: number;
-    const groupTilt = new THREE.Vector2();
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      if (hidden) return;
+
       const rawDelta = clock.getDelta();
-      const delta = Math.min(rawDelta, 0.05);
-      const time = clock.elapsedTime;
+      const dt = Math.min(rawDelta, 0.05);
+      time += dt;
 
-      smoothMouse.lerp(mouse, 0.08);
-
-      prevSmooth3D.copy(smoothMouse3D);
+      // Smooth cursor tracking
       if (mouseActive) {
-        smoothMouse3D.lerp(mouse3D, 0.14);
+        cx3d += (rawMouseX.v - cx3d) * 0.14;
+        cy3d += (rawMouseY.v - cy3d) * 0.14;
       }
-      cursorVelocity.subVectors(smoothMouse3D, prevSmooth3D).divideScalar(Math.max(delta, 0.008));
+      const newCvx = (cx3d - prevCx) / Math.max(dt, 0.008);
+      const newCvy = (cy3d - prevCy) / Math.max(dt, 0.008);
+      cvx = newCvx;
+      cvy = newCvy;
+      prevCx = cx3d;
+      prevCy = cy3d;
 
-      // Subtle group tilt follows mouse
-      groupTilt.x = THREE.MathUtils.lerp(groupTilt.x, smoothMouse.x * 0.05, 0.03);
-      groupTilt.y = THREE.MathUtils.lerp(groupTilt.y, -smoothMouse.y * 0.04, 0.03);
-      mainGroup.rotation.y = groupTilt.x;
-      mainGroup.rotation.x = groupTilt.y;
+      // Group tilt
+      const targetTiltX = mouseActive ? mouseSmoothX * 0.05 : 0;
+      const targetTiltY = mouseActive ? -mouseSmoothY * 0.04 : 0;
+      tiltX += (targetTiltX - tiltX) * 0.03;
+      tiltY += (targetTiltY - tiltY) * 0.03;
+      mainGroup.rotation.y = tiltX;
+      mainGroup.rotation.x = tiltY;
 
-      const SUB = 8;
-      const subDelta = delta / SUB;
-      const cVelX = cursorVelocity.x;
-      const cVelY = cursorVelocity.y;
+      // Fewer substeps when idle - saves CPU when no cursor interaction
+      const SUB = mouseActive ? 8 : 4;
+      const subDt = dt / SUB;
+      const dampFactor = Math.pow(DAMPING_PER_60, subDt * 60);
 
+      // Spawn animation (replaces separate RAF per object)
+      for (let i = 0; i < N; i++) {
+        if (spawned[i]) continue;
+        const elapsed = time - spawnStart[i];
+        if (elapsed < 0) continue;
+        const t = Math.min(elapsed / 1.0, 1);
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const s = ease * (1 + 0.1 * Math.sin(elapsed * 10) * Math.max(0, 1 - t * 1.8));
+        meshes[i].scale.setScalar(Math.min(s, 1));
+        if (t >= 1) {
+          meshes[i].scale.setScalar(1);
+          spawned[i] = 1;
+        }
+      }
+
+      // Physics substeps
       for (let s = 0; s < SUB; s++) {
-        for (let i = 0; i < objects.length; i++) {
-          const obj = objects[i];
 
-          // Centralized attractor force - this is the heart of the Lusion simulation
-          // Objects far from center feel much stronger pull (attractor scale with distance)
-          const px = obj.position.x;
-          const py = obj.position.y;
-          const distFromCenter = Math.sqrt(px * px + py * py);
-          const attractMag = ATTRACTOR_BASE + distFromCenter * ATTRACTOR_SCALE;
-          obj.velocity.x -= px * attractMag * subDelta;
-          obj.velocity.y -= py * attractMag * subDelta;
+        // Forces + integrate
+        for (let i = 0; i < N; i++) {
+          const ix = px[i], iy = py[i];
 
-          // Tiny downward bias adds organic asymmetry
-          obj.velocity.y -= 0.05 * subDelta;
+          // Attractor toward center - strength grows with distance
+          const distSq = ix * ix + iy * iy;
+          const dist = Math.sqrt(distSq);
+          const aM = (ATTRACTOR_BASE + dist * ATTRACTOR_SCALE) * subDt;
+          vx[i] -= ix * aM;
+          vy[i] -= iy * aM + 0.05 * subDt;
 
-          // Low damping - preserves lofty buoyant energy
-          obj.velocity.multiplyScalar(Math.pow(DAMPING, subDelta * 60));
+          // Damping
+          vx[i] *= dampFactor;
+          vy[i] *= dampFactor;
 
-          // Speed cap
-          const spd = Math.sqrt(obj.velocity.x * obj.velocity.x + obj.velocity.y * obj.velocity.y);
-          if (spd > MAX_SPEED) {
-            const sc = MAX_SPEED / spd;
-            obj.velocity.x *= sc;
-            obj.velocity.y *= sc;
+          // Speed cap (squared comparison - no sqrt needed)
+          const spd2 = vx[i] * vx[i] + vy[i] * vy[i];
+          if (spd2 > MAX_SPEED_SQ) {
+            const sc = Math.sqrt(MAX_SPEED_SQ / spd2);
+            vx[i] *= sc;
+            vy[i] *= sc;
           }
 
-          obj.position.x += obj.velocity.x * subDelta;
-          obj.position.y += obj.velocity.y * subDelta;
-          obj.position.z += obj.velocity.z * subDelta;
+          px[i] += vx[i] * subDt;
+          py[i] += vy[i] * subDt;
+          pz[i] += vz[i] * subDt;
 
-          // Wall bounces - the attractor makes these rare since objects pull back to center
-          const maxBX = BOUNDS_X - obj.radius;
-          const maxBY = BOUNDS_Y - obj.radius;
-          const maxBZ = 1.5;
-          if (obj.position.x > maxBX) {
-            obj.position.x = maxBX;
-            obj.velocity.x = -Math.abs(obj.velocity.x) * RESTITUTION;
-            applySquish(obj, 1, 0, Math.abs(obj.velocity.x));
-          } else if (obj.position.x < -maxBX) {
-            obj.position.x = -maxBX;
-            obj.velocity.x = Math.abs(obj.velocity.x) * RESTITUTION;
-            applySquish(obj, 1, 0, Math.abs(obj.velocity.x));
-          }
-          if (obj.position.y > maxBY) {
-            obj.position.y = maxBY;
-            obj.velocity.y = -Math.abs(obj.velocity.y) * RESTITUTION;
-            applySquish(obj, 0, 1, Math.abs(obj.velocity.y));
-          } else if (obj.position.y < -maxBY) {
-            obj.position.y = -maxBY;
-            obj.velocity.y = Math.abs(obj.velocity.y) * RESTITUTION;
-            applySquish(obj, 0, 1, Math.abs(obj.velocity.y));
-          }
-          if (Math.abs(obj.position.z) > maxBZ) {
-            obj.position.z = Math.sign(obj.position.z) * maxBZ;
-            obj.velocity.z = -obj.velocity.z * RESTITUTION;
+          // Wall bounds
+          const r = radii[i];
+          const mX = BOUNDS_X - r, mY = BOUNDS_Y - r;
+          if (px[i] > mX) { px[i] = mX; vx[i] = -Math.abs(vx[i]) * RESTITUTION; const a = Math.abs(vx[i]); sqX[i] = 1 - a * 0.06; sqY[i] = 1 + a * 0.06; }
+          else if (px[i] < -mX) { px[i] = -mX; vx[i] = Math.abs(vx[i]) * RESTITUTION; const a = Math.abs(vx[i]); sqX[i] = 1 - a * 0.06; sqY[i] = 1 + a * 0.06; }
+          if (py[i] > mY) { py[i] = mY; vy[i] = -Math.abs(vy[i]) * RESTITUTION; const a = Math.abs(vy[i]); sqX[i] = 1 + a * 0.06; sqY[i] = 1 - a * 0.06; }
+          else if (py[i] < -mY) { py[i] = -mY; vy[i] = Math.abs(vy[i]) * RESTITUTION; const a = Math.abs(vy[i]); sqX[i] = 1 + a * 0.06; sqY[i] = 1 - a * 0.06; }
+          if (pz[i] > 1.5) { pz[i] = 1.5; vz[i] = -Math.abs(vz[i]) * RESTITUTION; }
+          else if (pz[i] < -1.5) { pz[i] = -1.5; vz[i] = Math.abs(vz[i]) * RESTITUTION; }
+        }
+
+        // Object-object collisions (O(n²) but n is small ~18)
+        for (let i = 0; i < N; i++) {
+          for (let j = i + 1; j < N; j++) {
+            const dx = px[j] - px[i];
+            const dy = py[j] - py[i];
+            const dz = pz[j] - pz[i];
+            const distSq = dx * dx + dy * dy + dz * dz;
+            const minD = radii[i] + radii[j];
+            if (distSq >= minD * minD || distSq < 0.0001) continue;
+
+            const dist = Math.sqrt(distSq);
+            const nx = dx / dist, ny = dy / dist, nz = dz / dist;
+            const overlap = minD - dist;
+            const mA = masses[i], mB = masses[j], mT = mA + mB;
+
+            px[i] -= nx * overlap * (mB / mT);
+            py[i] -= ny * overlap * (mB / mT);
+            pz[i] -= nz * overlap * (mB / mT);
+            px[j] += nx * overlap * (mA / mT);
+            py[j] += ny * overlap * (mA / mT);
+            pz[j] += nz * overlap * (mA / mT);
+
+            const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
+            if (rvn > 0) continue;
+            const imp = (-(1 + RESTITUTION) * rvn) / mT;
+            vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
+            vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
+
+            const impact = Math.abs(rvn);
+            if (impact > 0.1) {
+              const amt = Math.min(impact * 0.075, 0.45);
+              sqX[i] = 1 + Math.abs(ny) * amt - Math.abs(nx) * amt * 0.6;
+              sqY[i] = 1 + Math.abs(nx) * amt - Math.abs(ny) * amt * 0.6;
+              sqX[j] = 1 + Math.abs(ny) * amt - Math.abs(nx) * amt * 0.6;
+              sqY[j] = 1 + Math.abs(nx) * amt - Math.abs(ny) * amt * 0.6;
+            }
           }
         }
 
-        // Object-object collisions
-        for (let i = 0; i < objects.length; i++) {
-          for (let j = i + 1; j < objects.length; j++) {
-            resolveCollision(objects[i], objects[j]);
-          }
-        }
+        // Cursor force: soft field + hard contact
+        if (mouseActive && cx3d > -999) {
+          for (let i = 0; i < N; i++) {
+            const dx = px[i] - cx3d;
+            const dy = py[i] - cy3d;
+            const distSq = dx * dx + dy * dy;
+            const dist = Math.sqrt(distSq);
 
-        // Cursor interaction
-        if (mouseActive) {
-          for (let i = 0; i < objects.length; i++) {
-            applyCursorForce(
-              objects[i],
-              smoothMouse3D.x,
-              smoothMouse3D.y,
-              cVelX * subDelta,
-              cVelY * subDelta,
-              subDelta
-            );
+            if (dist < CURSOR_FIELD_R && dist > 0.01) {
+              const t = 1 - dist / CURSOR_FIELD_R;
+              const fM = t * t * t * CURSOR_FIELD_STR * subDt;
+              const nx = dx / dist, ny = dy / dist;
+              vx[i] += nx * fM;
+              vy[i] += ny * fM;
+
+              const contactMin = radii[i] + CURSOR_CONTACT_R;
+              if (dist < contactMin) {
+                const nx2 = dx / dist, ny2 = dy / dist;
+                const overlap = contactMin - dist;
+                px[i] += nx2 * overlap * 1.05;
+                py[i] += ny2 * overlap * 1.05;
+
+                const cSpd = Math.sqrt(cvx * cvx + cvy * cvy);
+                const boost = Math.min(cSpd * 0.7 + 1.5, 5.0);
+                const rvn = (vx[i] - cvx * subDt) * nx2 + (vy[i] - cvy * subDt) * ny2;
+                const imp = Math.max(-(1 + RESTITUTION) * rvn, 1.5) * boost;
+                vx[i] += nx2 * imp;
+                vy[i] += ny2 * imp;
+
+                const amt = Math.min(Math.abs(imp) * 0.03, 0.45);
+                sqX[i] = 1 + Math.abs(ny2) * amt - Math.abs(nx2) * amt * 0.6;
+                sqY[i] = 1 + Math.abs(nx2) * amt - Math.abs(ny2) * amt * 0.6;
+              }
+            }
           }
         }
       }
 
-      // Continuous micro-impulses - keep cluster perpetually jostling (never frozen)
-      for (let i = 0; i < objects.length; i++) {
-        const obj = objects[i];
-        if (!obj.spawned) continue;
-        if (time >= obj.nextImpulseTime) {
-          const angle = Math.random() * Math.PI * 2;
-          obj.velocity.x += Math.cos(angle) * MICRO_IMPULSE;
-          obj.velocity.y += Math.sin(angle) * MICRO_IMPULSE;
-          obj.nextImpulseTime = time + MICRO_INTERVAL_MIN + Math.random() * (MICRO_INTERVAL_MAX - MICRO_INTERVAL_MIN);
+      // Micro-impulses outside substeps (once per frame per object)
+      for (let i = 0; i < N; i++) {
+        if (!spawned[i]) continue;
+        if (time >= nextImpulse[i]) {
+          const angle = Math.random() * 6.2832;
+          vx[i] += Math.cos(angle) * MICRO_IMPULSE;
+          vy[i] += Math.sin(angle) * MICRO_IMPULSE;
+          nextImpulse[i] = time + MICRO_INT_MIN + Math.random() * MICRO_INT_RNG;
         }
       }
 
-      // Visual update - squish recovery + rotation
-      const squishLerp = 1 - Math.pow(0.06, delta);
-      for (let i = 0; i < objects.length; i++) {
-        const obj = objects[i];
-        obj.mesh.position.set(obj.position.x, obj.position.y, obj.position.z);
+      // Visual sync - batch all mesh updates together
+      const sqLerp = 1 - Math.pow(0.06, dt);
+      for (let i = 0; i < N; i++) {
+        meshes[i].position.set(px[i], py[i], pz[i]);
 
-        if (obj.spawned) {
-          obj.squishX += (1 - obj.squishX) * squishLerp;
-          obj.squishY += (1 - obj.squishY) * squishLerp;
-          const squishZ = 2 - (obj.squishX + obj.squishY) * 0.5;
-          obj.mesh.scale.set(obj.squishX, obj.squishY, squishZ);
+        if (spawned[i]) {
+          sqX[i] += (1 - sqX[i]) * sqLerp;
+          sqY[i] += (1 - sqY[i]) * sqLerp;
+          meshes[i].scale.set(sqX[i], sqY[i], 2 - (sqX[i] + sqY[i]) * 0.5);
         }
 
-        const speed = obj.velocity.length();
-        const spinBoost = 1 + speed * 0.45;
-        obj.innerGroup.rotation.x += obj.rotSpeedX * delta * spinBoost;
-        obj.innerGroup.rotation.y += obj.rotSpeedY * delta * spinBoost;
-        obj.innerGroup.rotation.z += obj.rotSpeedZ * delta * spinBoost;
+        const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
+        const spin = dt * (1 + speed * 0.45);
+        innerGroups[i].rotation.x += rotX[i] * spin;
+        innerGroups[i].rotation.y += rotY[i] * spin;
+        innerGroups[i].rotation.z += rotZ[i] * spin;
       }
 
       renderer.render(scene, camera);
@@ -568,24 +447,18 @@ export function HeroWebGLPanel() {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       container.removeEventListener("touchmove", handleTouchMove);
       container.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animId);
 
       loadedTextures.forEach((t) => t.dispose());
+      geoCache.forEach(([g1, g2]) => { g1.dispose(); g2.dispose(); });
       scene.traverse((obj) => {
         if (obj instanceof THREE.Mesh) {
-          obj.geometry.dispose();
           const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          mats.forEach((m) => {
-            if (m instanceof THREE.ShaderMaterial) {
-              m.dispose();
-            } else if ((m as THREE.MeshStandardMaterial).map) {
-              (m as THREE.MeshStandardMaterial).map!.dispose();
-              m.dispose();
-            }
-          });
+          mats.forEach((m) => { m.dispose(); });
         }
       });
       renderer.dispose();

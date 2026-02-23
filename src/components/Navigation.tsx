@@ -86,9 +86,14 @@ export function Navigation() {
           <a
             href="#hero"
             aria-label="H2H Digital Home"
-            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            onClick={(e) => { 
+              e.preventDefault(); 
+              setIsOpen(false);
+              window.scrollTo({ top: 0, behavior: "smooth" }); 
+            }}
+            className="relative z-[110] transition-all duration-300 opacity-100"
           >
+            {/* Logo remains visible even when menu is open for brand consistency */}
             <H2HLogo height={56} className="transition-all duration-300" />
           </a>
 
@@ -174,7 +179,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setActiveIndex(i)}
-                  className="group relative flex items-center py-3 md:py-4 border-b border-white/[0.06] overflow-hidden"
+                  className="group relative flex items-center py-5 md:py-4 border-b border-white/[0.06] overflow-hidden"
                   style={{
                     transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
                     transitionDelay: mounted ? `${i * 60}ms` : "0ms",
@@ -196,9 +201,9 @@ export function Navigation() {
                     {link.id}
                   </span>
 
-                  {/* Label */}
+                  {/* Label - Resized for better mobile fit */}
                   <span
-                    className="relative z-10 flex-1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
+                    className="relative z-10 flex-1 text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex !== null && activeIndex !== i ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.9)",
@@ -330,7 +335,7 @@ export function Navigation() {
             ))}
           </div>
           <p
-            className="text-[10px] uppercase tracking-[0.4em] text-white/20"
+            className="text-[10px] uppercase tracking-[0.4em] text-white/20 hidden sm:block"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             Nairobi · Lagos · Cape Town

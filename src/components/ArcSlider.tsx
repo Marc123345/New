@@ -102,14 +102,15 @@ export function ArcSlider() {
   const wheelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-
+  
   const [activeIndex, setActiveIndex] = useState(0);
+  // We use a ref to track the active index during the drag loop
+  // to avoid reading stale state in the event listener
   const activeIndexRef = useRef(0);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   // --- CONFIGURATION ---
-  const THETA = 20;
-  const RADIUS = isMobile ? 900 : 1500;
+  const THETA = 20; // Angle between cards
+  const RADIUS = 1500; // Arc radius
 
   // --- VISUAL UPDATE FUNCTION ---
   const updateCardVisuals = (currentRotation: number) => {
@@ -167,21 +168,6 @@ export function ArcSlider() {
         });
       }
     });
-
-    const onResize = () => {
-      const newIsMobile = window.innerWidth < 768;
-      const newRadius = newIsMobile ? 900 : 1500;
-      gsap.set(wheel, { y: newRadius });
-      SERVICES.forEach((_, i) => {
-        if (cardsRef.current[i]) {
-          gsap.set(cardsRef.current[i], {
-            transformOrigin: `50% ${newRadius}px`,
-            y: -newRadius,
-          });
-        }
-      });
-    };
-    window.addEventListener('resize', onResize);
 
     // 2. Drag Logic
     let isDragging = false;
@@ -272,7 +258,6 @@ export function ArcSlider() {
       container.removeEventListener("touchstart", onStart);
       window.removeEventListener("touchmove", onMove);
       window.removeEventListener("touchend", onEnd);
-      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -303,7 +288,7 @@ export function ArcSlider() {
           fontSize: "clamp(2.5rem, 5vw, 4rem)",
           fontFamily: "var(--font-stack-heading)",
           color: "var(--color-text-dark)",
-          marginBottom: "clamp(120px, 20vw, 240px)",
+          marginBottom: "240px",
         }}
       >
         <span
@@ -318,14 +303,16 @@ export function ArcSlider() {
       {/* The Interaction Zone */}
       <div
         ref={containerRef}
-        className="relative w-full h-[420px] sm:h-[500px] md:h-[600px] cursor-grab active:cursor-grabbing"
+        className="relative w-full h-[600px] cursor-grab active:cursor-grabbing"
         style={{
           overflow: "visible",
-          marginTop: "0px",
-          marginBottom: "clamp(48px, 8vw, 96px)",
+          // IMPROVEMENT: Increased marginTop for more visual breathing room
+          marginTop: "0px", 
+          marginBottom: "96px",
           userSelect: "none",
           WebkitUserSelect: "none",
-          touchAction: "pan-y",
+          // IMPROVEMENT: Allows vertical scrolling on mobile, but captures horizontal swipes
+          touchAction: "pan-y", 
           zIndex: 10,
         }}
       >
@@ -343,7 +330,7 @@ export function ArcSlider() {
               <div
                 key={service.id}
                 ref={(el) => (cardsRef.current[i] = el)}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-[260px] sm:w-[300px] md:w-[340px] lg:w-[420px] aspect-[3/4] overflow-hidden will-change-transform"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[420px] aspect-[3/4] overflow-hidden will-change-transform"
                 style={{
                   top: 0,
                   left: 0,
@@ -354,7 +341,7 @@ export function ArcSlider() {
                 }}
               >
                 {/* Card Content */}
-                <div className="relative h-full w-full p-6 sm:p-8 md:p-10 flex flex-col justify-between">
+                <div className="relative h-full w-full p-10 flex flex-col justify-between">
                   {/* Top: Category & Icon */}
                   <div className="flex justify-between items-start">
                     <div>
@@ -388,9 +375,9 @@ export function ArcSlider() {
                   {/* Middle: Title */}
                   <div>
                     <h3
-                      className="tracking-tight leading-[0.85] mb-4 sm:mb-6"
+                      className="tracking-tight leading-[0.85] mb-6"
                       style={{
-                        fontSize: "clamp(1.4rem, 5vw, 3rem)",
+                        fontSize: "clamp(2rem, 5vw, 3rem)",
                         fontFamily: "var(--font-stack-heading)",
                         color: textColor,
                       }}
@@ -398,7 +385,7 @@ export function ArcSlider() {
                       {service.fullTitle}
                     </h3>
                     <p
-                      className="leading-relaxed mb-4 sm:mb-8"
+                      className="leading-relaxed mb-8"
                       style={{
                         fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
                         fontFamily: "var(--font-stack-body)",
@@ -437,17 +424,16 @@ export function ArcSlider() {
       </div>
 
       {/* Footer Navigation (Synced) */}
-      <div className="absolute bottom-6 sm:bottom-12 z-20 flex gap-2 left-1/2 -translate-x-1/2">
+      <div className="absolute bottom-12 z-20 flex gap-2 left-1/2 -translate-x-1/2">
         {SERVICES.map((_, i) => (
           <button
             key={i}
             onClick={() => navigateTo(i)}
-            className="group relative pointer-events-auto flex items-center justify-center"
+            className="group relative pointer-events-auto"
             aria-label={`Go to service ${i + 1}`}
-            style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
           >
             <div
-              className={`w-8 sm:w-12 h-1 rounded-full transition-all duration-300 ${
+              className={`w-12 h-1 rounded-full transition-all duration-300 ${
                 i === activeIndex
                   ? "bg-[#A46CFC]"
                   : "bg-[var(--color-text-dark)]/20 group-hover:bg-[var(--color-text-dark)]/40"

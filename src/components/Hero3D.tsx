@@ -431,7 +431,6 @@ export function Hero3D() {
           });
         }
       });
-
       coinGeometry.dispose();
       sideMaterial.dispose();
       renderer.dispose();

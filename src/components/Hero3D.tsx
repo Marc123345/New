@@ -12,21 +12,22 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-const BOUNDS_X = 16;
-const BOUNDS_Y = 12;
+const BOUNDS_X = 15;
+const BOUNDS_Y = 10;
 
-const PARALLAX_LAYERS = [-3.5, -2, -0.8, 0.8, 2, 3.5];
-
-interface PhysicsObject {
+interface Block {
   mesh: THREE.Group;
-  velocity: THREE.Vector3;
-  position: THREE.Vector3;
-  radius: number;
-  baseRotationSpeed: number;
-  parallaxStrength: number;
+  vel: THREE.Vector2;
+  pos: THREE.Vector2;
+  w: number;
+  h: number;
+  targetRotZ: number;
+  currentRotZ: number;
+  rotVel: number;
+  z: number;
   floatPhase: number;
   floatSpeed: number;
-  floatAmplitude: number;
+  floatAmp: number;
 }
 
 export function Hero3D() {
@@ -39,7 +40,7 @@ export function Hero3D() {
     const scene = new THREE.Scene();
     const aspect = container.clientWidth / container.clientHeight;
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    camera.position.set(0, 0, 35);
+    camera.position.set(0, 0, 38);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -49,41 +50,39 @@ export function Hero3D() {
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 2);
-    dirLight.position.set(10, 20, 15);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2.5);
+    dirLight.position.set(8, 15, 20);
+    dirLight.castShadow = true;
     scene.add(dirLight);
 
-    const fillLight = new THREE.DirectionalLight(0xeef2ff, 0.8);
-    fillLight.position.set(-10, -5, 10);
+    const fillLight = new THREE.DirectionalLight(0xd0e8ff, 1.0);
+    fillLight.position.set(-12, -8, 10);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    rimLight.position.set(0, 0, -10);
+    const rimLight = new THREE.DirectionalLight(0xfff8f0, 0.5);
+    rimLight.position.set(0, 0, -15);
     scene.add(rimLight);
 
     const textureLoader = new THREE.TextureLoader();
     textureLoader.setCrossOrigin("anonymous");
 
-    const coinGeometry = new THREE.CylinderGeometry(1, 1, 0.18, 64);
-
-    const sideMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf0f0f0,
-      roughness: 0.15,
-      metalness: 0.3,
-    });
-
-    const objects: PhysicsObject[] = [];
+    const blocks: Block[] = [];
     const loadedTextures: THREE.Texture[] = [];
 
-    const createToken = (url: string, size: number, index: number, total: number) => {
+    const RESTITUTION = 0.72;
+    const FRICTION = 0.988;
+
+    const createBlock = (url: string, w: number, h: number, index: number, total: number) => {
       const group = new THREE.Group();
 
       const texture = textureLoader.load(
@@ -98,70 +97,98 @@ export function Hero3D() {
       );
       loadedTextures.push(texture);
 
-      const faceMaterial = new THREE.MeshStandardMaterial({
+      const depth = 0.22;
+      const geo = new THREE.BoxGeometry(w, h, depth, 1, 1, 1);
+
+      const faceMat = new THREE.MeshStandardMaterial({
         map: texture,
         color: 0xffffff,
-        roughness: 0.35,
-        metalness: 0,
-        transparent: true,
-        side: THREE.DoubleSide,
+        roughness: 0.2,
+        metalness: 0.05,
+        transparent: false,
       });
 
-      const coin = new THREE.Mesh(coinGeometry, [sideMaterial, faceMaterial, faceMaterial]);
-      coin.rotation.x = Math.PI / 2;
-      coin.scale.set(size, 1, size);
-      group.add(coin);
+      const edgeMat = new THREE.MeshStandardMaterial({
+        color: 0xf5f5f5,
+        roughness: 0.3,
+        metalness: 0.1,
+      });
 
-      const angle = (index / total) * Math.PI * 2;
-      const spreadX = BOUNDS_X * 0.7;
-      const spreadY = BOUNDS_Y * 0.7;
-      const x = Math.cos(angle) * spreadX * (0.5 + Math.random() * 0.5);
-      const y = Math.sin(angle) * spreadY * (0.5 + Math.random() * 0.5);
-      const z = (Math.random() - 0.5) * 3;
+      const materials = [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, edgeMat];
+      const box = new THREE.Mesh(geo, materials);
+      box.castShadow = true;
+      box.receiveShadow = true;
+      group.add(box);
 
-      group.position.set(x, y, z);
+      const angle = (index / total) * Math.PI * 2 + Math.random() * 0.5;
+      const spreadX = BOUNDS_X * 0.65;
+      const spreadY = BOUNDS_Y * 0.65;
+      const px = Math.cos(angle) * spreadX * (0.4 + Math.random() * 0.5);
+      const py = Math.sin(angle) * spreadY * (0.4 + Math.random() * 0.5);
+      const pz = (Math.random() - 0.5) * 4;
+
+      group.position.set(px, py, pz);
       group.scale.set(0, 0, 0);
       mainGroup.add(group);
 
-      const layerIndex = index % PARALLAX_LAYERS.length;
-      const parallaxStrength = PARALLAX_LAYERS[layerIndex];
+      const speed = 3.5 + Math.random() * 3;
+      const dir = Math.random() * Math.PI * 2;
+      const vx = Math.cos(dir) * speed;
+      const vy = Math.sin(dir) * speed;
 
-      objects.push({
+      blocks.push({
         mesh: group,
-        velocity: new THREE.Vector3(0, 0, 0),
-        position: new THREE.Vector3(x, y, z),
-        radius: size,
-        baseRotationSpeed: (Math.random() - 0.5) * 0.3,
-        parallaxStrength,
+        vel: new THREE.Vector2(vx, vy),
+        pos: new THREE.Vector2(px, py),
+        w,
+        h,
+        targetRotZ: 0,
+        currentRotZ: (Math.random() - 0.5) * 0.3,
+        rotVel: 0,
+        z: pz,
         floatPhase: Math.random() * Math.PI * 2,
-        floatSpeed: 0.4 + Math.random() * 0.5,
-        floatAmplitude: 0.12 + Math.random() * 0.18,
+        floatSpeed: 0.3 + Math.random() * 0.4,
+        floatAmp: 0.06 + Math.random() * 0.1,
       });
 
       gsap.to(group.scale, {
         x: 1,
         y: 1,
         z: 1,
-        duration: 0.8,
-        delay: 0.08 * index,
-        ease: "back.out(1.4)",
+        duration: 0.9,
+        delay: 0.07 * index,
+        ease: "back.out(1.7)",
       });
     };
 
-    const totalTokens = PEOPLE_IMAGES.length + brandLogos.length;
-    PEOPLE_IMAGES.forEach((url, i) => createToken(url, 3.8, i, totalTokens));
-    brandLogos.forEach((url, i) =>
-      createToken(url, 3.0, i + PEOPLE_IMAGES.length, totalTokens)
-    );
+    const totalBlocks = PEOPLE_IMAGES.length + brandLogos.length;
+
+    PEOPLE_IMAGES.forEach((url, i) => {
+      const isPortrait = i % 3 !== 0;
+      const w = isPortrait ? 3.5 : 4.2;
+      const h = isPortrait ? 4.8 : 3.2;
+      createBlock(url, w, h, i, totalBlocks);
+    });
+
+    brandLogos.forEach((url, i) => {
+      const s = 2.8 + Math.random() * 0.8;
+      createBlock(url, s, s, i + PEOPLE_IMAGES.length, totalBlocks);
+    });
 
     const mouse = new THREE.Vector2();
     const targetMouse = new THREE.Vector2();
+
+    const springPos = new THREE.Vector2();
+    const springVel = new THREE.Vector2();
+    const SPRING_K = 120;
+    const SPRING_DAMP = 14;
+
+    let hoveredBlock: Block | null = null;
+    let draggedBlock: Block | null = null;
+
     const raycaster = new THREE.Raycaster();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     const mouse3D = new THREE.Vector3();
-
-    let draggedObject: PhysicsObject | null = null;
-    let hoveredObject: PhysicsObject | null = null;
 
     const updateMouse = (clientX: number, clientY: number) => {
       const rect = container.getBoundingClientRect();
@@ -171,66 +198,67 @@ export function Hero3D() {
       raycaster.ray.intersectPlane(plane, mouse3D);
     };
 
-    const findHitObject = (): PhysicsObject | null => {
-      const intersects = raycaster.intersectObjects(mainGroup.children, true);
-      const hit = intersects.find((h) => h.object.parent instanceof THREE.Group);
-      if (hit && hit.object.parent) {
-        return objects.find((o) => o.mesh === hit.object.parent) || null;
+    const findHit = (): Block | null => {
+      const hits = raycaster.intersectObjects(mainGroup.children, true);
+      const hit = hits[0];
+      if (!hit) return null;
+      let obj: THREE.Object3D | null = hit.object;
+      while (obj && !(obj instanceof THREE.Group && obj.parent === mainGroup)) {
+        obj = obj.parent;
       }
-      return null;
+      if (!obj) return null;
+      return blocks.find((b) => b.mesh === obj) || null;
     };
 
-    const setHover = (obj: PhysicsObject | null) => {
-      if (obj === hoveredObject) return;
-      if (hoveredObject) {
-        gsap.to(hoveredObject.mesh.scale, { x: 1, y: 1, z: 1, duration: 0.25 });
+    const setHover = (b: Block | null) => {
+      if (b === hoveredBlock) return;
+      if (hoveredBlock && hoveredBlock !== draggedBlock) {
+        gsap.to(hoveredBlock.mesh.scale, { x: 1, y: 1, z: 1, duration: 0.3, ease: "power2.out" });
       }
-      hoveredObject = obj;
-      if (obj) {
+      hoveredBlock = b;
+      if (b && b !== draggedBlock) {
         container.style.cursor = "grab";
-        gsap.to(obj.mesh.scale, { x: 1.12, y: 1.12, z: 1.12, duration: 0.3 });
-      } else {
+        gsap.to(b.mesh.scale, { x: 1.08, y: 1.08, z: 1.08, duration: 0.3, ease: "power2.out" });
+      } else if (!b) {
         container.style.cursor = "default";
       }
     };
 
-    const onPointerMove = (clientX: number, clientY: number) => {
-      updateMouse(clientX, clientY);
-      if (!draggedObject) {
-        setHover(findHitObject());
-      }
+    const onPointerMove = (cx: number, cy: number) => {
+      updateMouse(cx, cy);
+      if (!draggedBlock) setHover(findHit());
     };
 
     const onPointerDown = () => {
-      if (hoveredObject) {
-        draggedObject = hoveredObject;
+      if (hoveredBlock) {
+        draggedBlock = hoveredBlock;
         container.style.cursor = "grabbing";
-        gsap.to(draggedObject.mesh.scale, { x: 0.95, y: 0.95, z: 0.95, duration: 0.1 });
+        draggedBlock.vel.set(0, 0);
+        gsap.to(draggedBlock.mesh.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.15 });
       }
     };
 
     const onPointerUp = () => {
-      if (draggedObject) {
-        gsap.to(draggedObject.mesh.scale, {
-          x: 1.12,
-          y: 1.12,
-          z: 1.12,
-          duration: 0.4,
+      if (draggedBlock) {
+        gsap.to(draggedBlock.mesh.scale, {
+          x: 1,
+          y: 1,
+          z: 1,
+          duration: 0.5,
           ease: "elastic.out(1, 0.5)",
         });
+        draggedBlock = null;
       }
-      draggedObject = null;
-      container.style.cursor = hoveredObject ? "grab" : "default";
+      container.style.cursor = hoveredBlock ? "grab" : "default";
     };
 
     const handleMouseMove = (e: MouseEvent) => onPointerMove(e.clientX, e.clientY);
     const handleMouseDown = () => onPointerDown();
     const handleMouseUp = () => onPointerUp();
-
     const handleTouchStart = (e: TouchEvent) => {
       if (!e.touches[0]) return;
       updateMouse(e.touches[0].clientX, e.touches[0].clientY);
-      setHover(findHitObject());
+      setHover(findHit());
       onPointerDown();
     };
     const handleTouchMove = (e: TouchEvent) => {
@@ -248,27 +276,50 @@ export function Hero3D() {
 
     const clock = new THREE.Clock();
     let animId: number;
-    const tmpVel = new THREE.Vector3();
 
-    const springPos = new THREE.Vector2();
-    const springVel = new THREE.Vector2();
-    const SPRING_K = 160;
-    const SPRING_DAMP = 16;
+    const resolveAABBCollision = (a: Block, b: Block) => {
+      const dx = b.pos.x - a.pos.x;
+      const dy = b.pos.y - a.pos.y;
+      const overlapX = (a.w / 2 + b.w / 2) - Math.abs(dx);
+      const overlapY = (a.h / 2 + b.h / 2) - Math.abs(dy);
 
-    const prevMouse = new THREE.Vector2();
-    const mouseVelocity = new THREE.Vector2();
+      if (overlapX <= 0 || overlapY <= 0) return;
+
+      const gap = 0.05;
+      if (overlapX < overlapY) {
+        const sign = dx > 0 ? 1 : -1;
+        const push = (overlapX + gap) * 0.5;
+        a.pos.x -= sign * push;
+        b.pos.x += sign * push;
+
+        const relVx = a.vel.x - b.vel.x;
+        const impulse = relVx * RESTITUTION;
+        a.vel.x -= impulse;
+        b.vel.x += impulse;
+
+        a.rotVel += sign * Math.abs(a.vel.y) * 0.04;
+        b.rotVel -= sign * Math.abs(b.vel.y) * 0.04;
+      } else {
+        const sign = dy > 0 ? 1 : -1;
+        const push = (overlapY + gap) * 0.5;
+        a.pos.y -= sign * push;
+        b.pos.y += sign * push;
+
+        const relVy = a.vel.y - b.vel.y;
+        const impulse = relVy * RESTITUTION;
+        a.vel.y -= impulse;
+        b.vel.y += impulse;
+
+        a.rotVel -= sign * Math.abs(a.vel.x) * 0.04;
+        b.rotVel += sign * Math.abs(b.vel.x) * 0.04;
+      }
+    };
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
       const rawDelta = clock.getDelta();
       const delta = Math.min(rawDelta, 0.05);
       const time = clock.elapsedTime;
-
-      if (rawDelta > 0) {
-        mouseVelocity.x = (mouse.x - prevMouse.x) / delta;
-        mouseVelocity.y = (mouse.y - prevMouse.y) / delta;
-      }
-      prevMouse.copy(mouse);
 
       const springAccX = -SPRING_K * (springPos.x - mouse.x) - SPRING_DAMP * springVel.x;
       const springAccY = -SPRING_K * (springPos.y - mouse.y) - SPRING_DAMP * springVel.y;
@@ -277,113 +328,82 @@ export function Hero3D() {
       springPos.x += springVel.x * delta;
       springPos.y += springVel.y * delta;
 
-      targetMouse.lerp(mouse, 0.05);
+      targetMouse.lerp(mouse, 0.06);
+      const tiltX = targetMouse.x * 0.08;
+      const tiltY = -targetMouse.y * 0.06;
+      mainGroup.rotation.y = THREE.MathUtils.lerp(mainGroup.rotation.y, tiltX, 0.06);
+      mainGroup.rotation.x = THREE.MathUtils.lerp(mainGroup.rotation.x, tiltY, 0.06);
 
-      const tiltX = targetMouse.x * 0.1 + THREE.MathUtils.clamp(mouseVelocity.x, -1, 1) * 0.04;
-      const tiltY = -targetMouse.y * 0.07 - THREE.MathUtils.clamp(mouseVelocity.y, -1, 1) * 0.03;
-      mainGroup.rotation.y = THREE.MathUtils.lerp(mainGroup.rotation.y, tiltX, 0.08);
-      mainGroup.rotation.x = THREE.MathUtils.lerp(mainGroup.rotation.x, tiltY, 0.08);
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, -springPos.x * 0.5, 0.05);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, springPos.y * 0.35, 0.05);
 
-      camera.position.x = THREE.MathUtils.lerp(camera.position.x, -springPos.x * 0.6, 0.05);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, springPos.y * 0.4, 0.05);
+      for (let i = 0; i < blocks.length; i++) {
+        const b = blocks[i];
 
-      for (let i = 0; i < objects.length; i++) {
-        const obj = objects[i];
-
-        if (obj === draggedObject) {
-          const k = 8.0;
-          obj.velocity.x += (mouse3D.x - obj.position.x) * k * delta;
-          obj.velocity.y += (mouse3D.y - obj.position.y) * k * delta;
-          obj.velocity.multiplyScalar(0.7);
+        if (b === draggedBlock) {
+          const targetX = mouse3D.x;
+          const targetY = mouse3D.y;
+          b.vel.x = (targetX - b.pos.x) * 18;
+          b.vel.y = (targetY - b.pos.y) * 18;
+          b.pos.x += (targetX - b.pos.x) * 0.35;
+          b.pos.y += (targetY - b.pos.y) * 0.35;
+          b.rotVel *= 0.85;
+          b.targetRotZ = THREE.MathUtils.clamp(b.vel.x * 0.015, -0.3, 0.3);
         } else {
-          const cx = obj.position.x;
-          const cy = obj.position.y;
-          const distCenter = Math.sqrt(cx * cx + cy * cy);
-          const gravity = 0.8 + distCenter * 0.12;
-          obj.velocity.x -= cx * gravity * delta;
-          obj.velocity.y -= cy * gravity * delta;
-          obj.velocity.y -= 0.5 * delta;
+          b.pos.x += b.vel.x * delta;
+          b.pos.y += b.vel.y * delta;
 
-          const dist = obj.position.distanceTo(mouse3D);
-          if (dist < 7) {
-            const force = (7 - dist) * 15 * delta;
-            const angle = Math.atan2(
-              obj.position.y - mouse3D.y,
-              obj.position.x - mouse3D.x
-            );
-            obj.velocity.x += Math.cos(angle) * force;
-            obj.velocity.y += Math.sin(angle) * force;
+          b.vel.multiplyScalar(FRICTION);
+
+          const halfW = b.w / 2;
+          const halfH = b.h / 2;
+
+          if (b.pos.x + halfW > BOUNDS_X) {
+            b.pos.x = BOUNDS_X - halfW;
+            b.vel.x *= -RESTITUTION;
+            b.rotVel += b.vel.y * 0.06;
+          } else if (b.pos.x - halfW < -BOUNDS_X) {
+            b.pos.x = -BOUNDS_X + halfW;
+            b.vel.x *= -RESTITUTION;
+            b.rotVel += b.vel.y * 0.06;
           }
 
-          for (let j = i + 1; j < objects.length; j++) {
-            const other = objects[j];
-            const dx = obj.position.x - other.position.x;
-            const dy = obj.position.y - other.position.y;
-            const dz = obj.position.z - other.position.z;
-            const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            const minD = obj.radius + other.radius + 0.3;
-
-            if (d < minD && d > 0) {
-              const f = (minD - d) * 25 * delta;
-              const nx = dx / d;
-              const ny = dy / d;
-              obj.velocity.x += nx * f;
-              obj.velocity.y += ny * f;
-              other.velocity.x -= nx * f;
-              other.velocity.y -= ny * f;
-            }
+          if (b.pos.y + halfH > BOUNDS_Y) {
+            b.pos.y = BOUNDS_Y - halfH;
+            b.vel.y *= -RESTITUTION;
+            b.rotVel -= b.vel.x * 0.06;
+          } else if (b.pos.y - halfH < -BOUNDS_Y) {
+            b.pos.y = -BOUNDS_Y + halfH;
+            b.vel.y *= -RESTITUTION;
+            b.rotVel -= b.vel.x * 0.06;
           }
 
-          obj.velocity.multiplyScalar(0.93);
+          b.targetRotZ = THREE.MathUtils.clamp(-b.vel.x * 0.02, -0.25, 0.25);
         }
 
-        tmpVel.copy(obj.velocity).multiplyScalar(delta * 12);
-        obj.position.add(tmpVel);
+        b.rotVel *= 0.92;
+        b.currentRotZ += b.rotVel * delta;
+        b.currentRotZ = THREE.MathUtils.lerp(b.currentRotZ, b.targetRotZ, 0.08);
 
-        if (obj.position.x > BOUNDS_X) {
-          obj.position.x = BOUNDS_X;
-          obj.velocity.x *= -0.5;
-        } else if (obj.position.x < -BOUNDS_X) {
-          obj.position.x = -BOUNDS_X;
-          obj.velocity.x *= -0.5;
-        }
-        if (obj.position.y > BOUNDS_Y) {
-          obj.position.y = BOUNDS_Y;
-          obj.velocity.y *= -0.5;
-        } else if (obj.position.y < -BOUNDS_Y) {
-          obj.position.y = -BOUNDS_Y;
-          obj.velocity.y *= -0.5;
+        for (let j = i + 1; j < blocks.length; j++) {
+          resolveAABBCollision(b, blocks[j]);
         }
 
-        const floatY = Math.sin(time * obj.floatSpeed + obj.floatPhase) * obj.floatAmplitude;
-        const floatX = Math.cos(time * obj.floatSpeed * 0.7 + obj.floatPhase) * obj.floatAmplitude * 0.5;
+        const floatY = Math.sin(time * b.floatSpeed + b.floatPhase) * b.floatAmp;
+        const floatX = Math.cos(time * b.floatSpeed * 0.6 + b.floatPhase) * b.floatAmp * 0.4;
 
-        const parallaxOffsetX = springPos.x * obj.parallaxStrength;
-        const parallaxOffsetY = springPos.y * obj.parallaxStrength * 0.7;
-        const parallaxOffsetZ = Math.abs(obj.parallaxStrength) * springPos.x * 0.15 * Math.sign(obj.parallaxStrength);
+        const parallaxX = springPos.x * (b.z * 0.08);
+        const parallaxY = springPos.y * (b.z * 0.06);
 
-        obj.mesh.position.set(
-          obj.position.x + parallaxOffsetX + floatX,
-          obj.position.y + parallaxOffsetY + floatY,
-          obj.position.z + parallaxOffsetZ,
+        b.mesh.position.set(
+          b.pos.x + floatX + parallaxX,
+          b.pos.y + floatY + parallaxY,
+          b.z
         );
+        b.mesh.rotation.z = b.currentRotZ;
 
-        const mesh = obj.mesh.children[0];
-        if (mesh) {
-          const parallaxTiltX = springVel.y * 0.015 * obj.parallaxStrength;
-          const parallaxTiltZ = -springVel.x * 0.015 * obj.parallaxStrength;
-
-          mesh.rotation.x = THREE.MathUtils.lerp(
-            mesh.rotation.x,
-            Math.PI / 2 - obj.velocity.y * 0.3 + parallaxTiltX,
-            0.06
-          );
-          mesh.rotation.z = THREE.MathUtils.lerp(
-            mesh.rotation.z,
-            obj.velocity.x * 0.3 + obj.baseRotationSpeed * 0.1 + parallaxTiltZ,
-            0.06
-          );
-        }
+        const tiltFromVel = b.vel.y * 0.008;
+        b.mesh.rotation.x = THREE.MathUtils.lerp(b.mesh.rotation.x, tiltFromVel, 0.1);
       }
 
       renderer.render(scene, camera);
@@ -416,14 +436,12 @@ export function Hero3D() {
           obj.geometry.dispose();
           const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
           mats.forEach((m) => {
-            if (m.map) m.map.dispose();
+            if ((m as THREE.MeshStandardMaterial).map) (m as THREE.MeshStandardMaterial).map!.dispose();
             m.dispose();
           });
         }
       });
 
-      coinGeometry.dispose();
-      sideMaterial.dispose();
       renderer.dispose();
 
       if (renderer.domElement.parentNode === container) {

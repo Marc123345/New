@@ -116,7 +116,7 @@ export function Loader({ onComplete }: LoaderProps) {
           pointerEvents: 'none',
         }}
       >
-        <source src="https://ik.imagekit.io/qcvroy8xpd/H2H%20Loader%20Video.mp4" type="video/mp4" />
+        <source src="https://ik.imagekit.io/qcvroy8xpd/envato_video_gen_Feb_23_2026_16_41_55.mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay */}

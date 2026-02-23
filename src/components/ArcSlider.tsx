@@ -7,6 +7,7 @@ import {
   TrendingUp,
   Sparkles,
 } from "lucide-react";
+import { ServiceCardOverlay } from "./ServiceCardOverlay";
 
 const SERVICES = [
   {
@@ -102,8 +103,9 @@ export function ArcSlider() {
   const wheelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const [overlayService, setOverlayService] = useState<typeof SERVICES[number] | null>(null);
   // We use a ref to track the active index during the drag loop
   // to avoid reading stale state in the event listener
   const activeIndexRef = useRef(0);
@@ -335,7 +337,7 @@ export function ArcSlider() {
                   top: 0,
                   left: 0,
                   backgroundColor: service.bgColor,
-                  pointerEvents: "none",
+                  pointerEvents: "auto",
                   border: isLight ? '2px solid var(--color-surface-dark)' : '2px solid rgba(255,255,255,0.15)',
                   boxShadow: 'var(--shadow-geometric)',
                 }}
@@ -372,10 +374,10 @@ export function ArcSlider() {
                     </div>
                   </div>
 
-                  {/* Middle: Title */}
+                  {/* Middle: Title + Learn More */}
                   <div>
                     <h3
-                      className="tracking-tight leading-[0.85] mb-6"
+                      className="tracking-tight leading-[0.85] mb-8"
                       style={{
                         fontSize: "clamp(2rem, 5vw, 3rem)",
                         fontFamily: "var(--font-stack-heading)",
@@ -384,37 +386,33 @@ export function ArcSlider() {
                     >
                       {service.fullTitle}
                     </h3>
-                    <p
-                      className="leading-relaxed mb-8"
-                      style={{
-                        fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-                        fontFamily: "var(--font-stack-body)",
-                        color: textColor,
-                        opacity: 0.8,
-                      }}
-                    >
-                      {service.description}
-                    </p>
 
-                    {/* Details List */}
-                    {service.details.length > 0 && (
-                      <ul className="space-y-2">
-                        {service.details.map((detail, idx) => (
-                          <li
-                            key={idx}
-                            className="text-sm flex items-start gap-2"
-                            style={{
-                              fontFamily: "var(--font-stack-heading)",
-                              color: textColor,
-                              opacity: 0.7,
-                            }}
-                          >
-                            <span className="mt-1">→</span>
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setOverlayService(service); }}
+                      className="group inline-flex items-center gap-2 transition-all duration-200"
+                      style={{
+                        fontFamily: 'var(--font-stack-heading)',
+                        fontSize: '0.75rem',
+                        letterSpacing: '0.18em',
+                        textTransform: 'uppercase',
+                        color: textColor,
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        padding: '10px 20px',
+                        cursor: 'pointer',
+                        pointerEvents: 'auto',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+                    >
+                      Learn More
+                      <span
+                        className="transition-transform duration-200 group-hover:translate-x-1"
+                        style={{ display: 'inline-block' }}
+                      >
+                        →
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -442,6 +440,11 @@ export function ArcSlider() {
           </button>
         ))}
       </div>
+
+      <ServiceCardOverlay
+        service={overlayService}
+        onClose={() => setOverlayService(null)}
+      />
     </div>
   );
 }

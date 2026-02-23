@@ -11,7 +11,7 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="inline-block px-8 py-4 border-2 cursor-pointer uppercase"
+      className="inline-block px-5 py-3 sm:px-8 sm:py-4 border-2 cursor-pointer uppercase"
       style={{
         fontFamily: 'var(--font-stack-heading)',
         fontSize: '0.75rem',
@@ -47,7 +47,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.05 }}
           style={{
-            fontSize: 'clamp(2.8rem, 7vw, 5rem)',
+            fontSize: 'clamp(2rem, 8vw, 5rem)',
             lineHeight: 1.08,
             letterSpacing: '-0.03em',
             fontFamily: 'var(--font-stack-heading)',
@@ -67,7 +67,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
         <motion.p
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.2 }}
-          className="text-xl md:text-2xl"
+          className="text-base sm:text-xl md:text-2xl"
           style={{
             color: 'rgba(255,255,255,0.85)',
             lineHeight: 1.6,

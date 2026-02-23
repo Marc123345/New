@@ -3338,6 +3338,8 @@ button, a, [class*="hover:"], [class*="transition"] {
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -65,20 +65,20 @@ const Section = ({
 function AppContent() {
 
   return (
-    <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
+    <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white overflow-x-hidden w-full">
       <CursorTrail />
       <Navigation />
       <ScrollProgress />
 
       <section
         id="hero"
-        className="relative min-h-screen overflow-x-hidden"
+        className="relative min-h-screen overflow-hidden w-full"
         style={{ background: '#000' }}
       >
         <HeroWebGL />
 
         <div
-          className="relative z-10 px-6 md:px-12"
+          className="relative z-10 px-4 sm:px-6 md:px-12"
           style={{
             paddingTop: 'var(--space-8x)',
             paddingBottom: 'var(--space-8x)',
@@ -87,10 +87,10 @@ function AppContent() {
           <div className="max-w-7xl mx-auto">
             <HeroTitle>
               <div
-                className="relative mx-auto w-full h-[300px] sm:h-[420px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
+                className="relative mx-auto w-full h-[240px] sm:h-[360px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
                 style={{
                   border: "3px solid var(--color-text-dark)",
-                  boxShadow: "10px 10px 0 var(--color-surface-dark)",
+                  boxShadow: "none",
                   background: "#000",
                 }}
               >
@@ -110,9 +110,9 @@ function AppContent() {
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
+        <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
-            className="text-xs tracking-[0.2em] uppercase text-center"
+            className="text-xs tracking-[0.2em] uppercase text-center whitespace-nowrap"
             style={{ color: 'var(--color-secondary)', fontFamily: 'var(--font-stack-heading)' }}
           >
             Scroll to Explore

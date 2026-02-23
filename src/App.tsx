@@ -134,31 +134,33 @@ function AppContent() {
         <EcosystemServices />
       </div>
 
-      <div id="about" className="relative" style={{ zIndex: 2 }}>
-        <Suspense fallback={<SectionLoader />}>
-          <AboutStory />
-        </Suspense>
-      </div>
-
-      <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
-        <ArcSlider />
-      </Section>
-
-      <Section id="testimonials" className="bg-[var(--color-background-light)]">
-        <Testimonials />
-      </Section>
-
-      <div id="blog">
-        <LazySection>
+      <div style={{ background: '#ffffff', color: '#1a1a2e' }}>
+        <div id="about" className="relative" style={{ zIndex: 2 }}>
           <Suspense fallback={<SectionLoader />}>
-            <BlogSection />
+            <AboutStory />
           </Suspense>
-        </LazySection>
-      </div>
+        </div>
 
-      <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
-        <ContactForm />
-      </Section>
+        <Section id="services" className="" noPadding={true}>
+          <ArcSlider />
+        </Section>
+
+        <Section id="testimonials" className="">
+          <Testimonials />
+        </Section>
+
+        <div id="blog">
+          <LazySection>
+            <Suspense fallback={<SectionLoader />}>
+              <BlogSection />
+            </Suspense>
+          </LazySection>
+        </div>
+
+        <Section id="contact" className="" delay={0.2} noPadding={true}>
+          <ContactForm />
+        </Section>
+      </div>
 
       <Footer />
     </main>

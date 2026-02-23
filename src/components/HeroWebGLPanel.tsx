@@ -11,11 +11,25 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-const BOUNDS_X = 14;
-const BOUNDS_Y = 10;
-const RESTITUTION = 0.62;
-const FRICTION = 0.992;
-const CURSOR_RADIUS = 2.2;
+// --- Lusion-style physics constants ---
+const BOUNDS_X = 13;
+const BOUNDS_Y = 9;
+// Centralized gravity - pulls objects toward center at all times
+const GRAVITY_STRENGTH = 0.55;
+// How much stronger gravity gets with distance (exponential pull)
+const GRAVITY_DISTANCE_SCALE = 0.048;
+// Buoyant, lofty restitution - high so objects bounce off each other energetically
+const RESTITUTION = 0.78;
+// Mild friction so objects slow gently but never stop
+const FRICTION = 0.988;
+// Cursor repulsion sphere size
+const CURSOR_RADIUS = 3.2;
+// Random micro-impulse magnitude applied each second per object
+const MICRO_IMPULSE = 0.9;
+// Interval between micro-impulses (seconds)
+const MICRO_IMPULSE_INTERVAL = 0.65;
+// Max velocity cap
+const MAX_SPEED = 9.0;
 
 interface PhysicsBall {
   mesh: THREE.Group;
@@ -24,15 +38,13 @@ interface PhysicsBall {
   position: THREE.Vector3;
   radius: number;
   mass: number;
-  floatPhase: number;
-  floatSpeed: number;
-  floatAmplitude: number;
   squishX: number;
   squishY: number;
   spawned: boolean;
   rotSpeedX: number;
   rotSpeedY: number;
   rotSpeedZ: number;
+  nextImpulseTime: number;
 }
 
 const CUBE_VERT = `
@@ -200,41 +212,43 @@ export function HeroWebGLPanel() {
         Math.random() * Math.PI * 2
       );
 
+      // Spawn spread around the bounds edges so they all fall toward center
       const angle = (index / total) * Math.PI * 2;
-      const spreadX = BOUNDS_X * 0.65;
-      const spreadY = BOUNDS_Y * 0.65;
-      const x = Math.cos(angle) * spreadX * (0.4 + Math.random() * 0.55);
-      const y = Math.sin(angle) * spreadY * (0.4 + Math.random() * 0.55);
+      const spreadR = 0.5 + Math.random() * 0.45;
+      const x = Math.cos(angle) * BOUNDS_X * spreadR;
+      const y = Math.sin(angle) * BOUNDS_Y * spreadR;
       const z = (Math.random() - 0.5) * 2;
 
       group.position.set(x, y, z);
       group.scale.set(0, 0, 0);
       mainGroup.add(group);
 
+      // Initial velocity pointing vaguely toward center for the first cluster
+      const toCenterX = -x * 0.03;
+      const toCenterY = -y * 0.03;
+
       objects.push({
         mesh: group,
         innerGroup,
         velocity: new THREE.Vector3(
-          (Math.random() - 0.5) * 0.4,
-          (Math.random() - 0.5) * 0.4,
+          toCenterX + (Math.random() - 0.5) * 0.5,
+          toCenterY + (Math.random() - 0.5) * 0.5,
           0
         ),
         position: new THREE.Vector3(x, y, z),
         radius,
         mass: radius * radius,
-        floatPhase: Math.random() * Math.PI * 2,
-        floatSpeed: 0.18 + Math.random() * 0.12,
-        floatAmplitude: 0.1 + Math.random() * 0.08,
         squishX: 1,
         squishY: 1,
         spawned: false,
-        rotSpeedX: (Math.random() - 0.5) * 0.6,
-        rotSpeedY: (Math.random() - 0.5) * 0.6,
-        rotSpeedZ: (Math.random() - 0.5) * 0.25,
+        rotSpeedX: (Math.random() - 0.5) * 0.8,
+        rotSpeedY: (Math.random() - 0.5) * 0.8,
+        rotSpeedZ: (Math.random() - 0.5) * 0.35,
+        nextImpulseTime: Math.random() * MICRO_IMPULSE_INTERVAL,
       });
 
       const thisObj = objects[objects.length - 1];
-      const delay = 0.06 * index;
+      const delay = 0.055 * index;
       const startTime = performance.now() + delay * 1000;
       const springIn = () => {
         const elapsed = (performance.now() - startTime) / 1000;
@@ -294,9 +308,9 @@ export function HeroWebGLPanel() {
     const tmpRelVel = new THREE.Vector3();
 
     const applySquish = (obj: PhysicsBall, nx: number, ny: number, impulseStrength: number) => {
-      const amount = Math.min(impulseStrength * 0.055, 0.28);
-      obj.squishX = 1 + Math.abs(ny) * amount - Math.abs(nx) * amount * 0.5;
-      obj.squishY = 1 + Math.abs(nx) * amount - Math.abs(ny) * amount * 0.5;
+      const amount = Math.min(impulseStrength * 0.07, 0.38);
+      obj.squishX = 1 + Math.abs(ny) * amount - Math.abs(nx) * amount * 0.55;
+      obj.squishY = 1 + Math.abs(nx) * amount - Math.abs(ny) * amount * 0.55;
     };
 
     const resolveCollision = (a: PhysicsBall, b: PhysicsBall) => {
@@ -338,12 +352,13 @@ export function HeroWebGLPanel() {
       b.velocity.z -= nz * impulse * a.mass;
 
       const impactStrength = Math.abs(relVelAlongN);
-      if (impactStrength > 0.3) {
+      if (impactStrength > 0.15) {
         applySquish(a, nx, ny, impactStrength);
         applySquish(b, -nx, -ny, impactStrength);
       }
     };
 
+    // Cursor pushes objects away; when cursor leaves, gravity naturally pulls them back to center
     const resolveCursorCollision = (obj: PhysicsBall, cursorX: number, cursorY: number, cursorVelX: number, cursorVelY: number) => {
       const dx = obj.position.x - cursorX;
       const dy = obj.position.y - cursorY;
@@ -355,22 +370,24 @@ export function HeroWebGLPanel() {
       const ny = dy / dist;
       const overlap = minDist - dist;
 
-      obj.position.x += nx * overlap;
-      obj.position.y += ny * overlap;
+      obj.position.x += nx * overlap * 1.05;
+      obj.position.y += ny * overlap * 1.05;
+
+      const cursorSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
+      const cursorBoost = Math.min(cursorSpeed * 0.6 + 1.2, 4.0);
 
       const relVelX = obj.velocity.x - cursorVelX;
       const relVelY = obj.velocity.y - cursorVelY;
       const relVelAlongN = relVelX * nx + relVelY * ny;
-      if (relVelAlongN > 0) return;
 
-      const impulse = -(1 + RESTITUTION) * relVelAlongN;
+      // Always apply at least a base push even for slow cursors
+      const baseImpulse = Math.max(-(1 + RESTITUTION) * relVelAlongN, 1.2);
+      const impulse = baseImpulse * cursorBoost;
+
       obj.velocity.x += nx * impulse;
       obj.velocity.y += ny * impulse;
 
-      const impactStrength = Math.abs(relVelAlongN);
-      if (impactStrength > 0.2) {
-        applySquish(obj, nx, ny, impactStrength);
-      }
+      applySquish(obj, nx, ny, Math.abs(impulse) * 0.5);
     };
 
     const clock = new THREE.Clock();
@@ -383,16 +400,16 @@ export function HeroWebGLPanel() {
       const delta = Math.min(rawDelta, 0.05);
       const time = clock.elapsedTime;
 
-      smoothMouse.lerp(mouse, 0.04);
+      smoothMouse.lerp(mouse, 0.06);
 
       prevSmooth3D.copy(smoothMouse3D);
       if (mouseActive) {
-        smoothMouse3D.lerp(mouse3D, 0.1);
+        smoothMouse3D.lerp(mouse3D, 0.12);
       }
       cursorVelocity.subVectors(smoothMouse3D, prevSmooth3D).divideScalar(Math.max(delta, 0.008));
 
-      groupTilt.x = THREE.MathUtils.lerp(groupTilt.x, smoothMouse.x * 0.07, 0.04);
-      groupTilt.y = THREE.MathUtils.lerp(groupTilt.y, -smoothMouse.y * 0.05, 0.04);
+      groupTilt.x = THREE.MathUtils.lerp(groupTilt.x, smoothMouse.x * 0.06, 0.035);
+      groupTilt.y = THREE.MathUtils.lerp(groupTilt.y, -smoothMouse.y * 0.045, 0.035);
       mainGroup.rotation.y = groupTilt.x;
       mainGroup.rotation.x = groupTilt.y;
 
@@ -406,42 +423,59 @@ export function HeroWebGLPanel() {
         for (let i = 0; i < objects.length; i++) {
           const obj = objects[i];
 
+          // --- Lusion-style centralized gravity ---
+          // Pull toward center; strength increases with distance from center
           const cx = obj.position.x;
           const cy = obj.position.y;
           const distCenter = Math.sqrt(cx * cx + cy * cy);
-          const centerGravity = 0.18 + distCenter * 0.022;
-          obj.velocity.x -= cx * centerGravity * subDelta;
-          obj.velocity.y -= cy * centerGravity * subDelta;
-          obj.velocity.y -= 0.06 * subDelta;
+          const gravityMag = GRAVITY_STRENGTH + distCenter * GRAVITY_DISTANCE_SCALE;
+          obj.velocity.x -= cx * gravityMag * subDelta;
+          obj.velocity.y -= cy * gravityMag * subDelta;
 
+          // Very slight downward bias for organic feel
+          obj.velocity.y -= 0.04 * subDelta;
+
+          // Friction - mild damping so objects keep lofty buoyant motion
           obj.velocity.multiplyScalar(Math.pow(FRICTION, subDelta * 60));
+
+          // Clamp speed
+          const spd = Math.sqrt(obj.velocity.x * obj.velocity.x + obj.velocity.y * obj.velocity.y);
+          if (spd > MAX_SPEED) {
+            const sc = MAX_SPEED / spd;
+            obj.velocity.x *= sc;
+            obj.velocity.y *= sc;
+          }
 
           obj.position.x += obj.velocity.x * subDelta;
           obj.position.y += obj.velocity.y * subDelta;
           obj.position.z += obj.velocity.z * subDelta;
 
+          // Soft boundary - push back but with high restitution for bouncy feel
           const maxBX = BOUNDS_X - obj.radius;
           const maxBY = BOUNDS_Y - obj.radius;
-          const maxBZ = 1.5;
+          const maxBZ = 1.4;
           if (obj.position.x > maxBX) {
             obj.position.x = maxBX;
-            obj.velocity.x *= -RESTITUTION;
+            obj.velocity.x = -Math.abs(obj.velocity.x) * RESTITUTION;
             applySquish(obj, 1, 0, Math.abs(obj.velocity.x));
           } else if (obj.position.x < -maxBX) {
             obj.position.x = -maxBX;
-            obj.velocity.x *= -RESTITUTION;
+            obj.velocity.x = Math.abs(obj.velocity.x) * RESTITUTION;
             applySquish(obj, 1, 0, Math.abs(obj.velocity.x));
           }
           if (obj.position.y > maxBY) {
             obj.position.y = maxBY;
-            obj.velocity.y *= -RESTITUTION;
+            obj.velocity.y = -Math.abs(obj.velocity.y) * RESTITUTION;
             applySquish(obj, 0, 1, Math.abs(obj.velocity.y));
           } else if (obj.position.y < -maxBY) {
             obj.position.y = -maxBY;
-            obj.velocity.y *= -RESTITUTION;
+            obj.velocity.y = Math.abs(obj.velocity.y) * RESTITUTION;
             applySquish(obj, 0, 1, Math.abs(obj.velocity.y));
           }
-          if (Math.abs(obj.position.z) > maxBZ) { obj.position.z = Math.sign(obj.position.z) * maxBZ; obj.velocity.z *= -RESTITUTION; }
+          if (Math.abs(obj.position.z) > maxBZ) {
+            obj.position.z = Math.sign(obj.position.z) * maxBZ;
+            obj.velocity.z = -obj.velocity.z * RESTITUTION;
+          }
         }
 
         for (let i = 0; i < objects.length; i++) {
@@ -457,16 +491,23 @@ export function HeroWebGLPanel() {
         }
       }
 
-      const squishRecovery = Math.pow(0.12, delta);
+      // --- Continuous micro-impulses: keep cluster perpetually shifting and jostling ---
       for (let i = 0; i < objects.length; i++) {
         const obj = objects[i];
-        const floatY = Math.sin(time * obj.floatSpeed + obj.floatPhase) * obj.floatAmplitude;
-        const floatX = Math.cos(time * obj.floatSpeed * 0.7 + obj.floatPhase) * obj.floatAmplitude * 0.4;
-        obj.mesh.position.set(
-          obj.position.x + floatX,
-          obj.position.y + floatY,
-          obj.position.z
-        );
+        if (!obj.spawned) continue;
+        if (time >= obj.nextImpulseTime) {
+          const impulseAngle = Math.random() * Math.PI * 2;
+          obj.velocity.x += Math.cos(impulseAngle) * MICRO_IMPULSE;
+          obj.velocity.y += Math.sin(impulseAngle) * MICRO_IMPULSE;
+          obj.nextImpulseTime = time + MICRO_IMPULSE_INTERVAL * (0.6 + Math.random() * 0.8);
+        }
+      }
+
+      // Squish recovery
+      const squishRecovery = Math.pow(0.08, delta);
+      for (let i = 0; i < objects.length; i++) {
+        const obj = objects[i];
+        obj.mesh.position.set(obj.position.x, obj.position.y, obj.position.z);
 
         if (obj.spawned) {
           obj.squishX += (1 - obj.squishX) * (1 - squishRecovery);
@@ -476,7 +517,7 @@ export function HeroWebGLPanel() {
         }
 
         const speed = obj.velocity.length();
-        const spinBoost = 1 + speed * 0.35;
+        const spinBoost = 1 + speed * 0.5;
         obj.innerGroup.rotation.x += obj.rotSpeedX * delta * spinBoost;
         obj.innerGroup.rotation.y += obj.rotSpeedY * delta * spinBoost;
         obj.innerGroup.rotation.z += obj.rotSpeedZ * delta * spinBoost;

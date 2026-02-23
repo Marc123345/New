@@ -143,8 +143,9 @@ export function Navigation() {
         {/* Close button */}
         <button
           onClick={() => setIsOpen(false)}
+          onTouchEnd={(e) => { e.preventDefault(); setIsOpen(false); }}
           className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
-          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
+          style={{ minWidth: 56, minHeight: 56, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
           aria-label="Close menu"
         >
           <span

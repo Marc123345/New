@@ -241,7 +241,7 @@ export function AboutStory() {
       />
       <div
         className="absolute inset-0"
-        style={{ background: 'rgba(5,3,20,0.72)', zIndex: 1 }}
+        style={{ background: 'rgba(5,3,20,0.45)', zIndex: 1 }}
       />
       <motion.div
         className="absolute left-8 lg:left-12 top-0 bottom-0 hidden lg:block pointer-events-none"

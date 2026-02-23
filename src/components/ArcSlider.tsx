@@ -105,11 +105,11 @@ export function ArcSlider() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   // --- CONFIGURATION ---
   const THETA = 20;
-  const RADIUS = isMobile ? 900 : 1500;
+
+  const getRadius = () => (window.innerWidth < 768 ? 800 : 1500);
 
   // --- VISUAL UPDATE FUNCTION ---
   const updateCardVisuals = (currentRotation: number) => {
@@ -150,36 +150,29 @@ export function ArcSlider() {
     const maxRotation = 0;
     const minRotation = -((totalCards - 1) * THETA);
 
-    // 1. Setup initial state
-    gsap.set(wheel, {
-      y: RADIUS,
-      transformOrigin: "50% 50%",
-      rotation: 0,
-    });
-
-    SERVICES.forEach((_, i) => {
-      if (cardsRef.current[i]) {
-        gsap.set(cardsRef.current[i], {
-          rotation: i * THETA,
-          transformOrigin: `50% ${RADIUS}px`,
-          x: 0,
-          y: -RADIUS,
-        });
-      }
-    });
-
-    const onResize = () => {
-      const newIsMobile = window.innerWidth < 768;
-      const newRadius = newIsMobile ? 900 : 1500;
-      gsap.set(wheel, { y: newRadius });
+    const setupWheel = (radius: number) => {
+      gsap.set(wheel, {
+        y: radius,
+        transformOrigin: "50% 50%",
+        rotation: gsap.getProperty(wheel, "rotation") as number,
+      });
       SERVICES.forEach((_, i) => {
         if (cardsRef.current[i]) {
           gsap.set(cardsRef.current[i], {
-            transformOrigin: `50% ${newRadius}px`,
-            y: -newRadius,
+            rotation: i * THETA,
+            transformOrigin: `50% ${radius}px`,
+            x: 0,
+            y: -radius,
           });
         }
       });
+    };
+
+    // 1. Setup initial state
+    setupWheel(getRadius());
+
+    const onResize = () => {
+      setupWheel(getRadius());
     };
     window.addEventListener('resize', onResize);
 

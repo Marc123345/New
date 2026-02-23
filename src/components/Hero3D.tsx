@@ -39,8 +39,12 @@ export function Hero3D() {
     let boundsY = window.innerWidth < 768 ? 10 : 12;
     let scaleMult = window.innerWidth < 768 ? 0.7 : 1;
 
+    // Safe dimensions to prevent divide-by-zero white screens
+    const safeWidth = container.clientWidth || window.innerWidth;
+    const safeHeight = container.clientHeight || window.innerHeight;
+
     const scene = new THREE.Scene();
-    const aspect = container.clientWidth / container.clientHeight;
+    const aspect = safeWidth / safeHeight;
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
     camera.position.set(0, 0, 35);
 
@@ -49,8 +53,8 @@ export function Hero3D() {
       alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(safeWidth, safeHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
@@ -134,7 +138,7 @@ export function Hero3D() {
         mesh: group,
         velocity: new THREE.Vector3(0, 0, 0),
         position: new THREE.Vector3(x, y, z),
-        radius: actualSize, // Use scaled radius for collision detection
+        radius: actualSize, 
         baseRotationSpeed: (Math.random() - 0.5) * 0.3,
         parallaxStrength,
         floatPhase: Math.random() * Math.PI * 2,
@@ -344,7 +348,6 @@ export function Hero3D() {
         tmpVel.copy(obj.velocity).multiplyScalar(delta * 12);
         obj.position.add(tmpVel);
 
-        // Responsive boundaries check
         if (obj.position.x > boundsX) {
           obj.position.x = boundsX;
           obj.velocity.x *= -0.5;
@@ -399,13 +402,15 @@ export function Hero3D() {
     const handleResize = () => {
       if (!container) return;
       
-      // Update bounds on resize
       boundsX = window.innerWidth < 768 ? 8 : 16;
       boundsY = window.innerWidth < 768 ? 10 : 12;
       
-      camera.aspect = container.clientWidth / container.clientHeight;
+      const newWidth = container.clientWidth || window.innerWidth;
+      const newHeight = container.clientHeight || window.innerHeight;
+      
+      camera.aspect = newWidth / newHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(newWidth, newHeight);
     };
     window.addEventListener("resize", handleResize);
 
@@ -431,6 +436,7 @@ export function Hero3D() {
           });
         }
       });
+
       coinGeometry.dispose();
       sideMaterial.dispose();
       renderer.dispose();

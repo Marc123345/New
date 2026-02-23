@@ -229,8 +229,20 @@ export function AboutStory() {
       ref={sectionRef}
       id="about"
       className="relative w-full overflow-hidden"
-      style={{ background: 'var(--color-background-light)' }}
     >
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 0 }}
+        src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful%20(1).mp4?updatedAt=1771264402365"
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: 'rgba(5,3,20,0.72)', zIndex: 1 }}
+      />
       <motion.div
         className="absolute left-8 lg:left-12 top-0 bottom-0 hidden lg:block pointer-events-none"
         style={{
@@ -240,6 +252,7 @@ export function AboutStory() {
           scaleY: lineProgress,
           transformOrigin: 'top',
           opacity: 0.2,
+          zIndex: 2,
         }}
       />
 
@@ -248,11 +261,12 @@ export function AboutStory() {
         style={{
           background:
             'linear-gradient(to right, transparent, rgba(164,108,252,0.25), transparent)',
+          zIndex: 2,
         }}
       />
 
       <div
-        className="relative z-10"
+        className="relative z-[2]"
         style={{
           maxWidth: 1400,
           margin: '0 auto',

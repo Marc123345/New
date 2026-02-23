@@ -11,8 +11,8 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-const BOUNDS_X = 14;
-const BOUNDS_Y = 10;
+const BASE_BOUNDS_X = 14;
+const BASE_BOUNDS_Y = 10;
 const RESTITUTION = 0.62;
 const FRICTION = 0.992;
 const CURSOR_RADIUS = 2.2;
@@ -114,19 +114,26 @@ export function HeroWebGLPanel() {
     if (!container) return;
 
     const scene = new THREE.Scene();
-    const initW = container.clientWidth || container.offsetWidth || 400;
-    const initH = container.clientHeight || container.offsetHeight || 300;
+    const initW = container.clientWidth || container.offsetWidth || window.innerWidth;
+    const initH = container.clientHeight || container.offsetHeight || window.innerHeight;
     const aspect = initW / initH;
+
+    const isMobile = window.innerWidth < 768;
+    const scaleFactor = isMobile ? Math.min(aspect, 0.75) : 1;
+
+    let BOUNDS_X = BASE_BOUNDS_X * scaleFactor;
+    let BOUNDS_Y = BASE_BOUNDS_Y * scaleFactor;
+
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    camera.position.set(0, 0, 35);
+    camera.position.set(0, 0, isMobile ? 28 : 35);
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
       powerPreference: "high-performance",
     });
     renderer.setSize(initW, initH);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
@@ -257,9 +264,10 @@ export function HeroWebGLPanel() {
       requestAnimationFrame(springIn);
     };
 
+    const ballScale = isMobile ? 0.6 : 1;
     const totalTokens = PEOPLE_IMAGES.length + brandLogos.length;
-    PEOPLE_IMAGES.forEach((url, i) => createBall(url, 2.8, i, totalTokens));
-    brandLogos.forEach((url, i) => createBall(url, 2.2, i + PEOPLE_IMAGES.length, totalTokens));
+    PEOPLE_IMAGES.forEach((url, i) => createBall(url, 2.8 * ballScale, i, totalTokens));
+    brandLogos.forEach((url, i) => createBall(url, 2.2 * ballScale, i + PEOPLE_IMAGES.length, totalTokens));
 
     const mouse = new THREE.Vector2(-999, -999);
     const smoothMouse = new THREE.Vector2(-999, -999);
@@ -493,7 +501,13 @@ export function HeroWebGLPanel() {
       const w = container.clientWidth;
       const h = container.clientHeight;
       if (w === 0 || h === 0) return;
-      camera.aspect = w / h;
+      const newAspect = w / h;
+      const newIsMobile = window.innerWidth < 768;
+      const newScale = newIsMobile ? Math.min(newAspect, 0.75) : 1;
+      BOUNDS_X = BASE_BOUNDS_X * newScale;
+      BOUNDS_Y = BASE_BOUNDS_Y * newScale;
+      camera.aspect = newAspect;
+      camera.position.z = newIsMobile ? 28 : 35;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };

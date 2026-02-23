@@ -447,5 +447,12 @@ export function Hero3D() {
     };
   }, []);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  // FIXED: Explicit min-height ensures container does not collapse on mobile!
+  return (
+    <div 
+      ref={containerRef} 
+      className="absolute inset-0 w-full h-full min-h-[100dvh] pointer-events-auto" 
+      style={{ zIndex: 1 }}
+    />
+  );
 }

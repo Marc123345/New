@@ -31,28 +31,17 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Simplified and mobile-safe scroll lock
   useEffect(() => {
     if (isOpen) {
-      const scrollY = window.scrollY;
       document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.top = `-${scrollY}px`;
       timerRef.current = setTimeout(() => setMounted(true), 50);
     } else {
       setMounted(false);
-      const scrollY = document.body.style.top;
       document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      if (scrollY) window.scrollTo(0, parseInt(scrollY || "0") * -1);
     }
     return () => {
       document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [isOpen]);
@@ -91,9 +80,9 @@ export function Navigation() {
               setIsOpen(false);
               window.scrollTo({ top: 0, behavior: "smooth" }); 
             }}
-            className="relative z-[110] transition-all duration-300 opacity-100"
+            // Increased touch target with padding
+            className="relative z-[110] p-2 -ml-2 transition-all duration-300 opacity-100"
           >
-            {/* Logo remains visible even when menu is open for brand consistency */}
             <H2HLogo height={56} className="transition-all duration-300" />
           </a>
 
@@ -101,7 +90,8 @@ export function Navigation() {
             onClick={() => setIsOpen(!isOpen)}
             aria-label={isOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={isOpen}
-            className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
+            // Increased touch target with p-4 and negative margin to keep alignment
+            className={`relative z-[110] group p-4 -mr-4 flex items-center gap-3 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
           >
@@ -126,11 +116,10 @@ export function Navigation() {
       {/* Fullscreen overlay */}
       <div
         className={`fixed inset-0 z-[105] transition-opacity duration-700 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{ backgroundColor: "#0c0c0c" }}
       >
-
         {/* Accent gradient blob */}
         <div
           className="absolute pointer-events-none"
@@ -147,7 +136,8 @@ export function Navigation() {
         {/* Close button */}
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-6 right-6 md:top-8 md:right-10 z-20 group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+          // Increased touch target here as well
+          className="absolute top-6 right-6 md:top-8 md:right-10 z-20 p-4 -mr-4 -mt-4 group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
           aria-label="Close menu"
         >
           <span
@@ -167,10 +157,10 @@ export function Navigation() {
 
         {/* Main content grid */}
         <div className="absolute inset-0 flex flex-col lg:flex-row">
-          {/* Left: Nav links (60%) */}
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-28 lg:pt-0">
+          {/* Left: Nav links (60%) - Added overflow-y-auto for tiny screens */}
+          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 md:px-16 lg:px-24 pt-24 pb-20 lg:pt-0 overflow-y-auto">
             <nav
-              className="flex flex-col"
+              className="flex flex-col my-auto"
               onMouseLeave={() => setActiveIndex(null)}
             >
               {NAV_LINKS.map((link, i) => (
@@ -187,23 +177,20 @@ export function Navigation() {
                     opacity: mounted ? 1 : 0,
                   }}
                 >
-                  {/* Hover background fill */}
                   <div
                     className="absolute inset-0 bg-white/[0.03] transition-transform duration-500 origin-left"
                     style={{ transform: activeIndex === i ? "scaleX(1)" : "scaleX(0)" }}
                   />
 
-                  {/* Number */}
                   <span
-                    className="relative z-10 w-10 text-xs text-white/20 mr-6 transition-colors duration-300 group-hover:text-white/40"
+                    className="relative z-10 w-8 md:w-10 text-xs text-white/20 mr-4 md:mr-6 transition-colors duration-300 group-hover:text-white/40"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
                   >
                     {link.id}
                   </span>
 
-                  {/* Label - Resized for better mobile fit */}
                   <span
-                    className="relative z-10 flex-1 text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
+                    className="relative z-10 flex-1 text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex !== null && activeIndex !== i ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.9)",
@@ -213,7 +200,6 @@ export function Navigation() {
                     {link.label}
                   </span>
 
-                  {/* Sub label */}
                   <span
                     className="relative z-10 hidden md:block text-xs tracking-widest uppercase text-white/30 transition-all duration-300 group-hover:text-white/60 group-hover:translate-x-1"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
@@ -221,7 +207,6 @@ export function Navigation() {
                     {link.sub}
                   </span>
 
-                  {/* Arrow */}
                   <svg
                     className="relative z-10 ml-4 w-5 h-5 text-white/20 transition-all duration-300 group-hover:text-white/70 group-hover:translate-x-1"
                     viewBox="0 0 24 24"
@@ -246,7 +231,6 @@ export function Navigation() {
               transform: mounted ? "translateX(0)" : "translateX(30px)",
             }}
           >
-            {/* Top: tagline */}
             <div>
               <p
                 className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6"
@@ -259,13 +243,11 @@ export function Navigation() {
               </p>
             </div>
 
-            {/* Middle: decorative element */}
             <div className="flex items-center gap-4">
               <div className="h-[1px] flex-1 bg-white/10" />
               <div className="w-1 h-1 rounded-full bg-white/20" />
             </div>
 
-            {/* Bottom: contact + social */}
             <div className="space-y-8">
               <div>
                 <p
@@ -309,7 +291,7 @@ export function Navigation() {
 
         {/* Bottom bar */}
         <div
-          className="absolute bottom-0 left-0 right-0 px-8 md:px-16 py-5 flex items-center justify-between border-t border-white/[0.06]"
+          className="absolute bottom-0 left-0 right-0 px-6 md:px-16 py-5 flex items-center justify-between border-t border-white/[0.06] bg-[#0c0c0c]"
           style={{
             transition: "opacity 0.8s ease",
             transitionDelay: mounted ? "350ms" : "0ms",
@@ -322,7 +304,7 @@ export function Navigation() {
           >
             &copy; {new Date().getFullYear()} H2H Digital
           </p>
-          <div className="flex lg:hidden gap-5">
+          <div className="flex lg:hidden gap-4">
             {SOCIAL.map((s) => (
               <a
                 key={s.label}

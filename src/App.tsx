@@ -86,28 +86,26 @@ function AppContent() {
         >
           <div className="max-w-7xl mx-auto">
             <HeroTitle>
-              <ScrollReveal mode="blur" delay={0.2} className="w-full">
-                <div
-                  className="relative mx-auto w-full h-[300px] sm:h-[420px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
-                  style={{
-                    border: "3px solid var(--color-text-dark)",
-                    boxShadow: "10px 10px 0 var(--color-surface-dark)",
-                    background: "#000",
-                  }}
-                >
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214"
-                  />
-                  <div className="absolute inset-0">
-                    <HeroWebGLPanel />
-                  </div>
+              <div
+                className="relative mx-auto w-full h-[300px] sm:h-[420px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
+                style={{
+                  border: "3px solid var(--color-text-dark)",
+                  boxShadow: "10px 10px 0 var(--color-surface-dark)",
+                  background: "#000",
+                }}
+              >
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                  src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214"
+                />
+                <div className="absolute inset-0">
+                  <HeroWebGLPanel />
                 </div>
-              </ScrollReveal>
+              </div>
             </HeroTitle>
           </div>
         </div>

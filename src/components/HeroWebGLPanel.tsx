@@ -114,7 +114,9 @@ export function HeroWebGLPanel() {
     if (!container) return;
 
     const scene = new THREE.Scene();
-    const aspect = container.clientWidth / container.clientHeight;
+    const initW = container.clientWidth || container.offsetWidth || 400;
+    const initH = container.clientHeight || container.offsetHeight || 300;
+    const aspect = initW / initH;
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
     camera.position.set(0, 0, 35);
 
@@ -123,7 +125,7 @@ export function HeroWebGLPanel() {
       alpha: true,
       powerPreference: "high-performance",
     });
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(initW, initH);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
@@ -488,13 +490,20 @@ export function HeroWebGLPanel() {
 
     const handleResize = () => {
       if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w === 0 || h === 0) return;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(w, h);
     };
+
+    const ro = new ResizeObserver(handleResize);
+    ro.observe(container);
     window.addEventListener("resize", handleResize);
 
     return () => {
+      ro.disconnect();
       window.removeEventListener("mousemove", handleMouseMove);
       container.removeEventListener("touchmove", handleTouchMove);
       container.removeEventListener("mouseleave", handleMouseLeave);

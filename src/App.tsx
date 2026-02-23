@@ -48,7 +48,7 @@ const Section = ({
 }: SectionProps) => (
   <section
     id={id}
-    className={className}
+    className={`${className} px-4 md:px-8`}
     style={noPadding ? {} : {
       paddingTop: 'var(--space-8x)',
       paddingBottom: 'var(--space-8x)'
@@ -88,7 +88,7 @@ function AppContent() {
             <HeroTitle>
               <ScrollReveal mode="blur" delay={0.2} className="w-full">
                 <div
-                  className="relative mx-auto w-full h-[520px] md:h-[700px] lg:h-[820px] overflow-hidden"
+                  className="relative mx-auto w-full h-[520px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-lg md:rounded-none"
                   style={{
                     border: "3px solid var(--color-text-dark)",
                     boxShadow: "10px 10px 0 var(--color-surface-dark)",
@@ -114,7 +114,7 @@ function AppContent() {
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
-            className="text-xs tracking-[0.2em] uppercase"
+            className="text-xs tracking-[0.2em] uppercase text-center"
             style={{ color: 'var(--color-secondary)', fontFamily: 'var(--font-stack-heading)' }}
           >
             Scroll to Explore

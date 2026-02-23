@@ -7,7 +7,6 @@ import {
   useMotionValueEvent,
   MotionValue
 } from 'framer-motion';
-import { HeroWebGL } from './HeroWebGL';
 
 interface Chapter {
   title: string;
@@ -103,29 +102,20 @@ const ChapterSlide = ({
       }}
     >
       <div className="relative w-full h-full">
-        {/* Background Layer */}
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: chapter.bg,
-            opacity: 0.75,
-            scale,
-          }}
-        />
-        
         {/* Radial Gradient Overlay */}
         <motion.div
           className="absolute inset-0"
           style={{
             background: useTransform(
               localProgress,
-              (val) => `radial-gradient(ellipse at 70% 50%, rgba(124, 4, 252, ${0.08 + val * 0.04}) 0%, transparent 70%)`
+              (val) => `radial-gradient(ellipse at 70% 50%, rgba(124, 4, 252, ${0.1 + val * 0.06}) 0%, transparent 70%)`
             ),
+            zIndex: 2,
           }}
         />
 
         {/* Text Content (Left Side) */}
-        <div className="relative z-10 h-full flex items-center" style={{ paddingTop: '6rem' }}>
+        <div className="relative h-full flex items-center" style={{ paddingTop: '6rem', zIndex: 5 }}>
           <div className="container mx-auto px-6 md:px-12">
             <div className="max-w-7xl mx-auto">
               <motion.div
@@ -269,7 +259,20 @@ export function HeroStory() {
       style={{ height: `${chapters.length * 100}vh`, background: '#000' }}
     >
       <div className="sticky top-0 h-screen overflow-hidden">
-        <HeroWebGL />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ zIndex: 0 }}
+        >
+          <source src="https://ik.imagekit.io/qcvroy8xpd/Space%20Together.mp4" type="video/mp4" />
+        </video>
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(0,0,0,0.55)', zIndex: 1 }}
+        />
 
         {/* Render Chapters */}
         {chapters.map((chapter, index) => (

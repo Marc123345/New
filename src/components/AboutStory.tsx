@@ -233,7 +233,7 @@ function VideoPanel() {
         playsInline
         style={{ scale }}
         className="absolute inset-0 w-full h-full object-cover"
-        src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4a"
+        src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful%20(1).mp4?updatedAt=1771264402365"
       />
       <div
         className="absolute inset-0"

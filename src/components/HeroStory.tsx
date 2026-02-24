@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   motion,
   useScroll,
@@ -7,6 +7,11 @@ import {
   useMotionValueEvent,
   MotionValue
 } from 'framer-motion';
+
+const VIDEOS = [
+  'https://ik.imagekit.io/qcvroy8xpd/astronaut-discussing-with-colleague-conducting-sci-2026-01-22-07-18-24-utc.mp4',
+  'https://ik.imagekit.io/qcvroy8xpd/two-astronauts-wearing-space-suits-work-on-a-lapto-2026-01-20-12-26-32-utc.mp4',
+];
 
 interface Chapter {
   title: string;
@@ -252,6 +257,22 @@ export function HeroStory() {
     window.scrollTo({ top: targetScroll, behavior: 'smooth' });
   };
 
+  const videoARef = useRef<HTMLVideoElement>(null);
+  const videoBRef = useRef<HTMLVideoElement>(null);
+  const [activeVideo, setActiveVideo] = useState(0);
+
+  useEffect(() => {
+    const newActiveVideo = activeSection % 2;
+    if (newActiveVideo !== activeVideo) {
+      setActiveVideo(newActiveVideo);
+      const nextRef = newActiveVideo === 0 ? videoARef : videoBRef;
+      if (nextRef.current) {
+        nextRef.current.currentTime = 0;
+        nextRef.current.play();
+      }
+    }
+  }, [activeSection]);
+
   return (
     <div
       ref={containerRef}
@@ -259,16 +280,24 @@ export function HeroStory() {
       style={{ height: `${chapters.length * 100}vh`, background: '#000' }}
     >
       <div className="sticky top-0 h-screen overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ zIndex: 0 }}
-        >
-          <source src="https://ik.imagekit.io/qcvroy8xpd/Space%20Together.mp4" type="video/mp4" />
-        </video>
+        {VIDEOS.map((src, i) => (
+          <video
+            key={i}
+            ref={i === 0 ? videoARef : videoBRef}
+            autoPlay={i === 0}
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              zIndex: 0,
+              opacity: activeVideo === i ? 1 : 0,
+              transition: 'opacity 0.9s ease-in-out',
+            }}
+          >
+            <source src={src} type="video/mp4" />
+          </video>
+        ))}
         <div
           className="absolute inset-0"
           style={{ background: 'rgba(0,0,0,0.55)', zIndex: 1 }}

@@ -300,7 +300,7 @@ export function HeroStory() {
         ))}
         <div
           className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.55)', zIndex: 1 }}
+          style={{ background: 'rgba(0,0,0,0.75)', zIndex: 1 }}
         />
 
         {/* Render Chapters */}

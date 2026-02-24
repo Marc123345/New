@@ -116,7 +116,7 @@ export function Loader({ onComplete }: LoaderProps) {
           pointerEvents: 'none',
         }}
       >
-        <source src="https://ik.imagekit.io/qcvroy8xpd/envato_video_gen_Feb_23_2026_16_41_55.mp4" type="video/mp4" />
+        <source src="https://ik.imagekit.io/qcvroy8xpd/two-astronauts-in-space-suits-stand-on-the-alien-p-2026-01-20-12-19-32-utc.mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay */}

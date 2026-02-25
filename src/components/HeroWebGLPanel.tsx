@@ -17,28 +17,31 @@ const N = ALL_URLS.length;
 
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
-const ATTRACTOR_BASE = 1.8;
-const ATTRACTOR_SCALE = 0.14;
-const RESTITUTION = 0.82;
-const DAMPING_PER_60 = 0.994;
-const CURSOR_CONTACT_R = 2.8;
-const CURSOR_FIELD_R = 6.5;
-const CURSOR_FIELD_STR = 22.0;
-const MAX_SPEED_SQ = 11.0 * 11.0;
-const MICRO_IMPULSE = 1.4;
-const MICRO_INT_MIN = 0.3;
-const MICRO_INT_RNG = 0.5;
+
+const SPRING_CENTER = 0.6;
+const SPRING_DAMPING = 0.92;
+const CURSOR_RADIUS = 8.0;
+const CURSOR_INNER = 3.5;
+const CURSOR_PUSH_STR = 35.0;
+const CURSOR_DRAG_STR = 12.0;
+const MAX_SPEED = 14.0;
+const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
+
+const JELLY_SPRING = 18.0;
+const JELLY_DAMPING = 4.5;
 
 const CUBE_VERT = `
 varying vec3 vNormal;
 varying vec3 vViewDir;
 varying vec2 vUv;
+varying float vFresnel;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vec4 vp = viewMatrix * wp;
   vViewDir = normalize(-vp.xyz);
   vNormal = normalize(normalMatrix * normal);
+  vFresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.5);
   gl_Position = projectionMatrix * vp;
 }`;
 
@@ -46,18 +49,21 @@ const CUBE_FRAG = `
 uniform sampler2D uMap;
 uniform vec3 uRimColor;
 uniform float uRimStr;
+uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 varying vec2 vUv;
+varying float vFresnel;
 void main() {
   vec4 tex = texture2D(uMap, vUv);
-  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.2);
-  vec3 rim = uRimColor * fr * uRimStr;
-  vec3 L = normalize(vec3(0.6, 0.8, 1.0));
+  vec3 rim = uRimColor * vFresnel * uRimStr * (1.0 + uHover * 0.8);
+  vec3 L = normalize(vec3(0.4, 0.7, 1.0));
   float diff = max(dot(vNormal, L), 0.0);
   vec3 H = normalize(L + vViewDir);
-  float spec = pow(max(dot(vNormal, H), 0.0), 90.0);
-  gl_FragColor = vec4(tex.rgb * (0.6 + diff * 0.4) + spec * 0.85 + rim, 1.0);
+  float spec = pow(max(dot(vNormal, H), 0.0), 64.0) * (0.7 + uHover * 0.5);
+  vec3 ambient = tex.rgb * 0.55;
+  vec3 lit = tex.rgb * diff * 0.45;
+  gl_FragColor = vec4(ambient + lit + spec * 0.9 + rim, 1.0);
 }`;
 
 const SHELL_VERT = `
@@ -72,11 +78,46 @@ void main() {
 
 const SHELL_FRAG = `
 uniform vec3 uColor;
+uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 void main() {
-  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
-  gl_FragColor = vec4(uColor * fr, fr * 0.5);
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.8);
+  float glow = fr * (0.4 + uHover * 0.6);
+  gl_FragColor = vec4(uColor * glow, glow * 0.6);
+}`;
+
+const DISPLACEMENT_VERT = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}`;
+
+const DISPLACEMENT_FRAG = `
+uniform sampler2D uScene;
+uniform vec2 uMouse;
+uniform float uRadius;
+uniform float uStrength;
+uniform vec2 uVelocity;
+uniform vec2 uResolution;
+varying vec2 vUv;
+void main() {
+  vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+  vec2 uv = vUv;
+  vec2 mouse = uMouse;
+  vec2 diff = (uv - mouse) * aspect;
+  float dist = length(diff);
+  float falloff = smoothstep(uRadius, 0.0, dist);
+  vec2 dir = normalize(diff + 0.0001);
+  vec2 vel = uVelocity * aspect;
+  float velMag = length(vel);
+  vec2 displacement = dir * falloff * uStrength * 0.012;
+  displacement += vel * falloff * 0.008 * min(velMag * 2.0, 1.0);
+  vec2 r = texture2D(uScene, uv + displacement * 1.1).rg;
+  float g = texture2D(uScene, uv + displacement).g;
+  vec2 b = texture2D(uScene, uv + displacement * 0.9).ba;
+  gl_FragColor = vec4(r.x, g, b.x, b.y);
 }`;
 
 const SHELL_COLORS = [
@@ -103,40 +144,92 @@ export function HeroWebGLPanel() {
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
+    const renderTarget = new THREE.WebGLRenderTarget(
+      container.clientWidth * Math.min(window.devicePixelRatio, 2),
+      container.clientHeight * Math.min(window.devicePixelRatio, 2)
+    );
+
+    const displacementScene = new THREE.Scene();
+    const displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const displacementMaterial = new THREE.ShaderMaterial({
+      vertexShader: DISPLACEMENT_VERT,
+      fragmentShader: DISPLACEMENT_FRAG,
+      uniforms: {
+        uScene: { value: renderTarget.texture },
+        uMouse: { value: new THREE.Vector2(-1, -1) },
+        uRadius: { value: 0.15 },
+        uStrength: { value: 0.0 },
+        uVelocity: { value: new THREE.Vector2(0, 0) },
+        uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
+      },
+    });
+    const displacementQuad = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      displacementMaterial
+    );
+    displacementScene.add(displacementQuad);
+
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
 
-    // Shared geometries - one per unique size to avoid redundant GPU uploads
     const geoCache = new Map<number, [THREE.BoxGeometry, THREE.BoxGeometry]>();
     const getGeos = (r: number) => {
       const key = Math.round(r * 10);
       if (!geoCache.has(key)) {
         const s = r * 2;
-        geoCache.set(key, [new THREE.BoxGeometry(s, s, s), new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07)]);
+        geoCache.set(key, [new THREE.BoxGeometry(s, s, s), new THREE.BoxGeometry(s * 1.08, s * 1.08, s * 1.08)]);
       }
       return geoCache.get(key)!;
     };
 
-    // Flat typed arrays for all physics state - eliminates per-frame GC from THREE.Vector3
-    const px = new Float32Array(N);   // position x
-    const py = new Float32Array(N);   // position y
-    const pz = new Float32Array(N);   // position z
-    const vx = new Float32Array(N);   // velocity x
-    const vy = new Float32Array(N);   // velocity y
-    const vz = new Float32Array(N);   // velocity z
+    const px = new Float32Array(N);
+    const py = new Float32Array(N);
+    const pz = new Float32Array(N);
+    const vx = new Float32Array(N);
+    const vy = new Float32Array(N);
+    const vz = new Float32Array(N);
     const radii = new Float32Array(RADII);
     const masses = new Float32Array(N);
-    const sqX = new Float32Array(N).fill(1);  // squish x
-    const sqY = new Float32Array(N).fill(1);  // squish y
-    const rotX = new Float32Array(N); // rotation speeds
-    const rotY = new Float32Array(N);
-    const rotZ = new Float32Array(N);
-    const nextImpulse = new Float32Array(N);
+
+    const jellyScaleX = new Float32Array(N).fill(1);
+    const jellyScaleY = new Float32Array(N).fill(1);
+    const jellyScaleZ = new Float32Array(N).fill(1);
+    const jellyVelX = new Float32Array(N);
+    const jellyVelY = new Float32Array(N);
+    const jellyVelZ = new Float32Array(N);
+    const jellyTargetX = new Float32Array(N).fill(1);
+    const jellyTargetY = new Float32Array(N).fill(1);
+    const jellyTargetZ = new Float32Array(N).fill(1);
+
+    const breathPhase = new Float32Array(N);
+    const floatPhaseX = new Float32Array(N);
+    const floatPhaseY = new Float32Array(N);
+    const floatPhaseZ = new Float32Array(N);
+    const floatSpeedX = new Float32Array(N);
+    const floatSpeedY = new Float32Array(N);
+    const floatSpeedZ = new Float32Array(N);
+    const floatAmpX = new Float32Array(N);
+    const floatAmpY = new Float32Array(N);
+
+    const homeX = new Float32Array(N);
+    const homeY = new Float32Array(N);
+
+    const rotVelX = new Float32Array(N);
+    const rotVelY = new Float32Array(N);
+    const rotTargetVelX = new Float32Array(N);
+    const rotTargetVelY = new Float32Array(N);
+    const baseRotX = new Float32Array(N);
+    const baseRotY = new Float32Array(N);
+    const baseRotZ = new Float32Array(N);
+
+    const hoverAmount = new Float32Array(N);
     const spawned = new Uint8Array(N);
     const spawnStart = new Float32Array(N);
 
     const meshes: THREE.Group[] = [];
     const innerGroups: THREE.Group[] = [];
+    const cubeMaterials: THREE.ShaderMaterial[] = [];
+    const shellMaterials: THREE.ShaderMaterial[] = [];
     const loadedTextures: THREE.Texture[] = [];
     const textureLoader = new THREE.TextureLoader();
     textureLoader.setCrossOrigin("anonymous");
@@ -144,17 +237,29 @@ export function HeroWebGLPanel() {
     for (let i = 0; i < N; i++) {
       const r = radii[i];
       masses[i] = r * r;
-      rotX[i] = (Math.random() - 0.5) * 0.7;
-      rotY[i] = (Math.random() - 0.5) * 0.7;
-      rotZ[i] = (Math.random() - 0.5) * 0.3;
-      nextImpulse[i] = Math.random() * MICRO_INT_RNG;
-      spawnStart[i] = i * 0.06;
+      spawnStart[i] = i * 0.08;
 
-      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
-      const dist = 0.55 + Math.random() * 0.4;
-      px[i] = Math.cos(angle) * BOUNDS_X * dist;
-      py[i] = Math.sin(angle) * BOUNDS_Y * dist;
-      pz[i] = (Math.random() - 0.5) * 2.5;
+      breathPhase[i] = Math.random() * Math.PI * 2;
+      floatPhaseX[i] = Math.random() * Math.PI * 2;
+      floatPhaseY[i] = Math.random() * Math.PI * 2;
+      floatPhaseZ[i] = Math.random() * Math.PI * 2;
+      floatSpeedX[i] = 0.3 + Math.random() * 0.4;
+      floatSpeedY[i] = 0.25 + Math.random() * 0.35;
+      floatSpeedZ[i] = 0.15 + Math.random() * 0.25;
+      floatAmpX[i] = 0.3 + Math.random() * 0.5;
+      floatAmpY[i] = 0.25 + Math.random() * 0.4;
+
+      baseRotX[i] = (Math.random() - 0.5) * 0.15;
+      baseRotY[i] = (Math.random() - 0.5) * 0.15;
+      baseRotZ[i] = (Math.random() - 0.5) * 0.08;
+
+      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+      const dist = 0.35 + Math.random() * 0.45;
+      homeX[i] = Math.cos(angle) * BOUNDS_X * dist * 0.7;
+      homeY[i] = Math.sin(angle) * BOUNDS_Y * dist * 0.7;
+      px[i] = homeX[i] + (Math.random() - 0.5) * 2;
+      py[i] = homeY[i] + (Math.random() - 0.5) * 2;
+      pz[i] = (Math.random() - 0.5) * 3;
 
       const group = new THREE.Group();
       const inner = new THREE.Group();
@@ -177,30 +282,39 @@ export function HeroWebGLPanel() {
       }, undefined, () => {});
       loadedTextures.push(tex);
 
-      // Single shared material per cube (not 6 separate ones)
       const cubeMat = new THREE.ShaderMaterial({
         vertexShader: CUBE_VERT,
         fragmentShader: CUBE_FRAG,
-        uniforms: { uMap: { value: tex }, uRimColor: { value: rimColor }, uRimStr: { value: 1.4 } },
+        uniforms: {
+          uMap: { value: tex },
+          uRimColor: { value: rimColor },
+          uRimStr: { value: 1.2 },
+          uHover: { value: 0 },
+        },
       });
+      cubeMaterials.push(cubeMat);
       inner.add(new THREE.Mesh(cubeGeo, cubeMat));
 
       const shellMat = new THREE.ShaderMaterial({
         vertexShader: SHELL_VERT,
         fragmentShader: SHELL_FRAG,
-        uniforms: { uColor: { value: rimColor } },
+        uniforms: {
+          uColor: { value: rimColor },
+          uHover: { value: 0 },
+        },
         transparent: true, side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending,
       });
+      shellMaterials.push(shellMat);
       inner.add(new THREE.Mesh(shellGeo, shellMat));
     }
 
-    // Cursor state
     let cx3d = -9999, cy3d = -9999;
-    let prevCx = -9999, prevCy = -9999;
-    let cvx = 0, cvy = 0;
+    let smoothCx = -9999, smoothCy = -9999;
+    let prevSmoothCx = -9999, prevSmoothCy = -9999;
+    let cursorVelX = 0, cursorVelY = 0;
     let mouseActive = false;
-    let mouseSmoothX = -999, mouseSmoothY = -999;
-    const rawMouseX = { v: -999 }, rawMouseY = { v: -999 };
+    let mouseNdcX = 0, mouseNdcY = 0;
+    let displacementStrength = 0;
 
     const raycaster = new THREE.Raycaster();
     const mouse2D = new THREE.Vector2();
@@ -213,10 +327,10 @@ export function HeroWebGLPanel() {
       mouse2D.y = -((clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mouse2D, camera);
       raycaster.ray.intersectPlane(plane, hitPt);
-      rawMouseX.v = hitPt.x;
-      rawMouseY.v = hitPt.y;
-      mouseSmoothX = mouse2D.x;
-      mouseSmoothY = mouse2D.y;
+      cx3d = hitPt.x;
+      cy3d = hitPt.y;
+      mouseNdcX = (clientX - rect.left) / rect.width;
+      mouseNdcY = 1.0 - (clientY - rect.top) / rect.height;
       mouseActive = true;
     };
 
@@ -246,202 +360,275 @@ export function HeroWebGLPanel() {
       const dt = Math.min(rawDelta, 0.05);
       time += dt;
 
-      // Smooth cursor tracking
       if (mouseActive) {
-        cx3d += (rawMouseX.v - cx3d) * 0.14;
-        cy3d += (rawMouseY.v - cy3d) * 0.14;
+        const lerp = 1 - Math.pow(0.001, dt);
+        smoothCx += (cx3d - smoothCx) * lerp;
+        smoothCy += (cy3d - smoothCy) * lerp;
+      } else {
+        smoothCx += (-9999 - smoothCx) * 0.03;
+        smoothCy += (-9999 - smoothCy) * 0.03;
       }
-      const newCvx = (cx3d - prevCx) / Math.max(dt, 0.008);
-      const newCvy = (cy3d - prevCy) / Math.max(dt, 0.008);
-      cvx = newCvx;
-      cvy = newCvy;
-      prevCx = cx3d;
-      prevCy = cy3d;
 
-      // Group tilt
-      const targetTiltX = mouseActive ? mouseSmoothX * 0.05 : 0;
-      const targetTiltY = mouseActive ? -mouseSmoothY * 0.04 : 0;
-      tiltX += (targetTiltX - tiltX) * 0.03;
-      tiltY += (targetTiltY - tiltY) * 0.03;
+      cursorVelX = (smoothCx - prevSmoothCx) / Math.max(dt, 0.008);
+      cursorVelY = (smoothCy - prevSmoothCy) / Math.max(dt, 0.008);
+      prevSmoothCx = smoothCx;
+      prevSmoothCy = smoothCy;
+
+      const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.06 : 0;
+      const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.05 : 0;
+      tiltX += (targetTiltX - tiltX) * (1 - Math.pow(0.01, dt));
+      tiltY += (targetTiltY - tiltY) * (1 - Math.pow(0.01, dt));
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
-      // Fewer substeps when idle - saves CPU when no cursor interaction
-      const SUB = mouseActive ? 8 : 4;
-      const subDt = dt / SUB;
-      const dampFactor = Math.pow(DAMPING_PER_60, subDt * 60);
+      const targetDisplacement = mouseActive ? 1.0 : 0.0;
+      displacementStrength += (targetDisplacement - displacementStrength) * (1 - Math.pow(0.005, dt));
 
-      // Spawn animation (replaces separate RAF per object)
       for (let i = 0; i < N; i++) {
         if (spawned[i]) continue;
         const elapsed = time - spawnStart[i];
         if (elapsed < 0) continue;
-        const t = Math.min(elapsed / 1.0, 1);
+        const t = Math.min(elapsed / 1.2, 1);
         const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        const s = ease * (1 + 0.1 * Math.sin(elapsed * 10) * Math.max(0, 1 - t * 1.8));
-        meshes[i].scale.setScalar(Math.min(s, 1));
+        const overshoot = 1.0 + 0.15 * Math.sin(elapsed * 6) * Math.exp(-elapsed * 2.5);
+        const s = ease * overshoot;
+        meshes[i].scale.setScalar(Math.max(s, 0));
         if (t >= 1) {
           meshes[i].scale.setScalar(1);
           spawned[i] = 1;
         }
       }
 
-      // Physics substeps
+      const SUB = 6;
+      const subDt = dt / SUB;
+
       for (let s = 0; s < SUB; s++) {
-
-        // Forces + integrate
         for (let i = 0; i < N; i++) {
-          const ix = px[i], iy = py[i];
+          const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * floatAmpX[i];
+          const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * floatAmpY[i];
 
-          // Attractor toward center - strength grows with distance
-          const distSq = ix * ix + iy * iy;
-          const dist = Math.sqrt(distSq);
-          const aM = (ATTRACTOR_BASE + dist * ATTRACTOR_SCALE) * subDt;
-          vx[i] -= ix * aM;
-          vy[i] -= iy * aM + 0.05 * subDt;
+          const targetX = homeX[i] + floatOffX;
+          const targetY = homeY[i] + floatOffY;
 
-          // Damping
-          vx[i] *= dampFactor;
-          vy[i] *= dampFactor;
+          const dx = targetX - px[i];
+          const dy = targetY - py[i];
+          const dz = -pz[i];
 
-          // Speed cap (squared comparison - no sqrt needed)
-          const spd2 = vx[i] * vx[i] + vy[i] * vy[i];
+          const springForce = SPRING_CENTER;
+          vx[i] += dx * springForce * subDt;
+          vy[i] += dy * springForce * subDt;
+          vz[i] += dz * springForce * 0.5 * subDt;
+
+          const dampPow = Math.pow(SPRING_DAMPING, subDt * 60);
+          vx[i] *= dampPow;
+          vy[i] *= dampPow;
+          vz[i] *= dampPow;
+
+          const spd2 = vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
           if (spd2 > MAX_SPEED_SQ) {
             const sc = Math.sqrt(MAX_SPEED_SQ / spd2);
             vx[i] *= sc;
             vy[i] *= sc;
+            vz[i] *= sc;
           }
 
           px[i] += vx[i] * subDt;
           py[i] += vy[i] * subDt;
           pz[i] += vz[i] * subDt;
 
-          // Wall bounds
           const r = radii[i];
           const mX = BOUNDS_X - r, mY = BOUNDS_Y - r;
-          if (px[i] > mX) { px[i] = mX; vx[i] = -Math.abs(vx[i]) * RESTITUTION; const a = Math.abs(vx[i]); sqX[i] = 1 - a * 0.06; sqY[i] = 1 + a * 0.06; }
-          else if (px[i] < -mX) { px[i] = -mX; vx[i] = Math.abs(vx[i]) * RESTITUTION; const a = Math.abs(vx[i]); sqX[i] = 1 - a * 0.06; sqY[i] = 1 + a * 0.06; }
-          if (py[i] > mY) { py[i] = mY; vy[i] = -Math.abs(vy[i]) * RESTITUTION; const a = Math.abs(vy[i]); sqX[i] = 1 + a * 0.06; sqY[i] = 1 - a * 0.06; }
-          else if (py[i] < -mY) { py[i] = -mY; vy[i] = Math.abs(vy[i]) * RESTITUTION; const a = Math.abs(vy[i]); sqX[i] = 1 + a * 0.06; sqY[i] = 1 - a * 0.06; }
-          if (pz[i] > 1.5) { pz[i] = 1.5; vz[i] = -Math.abs(vz[i]) * RESTITUTION; }
-          else if (pz[i] < -1.5) { pz[i] = -1.5; vz[i] = Math.abs(vz[i]) * RESTITUTION; }
+          const wallSoftness = 2.0;
+          if (px[i] > mX) { vx[i] -= (px[i] - mX) * wallSoftness * subDt * 60; }
+          else if (px[i] < -mX) { vx[i] -= (px[i] + mX) * wallSoftness * subDt * 60; }
+          if (py[i] > mY) { vy[i] -= (py[i] - mY) * wallSoftness * subDt * 60; }
+          else if (py[i] < -mY) { vy[i] -= (py[i] + mY) * wallSoftness * subDt * 60; }
+          const mZ = 2.5;
+          if (pz[i] > mZ) { vz[i] -= (pz[i] - mZ) * wallSoftness * subDt * 60; }
+          else if (pz[i] < -mZ) { vz[i] -= (pz[i] + mZ) * wallSoftness * subDt * 60; }
         }
 
-        // Object-object collisions (O(n²) but n is small ~18)
         for (let i = 0; i < N; i++) {
           for (let j = i + 1; j < N; j++) {
-            const dx = px[j] - px[i];
-            const dy = py[j] - py[i];
-            const dz = pz[j] - pz[i];
-            const distSq = dx * dx + dy * dy + dz * dz;
-            const minD = radii[i] + radii[j];
+            const ddx = px[j] - px[i];
+            const ddy = py[j] - py[i];
+            const ddz = pz[j] - pz[i];
+            const distSq = ddx * ddx + ddy * ddy + ddz * ddz;
+            const minD = (radii[i] + radii[j]) * 1.05;
             if (distSq >= minD * minD || distSq < 0.0001) continue;
 
             const dist = Math.sqrt(distSq);
-            const nx = dx / dist, ny = dy / dist, nz = dz / dist;
+            const nx = ddx / dist, ny = ddy / dist, nz = ddz / dist;
             const overlap = minD - dist;
             const mA = masses[i], mB = masses[j], mT = mA + mB;
 
-            px[i] -= nx * overlap * (mB / mT);
-            py[i] -= ny * overlap * (mB / mT);
-            pz[i] -= nz * overlap * (mB / mT);
-            px[j] += nx * overlap * (mA / mT);
-            py[j] += ny * overlap * (mA / mT);
-            pz[j] += nz * overlap * (mA / mT);
+            const sep = overlap * 0.55;
+            px[i] -= nx * sep * (mB / mT);
+            py[i] -= ny * sep * (mB / mT);
+            pz[i] -= nz * sep * (mB / mT);
+            px[j] += nx * sep * (mA / mT);
+            py[j] += ny * sep * (mA / mT);
+            pz[j] += nz * sep * (mA / mT);
 
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
-            const imp = (-(1 + RESTITUTION) * rvn) / mT;
+            const restitution = 0.35;
+            const imp = (-(1 + restitution) * rvn) / mT;
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
 
             const impact = Math.abs(rvn);
-            if (impact > 0.1) {
-              const amt = Math.min(impact * 0.075, 0.45);
-              sqX[i] = 1 + Math.abs(ny) * amt - Math.abs(nx) * amt * 0.6;
-              sqY[i] = 1 + Math.abs(nx) * amt - Math.abs(ny) * amt * 0.6;
-              sqX[j] = 1 + Math.abs(ny) * amt - Math.abs(nx) * amt * 0.6;
-              sqY[j] = 1 + Math.abs(nx) * amt - Math.abs(ny) * amt * 0.6;
+            if (impact > 0.3) {
+              const amt = Math.min(impact * 0.04, 0.3);
+              const squishX = 1 - Math.abs(nx) * amt;
+              const squishY = 1 - Math.abs(ny) * amt;
+              const squishZ = 1 - Math.abs(nz) * amt;
+              jellyTargetX[i] = squishX; jellyTargetY[i] = squishY; jellyTargetZ[i] = squishZ;
+              jellyTargetX[j] = squishX; jellyTargetY[j] = squishY; jellyTargetZ[j] = squishZ;
             }
           }
         }
 
-        // Cursor force: soft field + hard contact
-        if (mouseActive && cx3d > -999) {
+        if (mouseActive && smoothCx > -999) {
           for (let i = 0; i < N; i++) {
-            const dx = px[i] - cx3d;
-            const dy = py[i] - cy3d;
-            const distSq = dx * dx + dy * dy;
+            const ddx = px[i] - smoothCx;
+            const ddy = py[i] - smoothCy;
+            const distSq = ddx * ddx + ddy * ddy;
             const dist = Math.sqrt(distSq);
 
-            if (dist < CURSOR_FIELD_R && dist > 0.01) {
-              const t = 1 - dist / CURSOR_FIELD_R;
-              const fM = t * t * t * CURSOR_FIELD_STR * subDt;
-              const nx = dx / dist, ny = dy / dist;
-              vx[i] += nx * fM;
-              vy[i] += ny * fM;
+            if (dist < CURSOR_RADIUS && dist > 0.01) {
+              const nx = ddx / dist, ny = ddy / dist;
 
-              const contactMin = radii[i] + CURSOR_CONTACT_R;
-              if (dist < contactMin) {
-                const nx2 = dx / dist, ny2 = dy / dist;
-                const overlap = contactMin - dist;
-                px[i] += nx2 * overlap * 1.05;
-                py[i] += ny2 * overlap * 1.05;
+              const t = dist / CURSOR_RADIUS;
+              const falloff = 1 - t * t;
 
-                const cSpd = Math.sqrt(cvx * cvx + cvy * cvy);
-                const boost = Math.min(cSpd * 0.7 + 1.5, 5.0);
-                const rvn = (vx[i] - cvx * subDt) * nx2 + (vy[i] - cvy * subDt) * ny2;
-                const imp = Math.max(-(1 + RESTITUTION) * rvn, 1.5) * boost;
-                vx[i] += nx2 * imp;
-                vy[i] += ny2 * imp;
+              if (dist < CURSOR_INNER + radii[i]) {
+                const pushStr = CURSOR_PUSH_STR * falloff * subDt;
+                vx[i] += nx * pushStr;
+                vy[i] += ny * pushStr;
 
-                const amt = Math.min(Math.abs(imp) * 0.03, 0.45);
-                sqX[i] = 1 + Math.abs(ny2) * amt - Math.abs(nx2) * amt * 0.6;
-                sqY[i] = 1 + Math.abs(nx2) * amt - Math.abs(ny2) * amt * 0.6;
+                const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
+                if (cSpeed > 0.5) {
+                  const drag = Math.min(cSpeed * 0.15, 4.0) * subDt;
+                  vx[i] += cursorVelX * drag * 0.03;
+                  vy[i] += cursorVelY * drag * 0.03;
+                }
+
+                const squishAmt = Math.min(falloff * 0.2, 0.25);
+                jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.5;
+                jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.5;
+                jellyTargetZ[i] = 1 - squishAmt * 0.3;
+              } else {
+                const gentlePush = CURSOR_DRAG_STR * falloff * falloff * subDt;
+                vx[i] += nx * gentlePush;
+                vy[i] += ny * gentlePush;
+
+                const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
+                if (cSpeed > 1.0) {
+                  vx[i] += cursorVelX * 0.004 * falloff * subDt * 60;
+                  vy[i] += cursorVelY * 0.004 * falloff * subDt * 60;
+                }
               }
             }
           }
         }
       }
 
-      // Micro-impulses outside substeps (once per frame per object)
+      const jellyLerp = dt;
       for (let i = 0; i < N; i++) {
-        if (!spawned[i]) continue;
-        if (time >= nextImpulse[i]) {
-          const angle = Math.random() * 6.2832;
-          vx[i] += Math.cos(angle) * MICRO_IMPULSE;
-          vy[i] += Math.sin(angle) * MICRO_IMPULSE;
-          nextImpulse[i] = time + MICRO_INT_MIN + Math.random() * MICRO_INT_RNG;
-        }
+        const forceX = (jellyTargetX[i] - jellyScaleX[i]) * JELLY_SPRING;
+        const forceY = (jellyTargetY[i] - jellyScaleY[i]) * JELLY_SPRING;
+        const forceZ = (jellyTargetZ[i] - jellyScaleZ[i]) * JELLY_SPRING;
+
+        jellyVelX[i] += forceX * jellyLerp;
+        jellyVelY[i] += forceY * jellyLerp;
+        jellyVelZ[i] += forceZ * jellyLerp;
+
+        jellyVelX[i] *= Math.exp(-JELLY_DAMPING * jellyLerp);
+        jellyVelY[i] *= Math.exp(-JELLY_DAMPING * jellyLerp);
+        jellyVelZ[i] *= Math.exp(-JELLY_DAMPING * jellyLerp);
+
+        jellyScaleX[i] += jellyVelX[i] * jellyLerp;
+        jellyScaleY[i] += jellyVelY[i] * jellyLerp;
+        jellyScaleZ[i] += jellyVelZ[i] * jellyLerp;
+
+        jellyTargetX[i] += (1 - jellyTargetX[i]) * (1 - Math.pow(0.02, dt));
+        jellyTargetY[i] += (1 - jellyTargetY[i]) * (1 - Math.pow(0.02, dt));
+        jellyTargetZ[i] += (1 - jellyTargetZ[i]) * (1 - Math.pow(0.02, dt));
       }
 
-      // Visual sync - batch all mesh updates together
-      const sqLerp = 1 - Math.pow(0.06, dt);
       for (let i = 0; i < N; i++) {
+        if (!spawned[i]) {
+          meshes[i].position.set(px[i], py[i], pz[i]);
+          continue;
+        }
+
         meshes[i].position.set(px[i], py[i], pz[i]);
 
-        if (spawned[i]) {
-          sqX[i] += (1 - sqX[i]) * sqLerp;
-          sqY[i] += (1 - sqY[i]) * sqLerp;
-          meshes[i].scale.set(sqX[i], sqY[i], 2 - (sqX[i] + sqY[i]) * 0.5);
-        }
+        const breath = 1 + Math.sin(time * 1.2 + breathPhase[i]) * 0.015;
+        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.4;
+        meshes[i].position.z = pz[i] + zFloat;
+
+        const sx = jellyScaleX[i] * breath;
+        const sy = jellyScaleY[i] * breath;
+        const sz = jellyScaleZ[i] * breath;
+        meshes[i].scale.set(sx, sy, sz);
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        const spin = dt * (1 + speed * 0.45);
-        innerGroups[i].rotation.x += rotX[i] * spin;
-        innerGroups[i].rotation.y += rotY[i] * spin;
-        innerGroups[i].rotation.z += rotZ[i] * spin;
+        const speedFactor = Math.min(speed * 0.08, 1.0);
+
+        rotTargetVelX[i] = baseRotX[i] + vy[i] * 0.03;
+        rotTargetVelY[i] = baseRotY[i] - vx[i] * 0.03;
+
+        const rotLerp = 1 - Math.pow(0.02, dt);
+        rotVelX[i] += (rotTargetVelX[i] - rotVelX[i]) * rotLerp;
+        rotVelY[i] += (rotTargetVelY[i] - rotVelY[i]) * rotLerp;
+
+        const spinDt = dt * (1 + speedFactor * 2.0);
+        innerGroups[i].rotation.x += rotVelX[i] * spinDt;
+        innerGroups[i].rotation.y += rotVelY[i] * spinDt;
+        innerGroups[i].rotation.z += baseRotZ[i] * dt;
+
+        let targetHover = 0;
+        if (mouseActive && smoothCx > -999) {
+          const ddx = px[i] - smoothCx;
+          const ddy = py[i] - smoothCy;
+          const hDist = Math.sqrt(ddx * ddx + ddy * ddy);
+          if (hDist < CURSOR_RADIUS * 0.6) {
+            targetHover = 1 - (hDist / (CURSOR_RADIUS * 0.6));
+          }
+        }
+        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.pow(0.01, dt));
+        cubeMaterials[i].uniforms.uHover.value = hoverAmount[i];
+        shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
 
+      displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
+      const velNdcX = cursorVelX * 0.01;
+      const velNdcY = cursorVelY * 0.01;
+      displacementMaterial.uniforms.uVelocity.value.set(velNdcX, velNdcY);
+      displacementMaterial.uniforms.uStrength.value = displacementStrength * Math.min(
+        Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY) * 0.08 + 0.3,
+        2.0
+      );
+
+      renderer.setRenderTarget(renderTarget);
       renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
+      renderer.render(displacementScene, displacementCamera);
     };
     animId = requestAnimationFrame(animate);
 
     const handleResize = () => {
       if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(w, h);
+      const pr = Math.min(window.devicePixelRatio, 2);
+      renderTarget.setSize(w * pr, h * pr);
+      displacementMaterial.uniforms.uResolution.value.set(w, h);
     };
     window.addEventListener("resize", handleResize);
 
@@ -453,6 +640,9 @@ export function HeroWebGLPanel() {
       container.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animId);
 
+      renderTarget.dispose();
+      displacementMaterial.dispose();
+      displacementQuad.geometry.dispose();
       loadedTextures.forEach((t) => t.dispose());
       geoCache.forEach(([g1, g2]) => { g1.dispose(); g2.dispose(); });
       scene.traverse((obj) => {

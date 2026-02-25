@@ -84,7 +84,8 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.1, duration: 0.4 }}
-                    className="relative w-full h-40 sm:h-64 overflow-hidden flex-shrink-0"
+                    // TWEAK: Increased height on larger screens (h-48 sm:h-72)
+                    className="relative w-full h-48 sm:h-72 overflow-hidden flex-shrink-0"
                   >
                     <img
                       src={SECONDARY_SERVICES[serviceIndex].image}
@@ -94,12 +95,16 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                     <div
                       className="absolute inset-0"
                       style={{
-                        background: 'linear-gradient(to bottom, transparent 50%, rgba(251,251,252,0.9) 100%)',
+                        background: 'linear-gradient(to bottom, transparent 40%, rgba(251,251,252,0.9) 90%, rgba(251,251,252,1) 100%)',
                       }}
                     />
                   </motion.div>
 
-                  <div style={{ padding: 'clamp(20px, 5vw, 40px)' }}>
+                  {/* TWEAK: Increased clamp values for significantly more side/bottom padding */}
+                  <div 
+                    className="flex flex-col gap-6" 
+                    style={{ padding: 'clamp(28px, 6vw, 56px)' }}
+                  >
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -113,7 +118,6 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                           color: 'var(--color-primary)',
                           opacity: 0.8,
                           textTransform: 'uppercase',
-                          marginBottom: 12,
                           fontFamily: 'var(--font-stack-heading)',
                         }}
                       >
@@ -126,14 +130,14 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.15, duration: 0.4 }}
                       style={{
-                        fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                        fontSize: 'clamp(1.85rem, 4.5vw, 2.75rem)', // Slightly larger
                         fontWeight: 700,
                         color: 'var(--color-text-dark)',
-                        marginBottom: 16,
                         fontFamily: 'var(--font-stack-heading)',
                         textTransform: 'none',
                         letterSpacing: '-0.025em',
                         lineHeight: 1.15,
+                        margin: 0, // Handled by gap-6
                       }}
                     >
                       {SECONDARY_SERVICES[serviceIndex].title}
@@ -145,10 +149,10 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                       transition={{ delay: 0.2, duration: 0.4 }}
                       style={{
                         color: 'rgba(0,0,0,0.65)',
-                        lineHeight: 1.7,
-                        marginBottom: 28,
-                        fontSize: '1.0625rem',
+                        lineHeight: 1.75, // Better readability
+                        fontSize: '1.1rem', // Bumped font size
                         fontFamily: 'var(--font-stack-body)',
+                        margin: 0, // Handled by gap-6
                       }}
                     >
                       {SECONDARY_SERVICES[serviceIndex].description}
@@ -158,9 +162,11 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.25, duration: 0.4 }}
+                      // TWEAK: Pushed the tags section down slightly to separate from description
+                      className="pt-2" 
                     >
                       <div
-                        className="uppercase mb-3"
+                        className="uppercase mb-4"
                         style={{
                           fontSize: 10,
                           letterSpacing: '0.3em',
@@ -170,11 +176,13 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                       >
                         Key Areas
                       </div>
-                      <div className="flex flex-wrap gap-2">
+                      {/* TWEAK: Increased gap between tags to gap-3 */}
+                      <div className="flex flex-wrap gap-3">
                         {SECONDARY_SERVICES[serviceIndex].tags.map((tag: string) => (
                           <span
                             key={tag}
-                            className="px-4 py-2"
+                            // TWEAK: Increased padding inside the tags
+                            className="px-5 py-2.5"
                             style={{
                               fontSize: 12,
                               letterSpacing: '0.04em',

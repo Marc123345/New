@@ -18,18 +18,18 @@ const N = ALL_URLS.length;
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
 
-const SPRING_RETURN = 0.12;
-const DAMPING_IDLE = 0.98;
-const DAMPING_ACTIVE = 0.985;
-const CURSOR_RADIUS = 12.0;
-const CURSOR_INNER = 5.0;
-const CURSOR_PUSH_STR = 180.0;
-const CURSOR_SWEEP_STR = 0.45;
-const MAX_SPEED = 45.0;
+const CURSOR_SPHERE_R = 4.0;
+const CURSOR_SMOOTH = 8.0;
+const CURSOR_FIELD_R = 14.0;
+
+const SPRING_HOME = 0.08;
+const FRICTION = 0.97;
+
+const MAX_SPEED = 55.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
 
-const JELLY_SPRING = 18.0;
-const JELLY_DAMPING = 4.5;
+const JELLY_SPRING = 22.0;
+const JELLY_DAMPING = 5.0;
 
 const CUBE_VERT = `
 varying vec3 vNormal;
@@ -209,16 +209,12 @@ export function HeroWebGLPanel() {
     const floatSpeedX = new Float32Array(N);
     const floatSpeedY = new Float32Array(N);
     const floatSpeedZ = new Float32Array(N);
-    const floatAmpX = new Float32Array(N);
-    const floatAmpY = new Float32Array(N);
 
     const homeX = new Float32Array(N);
     const homeY = new Float32Array(N);
 
     const rotVelX = new Float32Array(N);
     const rotVelY = new Float32Array(N);
-    const rotTargetVelX = new Float32Array(N);
-    const rotTargetVelY = new Float32Array(N);
     const baseRotX = new Float32Array(N);
     const baseRotY = new Float32Array(N);
     const baseRotZ = new Float32Array(N);
@@ -244,15 +240,13 @@ export function HeroWebGLPanel() {
       floatPhaseX[i] = Math.random() * Math.PI * 2;
       floatPhaseY[i] = Math.random() * Math.PI * 2;
       floatPhaseZ[i] = Math.random() * Math.PI * 2;
-      floatSpeedX[i] = 0.08 + Math.random() * 0.12;
-      floatSpeedY[i] = 0.07 + Math.random() * 0.1;
-      floatSpeedZ[i] = 0.05 + Math.random() * 0.08;
-      floatAmpX[i] = 0.08 + Math.random() * 0.12;
-      floatAmpY[i] = 0.06 + Math.random() * 0.1;
+      floatSpeedX[i] = 0.06 + Math.random() * 0.08;
+      floatSpeedY[i] = 0.05 + Math.random() * 0.07;
+      floatSpeedZ[i] = 0.04 + Math.random() * 0.06;
 
-      baseRotX[i] = (Math.random() - 0.5) * 0.04;
-      baseRotY[i] = (Math.random() - 0.5) * 0.04;
-      baseRotZ[i] = (Math.random() - 0.5) * 0.02;
+      baseRotX[i] = (Math.random() - 0.5) * 0.03;
+      baseRotY[i] = (Math.random() - 0.5) * 0.03;
+      baseRotZ[i] = (Math.random() - 0.5) * 0.015;
 
       const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
       const dist = 0.35 + Math.random() * 0.45;
@@ -309,17 +303,17 @@ export function HeroWebGLPanel() {
       inner.add(new THREE.Mesh(shellGeo, shellMat));
     }
 
-    let cx3d = -9999, cy3d = -9999;
-    let smoothCx = -9999, smoothCy = -9999;
-    let prevSmoothCx = -9999, prevSmoothCy = -9999;
-    let cursorVelX = 0, cursorVelY = 0;
+    let targetCx = -9999, targetCy = -9999;
+    let sphereX = -9999, sphereY = -9999;
+    let prevSphereX = -9999, prevSphereY = -9999;
+    let sphereVx = 0, sphereVy = 0;
     let mouseActive = false;
     let mouseNdcX = 0, mouseNdcY = 0;
     let displacementStrength = 0;
 
     const raycaster = new THREE.Raycaster();
     const mouse2D = new THREE.Vector2();
-    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     const hitPt = new THREE.Vector3();
 
     const updateMouse = (clientX: number, clientY: number) => {
@@ -327,9 +321,9 @@ export function HeroWebGLPanel() {
       mouse2D.x = ((clientX - rect.left) / rect.width) * 2 - 1;
       mouse2D.y = -((clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mouse2D, camera);
-      raycaster.ray.intersectPlane(plane, hitPt);
-      cx3d = hitPt.x;
-      cy3d = hitPt.y;
+      raycaster.ray.intersectPlane(planeZ, hitPt);
+      targetCx = hitPt.x;
+      targetCy = hitPt.y;
       mouseNdcX = (clientX - rect.left) / rect.width;
       mouseNdcY = 1.0 - (clientY - rect.top) / rect.height;
       mouseActive = true;
@@ -362,28 +356,28 @@ export function HeroWebGLPanel() {
       time += dt;
 
       if (mouseActive) {
-        const lerp = 1 - Math.pow(0.001, dt);
-        smoothCx += (cx3d - smoothCx) * lerp;
-        smoothCy += (cy3d - smoothCy) * lerp;
+        const smoothFactor = 1 - Math.exp(-CURSOR_SMOOTH * dt);
+        sphereX += (targetCx - sphereX) * smoothFactor;
+        sphereY += (targetCy - sphereY) * smoothFactor;
       } else {
-        smoothCx += (-9999 - smoothCx) * 0.03;
-        smoothCy += (-9999 - smoothCy) * 0.03;
+        sphereX += (-9999 - sphereX) * 0.02;
+        sphereY += (-9999 - sphereY) * 0.02;
       }
 
-      cursorVelX = (smoothCx - prevSmoothCx) / Math.max(dt, 0.008);
-      cursorVelY = (smoothCy - prevSmoothCy) / Math.max(dt, 0.008);
-      prevSmoothCx = smoothCx;
-      prevSmoothCy = smoothCy;
+      sphereVx = (sphereX - prevSphereX) / Math.max(dt, 0.004);
+      sphereVy = (sphereY - prevSphereY) / Math.max(dt, 0.004);
+      prevSphereX = sphereX;
+      prevSphereY = sphereY;
 
       const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.06 : 0;
       const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.05 : 0;
-      tiltX += (targetTiltX - tiltX) * (1 - Math.pow(0.01, dt));
-      tiltY += (targetTiltY - tiltY) * (1 - Math.pow(0.01, dt));
+      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-3 * dt));
+      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-3 * dt));
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
-      const targetDisplacement = mouseActive ? 1.0 : 0.0;
-      displacementStrength += (targetDisplacement - displacementStrength) * (1 - Math.pow(0.005, dt));
+      const targetDisp = mouseActive ? 1.0 : 0.0;
+      displacementStrength += (targetDisp - displacementStrength) * (1 - Math.exp(-4 * dt));
 
       for (let i = 0; i < N; i++) {
         if (spawned[i]) continue;
@@ -392,47 +386,40 @@ export function HeroWebGLPanel() {
         const t = Math.min(elapsed / 1.2, 1);
         const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         const overshoot = 1.0 + 0.15 * Math.sin(elapsed * 6) * Math.exp(-elapsed * 2.5);
-        const s = ease * overshoot;
-        meshes[i].scale.setScalar(Math.max(s, 0));
+        meshes[i].scale.setScalar(Math.max(ease * overshoot, 0));
         if (t >= 1) {
           meshes[i].scale.setScalar(1);
           spawned[i] = 1;
         }
       }
 
-      const SUB = 8;
+      const SUB = 10;
       const subDt = dt / SUB;
+      const sphereSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
 
       for (let s = 0; s < SUB; s++) {
 
         for (let i = 0; i < N; i++) {
-          const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * floatAmpX[i];
-          const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * floatAmpY[i];
+          const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * 0.06;
+          const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * 0.05;
 
-          const targetX = homeX[i] + floatOffX;
-          const targetY = homeY[i] + floatOffY;
-
-          const dx = targetX - px[i];
-          const dy = targetY - py[i];
+          const dx = (homeX[i] + floatOffX) - px[i];
+          const dy = (homeY[i] + floatOffY) - py[i];
           const dz = -pz[i];
 
-          vx[i] += dx * SPRING_RETURN * subDt;
-          vy[i] += dy * SPRING_RETURN * subDt;
-          vz[i] += dz * SPRING_RETURN * 0.3 * subDt;
+          vx[i] += dx * SPRING_HOME * subDt;
+          vy[i] += dy * SPRING_HOME * subDt;
+          vz[i] += dz * SPRING_HOME * 0.3 * subDt;
 
-          const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-          const dampRate = speed > 2.0 ? DAMPING_ACTIVE : DAMPING_IDLE;
-          const dampPow = Math.pow(dampRate, subDt * 60);
-          vx[i] *= dampPow;
-          vy[i] *= dampPow;
-          vz[i] *= dampPow;
+          const frictionPow = Math.pow(FRICTION, subDt * 60);
+          vx[i] *= frictionPow;
+          vy[i] *= frictionPow;
+          vz[i] *= frictionPow;
 
           const spd2 = vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
           if (spd2 > MAX_SPEED_SQ) {
             const sc = Math.sqrt(MAX_SPEED_SQ / spd2);
-            vx[i] *= sc;
-            vy[i] *= sc;
-            vz[i] *= sc;
+            vx[i] *= sc; vy[i] *= sc; vz[i] *= sc;
           }
 
           px[i] += vx[i] * subDt;
@@ -440,14 +427,13 @@ export function HeroWebGLPanel() {
           pz[i] += vz[i] * subDt;
 
           const r = radii[i];
-          const mX = BOUNDS_X - r, mY = BOUNDS_Y - r;
-          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.5; }
-          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.5; }
-          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.5; }
-          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.5; }
-          const mZ = 3.0;
-          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.5; }
-          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.5; }
+          const mX = BOUNDS_X - r, mY = BOUNDS_Y - r, mZ = 3.0;
+          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.4; }
+          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.4; }
+          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.4; }
+          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.4; }
+          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.4; }
+          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.4; }
         }
 
         for (let i = 0; i < N; i++) {
@@ -456,7 +442,7 @@ export function HeroWebGLPanel() {
             const ddy = py[j] - py[i];
             const ddz = pz[j] - pz[i];
             const distSq = ddx * ddx + ddy * ddy + ddz * ddz;
-            const minD = (radii[i] + radii[j]) * 1.05;
+            const minD = (radii[i] + radii[j]) * 1.02;
             if (distSq >= minD * minD || distSq < 0.0001) continue;
 
             const dist = Math.sqrt(distSq);
@@ -464,105 +450,108 @@ export function HeroWebGLPanel() {
             const overlap = minD - dist;
             const mA = masses[i], mB = masses[j], mT = mA + mB;
 
-            const sep = overlap * 0.6;
-            px[i] -= nx * sep * (mB / mT);
-            py[i] -= ny * sep * (mB / mT);
-            pz[i] -= nz * sep * (mB / mT);
-            px[j] += nx * sep * (mA / mT);
-            py[j] += ny * sep * (mA / mT);
-            pz[j] += nz * sep * (mA / mT);
+            px[i] -= nx * overlap * 0.5 * (mB / mT);
+            py[i] -= ny * overlap * 0.5 * (mB / mT);
+            pz[i] -= nz * overlap * 0.5 * (mB / mT);
+            px[j] += nx * overlap * 0.5 * (mA / mT);
+            py[j] += ny * overlap * 0.5 * (mA / mT);
+            pz[j] += nz * overlap * 0.5 * (mA / mT);
 
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
-            const restitution = 0.7;
-            const imp = (-(1 + restitution) * rvn) / mT;
+            const imp = (-(1 + 0.65) * rvn) / mT;
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
 
             const impact = Math.abs(rvn);
             if (impact > 0.5) {
-              const amt = Math.min(impact * 0.05, 0.35);
-              const squishX = 1 - Math.abs(nx) * amt;
-              const squishY = 1 - Math.abs(ny) * amt;
-              const squishZ = 1 - Math.abs(nz) * amt;
-              jellyTargetX[i] = squishX; jellyTargetY[i] = squishY; jellyTargetZ[i] = squishZ;
-              jellyTargetX[j] = squishX; jellyTargetY[j] = squishY; jellyTargetZ[j] = squishZ;
+              const amt = Math.min(impact * 0.06, 0.4);
+              jellyTargetX[i] = 1 - Math.abs(nx) * amt;
+              jellyTargetY[i] = 1 - Math.abs(ny) * amt;
+              jellyTargetZ[i] = 1 - Math.abs(nz) * amt;
+              jellyTargetX[j] = 1 - Math.abs(nx) * amt;
+              jellyTargetY[j] = 1 - Math.abs(ny) * amt;
+              jellyTargetZ[j] = 1 - Math.abs(nz) * amt;
             }
           }
         }
 
-        if (mouseActive && smoothCx > -999) {
-          const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
-          const speedBoost = 1.0 + Math.min(cSpeed * 0.12, 5.0);
-
+        if (mouseActive && sphereX > -999) {
           for (let i = 0; i < N; i++) {
-            const ddx = px[i] - smoothCx;
-            const ddy = py[i] - smoothCy;
+            const ddx = px[i] - sphereX;
+            const ddy = py[i] - sphereY;
             const distSq = ddx * ddx + ddy * ddy;
             const dist = Math.sqrt(distSq);
 
-            if (dist < CURSOR_RADIUS && dist > 0.01) {
+            const contactDist = CURSOR_SPHERE_R + radii[i];
+
+            if (dist < contactDist && dist > 0.001) {
               const nx = ddx / dist, ny = ddy / dist;
-              const t = dist / CURSOR_RADIUS;
-              const falloff = 1 - t * t;
+              const overlap = contactDist - dist;
 
-              const contactDist = CURSOR_INNER + radii[i];
+              px[i] += nx * overlap;
+              py[i] += ny * overlap;
 
-              if (dist < contactDist) {
-                const penetration = 1 - (dist / contactDist);
-                const pushStr = CURSOR_PUSH_STR * (penetration + 0.3) * speedBoost * subDt;
-                vx[i] += nx * pushStr;
-                vy[i] += ny * pushStr;
+              const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
 
-                if (cSpeed > 1.0) {
-                  vx[i] += cursorVelX * CURSOR_SWEEP_STR * subDt;
-                  vy[i] += cursorVelY * CURSOR_SWEEP_STR * subDt;
-                }
+              if (relVn < 0) {
+                const restitution = 0.75;
+                const impulseMag = -(1 + restitution) * relVn;
+                vx[i] += nx * impulseMag;
+                vy[i] += ny * impulseMag;
+              }
 
-                const overlap = contactDist - dist;
-                px[i] += nx * overlap * 0.8;
-                py[i] += ny * overlap * 0.8;
+              const sweepFactor = Math.min(sphereSpeed * 0.015, 1.2);
+              vx[i] += sphereVx * sweepFactor * subDt * 60;
+              vy[i] += sphereVy * sweepFactor * subDt * 60;
 
-                const squishAmt = Math.min(penetration * 0.3, 0.35);
-                jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.6;
-                jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.6;
-                jellyTargetZ[i] = 1 - squishAmt * 0.4;
-              } else {
-                const outerPush = CURSOR_PUSH_STR * 0.15 * falloff * falloff * speedBoost * subDt;
-                vx[i] += nx * outerPush;
-                vy[i] += ny * outerPush;
+              const squishAmt = Math.min(overlap / contactDist * 0.5, 0.35);
+              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.7;
+              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.7;
+              jellyTargetZ[i] = 1 - squishAmt * 0.4;
+            }
 
-                if (cSpeed > 1.0) {
-                  vx[i] += cursorVelX * CURSOR_SWEEP_STR * 0.3 * falloff * subDt;
-                  vy[i] += cursorVelY * CURSOR_SWEEP_STR * 0.3 * falloff * subDt;
-                }
+            if (dist < CURSOR_FIELD_R && dist > contactDist) {
+              const nx = ddx / dist, ny = ddy / dist;
+              const t = (dist - contactDist) / (CURSOR_FIELD_R - contactDist);
+              const falloff = (1 - t) * (1 - t);
+
+              const pushStr = 15.0 * falloff * (1 + sphereSpeed * 0.04) * subDt;
+              vx[i] += nx * pushStr;
+              vy[i] += ny * pushStr;
+
+              if (sphereSpeed > 2.0) {
+                const sweepStr = sphereSpeed * 0.003 * falloff * subDt * 60;
+                vx[i] += sphereVx * sweepStr;
+                vy[i] += sphereVy * sweepStr;
               }
             }
           }
         }
       }
 
-      const jellyLerp = dt;
       for (let i = 0; i < N; i++) {
         const forceX = (jellyTargetX[i] - jellyScaleX[i]) * JELLY_SPRING;
         const forceY = (jellyTargetY[i] - jellyScaleY[i]) * JELLY_SPRING;
         const forceZ = (jellyTargetZ[i] - jellyScaleZ[i]) * JELLY_SPRING;
 
-        jellyVelX[i] += forceX * jellyLerp;
-        jellyVelY[i] += forceY * jellyLerp;
-        jellyVelZ[i] += forceZ * jellyLerp;
+        jellyVelX[i] += forceX * dt;
+        jellyVelY[i] += forceY * dt;
+        jellyVelZ[i] += forceZ * dt;
 
-        jellyVelX[i] *= Math.exp(-JELLY_DAMPING * jellyLerp);
-        jellyVelY[i] *= Math.exp(-JELLY_DAMPING * jellyLerp);
-        jellyVelZ[i] *= Math.exp(-JELLY_DAMPING * jellyLerp);
+        const decay = Math.exp(-JELLY_DAMPING * dt);
+        jellyVelX[i] *= decay;
+        jellyVelY[i] *= decay;
+        jellyVelZ[i] *= decay;
 
-        jellyScaleX[i] += jellyVelX[i] * jellyLerp;
-        jellyScaleY[i] += jellyVelY[i] * jellyLerp;
-        jellyScaleZ[i] += jellyVelZ[i] * jellyLerp;
+        jellyScaleX[i] += jellyVelX[i] * dt;
+        jellyScaleY[i] += jellyVelY[i] * dt;
+        jellyScaleZ[i] += jellyVelZ[i] * dt;
 
-        jellyTargetX[i] += (1 - jellyTargetX[i]) * (1 - Math.pow(0.02, dt));
-        jellyTargetY[i] += (1 - jellyTargetY[i]) * (1 - Math.pow(0.02, dt));
-        jellyTargetZ[i] += (1 - jellyTargetZ[i]) * (1 - Math.pow(0.02, dt));
+        const recover = 1 - Math.exp(-3 * dt);
+        jellyTargetX[i] += (1 - jellyTargetX[i]) * recover;
+        jellyTargetY[i] += (1 - jellyTargetY[i]) * recover;
+        jellyTargetZ[i] += (1 - jellyTargetZ[i]) * recover;
       }
 
       for (let i = 0; i < N; i++) {
@@ -571,52 +560,47 @@ export function HeroWebGLPanel() {
           continue;
         }
 
-        meshes[i].position.set(px[i], py[i], pz[i]);
+        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.1;
+        meshes[i].position.set(px[i], py[i], pz[i] + zFloat);
 
-        const breath = 1 + Math.sin(time * 0.8 + breathPhase[i]) * 0.008;
-        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.15;
-        meshes[i].position.z = pz[i] + zFloat;
-
-        const sx = jellyScaleX[i] * breath;
-        const sy = jellyScaleY[i] * breath;
-        const sz = jellyScaleZ[i] * breath;
-        meshes[i].scale.set(sx, sy, sz);
+        const breath = 1 + Math.sin(time * 0.6 + breathPhase[i]) * 0.005;
+        meshes[i].scale.set(
+          jellyScaleX[i] * breath,
+          jellyScaleY[i] * breath,
+          jellyScaleZ[i] * breath
+        );
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        const speedFactor = Math.min(speed * 0.05, 1.0);
 
-        rotTargetVelX[i] = baseRotX[i] + vy[i] * 0.12;
-        rotTargetVelY[i] = baseRotY[i] - vx[i] * 0.12;
+        const targetRotVelX = baseRotX[i] + vy[i] * 0.15;
+        const targetRotVelY = baseRotY[i] - vx[i] * 0.15;
+        const rLerp = 1 - Math.exp(-6 * dt);
+        rotVelX[i] += (targetRotVelX - rotVelX[i]) * rLerp;
+        rotVelY[i] += (targetRotVelY - rotVelY[i]) * rLerp;
 
-        const rotLerp = 1 - Math.pow(0.01, dt);
-        rotVelX[i] += (rotTargetVelX[i] - rotVelX[i]) * rotLerp;
-        rotVelY[i] += (rotTargetVelY[i] - rotVelY[i]) * rotLerp;
-
-        const spinDt = dt * (1 + speedFactor * 8.0);
-        innerGroups[i].rotation.x += rotVelX[i] * spinDt;
-        innerGroups[i].rotation.y += rotVelY[i] * spinDt;
+        const speedMult = 1 + Math.min(speed * 0.06, 1.0) * 10.0;
+        innerGroups[i].rotation.x += rotVelX[i] * dt * speedMult;
+        innerGroups[i].rotation.y += rotVelY[i] * dt * speedMult;
         innerGroups[i].rotation.z += baseRotZ[i] * dt;
 
         let targetHover = 0;
-        if (mouseActive && smoothCx > -999) {
-          const ddx = px[i] - smoothCx;
-          const ddy = py[i] - smoothCy;
-          const hDist = Math.sqrt(ddx * ddx + ddy * ddy);
-          if (hDist < CURSOR_RADIUS * 0.6) {
-            targetHover = 1 - (hDist / (CURSOR_RADIUS * 0.6));
+        if (mouseActive && sphereX > -999) {
+          const hDx = px[i] - sphereX;
+          const hDy = py[i] - sphereY;
+          const hDist = Math.sqrt(hDx * hDx + hDy * hDy);
+          if (hDist < CURSOR_FIELD_R * 0.5) {
+            targetHover = 1 - (hDist / (CURSOR_FIELD_R * 0.5));
           }
         }
-        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.pow(0.01, dt));
+        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.exp(-5 * dt));
         cubeMaterials[i].uniforms.uHover.value = hoverAmount[i];
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
 
       displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
-      const velNdcX = cursorVelX * 0.01;
-      const velNdcY = cursorVelY * 0.01;
-      displacementMaterial.uniforms.uVelocity.value.set(velNdcX, velNdcY);
+      displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.01, sphereVy * 0.01);
       displacementMaterial.uniforms.uStrength.value = displacementStrength * Math.min(
-        Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY) * 0.08 + 0.3,
+        sphereSpeed * 0.06 + 0.3,
         2.0
       );
 

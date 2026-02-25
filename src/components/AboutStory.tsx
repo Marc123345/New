@@ -8,7 +8,6 @@ import {
   useInView,
   Variants,
 } from 'motion/react';
-import { SignalGridPanel } from './SignalGridPanel';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const SPRING_TRANSITION = { type: 'spring', stiffness: 300, damping: 20 };
@@ -395,7 +394,7 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          {/* Signal Grid Panel - FIXED HEIGHT AND CLIPPING */}
+          {/* Video Showcase */}
           <div className="md:col-span-6 lg:col-span-5 lg:col-start-2 h-full">
             <GeometricCard
               cardStyle={{
@@ -405,11 +404,18 @@ export function AboutStory() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                overflow: 'hidden',
               }}
             >
-              <div className="relative w-full h-full opacity-80 mix-blend-screen pointer-events-none flex items-center justify-center">
-                <SignalGridPanel />
-              </div>
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+                style={{ minHeight: '380px' }}
+                src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4"
+              />
             </GeometricCard>
           </div>
 

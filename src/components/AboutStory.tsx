@@ -19,8 +19,8 @@ const staggerContainer: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15, // Creates a beautiful cascade effect
-      delayChildren: 0.3,
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
     },
   },
 };
@@ -85,6 +85,40 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   );
 }
 
+// Restored your SplitText component just in case you need it!
+function SplitText({
+  text,
+  className,
+  style,
+  delay = 0,
+}: {
+  text: string;
+  className?: string;
+  style?: React.CSSProperties;
+  delay?: number;
+}) {
+  return (
+    <span
+      className={className}
+      style={{ ...style, display: 'flex', flexWrap: 'wrap', gap: '0 0.3em', justifyContent: 'center' }}
+    >
+      {text.split(' ').map((word, i) => (
+        <span key={i} style={{ overflow: 'hidden', display: 'inline-flex', paddingBottom: '0.15em', marginBottom: '-0.15em' }}>
+          <motion.span
+            style={{ display: 'inline-block', transformOrigin: 'bottom' }}
+            initial={{ y: '110%', rotate: 2, opacity: 0 }}
+            whileInView={{ y: '0%', rotate: 0, opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.8, delay: delay + i * 0.04, ease: EASE_OUT_EXPO }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function GeometricCard({
   children,
   className = '',
@@ -99,29 +133,31 @@ function GeometricCard({
   const mag = useMagnetic(0.12);
 
   return (
-    <motion.div
-      variants={fadeUpItem} // Hooks into the staggerContainer
-      ref={mag.ref}
-      onMouseMove={mag.handleMove}
-      onMouseLeave={mag.handleLeave}
-      style={{ x: mag.springX, y: mag.springY }}
-      className={`relative h-full w-full ${className}`}
-    >
+    // FIX: Separated the Scroll Variant wrapper from the Magnetic wrapper to prevent Y-axis conflicts
+    <motion.div variants={fadeUpItem} className={`relative h-full w-full ${className}`}>
       <motion.div
-        whileHover={{
-          x: -4,
-          y: -4,
-          boxShadow: `12px 12px 0 ${shadowColor}`, // Tightened the shadow for a crisper feel
-          transition: SPRING_TRANSITION,
-        }}
+        ref={mag.ref}
+        onMouseMove={mag.handleMove}
+        onMouseLeave={mag.handleLeave}
+        style={{ x: mag.springX, y: mag.springY }}
         className="relative h-full w-full"
-        style={{
-          border: '2px solid var(--color-secondary)',
-          boxShadow: `6px 6px 0 ${shadowColor}`, // Baseline shadow
-          ...cardStyle,
-        }}
       >
-        {children}
+        <motion.div
+          whileHover={{
+            x: -4,
+            y: -4,
+            boxShadow: `12px 12px 0 ${shadowColor}`,
+            transition: SPRING_TRANSITION,
+          }}
+          className="relative h-full w-full overflow-hidden"
+          style={{
+            border: '2px solid var(--color-secondary)',
+            boxShadow: `6px 6px 0 ${shadowColor}`,
+            ...cardStyle,
+          }}
+        >
+          {children}
+        </motion.div>
       </motion.div>
     </motion.div>
   );
@@ -134,15 +170,15 @@ function SectionBadge({ label }: { label: string }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-      className="inline-block mb-10" // Standardized bottom margin
+      className="inline-block mb-10"
     >
       <motion.div
         whileHover={{ scale: 1.05, backgroundColor: '#ffffff' }}
         transition={SPRING_TRANSITION}
         className="inline-flex items-center gap-3 px-5 py-2 cursor-default group"
         style={{
-          border: '1px solid rgba(255,255,255,0.2)', // Refined border
-          borderRadius: '100px', // Pill shape for badges looks highly premium
+          border: '1px solid rgba(255,255,255,0.2)',
+          borderRadius: '100px',
           backdropFilter: 'blur(10px)',
           background: 'rgba(255,255,255,0.03)',
         }}
@@ -173,7 +209,7 @@ function CellLabel({ text }: { text: string }) {
         color: 'var(--color-secondary)',
         fontFamily: 'var(--font-stack-heading)',
         opacity: 0.8,
-        marginBottom: '1rem', // Strict pixel rhythm
+        marginBottom: '1rem',
       }}
     >
       {text}
@@ -185,7 +221,7 @@ function AccentLine() {
   return (
     <motion.div
       style={{
-        width: 48, // Divisible by 8
+        width: 48,
         height: 2,
         background: 'var(--color-secondary)',
         marginBottom: '1.5rem',
@@ -194,7 +230,7 @@ function AccentLine() {
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.8, delay: 0.5, ease: EASE_OUT_EXPO }}
+      transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
     />
   );
 }
@@ -207,7 +243,7 @@ export function AboutStory() {
     offset: ['start end', 'end start'],
   });
 
-  const contentParallax = useTransform(scrollYProgress, [0, 1], ['5%', '-5%']); // Softened parallax so it doesn't break grid alignment
+  const contentParallax = useTransform(scrollYProgress, [0, 1], ['5%', '-5%']);
 
   return (
     <section
@@ -216,7 +252,7 @@ export function AboutStory() {
       className="relative w-full min-h-screen overflow-hidden flex flex-col items-center justify-center selection:bg-[var(--color-secondary)] selection:text-[var(--color-primary)]"
       style={{ 
         background: 'var(--color-primary)',
-        padding: 'clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 3rem)' // Refined responsive padding
+        padding: 'clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 3rem)'
       }}
     >
       {/* Dynamic Background Mesh */}
@@ -228,23 +264,22 @@ export function AboutStory() {
       />
 
       <motion.div
-        className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col items-center" // Tightened max-width for better reading lengths
+        className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col items-center"
         style={{ y: contentParallax }}
       >
         <div className="flex flex-col items-center text-center mb-20 md:mb-28">
           <SectionBadge label="About Us" />
 
-          {/* Typography Refinements: Tighter line heights and exact margins */}
           <div className="flex flex-col items-center justify-center">
             <h2
               style={{
                 fontSize: 'clamp(2.75rem, 7vw, 6.5rem)',
                 fontFamily: 'var(--font-stack-heading)',
                 color: '#ffffff',
-                lineHeight: 1, // Tighter line-height for massive headers
+                lineHeight: 1,
                 fontWeight: 800,
                 textTransform: 'uppercase',
-                letterSpacing: '-0.04em', // Slightly tighter kerning
+                letterSpacing: '-0.04em',
                 textAlign: 'center',
                 margin: 0,
               }}
@@ -259,7 +294,7 @@ export function AboutStory() {
                 From Brand Voice
               </motion.span>
               <motion.span
-                className="block mt-2" // Exact pixel rhythm
+                className="block mt-2"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-100px' }}
@@ -280,20 +315,20 @@ export function AboutStory() {
           </div>
         </div>
 
-        {/* ORBITAL BENTO GRID - Orchestrated with Framer Motion */}
+        {/* ORBITAL BENTO GRID */}
         <motion.div 
-          className="w-full grid grid-cols-1 md:grid-cols-12 gap-6" // Using exact 24px (gap-6) layout grid
+          className="w-full grid grid-cols-1 md:grid-cols-12 gap-6"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
         >
           {/* Main Intro Card */}
-          <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
+          <div className="md:col-span-12 lg:col-span-8 lg:col-start-3 h-full">
             <GeometricCard
               cardStyle={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-                padding: 'clamp(2.5rem, 5vw, 4rem)', // Generous, exact padding
+                padding: 'clamp(2.5rem, 5vw, 4rem)',
                 backdropFilter: 'blur(16px)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -324,12 +359,11 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          {/* UI Fix: Placed the SignalGridPanel INSIDE a GeometricCard for perfect physical consistency */}
-          <div className="md:col-span-6 lg:col-span-5 lg:col-start-2">
+          {/* Signal Grid Panel */}
+          <div className="md:col-span-6 lg:col-span-5 lg:col-start-2 h-full">
             <GeometricCard
               cardStyle={{
-                padding: 0, // Zero padding so the grid fills the box
-                overflow: 'hidden',
+                padding: 0,
                 background: 'rgba(0,0,0,0.2)',
                 minHeight: '280px',
               }}
@@ -341,7 +375,7 @@ export function AboutStory() {
           </div>
 
           {/* Social First Card */}
-          <div className="md:col-span-6 lg:col-span-5">
+          <div className="md:col-span-6 lg:col-span-5 h-full">
             <GeometricCard
               shadowColor="var(--color-primary)"
               cardStyle={{
@@ -368,7 +402,7 @@ export function AboutStory() {
           </div>
 
           {/* Extended Team Card */}
-          <div className="md:col-span-12 lg:col-span-10 lg:col-start-2">
+          <div className="md:col-span-12 lg:col-span-10 lg:col-start-2 h-full">
             <GeometricCard
               cardStyle={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
@@ -390,7 +424,6 @@ export function AboutStory() {
                   </p>
                 </div>
                 
-                {/* Orchestrated inner tags */}
                 <motion.div 
                   className="grid grid-cols-2 gap-3 shrink-0 w-full md:w-auto"
                   variants={staggerContainer}
@@ -398,7 +431,7 @@ export function AboutStory() {
                   {['Strategy', 'Creative', 'Growth', 'Content'].map((tag) => (
                     <motion.div
                       key={tag}
-                      variants={fadeUpItem} // Hooks into the parent orchestrator
+                      variants={fadeUpItem}
                       whileHover={{ 
                         scale: 1.05, 
                         backgroundColor: 'var(--color-secondary)',

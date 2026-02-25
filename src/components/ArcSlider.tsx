@@ -283,168 +283,169 @@ export function ArcSlider() {
   };
 
   return (
-    <div className="relative w-full bg-[var(--color-background-light)] py-16 overflow-hidden">
-      <h2
-        className="relative z-30 text-center px-8 tracking-tight"
-        style={{
-          fontSize: "clamp(2.5rem, 5vw, 4rem)",
-          fontFamily: "var(--font-stack-heading)",
-          color: "var(--color-text-dark)",
-          marginBottom: "240px",
-        }}
-      >
-        <span
-          className="text-xs tracking-[0.3em] mb-6 block uppercase"
-          style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}
+    <>
+      <div className="relative w-full bg-[var(--color-background-light)] py-16 overflow-hidden">
+        <h2
+          className="relative z-30 text-center px-8 tracking-tight"
+          style={{
+            fontSize: "clamp(2.5rem, 5vw, 4rem)",
+            fontFamily: "var(--font-stack-heading)",
+            color: "var(--color-text-dark)",
+            marginBottom: "240px",
+          }}
         >
-          Our Capabilities
-        </span>
-        Services
-      </h2>
+          <span
+            className="text-xs tracking-[0.3em] mb-6 block uppercase"
+            style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}
+          >
+            Our Capabilities
+          </span>
+          Services
+        </h2>
 
-      {/* The Interaction Zone */}
-      <div
-        ref={containerRef}
-        className="relative w-full h-[600px] cursor-grab active:cursor-grabbing"
-        style={{
-          overflow: "visible",
-          // IMPROVEMENT: Increased marginTop for more visual breathing room
-          marginTop: "0px", 
-          marginBottom: "96px",
-          userSelect: "none",
-          WebkitUserSelect: "none",
-          // IMPROVEMENT: Allows vertical scrolling on mobile, but captures horizontal swipes
-          touchAction: "pan-y", 
-          zIndex: 10,
-        }}
-      >
-        {/* The Giant Wheel (Invisible Pivot) */}
+        {/* The Interaction Zone */}
         <div
-          ref={wheelRef}
-          className="absolute left-1/2 top-0 w-0 h-0"
+          ref={containerRef}
+          className="relative w-full h-[600px] cursor-grab active:cursor-grabbing"
+          style={{
+            overflow: "visible",
+            marginTop: "0px", 
+            marginBottom: "96px",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            touchAction: "pan-y", 
+            zIndex: 10,
+          }}
         >
-          {SERVICES.map((service, i) => {
-            const IconComponent = service.icon;
-            const isLight = false;
-            const textColor = "#FFFFFF";
+          {/* The Giant Wheel (Invisible Pivot) */}
+          <div
+            ref={wheelRef}
+            className="absolute left-1/2 top-0 w-0 h-0"
+          >
+            {SERVICES.map((service, i) => {
+              const IconComponent = service.icon;
+              const isLight = false;
+              const textColor = "#FFFFFF";
 
-            return (
-              <div
-                key={service.id}
-                ref={(el) => (cardsRef.current[i] = el)}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[420px] aspect-[3/4] overflow-hidden will-change-transform"
-                style={{
-                  top: 0,
-                  left: 0,
-                  backgroundColor: service.bgColor,
-                  pointerEvents: "auto",
-                  border: isLight ? '2px solid var(--color-surface-dark)' : '2px solid rgba(255,255,255,0.15)',
-                  boxShadow: 'var(--shadow-geometric)',
-                }}
-              >
-                {/* Card Content */}
-                <div className="relative h-full w-full p-10 flex flex-col justify-between">
-                  {/* Top: Category & Icon */}
-                  <div className="flex justify-between items-start">
+              return (
+                <div
+                  key={service.id}
+                  ref={(el) => (cardsRef.current[i] = el)}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[420px] aspect-[3/4] overflow-hidden will-change-transform"
+                  style={{
+                    top: 0,
+                    left: 0,
+                    backgroundColor: service.bgColor,
+                    pointerEvents: "auto",
+                    border: isLight ? '2px solid var(--color-surface-dark)' : '2px solid rgba(255,255,255,0.15)',
+                    boxShadow: 'var(--shadow-geometric)',
+                  }}
+                >
+                  {/* Card Content */}
+                  <div className="relative h-full w-full p-10 flex flex-col justify-between">
+                    {/* Top: Category & Icon */}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span
+                          className="text-xs tracking-[0.3em] opacity-50 block mb-1"
+                          style={{
+                            fontFamily: "var(--font-stack-heading)",
+                            color: textColor,
+                          }}
+                        >
+                          SERVICE {String(service.id).padStart(2, "0")}
+                        </span>
+                        <span
+                          className="text-xs tracking-[0.2em] opacity-40"
+                          style={{
+                            fontFamily: "var(--font-stack-heading)",
+                            color: textColor,
+                          }}
+                        >
+                          {service.category.toUpperCase()}
+                        </span>
+                      </div>
+                      <div
+                        className="w-16 h-16 flex items-center justify-center opacity-20"
+                        style={{ color: textColor }}
+                      >
+                        <IconComponent size={40} strokeWidth={1.5} />
+                      </div>
+                    </div>
+
+                    {/* Middle: Title + Learn More */}
                     <div>
-                      <span
-                        className="text-xs tracking-[0.3em] opacity-50 block mb-1"
+                      <h3
+                        className="tracking-tight leading-[0.85] mb-8"
                         style={{
+                          fontSize: "clamp(2rem, 5vw, 3rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: textColor,
                         }}
                       >
-                        SERVICE {String(service.id).padStart(2, "0")}
-                      </span>
-                      <span
-                        className="text-xs tracking-[0.2em] opacity-40"
+                        {service.fullTitle}
+                      </h3>
+
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOverlayService(service); }}
+                        className="group inline-flex items-center gap-2 transition-all duration-200"
                         style={{
-                          fontFamily: "var(--font-stack-heading)",
+                          fontFamily: 'var(--font-stack-heading)',
+                          fontSize: '0.75rem',
+                          letterSpacing: '0.18em',
+                          textTransform: 'uppercase',
                           color: textColor,
+                          background: 'rgba(255,255,255,0.08)',
+                          border: '1px solid rgba(255,255,255,0.25)',
+                          padding: '10px 20px',
+                          cursor: 'pointer',
+                          pointerEvents: 'auto',
                         }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
                       >
-                        {service.category.toUpperCase()}
-                      </span>
+                        Learn More
+                        <span
+                          className="transition-transform duration-200 group-hover:translate-x-1"
+                          style={{ display: 'inline-block' }}
+                        >
+                          →
+                        </span>
+                      </button>
                     </div>
-                    <div
-                      className="w-16 h-16 flex items-center justify-center opacity-20"
-                      style={{ color: textColor }}
-                    >
-                      <IconComponent size={40} strokeWidth={1.5} />
-                    </div>
-                  </div>
-
-                  {/* Middle: Title + Learn More */}
-                  <div>
-                    <h3
-                      className="tracking-tight leading-[0.85] mb-8"
-                      style={{
-                        fontSize: "clamp(2rem, 5vw, 3rem)",
-                        fontFamily: "var(--font-stack-heading)",
-                        color: textColor,
-                      }}
-                    >
-                      {service.fullTitle}
-                    </h3>
-
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setOverlayService(service); }}
-                      className="group inline-flex items-center gap-2 transition-all duration-200"
-                      style={{
-                        fontFamily: 'var(--font-stack-heading)',
-                        fontSize: '0.75rem',
-                        letterSpacing: '0.18em',
-                        textTransform: 'uppercase',
-                        color: textColor,
-                        background: 'rgba(255,255,255,0.08)',
-                        border: '1px solid rgba(255,255,255,0.25)',
-                        padding: '10px 20px',
-                        cursor: 'pointer',
-                        pointerEvents: 'auto',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-                    >
-                      Learn More
-                      <span
-                        className="transition-transform duration-200 group-hover:translate-x-1"
-                        style={{ display: 'inline-block' }}
-                      >
-                        →
-                      </span>
-                    </button>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer Navigation (Synced) */}
+        <div className="absolute bottom-12 z-20 flex gap-2 left-1/2 -translate-x-1/2">
+          {SERVICES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => navigateTo(i)}
+              className="group relative pointer-events-auto"
+              aria-label={`Go to service ${i + 1}`}
+            >
+              <div
+                className={`w-12 h-1 rounded-full transition-all duration-300 ${
+                  i === activeIndex
+                    ? "bg-[#A46CFC]"
+                    : "bg-[var(--color-text-dark)]/20 group-hover:bg-[var(--color-text-dark)]/40"
+                }`}
+              />
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Footer Navigation (Synced) */}
-      <div className="absolute bottom-12 z-20 flex gap-2 left-1/2 -translate-x-1/2">
-        {SERVICES.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => navigateTo(i)}
-            className="group relative pointer-events-auto"
-            aria-label={`Go to service ${i + 1}`}
-          >
-            <div
-              className={`w-12 h-1 rounded-full transition-all duration-300 ${
-                i === activeIndex
-                  ? "bg-[#A46CFC]"
-                  : "bg-[var(--color-text-dark)]/20 group-hover:bg-[var(--color-text-dark)]/40"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-
+      {/* OVERLAY FIX: Moved entirely outside the overflow-hidden wrapper */}
       <ServiceCardOverlay
         service={overlayService}
         onClose={() => setOverlayService(null)}
       />
-    </div>
+    </>
   );
 }

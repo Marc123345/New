@@ -63,39 +63,6 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   );
 }
 
-function SplitText({
-  text,
-  className,
-  style,
-  delay = 0,
-}: {
-  text: string;
-  className?: string;
-  style?: React.CSSProperties;
-  delay?: number;
-}) {
-  return (
-    <span
-      className={className}
-      style={{ ...style, display: 'flex', flexWrap: 'wrap', gap: '0 0.3em', justifyContent: 'center' }}
-    >
-      {text.split(' ').map((word, i) => (
-        <span key={i} style={{ overflow: 'hidden', display: 'inline-flex', paddingBottom: '0.15em', marginBottom: '-0.15em' }}>
-          <motion.span
-            style={{ display: 'inline-block', transformOrigin: 'bottom' }}
-            initial={{ y: '110%', rotate: 2, opacity: 0 }}
-            whileInView={{ y: '0%', rotate: 0, opacity: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.8, delay: delay + i * 0.04, ease: EASE_OUT_EXPO }}
-          >
-            {word}
-          </motion.span>
-        </span>
-      ))}
-    </span>
-  );
-}
-
 function GeometricCard({
   children,
   className = '',
@@ -153,19 +120,19 @@ function SectionBadge({ label }: { label: string }) {
       style={{ marginBottom: 'var(--space-6x)' }}
     >
       <motion.div
-        whileHover={{ scale: 1.05, backgroundColor: 'var(--color-secondary)' }}
+        whileHover={{ scale: 1.05, backgroundColor: '#ffffff' }}
         transition={SPRING_TRANSITION}
         className="inline-flex items-center gap-3 px-4 py-2 cursor-default group"
         style={{
-          border: '2px solid var(--color-secondary)',
-          boxShadow: '4px 4px 0 var(--color-secondary)',
+          border: '2px solid #ffffff',
+          boxShadow: '4px 4px 0 rgba(255,255,255,0.3)',
         }}
       >
         <span
-          className="text-xs uppercase group-hover:text-[var(--color-primary)] transition-colors duration-300"
+          className="text-xs uppercase transition-colors duration-300"
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            color: 'var(--color-secondary)',
+            color: '#ffffff',
             letterSpacing: '0.3em',
           }}
         >
@@ -222,7 +189,6 @@ export function AboutStory() {
     offset: ['start end', 'end start'],
   });
 
-  const starsParallax = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
   const contentParallax = useTransform(scrollYProgress, [0, 1], ['10%', '-5%']);
 
   return (
@@ -235,78 +201,54 @@ export function AboutStory() {
         padding: 'clamp(4rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)'
       }}
     >
-      {/* GALAXY THEME: Deep Space Nebula Glow */}
-      <div 
-        className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
-        style={{
-          background: 'radial-gradient(circle at 50% 30%, rgba(164,108,252,0.12) 0%, transparent 60%)',
-        }}
-      />
-
-      {/* GALAXY THEME: Subtle Orbital Rings in Background */}
-      <motion.div 
-        className="absolute top-[20%] left-1/2 w-[800px] h-[800px] -translate-x-1/2 rounded-full border border-white/5 pointer-events-none z-0 hidden md:block"
-        style={{ y: starsParallax }}
-      />
-      <motion.div 
-        className="absolute top-[10%] left-1/2 w-[1200px] h-[1200px] -translate-x-1/2 rounded-full border border-white/5 pointer-events-none z-0 hidden md:block"
-        style={{ y: starsParallax }}
-      />
-
-      <motion.div 
+      <motion.div
         className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col items-center"
         style={{ y: contentParallax }}
       >
         <div className="flex flex-col items-center text-center mb-24 md:mb-32">
           <SectionBadge label="About Us" />
 
-          {/* UPDATED UI: White text with a high-contrast stroke on two words */}
-          <div className="mt-8 flex flex-col items-center justify-center" style={{ perspective: 800 }}>
-            <SplitText
-              text="From Brand Voice"
-              className="block"
+          <div className="mt-8 flex flex-col items-center justify-center">
+            <h2
               style={{
                 fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                 fontFamily: 'var(--font-stack-heading)',
-                color: '#ffffff', // Pure white
-                lineHeight: 1,
+                color: '#ffffff',
+                lineHeight: 1.05,
                 fontWeight: 800,
-                textTransform: 'uppercase',
+                textTransform: 'uppercase' as const,
                 letterSpacing: '-0.03em',
-                textAlign: 'center',
-                textShadow: '0px 4px 20px rgba(255,255,255,0.15)' // Subtle white glow
+                textAlign: 'center' as const,
+                margin: 0,
               }}
-            />
-            <div className="flex items-center justify-center flex-wrap mt-2" style={{ gap: '0 0.25em' }}>
-              <SplitText
-                text="To Human" // The two stroked words
-                delay={0.3}
-                style={{
-                  fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
-                  fontFamily: 'var(--font-stack-heading)',
-                  color: 'transparent', // Transparent fill to show background
-                  WebkitTextStroke: '2px #ffffff', // Solid white stroke
-                  lineHeight: 1,
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '-0.03em',
-                }}
-              />
-              <SplitText
-                text="Connection"
-                delay={0.45}
-                style={{
-                  fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
-                  fontFamily: 'var(--font-stack-heading)',
-                  color: '#ffffff', // Pure white
-                  lineHeight: 1,
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '-0.03em',
-                  textShadow: '0px 4px 20px rgba(255,255,255,0.15)'
-                }}
-              />
-            </div>
+            >
+              <motion.span
+                className="block"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+              >
+                From Brand Voice
+              </motion.span>
+              <motion.span
+                className="block mt-1"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT_EXPO }}
+              >
+                <span
+                  style={{
+                    color: 'transparent',
+                    WebkitTextStroke: '2px #ffffff',
+                  }}
+                >
+                  To Human
+                </span>{' '}
+                Connection
+              </motion.span>
+            </h2>
           </div>
         </div>
 

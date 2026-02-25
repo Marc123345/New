@@ -367,13 +367,13 @@ export function ArcSlider() {
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between"
+                    className="relative h-full w-full overflow-hidden flex flex-col p-5 sm:p-7"
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",
                     }}
                   >
-                    <div className="p-6 sm:p-8 flex justify-between items-start">
+                    <div className="flex justify-between items-start mb-auto">
                       <div>
                         <span
                           className="text-[10px] tracking-[0.3em] opacity-50 block mb-1"
@@ -395,18 +395,18 @@ export function ArcSlider() {
                         </span>
                       </div>
                       <div
-                        className="w-12 h-12 flex items-center justify-center opacity-15"
+                        className="w-10 h-10 flex items-center justify-center opacity-15"
                         style={{ color: "#fff" }}
                       >
-                        <IconComponent size={32} strokeWidth={1.5} />
+                        <IconComponent size={28} strokeWidth={1.5} />
                       </div>
                     </div>
 
-                    <div className="p-6 sm:p-8 flex-1 flex flex-col justify-end">
+                    <div className="mt-auto">
                       <h3
-                        className="tracking-tight leading-[0.9] mb-3"
+                        className="tracking-tight leading-[0.95] mb-2"
                         style={{
-                          fontSize: "clamp(1.75rem, 4vw, 3rem)",
+                          fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
                         }}
@@ -415,12 +415,14 @@ export function ArcSlider() {
                       </h3>
 
                       <p
-                        className="mb-6 line-clamp-2"
+                        className="mb-5 line-clamp-2"
                         style={{
-                          fontSize: "0.85rem",
-                          lineHeight: 1.6,
+                          fontSize: "0.8rem",
+                          lineHeight: 1.5,
                           fontFamily: "var(--font-stack-body)",
                           color: "rgba(255,255,255,0.55)",
+                          margin: 0,
+                          marginBottom: "20px",
                         }}
                       >
                         {service.description}
@@ -432,7 +434,7 @@ export function ArcSlider() {
                           e.stopPropagation();
                           setOverlayService(service);
                         }}
-                        className="group self-start inline-flex items-center gap-2 transition-all duration-200"
+                        className="group inline-flex items-center gap-2 transition-all duration-200"
                         style={{
                           fontFamily: "var(--font-stack-heading)",
                           fontSize: "0.7rem",

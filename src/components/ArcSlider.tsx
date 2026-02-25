@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import {
   Globe,
@@ -100,154 +100,153 @@ const SERVICES = [
 ];
 
 export function ArcSlider() {
-  const wheelRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tabBarRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [overlayService, setOverlayService] = useState<typeof SERVICES[number] | null>(null);
   const activeIndexRef = useRef(0);
-  const isDraggingRef = useRef(false);
+  const dragRef = useRef({ startX: 0, hasMoved: false, isDragging: false });
 
-  const THETA = 20;
-  const RADIUS = 1500;
-
-  const updateCardVisuals = (currentRotation: number) => {
+  const positionCards = useCallback((index: number, animate: boolean) => {
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
       if (!card) return;
 
-      const rawAngle = currentRotation + i * THETA;
-      const distance = Math.abs(rawAngle);
+      const offset = i - index;
+      const absOffset = Math.abs(offset);
 
-      if (distance < THETA * 1.5) {
-        const progress = 1 - distance / (THETA * 1.5);
-        const scale = 0.92 + 0.08 * progress;
+      let translateX: number;
+      let rotateY: number;
+      let translateZ: number;
+      let scale: number;
+      let opacity: number;
+      let zIndex: number;
 
-        gsap.set(card, {
+      if (absOffset === 0) {
+        translateX = 0;
+        rotateY = 0;
+        translateZ = 0;
+        scale = 1;
+        opacity = 1;
+        zIndex = 10;
+      } else if (absOffset === 1) {
+        translateX = offset * 340;
+        rotateY = offset < 0 ? 30 : -30;
+        translateZ = -120;
+        scale = 0.82;
+        opacity = 0.6;
+        zIndex = 5;
+      } else if (absOffset === 2) {
+        translateX = offset * 540;
+        rotateY = offset < 0 ? 45 : -45;
+        translateZ = -240;
+        scale = 0.65;
+        opacity = 0.25;
+        zIndex = 2;
+      } else {
+        translateX = offset * 700;
+        rotateY = offset < 0 ? 55 : -55;
+        translateZ = -350;
+        scale = 0.5;
+        opacity = 0;
+        zIndex = 1;
+      }
+
+      const shadow = absOffset === 0
+        ? "10px 10px 0 rgba(164,108,252,0.6)"
+        : "none";
+
+      if (animate) {
+        gsap.to(card, {
+          x: translateX,
+          rotateY: rotateY,
+          z: translateZ,
           scale: scale,
-          opacity: 1,
-          filter: "none",
-          zIndex: Math.round(10 + progress * 10),
+          opacity: opacity,
+          zIndex: zIndex,
+          boxShadow: shadow,
+          duration: 0.7,
+          ease: "power2.out",
+          overwrite: true,
         });
       } else {
         gsap.set(card, {
-          scale: 0.92,
-          opacity: 1,
-          filter: "none",
-          zIndex: 1,
+          x: translateX,
+          rotateY: rotateY,
+          z: translateZ,
+          scale: scale,
+          opacity: opacity,
+          zIndex: zIndex,
+          boxShadow: shadow,
         });
       }
     });
-  };
+  }, []);
+
+  const navigateTo = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(SERVICES.length - 1, index));
+    activeIndexRef.current = clamped;
+    setActiveIndex(clamped);
+    positionCards(clamped, true);
+
+    const tab = tabRefs.current[clamped];
+    if (tab) {
+      tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [positionCards]);
 
   useEffect(() => {
-    const wheel = wheelRef.current;
+    positionCards(0, false);
+  }, [positionCards]);
+
+  useEffect(() => {
     const container = containerRef.current;
-    if (!wheel || !container) return;
-
-    const totalCards = SERVICES.length;
-    const maxRotation = 0;
-    const minRotation = -((totalCards - 1) * THETA);
-
-    gsap.set(wheel, {
-      y: RADIUS,
-      transformOrigin: "50% 50%",
-      rotation: 0,
-    });
-
-    SERVICES.forEach((_, i) => {
-      if (cardsRef.current[i]) {
-        gsap.set(cardsRef.current[i], {
-          rotation: i * THETA,
-          transformOrigin: `50% ${RADIUS}px`,
-          x: 0,
-          y: -RADIUS,
-        });
-      }
-    });
-
-    let isDragging = false;
-    let startX = 0;
-    let rotationAtStart = 0;
-
-    const handleMove = (currentX: number) => {
-      const dx = currentX - startX;
-      let newRotation = rotationAtStart + dx / 5;
-
-      if (newRotation > maxRotation) newRotation = maxRotation;
-      if (newRotation < minRotation) newRotation = minRotation;
-
-      gsap.set(wheel, { rotation: newRotation });
-      updateCardVisuals(newRotation);
-
-      const newIndex = Math.round(Math.abs(newRotation / THETA));
-      if (newIndex !== activeIndexRef.current) {
-        activeIndexRef.current = newIndex;
-        setActiveIndex(newIndex);
-      }
-    };
+    if (!container) return;
 
     const onStart = (e: MouseEvent | TouchEvent) => {
-      isDragging = true;
-      isDraggingRef.current = true;
-      startX = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
-      rotationAtStart = gsap.getProperty(wheel, "rotation") as number;
-      gsap.killTweensOf(wheel);
-
-      if (container) {
-        container.style.cursor = "grabbing";
-      }
+      dragRef.current.isDragging = true;
+      dragRef.current.hasMoved = false;
+      dragRef.current.startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      container.style.cursor = "grabbing";
     };
 
     const onMove = (e: MouseEvent | TouchEvent) => {
-      if (!isDragging) return;
-      if ("touches" in e) {
-        e.preventDefault();
+      if (!dragRef.current.isDragging) return;
+      const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+      if (Math.abs(x - dragRef.current.startX) > 8) {
+        dragRef.current.hasMoved = true;
       }
-      const x = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
-      handleMove(x);
     };
 
-    const onEnd = () => {
-      if (!isDragging) return;
-      isDragging = false;
-      isDraggingRef.current = false;
+    const onEnd = (e: MouseEvent | TouchEvent) => {
+      if (!dragRef.current.isDragging) return;
+      dragRef.current.isDragging = false;
+      container.style.cursor = "grab";
 
-      if (container) {
-        container.style.cursor = "grab";
-      }
+      if (!dragRef.current.hasMoved) return;
 
-      const currentR = gsap.getProperty(wheel, "rotation") as number;
-      const snappedR = Math.round(currentR / THETA) * THETA;
+      const endX = "changedTouches" in e
+        ? e.changedTouches[0].clientX
+        : (e as MouseEvent).clientX;
+      const delta = endX - dragRef.current.startX;
 
-      gsap.to(wheel, {
-        rotation: snappedR,
-        duration: 0.5,
-        ease: "power2.out",
-        onUpdate: () =>
-          updateCardVisuals(gsap.getProperty(wheel, "rotation") as number),
-      });
-
-      const index = Math.round(Math.abs(snappedR / THETA));
-      if (index !== activeIndexRef.current) {
-        activeIndexRef.current = index;
-        setActiveIndex(index);
+      if (Math.abs(delta) > 40) {
+        const dir = delta < 0 ? 1 : -1;
+        navigateTo(activeIndexRef.current + dir);
       }
     };
 
     container.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
-
-    container.addEventListener("touchstart", onStart, { passive: false });
-    window.addEventListener("touchmove", onMove, { passive: false });
+    container.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchmove", onMove, { passive: true });
     window.addEventListener("touchend", onEnd);
 
-    updateCardVisuals(0);
-
     return () => {
-      gsap.killTweensOf(wheel);
       container.removeEventListener("mousedown", onStart);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onEnd);
@@ -255,147 +254,207 @@ export function ArcSlider() {
       window.removeEventListener("touchmove", onMove);
       window.removeEventListener("touchend", onEnd);
     };
-  }, []);
+  }, [navigateTo]);
 
-  const navigateTo = (index: number) => {
-    const wheel = wheelRef.current;
-    if (!wheel) return;
-
-    const targetRotation = -(index * THETA);
-
-    gsap.to(wheel, {
-      rotation: targetRotation,
-      duration: 0.8,
-      ease: "power2.out",
-      onUpdate: () => {
-        updateCardVisuals(gsap.getProperty(wheel, "rotation") as number);
-      },
-    });
-
-    activeIndexRef.current = index;
-    setActiveIndex(index);
-  };
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") navigateTo(activeIndexRef.current - 1);
+      if (e.key === "ArrowRight") navigateTo(activeIndexRef.current + 1);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [navigateTo]);
 
   return (
     <>
-      <div className="relative w-full bg-[var(--color-background-light)] py-10 md:py-16 overflow-hidden">
-        <h2
-          className="relative z-30 text-center px-8 tracking-tight"
-          style={{
-            fontSize: "clamp(2.5rem, 5vw, 4rem)",
-            fontFamily: "var(--font-stack-heading)",
-            color: "var(--color-text-dark)",
-            marginBottom: "clamp(80px, 12vw, 200px)",
-          }}
-        >
+      <div
+        className="relative w-full py-16 md:py-24 overflow-hidden"
+        style={{ background: "var(--color-background-light)" }}
+      >
+        <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
           <span
-            className="text-xs tracking-[0.3em] mb-6 block uppercase"
-            style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}
+            className="text-xs tracking-[0.3em] mb-5 block uppercase"
+            style={{
+              fontFamily: "var(--font-stack-heading)",
+              color: "var(--color-secondary)",
+            }}
           >
             Our Capabilities
           </span>
-          Services
-        </h2>
+          <h2
+            className="tracking-tight"
+            style={{
+              fontSize: "clamp(2.5rem, 5vw, 4rem)",
+              fontFamily: "var(--font-stack-heading)",
+              color: "var(--color-text-dark)",
+            }}
+          >
+            Services
+          </h2>
+        </div>
+
+        <div
+          ref={tabBarRef}
+          className="relative z-30 flex gap-2 justify-start md:justify-center px-6 mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+          role="tablist"
+        >
+          {SERVICES.map((service, i) => (
+            <button
+              key={service.id}
+              ref={(el) => (tabRefs.current[i] = el)}
+              role="tab"
+              aria-selected={i === activeIndex}
+              onClick={() => navigateTo(i)}
+              className="flex-shrink-0 transition-all duration-300"
+              style={{
+                fontFamily: "var(--font-stack-heading)",
+                fontSize: "0.7rem",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                padding: "10px 20px",
+                whiteSpace: "nowrap",
+                border: "2px solid var(--color-secondary)",
+                background: i === activeIndex
+                  ? "var(--color-secondary)"
+                  : "transparent",
+                color: i === activeIndex
+                  ? "var(--color-background-light)"
+                  : "var(--color-text-dark)",
+                cursor: "pointer",
+                boxShadow: i === activeIndex
+                  ? "var(--shadow-button)"
+                  : "none",
+              }}
+            >
+              {service.title}
+            </button>
+          ))}
+        </div>
 
         <div
           ref={containerRef}
-          className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] cursor-grab active:cursor-grabbing"
+          className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            overflow: "visible",
-            marginTop: "0px",
-            marginBottom: "96px",
+            height: "clamp(440px, 60vw, 620px)",
+            perspective: "1200px",
+            perspectiveOrigin: "50% 50%",
+            touchAction: "pan-y",
             userSelect: "none",
             WebkitUserSelect: "none",
-            touchAction: "none",
-            zIndex: 10,
           }}
+          role="tabpanel"
         >
           <div
-            ref={wheelRef}
-            className="absolute left-1/2 top-0 w-0 h-0"
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ transformStyle: "preserve-3d" }}
           >
             {SERVICES.map((service, i) => {
               const IconComponent = service.icon;
-              const textColor = "#FFFFFF";
-
               return (
                 <div
                   key={service.id}
                   ref={(el) => (cardsRef.current[i] = el)}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[340px] md:w-[420px] md:max-w-none aspect-[3/4] overflow-hidden will-change-transform"
+                  className="absolute will-change-transform"
                   style={{
-                    top: 0,
-                    left: 0,
-                    backgroundColor: service.bgColor,
-                    pointerEvents: "auto",
-                    border: '2px solid rgba(255,255,255,0.15)',
-                    boxShadow: 'var(--shadow-geometric)',
+                    width: "clamp(280px, 28vw, 420px)",
+                    aspectRatio: "3 / 4",
+                    transformStyle: "preserve-3d",
+                    backfaceVisibility: "hidden",
                   }}
                 >
-                  <div className="relative h-full w-full p-6 sm:p-10 flex flex-col justify-between">
-                    <div className="flex justify-between items-start">
+                  <div
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between"
+                    style={{
+                      backgroundColor: service.bgColor,
+                      border: "2px solid rgba(255,255,255,0.12)",
+                    }}
+                  >
+                    <div className="p-6 sm:p-8 flex justify-between items-start">
                       <div>
                         <span
-                          className="text-xs tracking-[0.3em] opacity-50 block mb-1"
+                          className="text-[10px] tracking-[0.3em] opacity-50 block mb-1"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: textColor,
+                            color: "#fff",
                           }}
                         >
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-xs tracking-[0.2em] opacity-40"
+                          className="text-[10px] tracking-[0.2em] opacity-35"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: textColor,
+                            color: "#fff",
                           }}
                         >
                           {service.category.toUpperCase()}
                         </span>
                       </div>
                       <div
-                        className="w-16 h-16 flex items-center justify-center opacity-20"
-                        style={{ color: textColor }}
+                        className="w-12 h-12 flex items-center justify-center opacity-15"
+                        style={{ color: "#fff" }}
                       >
-                        <IconComponent size={40} strokeWidth={1.5} />
+                        <IconComponent size={32} strokeWidth={1.5} />
                       </div>
                     </div>
 
-                    <div>
+                    <div className="p-6 sm:p-8 flex-1 flex flex-col justify-end">
                       <h3
-                        className="tracking-tight leading-[0.85] mb-6 sm:mb-8"
+                        className="tracking-tight leading-[0.9] mb-3"
                         style={{
-                          fontSize: "clamp(1.75rem, 5vw, 3rem)",
+                          fontSize: "clamp(1.75rem, 4vw, 3rem)",
                           fontFamily: "var(--font-stack-heading)",
-                          color: textColor,
+                          color: "#fff",
                         }}
                       >
                         {service.fullTitle}
                       </h3>
 
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setOverlayService(service); }}
-                        className="group inline-flex items-center gap-2 transition-all duration-200"
+                      <p
+                        className="mb-6 line-clamp-2"
                         style={{
-                          fontFamily: 'var(--font-stack-heading)',
-                          fontSize: '0.75rem',
-                          letterSpacing: '0.18em',
-                          textTransform: 'uppercase',
-                          color: textColor,
-                          background: 'rgba(255,255,255,0.08)',
-                          border: '1px solid rgba(255,255,255,0.25)',
-                          padding: '10px 20px',
-                          cursor: 'pointer',
-                          pointerEvents: 'auto',
+                          fontSize: "0.85rem",
+                          lineHeight: 1.6,
+                          fontFamily: "var(--font-stack-body)",
+                          color: "rgba(255,255,255,0.55)",
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
                       >
-                        Learn More
+                        {service.description}
+                      </p>
+
+                      <button
+                        onClick={(e) => {
+                          if (dragRef.current.hasMoved) return;
+                          e.stopPropagation();
+                          setOverlayService(service);
+                        }}
+                        className="group self-start inline-flex items-center gap-2 transition-all duration-200"
+                        style={{
+                          fontFamily: "var(--font-stack-heading)",
+                          fontSize: "0.7rem",
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                          color: "#fff",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.25)",
+                          padding: "10px 24px",
+                          cursor: "pointer",
+                          pointerEvents: "auto",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.18)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                        }}
+                      >
+                        Discover
                         <span
-                          className="transition-transform duration-200 group-hover:translate-x-1"
-                          style={{ display: 'inline-block' }}
+                          className="transition-transform duration-200 group-hover:translate-x-1 inline-block"
                         >
                           &#8594;
                         </span>
@@ -408,22 +467,24 @@ export function ArcSlider() {
           </div>
         </div>
 
-        <div className="relative z-20 flex gap-2 justify-center pb-4">
+        <div className="relative z-20 flex gap-2 justify-center mt-6 md:mt-10">
           {SERVICES.map((_, i) => (
             <button
               key={i}
               onClick={() => navigateTo(i)}
-              className="group relative pointer-events-auto"
+              className="transition-all duration-300"
               aria-label={`Go to service ${i + 1}`}
-            >
-              <div
-                className={`w-12 h-1 rounded-full transition-all duration-300 ${
-                  i === activeIndex
-                    ? "bg-[#A46CFC]"
-                    : "bg-[var(--color-text-dark)]/20 group-hover:bg-[var(--color-text-dark)]/40"
-                }`}
-              />
-            </button>
+              style={{
+                width: i === activeIndex ? 32 : 8,
+                height: 4,
+                background: i === activeIndex
+                  ? "var(--color-secondary)"
+                  : "rgba(164,108,252,0.2)",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            />
           ))}
         </div>
       </div>

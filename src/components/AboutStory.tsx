@@ -359,7 +359,7 @@ export function AboutStory() {
                   }}
                 />
                 <motion.div
-                  className="absolute bottom-0 left-0 right-0 p-7 md:p-9"
+                  className="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-7 md:px-7 md:pb-7 md:pt-9"
                   initial={{ opacity: 0, y: 25 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}

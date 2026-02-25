@@ -1,5 +1,4 @@
 import { useRef, useEffect, useCallback } from 'react';
-import { motion } from 'motion/react';
 import logoSrc from '../assets/h2h_logo_transparent_(1).svg';
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -462,44 +461,6 @@ export function SignalGridPanel() {
         style={{ display: 'block' }}
       />
 
-      <motion.div
-        className="absolute top-3 left-3"
-        initial={{ opacity: 0, x: -10 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-      >
-        <div
-          className="inline-flex items-center gap-2 px-2.5 py-1"
-          style={{
-            background: 'rgba(0,0,0,0.55)',
-            border: '1px solid rgba(164,108,252,0.15)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: 3,
-          }}
-        >
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: '50%',
-              background: 'var(--color-secondary)',
-              display: 'inline-block',
-              boxShadow: '0 0 6px rgba(164,108,252,0.5)',
-            }}
-          />
-          <span
-            className="text-[0.55rem] uppercase"
-            style={{
-              color: 'rgba(232,226,255,0.6)',
-              letterSpacing: '0.18em',
-              fontFamily: 'var(--font-stack-heading)',
-            }}
-          >
-            H2H Network
-          </span>
-        </div>
-      </motion.div>
     </div>
   );
 }

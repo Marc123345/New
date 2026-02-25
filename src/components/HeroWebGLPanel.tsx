@@ -18,13 +18,14 @@ const N = ALL_URLS.length;
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
 
-const SPRING_CENTER = 0.6;
-const SPRING_DAMPING = 0.92;
-const CURSOR_RADIUS = 8.0;
-const CURSOR_INNER = 3.5;
-const CURSOR_PUSH_STR = 35.0;
-const CURSOR_DRAG_STR = 12.0;
-const MAX_SPEED = 14.0;
+const SPRING_CENTER = 0.45;
+const SPRING_DAMPING = 0.955;
+const CURSOR_RADIUS = 10.0;
+const CURSOR_INNER = 4.5;
+const CURSOR_PUSH_STR = 80.0;
+const CURSOR_DRAG_STR = 28.0;
+const CURSOR_FLING_STR = 0.18;
+const MAX_SPEED = 28.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
 
 const JELLY_SPRING = 18.0;
@@ -472,7 +473,7 @@ export function HeroWebGLPanel() {
 
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
-            const restitution = 0.35;
+            const restitution = 0.6;
             const imp = (-(1 + restitution) * rvn) / mT;
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
@@ -490,6 +491,7 @@ export function HeroWebGLPanel() {
         }
 
         if (mouseActive && smoothCx > -999) {
+          const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
           for (let i = 0; i < N; i++) {
             const ddx = px[i] - smoothCx;
             const ddy = py[i] - smoothCy;
@@ -501,32 +503,32 @@ export function HeroWebGLPanel() {
 
               const t = dist / CURSOR_RADIUS;
               const falloff = 1 - t * t;
+              const falloff3 = falloff * falloff * falloff;
+
+              const flingBoost = 1.0 + Math.min(cSpeed * 0.06, 3.0);
 
               if (dist < CURSOR_INNER + radii[i]) {
-                const pushStr = CURSOR_PUSH_STR * falloff * subDt;
+                const pushStr = CURSOR_PUSH_STR * falloff * flingBoost * subDt;
                 vx[i] += nx * pushStr;
                 vy[i] += ny * pushStr;
 
-                const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
                 if (cSpeed > 0.5) {
-                  const drag = Math.min(cSpeed * 0.15, 4.0) * subDt;
-                  vx[i] += cursorVelX * drag * 0.03;
-                  vy[i] += cursorVelY * drag * 0.03;
+                  vx[i] += cursorVelX * CURSOR_FLING_STR * falloff * subDt;
+                  vy[i] += cursorVelY * CURSOR_FLING_STR * falloff * subDt;
                 }
 
-                const squishAmt = Math.min(falloff * 0.2, 0.25);
+                const squishAmt = Math.min(falloff * 0.25 * flingBoost, 0.35);
                 jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.5;
                 jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.5;
-                jellyTargetZ[i] = 1 - squishAmt * 0.3;
+                jellyTargetZ[i] = 1 - squishAmt * 0.4;
               } else {
-                const gentlePush = CURSOR_DRAG_STR * falloff * falloff * subDt;
+                const gentlePush = CURSOR_DRAG_STR * falloff3 * flingBoost * subDt;
                 vx[i] += nx * gentlePush;
                 vy[i] += ny * gentlePush;
 
-                const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
-                if (cSpeed > 1.0) {
-                  vx[i] += cursorVelX * 0.004 * falloff * subDt * 60;
-                  vy[i] += cursorVelY * 0.004 * falloff * subDt * 60;
+                if (cSpeed > 0.5) {
+                  vx[i] += cursorVelX * CURSOR_FLING_STR * 0.5 * falloff * subDt;
+                  vy[i] += cursorVelY * CURSOR_FLING_STR * 0.5 * falloff * subDt;
                 }
               }
             }
@@ -577,14 +579,14 @@ export function HeroWebGLPanel() {
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
         const speedFactor = Math.min(speed * 0.08, 1.0);
 
-        rotTargetVelX[i] = baseRotX[i] + vy[i] * 0.03;
-        rotTargetVelY[i] = baseRotY[i] - vx[i] * 0.03;
+        rotTargetVelX[i] = baseRotX[i] + vy[i] * 0.06;
+        rotTargetVelY[i] = baseRotY[i] - vx[i] * 0.06;
 
-        const rotLerp = 1 - Math.pow(0.02, dt);
+        const rotLerp = 1 - Math.pow(0.005, dt);
         rotVelX[i] += (rotTargetVelX[i] - rotVelX[i]) * rotLerp;
         rotVelY[i] += (rotTargetVelY[i] - rotVelY[i]) * rotLerp;
 
-        const spinDt = dt * (1 + speedFactor * 2.0);
+        const spinDt = dt * (1 + speedFactor * 4.0);
         innerGroups[i].rotation.x += rotVelX[i] * spinDt;
         innerGroups[i].rotation.y += rotVelY[i] * spinDt;
         innerGroups[i].rotation.z += baseRotZ[i] * dt;

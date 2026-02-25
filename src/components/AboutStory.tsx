@@ -232,7 +232,6 @@ export function AboutStory() {
   });
 
   const contentParallax = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
-  const videoParallax = useTransform(scrollYProgress, [0, 1], ['5%', '-5%']);
   const networkFloat = useTransform(scrollYProgress, [0.2, 0.8], [10, -10]);
 
   return (
@@ -332,63 +331,50 @@ export function AboutStory() {
           <div className="lg:col-span-7 h-full">
             <GlassCard
               cardStyle={{
-                padding: 0,
+                padding: 'clamp(2rem, 4vw, 3rem)',
                 background: 'rgba(14,11,31,0.8)',
                 minHeight: '480px',
-                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
               }}
-              noHoverLift
             >
-              <motion.div className="relative w-full h-full" style={{ y: videoParallax }}>
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                  style={{ minHeight: '520px' }}
-                  src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `
-                      linear-gradient(180deg, rgba(14,11,31,0.4) 0%, transparent 30%),
-                      linear-gradient(180deg, transparent 50%, rgba(14,11,31,0.9) 100%)
-                    `,
-                  }}
-                />
-                <motion.div
-                  className="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-7 md:px-7 md:pb-7 md:pt-9"
-                  initial={{ opacity: 0, y: 25 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.9, delay: 0.4 }}
-                >
-                  <CellLabel text="Our Story" />
-                  <p
-                    className="font-semibold max-w-sm"
-                    style={{
-                      color: 'var(--color-text-dark)',
-                      fontFamily: 'var(--font-stack-body)',
-                      fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                      lineHeight: 1.45,
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    A social-first agency built to help brands grow by making their
-                    digital presence feel more human.
-                  </p>
-                  <motion.div
-                    className="mt-5 h-px"
-                    style={{ background: 'rgba(164,108,252,0.25)', transformOrigin: 'left' }}
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.2, delay: 0.7, ease: EASE_OUT_EXPO }}
-                  />
-                </motion.div>
-              </motion.div>
+              <CellLabel text="Our Story" />
+              <h3
+                className="font-bold"
+                style={{
+                  color: 'var(--color-text-dark)',
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: 'clamp(1.5rem, 3vw, 2.2rem)',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.02em',
+                  marginBottom: '1rem',
+                }}
+              >
+                A social-first agency built to help brands grow by making their
+                digital presence feel more human.
+              </h3>
+              <p
+                style={{
+                  color: 'rgba(232,226,255,0.4)',
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(0.9rem, 1.4vw, 1rem)',
+                  lineHeight: 1.7,
+                  maxWidth: '520px',
+                }}
+              >
+                We help companies build authentic relationships through strategic
+                content, thought leadership, and employee advocacy -- turning every
+                touchpoint into a meaningful conversation.
+              </p>
+              <motion.div
+                className="mt-6 h-px"
+                style={{ background: 'rgba(164,108,252,0.25)', transformOrigin: 'left' }}
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, delay: 0.7, ease: EASE_OUT_EXPO }}
+              />
             </GlassCard>
           </div>
 

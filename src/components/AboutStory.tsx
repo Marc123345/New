@@ -13,7 +13,7 @@ import { SignalGridPanel } from './SignalGridPanel';
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const SPRING_TRANSITION = { type: 'spring', stiffness: 300, damping: 20 };
 
-// --- ANIMATION VARIANTS ---
+// --- ANIMATION VARIANTS FOR ORCHESTRATED REVEALS ---
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -169,8 +169,8 @@ function GeometricCard({
           }}
           className="relative h-full w-full overflow-hidden"
           style={{
-            border: '1px solid rgba(255,255,255,0.1)', // Refined outer border
-            boxShadow: `6px 6px 0 ${shadowColor}, inset 0px 1px 1px rgba(255,255,255,0.15)`, // UI UPGRADE: Inner glassmorphism rim light
+            border: '1px solid rgba(255,255,255,0.1)', 
+            boxShadow: `6px 6px 0 ${shadowColor}, inset 0px 1px 1px rgba(255,255,255,0.15)`,
             ...cardStyle,
           }}
         >
@@ -210,7 +210,7 @@ function SectionBadge({ label }: { label: string }) {
           borderRadius: '100px',
           backdropFilter: 'blur(10px)',
           background: 'rgba(255,255,255,0.02)',
-          boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)', // Micro rim light
+          boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)',
         }}
       >
         <span
@@ -395,16 +395,19 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          {/* Signal Grid Panel */}
+          {/* Signal Grid Panel - FIXED HEIGHT AND CLIPPING */}
           <div className="md:col-span-6 lg:col-span-5 lg:col-start-2 h-full">
             <GeometricCard
               cardStyle={{
                 padding: 0,
                 background: 'rgba(0,0,0,0.3)',
-                minHeight: '280px',
+                minHeight: '380px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <div className="absolute inset-0 opacity-80 mix-blend-screen pointer-events-none">
+              <div className="relative w-full h-full opacity-80 mix-blend-screen pointer-events-none flex items-center justify-center">
                 <SignalGridPanel />
               </div>
             </GeometricCard>
@@ -418,7 +421,7 @@ export function AboutStory() {
                 background: 'var(--color-secondary)',
                 padding: 'clamp(2rem, 4vw, 3rem)',
                 justifyContent: 'center',
-                minHeight: '280px',
+                minHeight: '380px', // Match the sibling card height
               }}
             >
               <CellLabel text="01 / Social-First" />

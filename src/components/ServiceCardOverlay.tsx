@@ -77,8 +77,9 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                 style={{ background: `linear-gradient(to right, ${service.bgColor}, ${service.color}, transparent)` }}
               />
 
+              {/* HEADER SECTION - Increased padding for breathing room */}
               <div
-                className="relative px-4 pt-4 pb-4 sm:px-8 sm:pt-7 sm:pb-5 flex-shrink-0"
+                className="relative px-6 pt-6 pb-5 sm:px-10 sm:pt-10 sm:pb-8 flex-shrink-0"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
               >
                 <motion.button
@@ -87,7 +88,8 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                   initial={{ opacity: 0, scale: 0.7 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2, type: 'spring', stiffness: 320, damping: 22 }}
-                  className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
+                  // Adjusted top/right positioning to match new padding
+                  className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
                   style={{
                     border: '1px solid rgba(255,255,255,0.12)',
                     background: 'rgba(255,255,255,0.05)',
@@ -103,7 +105,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1, duration: 0.4 }}
-                  className="block text-[10px] uppercase tracking-[0.35em] mb-3"
+                  className="block text-[10px] uppercase tracking-[0.35em] mb-4"
                   style={{ color: service.color, fontFamily: 'var(--font-stack-heading)' }}
                 >
                   <span
@@ -120,7 +122,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                   transition={{ delay: 0.15, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   className="font-bold leading-tight tracking-tight"
                   style={{
-                    fontSize: 'clamp(1.6rem, 4vw, 2.2rem)',
+                    fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', // Slight bump in max font size
                     color: '#fff',
                     fontFamily: 'var(--font-stack-heading)',
                   }}
@@ -129,13 +131,14 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                 </motion.h3>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-8 sm:py-7 space-y-6">
+              {/* BODY SECTION - Increased padding and gap (space-y-8) */}
+              <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-10 sm:py-8 space-y-8">
                 <motion.p
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.22, duration: 0.45 }}
-                  className="leading-[1.8] text-[0.9375rem]"
-                  style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'var(--font-stack-body)' }}
+                  className="leading-[1.8] text-[0.95rem]" // Slightly larger text
+                  style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--font-stack-body)' }}
                 >
                   {service.description}
                 </motion.p>
@@ -146,7 +149,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.45 }}
                   >
-                    <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center gap-3 mb-6"> {/* Increased bottom margin */}
                       <span
                         className="text-[10px] uppercase tracking-[0.35em]"
                         style={{ color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-stack-heading)' }}
@@ -155,14 +158,16 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                       </span>
                       <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
                     </div>
-                    <ul className="space-y-2">
+                    {/* Increased spacing between list items */}
+                    <ul className="space-y-3">
                       {service.details.map((detail, i) => (
                         <motion.li
                           key={i}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.34 + i * 0.05, duration: 0.35 }}
-                          className="flex items-start gap-3 py-2.5 px-3 text-[0.875rem] leading-snug"
+                          // Increased inner padding and gap for list items
+                          className="flex items-start gap-4 py-3 px-4 text-[0.9rem] leading-relaxed"
                           style={{
                             background: 'rgba(255,255,255,0.025)',
                             border: '1px solid rgba(255,255,255,0.05)',

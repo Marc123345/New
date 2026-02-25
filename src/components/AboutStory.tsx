@@ -457,7 +457,7 @@ export function AboutStory() {
               </div>
             </GeometricCard>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </section>
   );

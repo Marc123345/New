@@ -44,7 +44,7 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   useEffect(() => {
     if (!inView) return;
     let start = 0;
-    const duration = 2000;
+    const duration = 2200;
     const step = (ts: number) => {
       if (!start) start = ts;
       const p = Math.min((ts - start) / duration, 1);
@@ -62,157 +62,137 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   );
 }
 
-function SplitText({
-  text,
-  className,
+function SplitWord({
+  word,
+  delay,
   style,
-  delay = 0,
 }: {
-  text: string;
-  className?: string;
+  word: string;
+  delay: number;
   style?: React.CSSProperties;
-  delay?: number;
 }) {
   return (
-    <span
-      className={className}
-      style={{ ...style, display: 'flex', flexWrap: 'wrap', gap: '0 0.3em' }}
+    <motion.span
+      style={{ display: 'inline-block', ...style }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0 }}
+      transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
     >
-      {text.split(' ').map((word, i) => (
-        <motion.span
-          key={i}
-          style={{ display: 'inline-block' }}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0 }}
-          transition={{ duration: 0.6, delay: delay + i * 0.04, ease: EASE_OUT_EXPO }}
-        >
-          {word}
-        </motion.span>
-      ))}
-    </span>
+      {word}
+    </motion.span>
   );
 }
 
-function GeometricCard({
-  children,
-  className = '',
-  cardStyle = {},
-  delay = 0,
-  shadowColor = 'var(--color-secondary)',
-}: {
-  children: React.ReactNode;
-  className?: string;
-  cardStyle?: React.CSSProperties;
-  delay?: number;
-  shadowColor?: string;
-}) {
-  const mag = useMagnetic(0.12);
+function PillTag({ label, delay = 0 }: { label: string; delay?: number }) {
   const [hovered, setHovered] = useState(false);
-
   return (
     <motion.div
-      ref={mag.ref}
-      onMouseMove={mag.handleMove}
-      onMouseLeave={() => {
-        mag.handleLeave();
-        setHovered(false);
-      }}
-      onMouseEnter={() => setHovered(true)}
-      style={{ x: mag.springX, y: mag.springY }}
-      className={className}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 60 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8, delay, ease: EASE_OUT_EXPO }}
-        className="relative h-full"
-        style={{
-          border: '2px solid var(--color-secondary)',
-          boxShadow: hovered
-            ? `14px 14px 0 ${shadowColor}`
-            : `10px 10px 0 ${shadowColor}`,
-          transform: hovered ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-          transition: 'box-shadow 0.25s ease, transform 0.25s ease',
-          ...cardStyle,
-        }}
-      >
-        {children}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function SectionBadge({ label }: { label: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, scale: 0.85 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className="inline-block"
-      style={{ marginBottom: 'var(--space-6x)' }}
+      transition={{ duration: 0.5, delay, ease: EASE_OUT_EXPO }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: '0.55rem 1.1rem',
+        border: `1px solid ${hovered ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.18)'}`,
+        background: hovered ? 'rgba(255,255,255,0.07)' : 'transparent',
+        cursor: 'default',
+        transition: 'border-color 0.25s, background 0.25s',
+        display: 'inline-block',
+      }}
     >
-      <div
-        className="inline-flex items-center gap-3 px-4 py-2"
+      <span
         style={{
-          border: '2px solid var(--color-secondary)',
-          boxShadow: '4px 4px 0 var(--color-secondary)',
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: '0.72rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.45)',
+          transition: 'color 0.25s',
         }}
       >
-        <span
-          className="text-xs uppercase"
-          style={{
-            fontFamily: 'var(--font-stack-heading)',
-            color: 'var(--color-secondary)',
-            letterSpacing: '0.3em',
-          }}
-        >
-          {label}
-        </span>
-      </div>
+        {label}
+      </span>
     </motion.div>
   );
 }
 
-function CellLabel({ text }: { text: string }) {
-  return (
-    <span
-      className="inline-block"
-      style={{
-        fontSize: '0.65rem',
-        fontWeight: 700,
-        letterSpacing: '0.25em',
-        textTransform: 'uppercase',
-        color: 'var(--color-secondary)',
-        fontFamily: 'var(--font-stack-heading)',
-        opacity: 0.7,
-        marginBottom: 'var(--space-4x)',
-      }}
-    >
-      {text}
-    </span>
-  );
-}
-
-function AccentLine({ delay = 0.3 }: { delay?: number }) {
+function HorizontalRule({ delay = 0 }: { delay?: number }) {
   return (
     <motion.div
-      style={{
-        width: 40,
-        height: 2,
-        background: 'var(--color-secondary)',
-        marginBottom: 'var(--space-4x)',
-      }}
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.8, delay }}
+      transition={{ duration: 1, delay, ease: EASE_OUT_EXPO }}
+      style={{
+        height: 1,
+        background: 'rgba(255,255,255,0.1)',
+        transformOrigin: 'left',
+        width: '100%',
+      }}
     />
   );
 }
 
+function StatBlock({
+  value,
+  suffix,
+  label,
+  delay,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  delay: number;
+}) {
+  const mag = useMagnetic(0.08);
+  return (
+    <motion.div
+      ref={mag.ref}
+      onMouseMove={mag.handleMove}
+      onMouseLeave={mag.handleLeave}
+      style={{ x: mag.springX, y: mag.springY }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
+    >
+      <div
+        style={{
+          paddingBottom: '1.25rem',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: 'clamp(2.8rem, 5vw, 4rem)',
+            fontWeight: 800,
+            color: '#ffffff',
+            lineHeight: 1,
+            letterSpacing: '-0.04em',
+          }}
+        >
+          <CountUp target={value} suffix={suffix} />
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: '0.68rem',
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.4)',
+            marginTop: '0.5rem',
+          }}
+        >
+          {label}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -221,10 +201,11 @@ export function AboutStory() {
     offset: ['start end', 'end start'],
   });
 
-  const lineProgress = useSpring(
-    useTransform(scrollYProgress, [0.1, 0.5], [0, 1]),
-    { stiffness: 100, damping: 30 },
-  );
+  const canvasParallax = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
+  const canvasSpring = useSpring(canvasParallax, { stiffness: 80, damping: 25 });
+
+  const HEADING_WORDS = ['Human', 'to', 'Human'];
+  const HEADING_OUTLINE_WORDS = ['Connection'];
 
   return (
     <section
@@ -233,225 +214,350 @@ export function AboutStory() {
       className="relative w-full overflow-hidden"
       style={{ background: 'var(--color-primary)' }}
     >
-      <motion.div
-        className="absolute left-8 lg:left-12 top-0 bottom-0 hidden lg:block pointer-events-none"
-        style={{
-          width: 2,
-          background:
-            'linear-gradient(to bottom, transparent, var(--color-secondary), transparent)',
-          scaleY: lineProgress,
-          transformOrigin: 'top',
-          opacity: 0.12,
-          zIndex: 2,
-        }}
-      />
-
       <div
         className="absolute top-0 left-0 right-0 h-px"
         style={{
-          background:
-            'linear-gradient(to right, transparent, rgba(164,108,252,0.25), transparent)',
+          background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent)',
           zIndex: 2,
         }}
       />
 
-      <div className="relative z-[2] flex flex-col lg:flex-row min-h-screen">
-        <motion.div
-          className="lg:w-1/2 w-full relative"
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-        >
-          <SignalGridPanel />
-        </motion.div>
+      <div className="relative z-[2] flex flex-col">
 
-        <div
-          className="lg:w-1/2 w-full flex flex-col justify-center"
-          style={{ padding: 'clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem)' }}
-        >
-          <SectionBadge label="About Us" />
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] items-end"
+          style={{ padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem) 0' }}>
 
-          <div style={{ perspective: 800, marginBottom: 'var(--space-8x)' }}>
-            <SplitText
-              text="From Brand Voice"
-              className="block"
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: -12 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              style={{ marginBottom: '2rem' }}
+            >
+              <div
+                className="inline-flex items-center gap-3"
+                style={{
+                  padding: '0.45rem 1rem',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.04)',
+                }}
+              >
+                <div
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.7)',
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.28em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.6)',
+                  }}
+                >
+                  About H2H
+                </span>
+              </div>
+            </motion.div>
+
+            <h2
               style={{
-                fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
                 fontFamily: 'var(--font-stack-heading)',
-                color: '#ffffff',
-                lineHeight: 0.95,
                 fontWeight: 800,
                 textTransform: 'uppercase',
-                letterSpacing: '-0.03em',
+                lineHeight: 0.9,
+                letterSpacing: '-0.04em',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '0 0.28em',
+                fontSize: 'clamp(3.5rem, 9vw, 8rem)',
               }}
-            />
-            <div className="flex items-baseline flex-wrap" style={{ gap: '0 0.25em' }}>
-              <SplitText
-                text="To Human"
-                delay={0.3}
+            >
+              {HEADING_WORDS.map((w, i) => (
+                <SplitWord
+                  key={i}
+                  word={w}
+                  delay={i * 0.08}
+                  style={{ color: '#ffffff' }}
+                />
+              ))}
+              {HEADING_OUTLINE_WORDS.map((w, i) => (
+                <SplitWord
+                  key={'o' + i}
+                  word={w}
+                  delay={0.24 + i * 0.08}
+                  style={{
+                    color: 'transparent',
+                    WebkitTextStroke: '1.5px rgba(255,255,255,0.55)',
+                  }}
+                />
+              ))}
+            </h2>
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
+            style={{
+              fontFamily: 'var(--font-stack-body)',
+              fontSize: 'clamp(0.9rem, 1.5vw, 1rem)',
+              lineHeight: 1.75,
+              color: 'rgba(255,255,255,0.45)',
+              maxWidth: 280,
+              paddingBottom: '0.5rem',
+              paddingLeft: 'clamp(0px, 4vw, 3rem)',
+              alignSelf: 'flex-end',
+            }}
+            className="hidden lg:block"
+          >
+            A social-first agency building brands that speak like humans — not marketing machines.
+          </motion.p>
+        </div>
+
+        <div style={{ padding: '2.5rem clamp(1.5rem, 5vw, 5rem) 0' }}>
+          <HorizontalRule delay={0.2} />
+        </div>
+
+        <div
+          className="relative overflow-hidden"
+          style={{ margin: '0 clamp(1.5rem, 5vw, 5rem)' }}
+        >
+          <motion.div style={{ y: canvasSpring }}>
+            <SignalGridPanel />
+          </motion.div>
+
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none"
+            style={{
+              height: '35%',
+              background: 'linear-gradient(to top, var(--color-primary) 0%, transparent 100%)',
+              zIndex: 3,
+            }}
+          />
+          <div
+            className="absolute top-0 left-0 right-0 pointer-events-none"
+            style={{
+              height: '15%',
+              background: 'linear-gradient(to bottom, var(--color-primary) 0%, transparent 100%)',
+              zIndex: 3,
+            }}
+          />
+        </div>
+
+        <div style={{ padding: '0 clamp(1.5rem, 5vw, 5rem)' }}>
+          <HorizontalRule />
+        </div>
+
+        <div
+          className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr]"
+          style={{
+            padding: 'clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 5rem)',
+            gap: 'clamp(2rem, 4vw, 3.5rem)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <div className="flex flex-col gap-6">
+            <StatBlock value={50} suffix="+" label="Brands elevated" delay={0.05} />
+            <StatBlock value={12} suffix="+" label="Global markets" delay={0.12} />
+            <StatBlock value={98} suffix="%" label="Client retention" delay={0.19} />
+          </div>
+
+          <div
+            style={{
+              borderLeft: '1px solid rgba(255,255,255,0.08)',
+              borderRight: '1px solid rgba(255,255,255,0.08)',
+              padding: '0 clamp(1.5rem, 4vw, 3rem)',
+            }}
+            className="flex flex-col justify-between gap-8"
+          >
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, delay: 0.1, ease: EASE_OUT_EXPO }}
+              style={{
+                fontFamily: 'var(--font-stack-body)',
+                fontSize: 'clamp(1.05rem, 2vw, 1.3rem)',
+                lineHeight: 1.65,
+                color: 'rgba(255,255,255,0.88)',
+                fontWeight: 500,
+              }}
+            >
+              At H2H we believe the most impactful brands are the ones that know how to
+              connect — not just communicate. Perfect campaigns matter, but people want
+              personality. They want brands that speak like humans and offer something
+              meaningful.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, delay: 0.22, ease: EASE_OUT_EXPO }}
+              style={{
+                fontFamily: 'var(--font-stack-body)',
+                fontSize: 'clamp(0.88rem, 1.5vw, 1rem)',
+                lineHeight: 1.8,
+                color: 'rgba(255,255,255,0.42)',
+              }}
+            >
+              We embed ourselves in your world — a flexible, responsive extension of your
+              team that combines insight with efficiency to help you build brand ecosystems
+              that work across every platform and every stage of growth.
+            </motion.p>
+
+            <div>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.35 }}
                 style={{
-                  fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
                   fontFamily: 'var(--font-stack-heading)',
-                  color: 'transparent',
-                  WebkitTextStroke: '1.5px var(--color-secondary)',
-                  lineHeight: 0.95,
-                  fontWeight: 800,
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.25em',
                   textTransform: 'uppercase',
-                  letterSpacing: '-0.03em',
+                  color: 'rgba(255,255,255,0.3)',
+                  marginBottom: '0.85rem',
                 }}
-              />
-              <SplitText
-                text="Connection"
-                delay={0.45}
-                style={{
-                  fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
-                  fontFamily: 'var(--font-stack-heading)',
-                  color: '#ffffff',
-                  lineHeight: 0.95,
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '-0.03em',
-                }}
-              />
+              >
+                Our disciplines
+              </motion.p>
+              <div className="flex flex-wrap gap-2">
+                {['Strategy', 'Creative', 'Growth', 'Content', 'Analytics', 'Community'].map(
+                  (tag, i) => (
+                    <PillTag key={tag} label={tag} delay={0.4 + i * 0.06} />
+                  ),
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col" style={{ gap: 'var(--space-4x)' }}>
-            <GeometricCard
-              delay={0.1}
-              cardStyle={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)',
-                padding: 'clamp(1.5rem, 3vw, 2rem)',
-              }}
+          <div className="flex flex-col justify-between gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT_EXPO }}
             >
-              <AccentLine />
               <p
-                className="relative z-10 font-medium"
                 style={{
-                  color: 'rgba(255,255,255,0.92)',
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-                  lineHeight: 1.6,
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.3)',
+                  marginBottom: '1rem',
                 }}
               >
-                At H2H we believe the most impactful brands are the ones that know how to
-                connect, not just communicate.
+                Platforms we dominate
               </p>
-              <p
-                className="relative z-10"
-                style={{
-                  color: 'rgba(255,255,255,0.45)',
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(0.9rem, 1.6vw, 1rem)',
-                  lineHeight: 1.7,
-                  marginTop: 'var(--space-3x)',
-                }}
-              >
-                Perfect, polished campaigns are something we take very seriously. But people
-                want more than that — they want personality, brands that speak like humans
-                and offer something meaningful.
-              </p>
-            </GeometricCard>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 'var(--space-4x)' }}>
-              <GeometricCard
-                delay={0.2}
-                shadowColor="var(--color-primary)"
-                cardStyle={{
-                  background: 'var(--color-secondary)',
-                  padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
-                }}
-              >
-                <CellLabel text="01 / Social-First" />
-                <p
-                  className="relative z-10 font-semibold"
-                  style={{
-                    color: 'var(--color-primary)',
-                    fontFamily: 'var(--font-stack-body)',
-                    fontSize: 'clamp(0.9rem, 1.8vw, 1.05rem)',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  A social-first agency built to help brands grow by making their digital
-                  presence feel more human.
-                </p>
-              </GeometricCard>
-
-              <GeometricCard
-                delay={0.3}
-                cardStyle={{
-                  background: 'rgba(255,255,255,0.03)',
-                  padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
-                }}
-              >
-                <CellLabel text="02 / Why H2H?" />
-                <p
-                  style={{
-                    color: 'rgba(255,255,255,0.6)',
-                    fontFamily: 'var(--font-stack-body)',
-                    fontSize: 'clamp(0.9rem, 1.8vw, 1.05rem)',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Because we embed ourselves in your world — a flexible, responsive
-                  extension of your team.
-                </p>
-              </GeometricCard>
-            </div>
-
-            <GeometricCard
-              delay={0.4}
-              cardStyle={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-                padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
-              }}
-            >
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <CellLabel text="03 / Your Extended Team" />
-                  <p
-                    style={{
-                      color: 'rgba(255,255,255,0.7)',
-                      fontFamily: 'var(--font-stack-body)',
-                      fontSize: 'clamp(0.85rem, 1.6vw, 1rem)',
-                      lineHeight: 1.6,
-                      maxWidth: 340,
-                    }}
+              <div className="flex flex-col gap-3">
+                {[
+                  { name: 'Instagram', pct: 94 },
+                  { name: 'TikTok', pct: 88 },
+                  { name: 'LinkedIn', pct: 81 },
+                  { name: 'YouTube', pct: 76 },
+                ].map((p, i) => (
+                  <motion.div
+                    key={p.name}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 + i * 0.07, ease: EASE_OUT_EXPO }}
                   >
-                    We combine insight with efficiency to help you build brand ecosystems
-                    that work — across every platform and every stage of growth.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 shrink-0" style={{ gap: 'var(--space-2x)' }}>
-                  {['Strategy', 'Creative', 'Growth', 'Content'].map((tag, i) => (
-                    <motion.div
-                      key={tag}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.6 + i * 0.08 }}
-                      className="px-3 py-2 text-center"
-                      style={{
-                        border: '1px solid var(--color-secondary)',
-                        background: 'rgba(164,108,252,0.08)',
-                      }}
-                    >
+                    <div className="flex justify-between items-center" style={{ marginBottom: '0.35rem' }}>
                       <span
-                        className="text-xs uppercase"
                         style={{
                           fontFamily: 'var(--font-stack-heading)',
-                          color: 'var(--color-secondary)',
-                          letterSpacing: '0.12em',
+                          fontSize: '0.7rem',
+                          letterSpacing: '0.15em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(255,255,255,0.55)',
                         }}
                       >
-                        {tag}
+                        {p.name}
                       </span>
-                    </motion.div>
-                  ))}
-                </div>
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-stack-heading)',
+                          fontSize: '0.7rem',
+                          color: 'rgba(255,255,255,0.35)',
+                        }}
+                      >
+                        {p.pct}%
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        height: 2,
+                        background: 'rgba(255,255,255,0.08)',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <motion.div
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, delay: 0.3 + i * 0.1, ease: EASE_OUT_EXPO }}
+                        style={{
+                          height: '100%',
+                          width: `${p.pct}%`,
+                          background: 'rgba(255,255,255,0.75)',
+                          transformOrigin: 'left',
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </GeometricCard>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.5, ease: EASE_OUT_EXPO }}
+            >
+              <div
+                style={{
+                  padding: '1.25rem',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.03)',
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.3)',
+                    marginBottom: '0.65rem',
+                  }}
+                >
+                  Our philosophy
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-stack-body)',
+                    fontSize: '0.92rem',
+                    lineHeight: 1.6,
+                    color: 'rgba(255,255,255,0.6)',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  "Real growth comes from real connection. We don't chase algorithms — we chase authenticity."
+                </p>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>

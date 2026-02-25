@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
+import logoSrc from '../assets/h2h_logo_transparent_(1).svg';
 
 const PLATFORM_COLORS: Record<string, string> = {
   instagram: '#E1306C',
@@ -120,6 +121,17 @@ export function SignalGridPanel() {
   const animRef = useRef<number>(0);
   const sizeRef = useRef({ w: 0, h: 0 });
   const mouseRef = useRef({ x: -9999, y: -9999 });
+  const logoImgRef = useRef<HTMLImageElement | null>(null);
+  const logoLoadedRef = useRef(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      logoLoadedRef.current = true;
+    };
+    img.src = logoSrc;
+    logoImgRef.current = img;
+  }, []);
 
   const buildScene = useCallback((w: number, h: number) => {
     const baseR = Math.min(w, h) * 0.3;
@@ -266,8 +278,8 @@ export function SignalGridPanel() {
       ctx.clearRect(0, 0, w, h);
 
       const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.7);
-      bgGrad.addColorStop(0, 'rgba(15,10,22,1)');
-      bgGrad.addColorStop(1, 'rgba(5,3,8,1)');
+      bgGrad.addColorStop(0, '#12091f');
+      bgGrad.addColorStop(1, '#08050f');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
 
@@ -281,37 +293,66 @@ export function SignalGridPanel() {
         av.angle += av.orbitSpeed;
       }
 
-      const coreR = Math.min(w, h) * 0.08;
+      const coreR = Math.min(w, h) * 0.1;
 
       ctx.save();
-      const outerGlow = ctx.createRadialGradient(cx, cy, coreR * 0.5, cx, cy, coreR * 4);
-      outerGlow.addColorStop(0, 'rgba(255,255,255,0.08)');
+      const outerGlow = ctx.createRadialGradient(cx, cy, coreR * 0.5, cx, cy, coreR * 5);
+      outerGlow.addColorStop(0, 'rgba(164,108,252,0.12)');
+      outerGlow.addColorStop(0.5, 'rgba(123,0,255,0.04)');
       outerGlow.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = outerGlow;
-      ctx.fillRect(cx - coreR * 4, cy - coreR * 4, coreR * 8, coreR * 8);
+      ctx.fillRect(cx - coreR * 5, cy - coreR * 5, coreR * 10, coreR * 10);
       ctx.restore();
 
-      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 2.5);
-      coreGlow.addColorStop(0, 'rgba(255,255,255,0.95)');
-      coreGlow.addColorStop(0.2, 'rgba(220,225,255,0.6)');
-      coreGlow.addColorStop(0.5, 'rgba(140,160,255,0.12)');
-      coreGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      const pulse = Math.sin(ts * 0.0015) * 0.15 + 0.85;
+
       ctx.save();
-      ctx.shadowColor = 'rgba(200,210,255,0.8)';
-      ctx.shadowBlur = 35;
+      ctx.shadowColor = 'rgba(164,108,252,0.6)';
+      ctx.shadowBlur = 30 * pulse;
+      ctx.beginPath();
+      ctx.arc(cx, cy, coreR + 2, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(164,108,252,${0.25 * pulse})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
-      ctx.fillStyle = coreGlow;
+      const coreFill = ctx.createRadialGradient(cx, cy - coreR * 0.2, 0, cx, cy, coreR);
+      coreFill.addColorStop(0, '#1a1030');
+      coreFill.addColorStop(1, '#0e0920');
+      ctx.fillStyle = coreFill;
       ctx.fill();
+      ctx.strokeStyle = 'rgba(164,108,252,0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
       ctx.restore();
 
-      ctx.save();
-      ctx.font = `800 ${coreR * 0.8}px Inter, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(15,10,25,0.95)';
-      ctx.fillText('H2H', cx, cy);
-      ctx.restore();
+      if (logoLoadedRef.current && logoImgRef.current) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, coreR * 0.85, 0, Math.PI * 2);
+        ctx.clip();
+        const logoSize = coreR * 1.5;
+        const aspect = logoImgRef.current.naturalWidth / logoImgRef.current.naturalHeight;
+        let drawW: number, drawH: number;
+        if (aspect > 1) {
+          drawW = logoSize;
+          drawH = logoSize / aspect;
+        } else {
+          drawH = logoSize;
+          drawW = logoSize * aspect;
+        }
+        ctx.drawImage(
+          logoImgRef.current,
+          cx - drawW / 2,
+          cy - drawH / 2,
+          drawW,
+          drawH,
+        );
+        ctx.restore();
+      }
 
       for (const av of avatars) {
         const ax = cx + Math.cos(av.angle) * av.orbitRadius;
@@ -325,7 +366,7 @@ export function SignalGridPanel() {
 
         const lineAlpha = 0.1 + glowAmt * 0.15;
         const grad = ctx.createLinearGradient(cx, cy, ax, ay);
-        grad.addColorStop(0, `${color}00`);
+        grad.addColorStop(0, 'rgba(164,108,252,0.05)');
         grad.addColorStop(0.3, `${color}${Math.floor(lineAlpha * 255).toString(16).padStart(2, '0')}`);
         grad.addColorStop(0.7, `${color}${Math.floor(lineAlpha * 255).toString(16).padStart(2, '0')}`);
         grad.addColorStop(1, `${color}00`);
@@ -432,7 +473,7 @@ export function SignalGridPanel() {
           className="inline-flex items-center gap-2 px-2.5 py-1"
           style={{
             background: 'rgba(0,0,0,0.55)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(164,108,252,0.15)',
             backdropFilter: 'blur(8px)',
             borderRadius: 3,
           }}
@@ -442,15 +483,15 @@ export function SignalGridPanel() {
               width: 5,
               height: 5,
               borderRadius: '50%',
-              background: '#ffffff',
+              background: 'var(--color-secondary)',
               display: 'inline-block',
-              boxShadow: '0 0 6px rgba(255,255,255,0.5)',
+              boxShadow: '0 0 6px rgba(164,108,252,0.5)',
             }}
           />
           <span
             className="text-[0.55rem] uppercase"
             style={{
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgba(232,226,255,0.6)',
               letterSpacing: '0.18em',
               fontFamily: 'var(--font-stack-heading)',
             }}

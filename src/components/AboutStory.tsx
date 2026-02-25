@@ -11,7 +11,6 @@ import {
 import { SignalGridPanel } from './SignalGridPanel';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const SPRING_TRANSITION = { type: 'spring' as const, stiffness: 300, damping: 20 };
 
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
@@ -103,7 +102,7 @@ function GlassCard({
           }}
           className="relative h-full w-full overflow-hidden"
           style={{
-            border: '1px solid rgba(255,255,255,0.07)',
+            border: '1px solid rgba(164,108,252,0.1)',
             borderRadius: 6,
             ...cardStyle,
           }}
@@ -112,7 +111,7 @@ function GlassCard({
             className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500"
             style={{
               opacity: isHovering ? 1 : 0,
-              background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.05), transparent 40%)`,
+              background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(164,108,252,0.06), transparent 40%)`,
             }}
           />
           <div className="relative z-10 h-full w-full flex flex-col">
@@ -136,9 +135,9 @@ function SectionBadge({ label }: { label: string }) {
       <div
         className="inline-flex items-center gap-2.5 px-4 py-1.5"
         style={{
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: '1px solid rgba(164,108,252,0.15)',
           borderRadius: '100px',
-          background: 'rgba(255,255,255,0.03)',
+          background: 'rgba(164,108,252,0.05)',
         }}
       >
         <motion.span
@@ -146,8 +145,9 @@ function SectionBadge({ label }: { label: string }) {
             width: 5,
             height: 5,
             borderRadius: '50%',
-            background: '#ffffff',
+            background: 'var(--color-secondary)',
             display: 'inline-block',
+            boxShadow: '0 0 8px rgba(164,108,252,0.5)',
           }}
           animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -156,7 +156,7 @@ function SectionBadge({ label }: { label: string }) {
           className="text-[0.55rem] font-bold uppercase tracking-[0.3em]"
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            color: 'rgba(255,255,255,0.6)',
+            color: 'var(--color-surface-dark)',
           }}
         >
           {label}
@@ -175,7 +175,7 @@ function FloatingOrb({ delay, size, x, y }: { delay: number; size: number; x: st
         height: size,
         left: x,
         top: y,
-        background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(164,108,252,0.06) 0%, transparent 70%)',
         filter: 'blur(60px)',
       }}
       animate={{
@@ -203,7 +203,7 @@ function CellLabel({ text }: { text: string }) {
         fontWeight: 700,
         letterSpacing: '0.25em',
         textTransform: 'uppercase',
-        color: 'rgba(255,255,255,0.4)',
+        color: 'rgba(164,108,252,0.6)',
         fontFamily: 'var(--font-stack-heading)',
         marginBottom: '0.75rem',
       }}
@@ -239,7 +239,7 @@ export function AboutStory() {
     <section
       ref={sectionRef}
       id="about"
-      className="relative w-full overflow-hidden flex flex-col items-center justify-center selection:bg-white/20 selection:text-white"
+      className="relative w-full overflow-hidden flex flex-col items-center justify-center"
       style={{
         background: 'var(--color-primary)',
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
@@ -261,8 +261,8 @@ export function AboutStory() {
       />
 
       <motion.div
-        className="relative z-10 w-full max-w-[1300px] mx-auto flex flex-col items-center"
-        style={{ y: contentParallax }}
+        className="relative z-10 w-full mx-auto flex flex-col items-center"
+        style={{ y: contentParallax, maxWidth: '1300px' }}
       >
         <div className="flex flex-col items-center text-center mb-16 md:mb-24">
           <SectionBadge label="About Us" />
@@ -271,7 +271,7 @@ export function AboutStory() {
             style={{
               fontSize: 'clamp(2.5rem, 6.5vw, 5.5rem)',
               fontFamily: 'var(--font-stack-heading)',
-              color: '#ffffff',
+              color: 'var(--color-text-dark)',
               lineHeight: 1.05,
               fontWeight: 800,
               textTransform: 'uppercase',
@@ -296,7 +296,7 @@ export function AboutStory() {
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.9, delay: 0.12, ease: EASE_OUT_EXPO }}
             >
-              <span style={{ color: 'transparent', WebkitTextStroke: '1.5px rgba(255,255,255,0.6)' }}>
+              <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
                 To Human
               </span>{' '}
               Connection
@@ -313,7 +313,7 @@ export function AboutStory() {
               fontFamily: 'var(--font-stack-body)',
               fontSize: 'clamp(1rem, 1.6vw, 1.1rem)',
               lineHeight: 1.75,
-              color: 'rgba(255,255,255,0.45)',
+              color: 'rgba(232,226,255,0.45)',
             }}
           >
             We believe the most impactful brands are the ones that know how to
@@ -333,7 +333,7 @@ export function AboutStory() {
             <GlassCard
               cardStyle={{
                 padding: 0,
-                background: 'rgba(0,0,0,0.5)',
+                background: 'rgba(14,11,31,0.8)',
                 minHeight: '480px',
                 overflow: 'hidden',
               }}
@@ -353,8 +353,8 @@ export function AboutStory() {
                   className="absolute inset-0"
                   style={{
                     background: `
-                      linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%),
-                      linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.8) 100%)
+                      linear-gradient(180deg, rgba(14,11,31,0.4) 0%, transparent 30%),
+                      linear-gradient(180deg, transparent 50%, rgba(14,11,31,0.9) 100%)
                     `,
                   }}
                 />
@@ -369,7 +369,7 @@ export function AboutStory() {
                   <p
                     className="font-semibold max-w-sm"
                     style={{
-                      color: 'rgba(255,255,255,0.95)',
+                      color: 'var(--color-text-dark)',
                       fontFamily: 'var(--font-stack-body)',
                       fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
                       lineHeight: 1.45,
@@ -381,7 +381,7 @@ export function AboutStory() {
                   </p>
                   <motion.div
                     className="mt-5 h-px"
-                    style={{ background: 'rgba(255,255,255,0.15)', transformOrigin: 'left' }}
+                    style={{ background: 'rgba(164,108,252,0.25)', transformOrigin: 'left' }}
                     initial={{ scaleX: 0 }}
                     whileInView={{ scaleX: 1 }}
                     viewport={{ once: true }}
@@ -397,7 +397,7 @@ export function AboutStory() {
               <GlassCard
                 cardStyle={{
                   padding: 0,
-                  background: 'rgba(0,0,0,0.4)',
+                  background: 'rgba(14,11,31,0.6)',
                   minHeight: '300px',
                   display: 'flex',
                   alignItems: 'stretch',
@@ -411,8 +411,8 @@ export function AboutStory() {
                   <div
                     className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5"
                     style={{
-                      background: 'rgba(0,0,0,0.6)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(14,11,31,0.7)',
+                      border: '1px solid rgba(164,108,252,0.12)',
                       backdropFilter: 'blur(10px)',
                       borderRadius: 4,
                     }}
@@ -420,7 +420,7 @@ export function AboutStory() {
                     <span
                       className="text-[0.55rem] uppercase"
                       style={{
-                        color: 'rgba(255,255,255,0.5)',
+                        color: 'rgba(232,226,255,0.5)',
                         letterSpacing: '0.15em',
                         fontFamily: 'var(--font-stack-heading)',
                       }}
@@ -440,7 +440,7 @@ export function AboutStory() {
 
             <GlassCard
               cardStyle={{
-                background: '#ffffff',
+                background: 'var(--color-text-dark)',
                 padding: 'clamp(1.5rem, 3vw, 2rem)',
                 justifyContent: 'center',
               }}
@@ -475,24 +475,21 @@ export function AboutStory() {
                   variants={scaleInItem}
                   onHoverStart={() => setActiveCapability(i)}
                   onHoverEnd={() => setActiveCapability(null)}
-                  className="relative px-4 py-4 cursor-default group"
+                  className="relative px-4 py-4 cursor-default"
                   style={{
-                    border: '1px solid rgba(255,255,255,0.07)',
+                    border: `1px solid ${activeCapability === i ? 'rgba(164,108,252,0.25)' : 'rgba(164,108,252,0.08)'}`,
                     background: activeCapability === i
-                      ? 'rgba(255,255,255,0.06)'
-                      : 'rgba(255,255,255,0.02)',
+                      ? 'rgba(164,108,252,0.08)'
+                      : 'rgba(164,108,252,0.02)',
                     borderRadius: 6,
                     transition: 'background 0.3s ease, border-color 0.3s ease',
-                    borderColor: activeCapability === i
-                      ? 'rgba(255,255,255,0.15)'
-                      : 'rgba(255,255,255,0.07)',
                   }}
                 >
                   <span
                     className="block text-[0.7rem] font-semibold uppercase tracking-[0.15em]"
                     style={{
                       fontFamily: 'var(--font-stack-heading)',
-                      color: activeCapability === i ? '#ffffff' : 'rgba(255,255,255,0.55)',
+                      color: activeCapability === i ? 'var(--color-text-dark)' : 'rgba(232,226,255,0.5)',
                       transition: 'color 0.3s ease',
                     }}
                   >
@@ -503,7 +500,7 @@ export function AboutStory() {
                       <motion.span
                         className="block mt-1.5 text-[0.65rem]"
                         style={{
-                          color: 'rgba(255,255,255,0.4)',
+                          color: 'rgba(232,226,255,0.4)',
                           fontFamily: 'var(--font-stack-body)',
                           lineHeight: 1.4,
                         }}
@@ -519,10 +516,10 @@ export function AboutStory() {
                   <motion.div
                     className="absolute bottom-0 left-2 right-2 h-px"
                     style={{
-                      background: '#ffffff',
+                      background: 'var(--color-secondary)',
                       transformOrigin: 'left',
                       scaleX: activeCapability === i ? 1 : 0,
-                      opacity: activeCapability === i ? 0.3 : 0,
+                      opacity: activeCapability === i ? 0.4 : 0,
                       transition: 'transform 0.4s ease, opacity 0.4s ease',
                     }}
                   />

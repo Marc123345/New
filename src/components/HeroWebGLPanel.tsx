@@ -18,14 +18,14 @@ const N = ALL_URLS.length;
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
 
-const SPRING_CENTER = 0.45;
-const SPRING_DAMPING = 0.955;
-const CURSOR_RADIUS = 10.0;
-const CURSOR_INNER = 4.5;
-const CURSOR_PUSH_STR = 80.0;
-const CURSOR_DRAG_STR = 28.0;
-const CURSOR_FLING_STR = 0.18;
-const MAX_SPEED = 28.0;
+const SPRING_RETURN = 0.12;
+const DAMPING_IDLE = 0.98;
+const DAMPING_ACTIVE = 0.985;
+const CURSOR_RADIUS = 12.0;
+const CURSOR_INNER = 5.0;
+const CURSOR_PUSH_STR = 180.0;
+const CURSOR_SWEEP_STR = 0.45;
+const MAX_SPEED = 45.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
 
 const JELLY_SPRING = 18.0;
@@ -244,15 +244,15 @@ export function HeroWebGLPanel() {
       floatPhaseX[i] = Math.random() * Math.PI * 2;
       floatPhaseY[i] = Math.random() * Math.PI * 2;
       floatPhaseZ[i] = Math.random() * Math.PI * 2;
-      floatSpeedX[i] = 0.3 + Math.random() * 0.4;
-      floatSpeedY[i] = 0.25 + Math.random() * 0.35;
-      floatSpeedZ[i] = 0.15 + Math.random() * 0.25;
-      floatAmpX[i] = 0.3 + Math.random() * 0.5;
-      floatAmpY[i] = 0.25 + Math.random() * 0.4;
+      floatSpeedX[i] = 0.08 + Math.random() * 0.12;
+      floatSpeedY[i] = 0.07 + Math.random() * 0.1;
+      floatSpeedZ[i] = 0.05 + Math.random() * 0.08;
+      floatAmpX[i] = 0.08 + Math.random() * 0.12;
+      floatAmpY[i] = 0.06 + Math.random() * 0.1;
 
-      baseRotX[i] = (Math.random() - 0.5) * 0.15;
-      baseRotY[i] = (Math.random() - 0.5) * 0.15;
-      baseRotZ[i] = (Math.random() - 0.5) * 0.08;
+      baseRotX[i] = (Math.random() - 0.5) * 0.04;
+      baseRotY[i] = (Math.random() - 0.5) * 0.04;
+      baseRotZ[i] = (Math.random() - 0.5) * 0.02;
 
       const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
       const dist = 0.35 + Math.random() * 0.45;
@@ -400,10 +400,11 @@ export function HeroWebGLPanel() {
         }
       }
 
-      const SUB = 6;
+      const SUB = 8;
       const subDt = dt / SUB;
 
       for (let s = 0; s < SUB; s++) {
+
         for (let i = 0; i < N; i++) {
           const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * floatAmpX[i];
           const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * floatAmpY[i];
@@ -415,12 +416,13 @@ export function HeroWebGLPanel() {
           const dy = targetY - py[i];
           const dz = -pz[i];
 
-          const springForce = SPRING_CENTER;
-          vx[i] += dx * springForce * subDt;
-          vy[i] += dy * springForce * subDt;
-          vz[i] += dz * springForce * 0.5 * subDt;
+          vx[i] += dx * SPRING_RETURN * subDt;
+          vy[i] += dy * SPRING_RETURN * subDt;
+          vz[i] += dz * SPRING_RETURN * 0.3 * subDt;
 
-          const dampPow = Math.pow(SPRING_DAMPING, subDt * 60);
+          const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
+          const dampRate = speed > 2.0 ? DAMPING_ACTIVE : DAMPING_IDLE;
+          const dampPow = Math.pow(dampRate, subDt * 60);
           vx[i] *= dampPow;
           vy[i] *= dampPow;
           vz[i] *= dampPow;
@@ -439,14 +441,13 @@ export function HeroWebGLPanel() {
 
           const r = radii[i];
           const mX = BOUNDS_X - r, mY = BOUNDS_Y - r;
-          const wallSoftness = 2.0;
-          if (px[i] > mX) { vx[i] -= (px[i] - mX) * wallSoftness * subDt * 60; }
-          else if (px[i] < -mX) { vx[i] -= (px[i] + mX) * wallSoftness * subDt * 60; }
-          if (py[i] > mY) { vy[i] -= (py[i] - mY) * wallSoftness * subDt * 60; }
-          else if (py[i] < -mY) { vy[i] -= (py[i] + mY) * wallSoftness * subDt * 60; }
-          const mZ = 2.5;
-          if (pz[i] > mZ) { vz[i] -= (pz[i] - mZ) * wallSoftness * subDt * 60; }
-          else if (pz[i] < -mZ) { vz[i] -= (pz[i] + mZ) * wallSoftness * subDt * 60; }
+          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.5; }
+          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.5; }
+          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.5; }
+          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.5; }
+          const mZ = 3.0;
+          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.5; }
+          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.5; }
         }
 
         for (let i = 0; i < N; i++) {
@@ -463,7 +464,7 @@ export function HeroWebGLPanel() {
             const overlap = minD - dist;
             const mA = masses[i], mB = masses[j], mT = mA + mB;
 
-            const sep = overlap * 0.55;
+            const sep = overlap * 0.6;
             px[i] -= nx * sep * (mB / mT);
             py[i] -= ny * sep * (mB / mT);
             pz[i] -= nz * sep * (mB / mT);
@@ -473,14 +474,14 @@ export function HeroWebGLPanel() {
 
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
-            const restitution = 0.6;
+            const restitution = 0.7;
             const imp = (-(1 + restitution) * rvn) / mT;
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
 
             const impact = Math.abs(rvn);
-            if (impact > 0.3) {
-              const amt = Math.min(impact * 0.04, 0.3);
+            if (impact > 0.5) {
+              const amt = Math.min(impact * 0.05, 0.35);
               const squishX = 1 - Math.abs(nx) * amt;
               const squishY = 1 - Math.abs(ny) * amt;
               const squishZ = 1 - Math.abs(nz) * amt;
@@ -492,6 +493,8 @@ export function HeroWebGLPanel() {
 
         if (mouseActive && smoothCx > -999) {
           const cSpeed = Math.sqrt(cursorVelX * cursorVelX + cursorVelY * cursorVelY);
+          const speedBoost = 1.0 + Math.min(cSpeed * 0.12, 5.0);
+
           for (let i = 0; i < N; i++) {
             const ddx = px[i] - smoothCx;
             const ddy = py[i] - smoothCy;
@@ -500,35 +503,38 @@ export function HeroWebGLPanel() {
 
             if (dist < CURSOR_RADIUS && dist > 0.01) {
               const nx = ddx / dist, ny = ddy / dist;
-
               const t = dist / CURSOR_RADIUS;
               const falloff = 1 - t * t;
-              const falloff3 = falloff * falloff * falloff;
 
-              const flingBoost = 1.0 + Math.min(cSpeed * 0.06, 3.0);
+              const contactDist = CURSOR_INNER + radii[i];
 
-              if (dist < CURSOR_INNER + radii[i]) {
-                const pushStr = CURSOR_PUSH_STR * falloff * flingBoost * subDt;
+              if (dist < contactDist) {
+                const penetration = 1 - (dist / contactDist);
+                const pushStr = CURSOR_PUSH_STR * (penetration + 0.3) * speedBoost * subDt;
                 vx[i] += nx * pushStr;
                 vy[i] += ny * pushStr;
 
-                if (cSpeed > 0.5) {
-                  vx[i] += cursorVelX * CURSOR_FLING_STR * falloff * subDt;
-                  vy[i] += cursorVelY * CURSOR_FLING_STR * falloff * subDt;
+                if (cSpeed > 1.0) {
+                  vx[i] += cursorVelX * CURSOR_SWEEP_STR * subDt;
+                  vy[i] += cursorVelY * CURSOR_SWEEP_STR * subDt;
                 }
 
-                const squishAmt = Math.min(falloff * 0.25 * flingBoost, 0.35);
-                jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.5;
-                jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.5;
+                const overlap = contactDist - dist;
+                px[i] += nx * overlap * 0.8;
+                py[i] += ny * overlap * 0.8;
+
+                const squishAmt = Math.min(penetration * 0.3, 0.35);
+                jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.6;
+                jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.6;
                 jellyTargetZ[i] = 1 - squishAmt * 0.4;
               } else {
-                const gentlePush = CURSOR_DRAG_STR * falloff3 * flingBoost * subDt;
-                vx[i] += nx * gentlePush;
-                vy[i] += ny * gentlePush;
+                const outerPush = CURSOR_PUSH_STR * 0.15 * falloff * falloff * speedBoost * subDt;
+                vx[i] += nx * outerPush;
+                vy[i] += ny * outerPush;
 
-                if (cSpeed > 0.5) {
-                  vx[i] += cursorVelX * CURSOR_FLING_STR * 0.5 * falloff * subDt;
-                  vy[i] += cursorVelY * CURSOR_FLING_STR * 0.5 * falloff * subDt;
+                if (cSpeed > 1.0) {
+                  vx[i] += cursorVelX * CURSOR_SWEEP_STR * 0.3 * falloff * subDt;
+                  vy[i] += cursorVelY * CURSOR_SWEEP_STR * 0.3 * falloff * subDt;
                 }
               }
             }
@@ -567,8 +573,8 @@ export function HeroWebGLPanel() {
 
         meshes[i].position.set(px[i], py[i], pz[i]);
 
-        const breath = 1 + Math.sin(time * 1.2 + breathPhase[i]) * 0.015;
-        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.4;
+        const breath = 1 + Math.sin(time * 0.8 + breathPhase[i]) * 0.008;
+        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.15;
         meshes[i].position.z = pz[i] + zFloat;
 
         const sx = jellyScaleX[i] * breath;
@@ -577,16 +583,16 @@ export function HeroWebGLPanel() {
         meshes[i].scale.set(sx, sy, sz);
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        const speedFactor = Math.min(speed * 0.08, 1.0);
+        const speedFactor = Math.min(speed * 0.05, 1.0);
 
-        rotTargetVelX[i] = baseRotX[i] + vy[i] * 0.06;
-        rotTargetVelY[i] = baseRotY[i] - vx[i] * 0.06;
+        rotTargetVelX[i] = baseRotX[i] + vy[i] * 0.12;
+        rotTargetVelY[i] = baseRotY[i] - vx[i] * 0.12;
 
-        const rotLerp = 1 - Math.pow(0.005, dt);
+        const rotLerp = 1 - Math.pow(0.01, dt);
         rotVelX[i] += (rotTargetVelX[i] - rotVelX[i]) * rotLerp;
         rotVelY[i] += (rotTargetVelY[i] - rotVelY[i]) * rotLerp;
 
-        const spinDt = dt * (1 + speedFactor * 4.0);
+        const spinDt = dt * (1 + speedFactor * 8.0);
         innerGroups[i].rotation.x += rotVelX[i] * spinDt;
         innerGroups[i].rotation.y += rotVelY[i] * spinDt;
         innerGroups[i].rotation.z += baseRotZ[i] * dt;

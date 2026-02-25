@@ -125,6 +125,7 @@ export function ArcSlider() {
       let opacity: number;
       let zIndex: number;
 
+      // Adjusted translation values slightly to give cards more breathing room
       if (absOffset === 0) {
         translateX = 0;
         rotateY = 0;
@@ -133,21 +134,21 @@ export function ArcSlider() {
         opacity = 1;
         zIndex = 10;
       } else if (absOffset === 1) {
-        translateX = offset * 340;
+        translateX = offset * 360; // Increased from 340
         rotateY = offset < 0 ? 30 : -30;
         translateZ = -120;
         scale = 0.82;
         opacity = 0.6;
         zIndex = 5;
       } else if (absOffset === 2) {
-        translateX = offset * 540;
+        translateX = offset * 580; // Increased from 540
         rotateY = offset < 0 ? 45 : -45;
         translateZ = -240;
         scale = 0.65;
         opacity = 0.25;
         zIndex = 2;
       } else {
-        translateX = offset * 700;
+        translateX = offset * 760; // Increased from 700
         rotateY = offset < 0 ? 55 : -55;
         translateZ = -350;
         scale = 0.5;
@@ -367,12 +368,14 @@ export function ArcSlider() {
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-6"
+                    // ADJUSTMENT: Increased padding to p-6 sm:p-8 for more breathing room
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8"
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",
                     }}
                   >
+                    {/* Top Section */}
                     <div className="flex justify-between items-start">
                       <div>
                         <span
@@ -403,64 +406,66 @@ export function ArcSlider() {
                       </div>
                     </div>
 
-                    <div>
+                    {/* Bottom Section - ADJUSTMENT: Grouped in a flex container with gaps */}
+                    <div className="flex flex-col gap-4">
                       <h3
-                        className="tracking-tight leading-[0.95]"
+                        className="tracking-tight leading-[1]"
                         style={{
                           fontSize: "clamp(1.4rem, 3vw, 2.25rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
-                          marginBottom: "8px",
+                          margin: 0, // Removed individual margins in favor of flex gap
                         }}
                       >
                         {service.fullTitle}
                       </h3>
 
                       <p
-                        className="line-clamp-2"
+                        className="line-clamp-2 opacity-80"
                         style={{
-                          fontSize: "0.78rem",
-                          lineHeight: 1.45,
+                          fontSize: "0.85rem",
+                          lineHeight: 1.6, // Increased line height for better readability
                           fontFamily: "var(--font-stack-body)",
-                          color: "rgba(255,255,255,0.55)",
+                          color: "#fff",
                           margin: 0,
-                          marginBottom: "16px",
                         }}
                       >
                         {service.description}
                       </p>
 
-                      <button
-                        onClick={(e) => {
-                          if (dragRef.current.hasMoved) return;
-                          e.stopPropagation();
-                          setOverlayService(service);
-                        }}
-                        className="group inline-flex items-center gap-2 transition-all duration-200"
-                        style={{
-                          fontFamily: "var(--font-stack-heading)",
-                          fontSize: "0.65rem",
-                          letterSpacing: "0.18em",
-                          textTransform: "uppercase",
-                          color: "#fff",
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.25)",
-                          padding: "8px 20px",
-                          cursor: "pointer",
-                          pointerEvents: "auto",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "rgba(255,255,255,0.18)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                        }}
-                      >
-                        Discover
-                        <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block">
-                          &#8594;
-                        </span>
-                      </button>
+                      <div className="mt-2">
+                        <button
+                          onClick={(e) => {
+                            if (dragRef.current.hasMoved) return;
+                            e.stopPropagation();
+                            setOverlayService(service);
+                          }}
+                          className="group inline-flex items-center gap-2 transition-all duration-200"
+                          style={{
+                            fontFamily: "var(--font-stack-heading)",
+                            fontSize: "0.65rem",
+                            letterSpacing: "0.18em",
+                            textTransform: "uppercase",
+                            color: "#fff",
+                            background: "rgba(255,255,255,0.08)",
+                            border: "1px solid rgba(255,255,255,0.25)",
+                            padding: "8px 20px",
+                            cursor: "pointer",
+                            pointerEvents: "auto",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                          }}
+                        >
+                          Discover
+                          <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block">
+                            &#8594;
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

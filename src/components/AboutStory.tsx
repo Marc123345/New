@@ -6,11 +6,33 @@ import {
   useSpring,
   useMotionValue,
   useInView,
+  Variants,
 } from 'motion/react';
 import { SignalGridPanel } from './SignalGridPanel';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const SPRING_TRANSITION = { type: 'spring', stiffness: 300, damping: 20 };
+
+// --- ANIMATION VARIANTS FOR ORCHESTRATED REVEALS ---
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15, // Creates a beautiful cascade effect
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const fadeUpItem: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.8, ease: EASE_OUT_EXPO } 
+  },
+};
 
 function useMagnetic(strength = 0.2) {
   const ref = useRef<HTMLDivElement>(null);
@@ -67,39 +89,35 @@ function GeometricCard({
   children,
   className = '',
   cardStyle = {},
-  delay = 0,
   shadowColor = 'var(--color-secondary)',
 }: {
   children: React.ReactNode;
   className?: string;
   cardStyle?: React.CSSProperties;
-  delay?: number;
   shadowColor?: string;
 }) {
   const mag = useMagnetic(0.12);
 
   return (
     <motion.div
+      variants={fadeUpItem} // Hooks into the staggerContainer
       ref={mag.ref}
       onMouseMove={mag.handleMove}
       onMouseLeave={mag.handleLeave}
       style={{ x: mag.springX, y: mag.springY }}
-      className={className}
+      className={`relative h-full w-full ${className}`}
     >
       <motion.div
-        initial={{ opacity: 0, y: 60, boxShadow: `10px 10px 0 ${shadowColor}` }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
         whileHover={{
           x: -4,
           y: -4,
-          boxShadow: `16px 16px 0 ${shadowColor}`,
+          boxShadow: `12px 12px 0 ${shadowColor}`, // Tightened the shadow for a crisper feel
           transition: SPRING_TRANSITION,
         }}
-        transition={{ duration: 0.8, delay, ease: EASE_OUT_EXPO }}
-        className="relative h-full"
+        className="relative h-full w-full"
         style={{
           border: '2px solid var(--color-secondary)',
+          boxShadow: `6px 6px 0 ${shadowColor}`, // Baseline shadow
           ...cardStyle,
         }}
       >
@@ -112,28 +130,28 @@ function GeometricCard({
 function SectionBadge({ label }: { label: string }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: -20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className="inline-block"
-      style={{ marginBottom: 'var(--space-6x)' }}
+      transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+      className="inline-block mb-10" // Standardized bottom margin
     >
       <motion.div
         whileHover={{ scale: 1.05, backgroundColor: '#ffffff' }}
         transition={SPRING_TRANSITION}
-        className="inline-flex items-center gap-3 px-4 py-2 cursor-default group"
+        className="inline-flex items-center gap-3 px-5 py-2 cursor-default group"
         style={{
-          border: '2px solid #ffffff',
-          boxShadow: '4px 4px 0 rgba(255,255,255,0.3)',
+          border: '1px solid rgba(255,255,255,0.2)', // Refined border
+          borderRadius: '100px', // Pill shape for badges looks highly premium
+          backdropFilter: 'blur(10px)',
+          background: 'rgba(255,255,255,0.03)',
         }}
       >
         <span
-          className="text-xs uppercase transition-colors duration-300"
+          className="text-xs font-bold uppercase tracking-[0.2em] transition-colors duration-300 group-hover:text-[var(--color-primary)]"
           style={{
             fontFamily: 'var(--font-stack-heading)',
             color: '#ffffff',
-            letterSpacing: '0.3em',
           }}
         >
           {label}
@@ -146,7 +164,7 @@ function SectionBadge({ label }: { label: string }) {
 function CellLabel({ text }: { text: string }) {
   return (
     <span
-      className="inline-block"
+      className="inline-block w-full"
       style={{
         fontSize: '0.65rem',
         fontWeight: 700,
@@ -154,8 +172,8 @@ function CellLabel({ text }: { text: string }) {
         textTransform: 'uppercase',
         color: 'var(--color-secondary)',
         fontFamily: 'var(--font-stack-heading)',
-        opacity: 0.7,
-        marginBottom: 'var(--space-4x)',
+        opacity: 0.8,
+        marginBottom: '1rem', // Strict pixel rhythm
       }}
     >
       {text}
@@ -163,20 +181,20 @@ function CellLabel({ text }: { text: string }) {
   );
 }
 
-function AccentLine({ delay = 0.3 }: { delay?: number }) {
+function AccentLine() {
   return (
     <motion.div
       style={{
-        width: 40,
+        width: 48, // Divisible by 8
         height: 2,
         background: 'var(--color-secondary)',
-        marginBottom: 'var(--space-4x)',
+        marginBottom: '1.5rem',
         transformOrigin: 'left',
       }}
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.8, delay, ease: EASE_OUT_EXPO }}
+      transition={{ duration: 0.8, delay: 0.5, ease: EASE_OUT_EXPO }}
     />
   );
 }
@@ -189,59 +207,69 @@ export function AboutStory() {
     offset: ['start end', 'end start'],
   });
 
-  const contentParallax = useTransform(scrollYProgress, [0, 1], ['10%', '-5%']);
+  const contentParallax = useTransform(scrollYProgress, [0, 1], ['5%', '-5%']); // Softened parallax so it doesn't break grid alignment
 
   return (
     <section
       ref={sectionRef}
       id="about"
-      className="relative w-full min-h-screen overflow-hidden flex flex-col items-center justify-center"
+      className="relative w-full min-h-screen overflow-hidden flex flex-col items-center justify-center selection:bg-[var(--color-secondary)] selection:text-[var(--color-primary)]"
       style={{ 
         background: 'var(--color-primary)',
-        padding: 'clamp(4rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)'
+        padding: 'clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 3rem)' // Refined responsive padding
       }}
     >
+      {/* Dynamic Background Mesh */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0 opacity-40"
+        style={{
+          background: 'radial-gradient(circle at 50% 0%, rgba(164,108,252,0.15) 0%, transparent 70%)',
+        }}
+      />
+
       <motion.div
-        className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col items-center"
+        className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col items-center" // Tightened max-width for better reading lengths
         style={{ y: contentParallax }}
       >
-        <div className="flex flex-col items-center text-center mb-24 md:mb-32">
+        <div className="flex flex-col items-center text-center mb-20 md:mb-28">
           <SectionBadge label="About Us" />
 
-          <div className="mt-8 flex flex-col items-center justify-center">
+          {/* Typography Refinements: Tighter line heights and exact margins */}
+          <div className="flex flex-col items-center justify-center">
             <h2
               style={{
-                fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
+                fontSize: 'clamp(2.75rem, 7vw, 6.5rem)',
                 fontFamily: 'var(--font-stack-heading)',
                 color: '#ffffff',
-                lineHeight: 1.05,
+                lineHeight: 1, // Tighter line-height for massive headers
                 fontWeight: 800,
-                textTransform: 'uppercase' as const,
-                letterSpacing: '-0.03em',
-                textAlign: 'center' as const,
+                textTransform: 'uppercase',
+                letterSpacing: '-0.04em', // Slightly tighter kerning
+                textAlign: 'center',
                 margin: 0,
               }}
             >
               <motion.span
-                className="block"
+                className="block drop-shadow-lg"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
               >
                 From Brand Voice
               </motion.span>
               <motion.span
-                className="block mt-1 pb-4"
+                className="block mt-2" // Exact pixel rhythm
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.7, delay: 0.15, ease: EASE_OUT_EXPO }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT_EXPO }}
               >
                 <span
                   style={{
                     color: 'transparent',
                     WebkitTextStroke: '2px #ffffff',
+                    opacity: 0.9,
                   }}
                 >
                   To Human
@@ -252,39 +280,42 @@ export function AboutStory() {
           </div>
         </div>
 
-        {/* ORBITAL BENTO GRID */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+        {/* ORBITAL BENTO GRID - Orchestrated with Framer Motion */}
+        <motion.div 
+          className="w-full grid grid-cols-1 md:grid-cols-12 gap-6" // Using exact 24px (gap-6) layout grid
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+        >
+          {/* Main Intro Card */}
           <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
             <GeometricCard
-              delay={0.1}
               cardStyle={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-                padding: 'clamp(2rem, 4vw, 3rem)',
-                backdropFilter: 'blur(12px)',
-                textAlign: 'center',
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                padding: 'clamp(2.5rem, 5vw, 4rem)', // Generous, exact padding
+                backdropFilter: 'blur(16px)',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center'
+                alignItems: 'center',
+                textAlign: 'center',
               }}
             >
               <AccentLine />
-              <p className="relative z-10 font-medium max-w-2xl mt-4" style={{
-                  color: 'var(--color-secondary)',
-                  opacity: 0.95,
+              <p className="relative z-10 max-w-2xl text-white/95" style={{
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-                  lineHeight: 1.6,
+                  fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+                  lineHeight: 1.5,
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
                 }}>
                 At H2H we believe the most impactful brands are the ones that know how to
                 connect, not just communicate.
               </p>
-              <p className="relative z-10 max-w-xl" style={{
-                  color: 'var(--color-secondary)',
-                  opacity: 0.7,
+              <p className="relative z-10 max-w-xl text-white/60 mt-6" style={{
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
-                  lineHeight: 1.7,
-                  marginTop: 'var(--space-4x)',
+                  fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
+                  lineHeight: 1.6,
                 }}>
                 Perfect, polished campaigns are something we take very seriously. But people
                 want more than that — they want personality, brands that speak like humans
@@ -293,31 +324,42 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          <div className="md:col-span-6 lg:col-span-4 lg:col-start-3">
-             <div className="h-full min-h-[250px] relative overflow-hidden rounded-sm border-2 border-[var(--color-secondary)] opacity-80 mix-blend-screen bg-black/20">
+          {/* UI Fix: Placed the SignalGridPanel INSIDE a GeometricCard for perfect physical consistency */}
+          <div className="md:col-span-6 lg:col-span-5 lg:col-start-2">
+            <GeometricCard
+              cardStyle={{
+                padding: 0, // Zero padding so the grid fills the box
+                overflow: 'hidden',
+                background: 'rgba(0,0,0,0.2)',
+                minHeight: '280px',
+              }}
+            >
+              <div className="absolute inset-0 opacity-80 mix-blend-screen">
                 <SignalGridPanel />
-             </div>
+              </div>
+            </GeometricCard>
           </div>
 
-          <div className="md:col-span-6 lg:col-span-4">
+          {/* Social First Card */}
+          <div className="md:col-span-6 lg:col-span-5">
             <GeometricCard
-              delay={0.2}
               shadowColor="var(--color-primary)"
               cardStyle={{
                 background: 'var(--color-secondary)',
-                padding: 'clamp(1.5rem, 3vw, 2rem)',
-                height: '100%',
+                padding: 'clamp(2rem, 4vw, 3rem)',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                minHeight: '280px',
               }}
             >
               <CellLabel text="01 / Social-First" />
               <p className="relative z-10 font-bold" style={{
                   color: 'var(--color-primary)',
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
-                  lineHeight: 1.4,
+                  fontSize: 'clamp(1.15rem, 2vw, 1.35rem)',
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.02em',
                 }}>
                 A social-first agency built to help brands grow by making their digital
                 presence feel more human.
@@ -325,55 +367,60 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
+          {/* Extended Team Card */}
+          <div className="md:col-span-12 lg:col-span-10 lg:col-start-2">
             <GeometricCard
-              delay={0.4}
               cardStyle={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-                padding: 'clamp(1.5rem, 3vw, 2.5rem)',
-                backdropFilter: 'blur(10px)',
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                padding: 'clamp(2rem, 4vw, 3rem)',
+                backdropFilter: 'blur(16px)',
               }}
             >
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-                <div className="flex-1">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
+                <div className="flex-1 max-w-md">
                   <CellLabel text="02 / Your Extended Team" />
                   <p style={{
-                      color: 'var(--color-secondary)',
-                      opacity: 0.8,
+                      color: 'rgba(255,255,255,0.75)',
                       fontFamily: 'var(--font-stack-body)',
-                      fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
+                      fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
                       lineHeight: 1.6,
                     }}>
                     We combine insight with efficiency to help you build brand ecosystems
                     that work — across every platform and every stage of growth.
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-3 shrink-0 w-full md:w-auto">
-                  {['Strategy', 'Creative', 'Growth', 'Content'].map((tag, i) => (
+                
+                {/* Orchestrated inner tags */}
+                <motion.div 
+                  className="grid grid-cols-2 gap-3 shrink-0 w-full md:w-auto"
+                  variants={staggerContainer}
+                >
+                  {['Strategy', 'Creative', 'Growth', 'Content'].map((tag) => (
                     <motion.div
                       key={tag}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      whileHover={{ scale: 1.05, backgroundColor: 'var(--color-secondary)' }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.6 + i * 0.08, ...SPRING_TRANSITION }}
-                      className="px-4 py-3 text-center group cursor-default"
+                      variants={fadeUpItem} // Hooks into the parent orchestrator
+                      whileHover={{ 
+                        scale: 1.05, 
+                        backgroundColor: 'var(--color-secondary)',
+                        color: 'var(--color-primary)',
+                      }}
+                      transition={SPRING_TRANSITION}
+                      className="px-5 py-3 text-center cursor-default"
                       style={{
-                        border: '1px solid var(--color-secondary)',
-                        background: 'rgba(164,108,252,0.08)',
+                        border: '1px solid rgba(164,108,252,0.3)',
+                        background: 'rgba(164,108,252,0.05)',
+                        fontFamily: 'var(--font-stack-heading)',
+                        color: 'var(--color-secondary)',
+                        letterSpacing: '0.15em',
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        fontWeight: 600,
                       }}
                     >
-                      <span className="text-xs uppercase group-hover:text-[var(--color-primary)] transition-colors duration-300"
-                        style={{
-                          fontFamily: 'var(--font-stack-heading)',
-                          color: 'var(--color-secondary)',
-                          letterSpacing: '0.15em',
-                        }}>
-                        {tag}
-                      </span>
+                      {tag}
                     </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </div>
             </GeometricCard>
           </div>

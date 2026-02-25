@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { useOverlay } from '../hooks/useOverlay';
@@ -29,7 +28,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
     return () => { clearTimeout(timer); window.removeEventListener('keydown', handleKey); };
   }, [service, onClose]);
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {service && (
         <>
@@ -49,7 +48,7 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
+            className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-6"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -63,11 +62,10 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
               exit={{ opacity: 0, y: 24, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 300, damping: 28, mass: 0.8 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full flex flex-col focus:outline-none"
+              className="relative w-full focus:outline-none"
               style={{
-                maxWidth: 760,
-                maxHeight: '92dvh',
-                background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
+                maxWidth: 560,
+                background: '#0d0d14',
                 border: '1px solid rgba(255,255,255,0.08)',
                 boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px -16px rgba(0,0,0,0.85), 0 0 60px -20px ${service.bgColor}55`,
               }}
@@ -76,27 +74,14 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                className="h-[3px] w-full origin-left flex-shrink-0"
+                className="h-[3px] w-full origin-left"
                 style={{ background: `linear-gradient(to right, ${service.bgColor}, ${service.color}, transparent)` }}
               />
 
               <div
-                className="relative flex-shrink-0 px-6 pt-6 pb-5 sm:px-8 sm:pt-7"
+                className="relative px-6 pt-6 pb-5 sm:px-8 sm:pt-7"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
               >
-                <div
-                  className="absolute right-6 top-4 select-none pointer-events-none font-black leading-none"
-                  aria-hidden="true"
-                  style={{
-                    fontSize: 'clamp(5rem, 12vw, 8rem)',
-                    color: 'rgba(255,255,255,0.03)',
-                    fontFamily: 'var(--font-stack-heading)',
-                    lineHeight: 1,
-                  }}
-                >
-                  {String(service.id).padStart(2, '0')}
-                </div>
-
                 <motion.button
                   onClick={onClose}
                   aria-label="Close overlay"
@@ -145,65 +130,59 @@ export function ServiceCardOverlay({ service, onClose }: ServiceCardOverlayProps
                 </motion.h3>
               </div>
 
-              <div
-                className="flex-1 overflow-y-auto"
-                style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.15) transparent' }}
-              >
-                <div className="px-6 py-6 sm:px-8 sm:py-7 space-y-6">
-                  <motion.p
+              <div className="px-6 py-6 sm:px-8 sm:py-7 space-y-6">
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.22, duration: 0.45 }}
+                  className="leading-[1.8] text-[0.9375rem]"
+                  style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'var(--font-stack-body)' }}
+                >
+                  {service.description}
+                </motion.p>
+
+                {service.details.length > 0 && (
+                  <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.22, duration: 0.45 }}
-                    className="leading-[1.8] text-[0.9375rem]"
-                    style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'var(--font-stack-body)' }}
+                    transition={{ delay: 0.3, duration: 0.45 }}
                   >
-                    {service.description}
-                  </motion.p>
-
-                  {service.details.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3, duration: 0.45 }}
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <span
-                          className="text-[10px] uppercase tracking-[0.35em]"
-                          style={{ color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-stack-heading)' }}
+                    <div className="flex items-center gap-3 mb-4">
+                      <span
+                        className="text-[10px] uppercase tracking-[0.35em]"
+                        style={{ color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-stack-heading)' }}
+                      >
+                        What We Deliver
+                      </span>
+                      <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    </div>
+                    <ul className="space-y-2">
+                      {service.details.map((detail, i) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.34 + i * 0.05, duration: 0.35 }}
+                          className="flex items-start gap-3 py-2.5 px-3 text-[0.875rem] leading-snug"
+                          style={{
+                            background: 'rgba(255,255,255,0.025)',
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            color: 'rgba(255,255,255,0.62)',
+                            fontFamily: 'var(--font-stack-body)',
+                          }}
                         >
-                          What We Deliver
-                        </span>
-                        <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
-                      </div>
-                      <ul className="space-y-2">
-                        {service.details.map((detail, i) => (
-                          <motion.li
-                            key={i}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.34 + i * 0.05, duration: 0.35 }}
-                            className="flex items-start gap-3 py-2.5 px-3 text-[0.875rem] leading-snug"
-                            style={{
-                              background: 'rgba(255,255,255,0.025)',
-                              border: '1px solid rgba(255,255,255,0.05)',
-                              color: 'rgba(255,255,255,0.62)',
-                              fontFamily: 'var(--font-stack-body)',
-                            }}
-                          >
-                            <span className="mt-[2px] flex-shrink-0" style={{ color: service.color }}>→</span>
-                            {detail}
-                          </motion.li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  )}
-                </div>
+                          <span className="mt-[2px] flex-shrink-0" style={{ color: service.color }}>→</span>
+                          {detail}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           </motion.div>
         </>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   );
 }

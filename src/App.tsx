@@ -63,38 +63,46 @@ const Section = ({
 );
 
 function AppContent() {
+
   return (
     <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
       <Navigation />
       <ScrollProgress />
 
-      {/* FULL SCREEN HERO SECTION */}
       <section
         id="hero"
-        className="relative min-h-screen overflow-hidden flex items-center justify-center"
+        className="relative min-h-screen overflow-hidden"
         style={{ background: '#000' }}
       >
         <HeroWebGL />
 
-        {/* 3D Panel - Now Absolute & Full Screen */}
-        <div className="absolute inset-0 z-10 w-full h-full">
-          <HeroWebGLPanel />
-        </div>
-
-        {/* Title Overlay - pointer-events-none lets mouse interact with 3D behind it */}
-        <div className="relative z-20 px-6 md:px-12 w-full pointer-events-none">
+        <div
+          className="relative z-10 px-6 md:px-12"
+          style={{
+            paddingTop: 'var(--space-8x)',
+            paddingBottom: 'var(--space-8x)',
+          }}
+        >
           <div className="max-w-7xl mx-auto">
             <HeroTitle>
               <ScrollReveal mode="blur" delay={0.2} className="w-full">
-                {/* Empty container just for the title animation framework */}
-                <div className="h-[20vh] sm:h-[30vh]"></div>
+                <div
+                  className="relative mx-auto w-full h-[340px] sm:h-[480px] md:h-[700px] lg:h-[820px] overflow-hidden"
+                  style={{
+                    border: "3px solid var(--color-text-dark)",
+                    boxShadow: "10px 10px 0 var(--color-surface-dark)",
+                    background: "#000",
+                  }}
+                >
+                  <HeroWebGLPanel />
+                </div>
               </ScrollReveal>
             </HeroTitle>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce pointer-events-none" aria-hidden="true">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
             className="text-xs tracking-[0.2em] uppercase"
             style={{ color: 'var(--color-secondary)', fontFamily: 'var(--font-stack-heading)' }}

@@ -226,89 +226,71 @@ export function AboutStory() {
     offset: ['start end', 'end start'],
   });
 
-  const lineProgress = useSpring(
-    useTransform(scrollYProgress, [0.1, 0.5], [0, 1]),
-    { stiffness: 100, damping: 30 },
-  );
-
-  // Parallax transforms: The grid moves up faster than the content
-  const gridParallaxY = useTransform(scrollYProgress, [0, 1], ['10%', '-15%']);
-  const contentParallaxY = useTransform(scrollYProgress, [0, 1], ['5%', '-5%']);
+  // Parallax for floating background elements and content
+  const starsParallax = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+  const contentParallax = useTransform(scrollYProgress, [0, 1], ['10%', '-5%']);
 
   return (
     <section
       ref={sectionRef}
       id="about"
-      className="relative w-full overflow-hidden"
-      style={{ background: 'var(--color-primary)' }}
+      className="relative w-full min-h-screen overflow-hidden flex flex-col items-center justify-center"
+      style={{ 
+        background: 'var(--color-primary)',
+        padding: 'clamp(4rem, 8vw, 8rem) clamp(1rem, 4vw, 2rem)'
+      }}
     >
-      <motion.div
-        className="absolute left-8 lg:left-12 top-0 bottom-0 hidden lg:block pointer-events-none"
+      {/* GALAXY THEME: Deep Space Nebula Glow */}
+      <div 
+        className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
         style={{
-          width: 2,
-          background:
-            'linear-gradient(to bottom, transparent, var(--color-secondary), transparent)',
-          scaleY: lineProgress,
-          transformOrigin: 'top',
-          opacity: 0.12,
-          zIndex: 2,
+          background: 'radial-gradient(circle at 50% 30%, rgba(164,108,252,0.12) 0%, transparent 60%)',
         }}
       />
 
-      <div
-        className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-        style={{
-          background:
-            'linear-gradient(to right, transparent, rgba(164,108,252,0.25), transparent)',
-          zIndex: 2,
-        }}
+      {/* GALAXY THEME: Subtle Orbital Rings in Background */}
+      <motion.div 
+        className="absolute top-[20%] left-1/2 w-[800px] h-[800px] -translate-x-1/2 rounded-full border border-white/5 pointer-events-none z-0 hidden md:block"
+        style={{ y: starsParallax }}
+      />
+      <motion.div 
+        className="absolute top-[10%] left-1/2 w-[1200px] h-[1200px] -translate-x-1/2 rounded-full border border-white/5 pointer-events-none z-0 hidden md:block"
+        style={{ y: starsParallax }}
       />
 
-      <div className="relative z-[2] flex flex-col lg:flex-row min-h-screen">
-        <motion.div
-          className="lg:w-1/2 w-full relative"
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-          style={{ y: gridParallaxY }} // Applied Parallax here
-        >
-          <SignalGridPanel />
-        </motion.div>
-
-        <motion.div
-          className="lg:w-1/2 w-full flex flex-col justify-center"
-          style={{ 
-            padding: 'clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem)',
-            y: contentParallaxY // Applied Parallax here
-          }}
-        >
+      <motion.div 
+        className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col items-center"
+        style={{ y: contentParallax }}
+      >
+        {/* CENTERED HERO TEXT */}
+        <div className="flex flex-col items-center text-center mb-24 md:mb-32">
           <SectionBadge label="About Us" />
 
-          <div style={{ perspective: 800, marginBottom: 'var(--space-8x)' }}>
+          <div className="mt-8 flex flex-col items-center justify-center" style={{ perspective: 800 }}>
             <SplitText
               text="From Brand Voice"
               className="block"
               style={{
-                fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
+                fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                 fontFamily: 'var(--font-stack-heading)',
                 color: '#ffffff',
-                lineHeight: 0.95,
+                lineHeight: 1,
                 fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '-0.03em',
+                textAlign: 'center'
               }}
             />
-            <div className="flex items-baseline flex-wrap" style={{ gap: '0 0.25em' }}>
+            <div className="flex items-center justify-center flex-wrap mt-2" style={{ gap: '0 0.25em' }}>
               <SplitText
                 text="To Human"
                 delay={0.3}
                 style={{
-                  fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
+                  fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                   fontFamily: 'var(--font-stack-heading)',
                   color: 'transparent',
-                  WebkitTextStroke: '1.5px var(--color-secondary)',
-                  lineHeight: 0.95,
+                  WebkitTextStroke: '2px var(--color-secondary)',
+                  lineHeight: 1,
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '-0.03em',
@@ -318,10 +300,10 @@ export function AboutStory() {
                 text="Connection"
                 delay={0.45}
                 style={{
-                  fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
+                  fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                   fontFamily: 'var(--font-stack-heading)',
                   color: '#ffffff',
-                  lineHeight: 0.95,
+                  lineHeight: 1,
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '-0.03em',
@@ -329,117 +311,107 @@ export function AboutStory() {
               />
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-col" style={{ gap: 'var(--space-4x)' }}>
+        {/* ORBITAL BENTO GRID */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+          
+          {/* Main Intro Card - Spans 8 columns, centered */}
+          <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
             <GeometricCard
               delay={0.1}
               cardStyle={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)',
-                padding: 'clamp(1.5rem, 3vw, 2rem)',
-                backdropFilter: 'blur(10px)', // Added subtle glassmorphism
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
+                padding: 'clamp(2rem, 4vw, 3rem)',
+                backdropFilter: 'blur(12px)',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
               }}
             >
               <AccentLine />
-              <p
-                className="relative z-10 font-medium"
-                style={{
-                  color: 'rgba(255,255,255,0.92)',
+              <p className="relative z-10 font-medium max-w-2xl mt-4" style={{
+                  color: 'rgba(255,255,255,0.95)',
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                  fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
                   lineHeight: 1.6,
-                }}
-              >
+                }}>
                 At H2H we believe the most impactful brands are the ones that know how to
                 connect, not just communicate.
               </p>
-              <p
-                className="relative z-10"
-                style={{
-                  color: 'rgba(255,255,255,0.45)',
+              <p className="relative z-10 max-w-xl" style={{
+                  color: 'rgba(255,255,255,0.5)',
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(0.9rem, 1.6vw, 1rem)',
+                  fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
                   lineHeight: 1.7,
-                  marginTop: 'var(--space-3x)',
-                }}
-              >
+                  marginTop: 'var(--space-4x)',
+                }}>
                 Perfect, polished campaigns are something we take very seriously. But people
                 want more than that — they want personality, brands that speak like humans
                 and offer something meaningful.
               </p>
             </GeometricCard>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 'var(--space-4x)' }}>
-              <GeometricCard
-                delay={0.2}
-                shadowColor="var(--color-primary)"
-                cardStyle={{
-                  background: 'var(--color-secondary)',
-                  padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
-                }}
-              >
-                <CellLabel text="01 / Social-First" />
-                <p
-                  className="relative z-10 font-semibold"
-                  style={{
-                    color: 'var(--color-primary)',
-                    fontFamily: 'var(--font-stack-body)',
-                    fontSize: 'clamp(0.9rem, 1.8vw, 1.05rem)',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  A social-first agency built to help brands grow by making their digital
-                  presence feel more human.
-                </p>
-              </GeometricCard>
+          {/* Signal Grid Panel as a decorative block */}
+          <div className="md:col-span-6 lg:col-span-4 lg:col-start-3">
+             <div className="h-full min-h-[250px] relative overflow-hidden rounded-sm border-2 border-[var(--color-secondary)] opacity-80 mix-blend-screen bg-black/20">
+                <SignalGridPanel />
+             </div>
+          </div>
 
-              <GeometricCard
-                delay={0.3}
-                cardStyle={{
-                  background: 'rgba(255,255,255,0.03)',
-                  padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
-                  backdropFilter: 'blur(10px)',
-                }}
-              >
-                <CellLabel text="02 / Why H2H?" />
-                <p
-                  style={{
-                    color: 'rgba(255,255,255,0.6)',
-                    fontFamily: 'var(--font-stack-body)',
-                    fontSize: 'clamp(0.9rem, 1.8vw, 1.05rem)',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Because we embed ourselves in your world — a flexible, responsive
-                  extension of your team.
-                </p>
-              </GeometricCard>
-            </div>
+          {/* Social First Card */}
+          <div className="md:col-span-6 lg:col-span-4">
+            <GeometricCard
+              delay={0.2}
+              shadowColor="var(--color-primary)"
+              cardStyle={{
+                background: 'var(--color-secondary)',
+                padding: 'clamp(1.5rem, 3vw, 2rem)',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}
+            >
+              <CellLabel text="01 / Social-First" />
+              <p className="relative z-10 font-bold" style={{
+                  color: 'var(--color-primary)',
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(1.1rem, 2vw, 1.25rem)',
+                  lineHeight: 1.4,
+                }}>
+                A social-first agency built to help brands grow by making their digital
+                presence feel more human.
+              </p>
+            </GeometricCard>
+          </div>
 
+          {/* Extended Team Card - Spans full width underneath */}
+          <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
             <GeometricCard
               delay={0.4}
               cardStyle={{
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-                padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
+                padding: 'clamp(1.5rem, 3vw, 2.5rem)',
                 backdropFilter: 'blur(10px)',
               }}
             >
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <CellLabel text="03 / Your Extended Team" />
-                  <p
-                    style={{
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                <div className="flex-1">
+                  <CellLabel text="02 / Your Extended Team" />
+                  <p style={{
                       color: 'rgba(255,255,255,0.7)',
                       fontFamily: 'var(--font-stack-body)',
-                      fontSize: 'clamp(0.85rem, 1.6vw, 1rem)',
+                      fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
                       lineHeight: 1.6,
-                      maxWidth: 340,
-                    }}
-                  >
+                    }}>
                     We combine insight with efficiency to help you build brand ecosystems
                     that work — across every platform and every stage of growth.
                   </p>
                 </div>
-                <div className="grid grid-cols-2 shrink-0" style={{ gap: 'var(--space-2x)' }}>
+                <div className="grid grid-cols-2 gap-3 shrink-0 w-full md:w-auto">
                   {['Strategy', 'Creative', 'Growth', 'Content'].map((tag, i) => (
                     <motion.div
                       key={tag}
@@ -448,20 +420,18 @@ export function AboutStory() {
                       whileHover={{ scale: 1.05, backgroundColor: 'var(--color-secondary)' }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.6 + i * 0.08, ...SPRING_TRANSITION }}
-                      className="px-3 py-2 text-center group cursor-default"
+                      className="px-4 py-3 text-center group cursor-default"
                       style={{
                         border: '1px solid var(--color-secondary)',
                         background: 'rgba(164,108,252,0.08)',
                       }}
                     >
-                      <span
-                        className="text-xs uppercase group-hover:text-[var(--color-primary)] transition-colors duration-300"
+                      <span className="text-xs uppercase group-hover:text-[var(--color-primary)] transition-colors duration-300"
                         style={{
                           fontFamily: 'var(--font-stack-heading)',
                           color: 'var(--color-secondary)',
-                          letterSpacing: '0.12em',
-                        }}
-                      >
+                          letterSpacing: '0.15em',
+                        }}>
                         {tag}
                       </span>
                     </motion.div>
@@ -470,8 +440,9 @@ export function AboutStory() {
               </div>
             </GeometricCard>
           </div>
-        </motion.div>
-      </div>
+
+        </div>
+      </motion.div>
     </section>
   );
 }

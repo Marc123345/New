@@ -13,7 +13,7 @@ import { SignalGridPanel } from './SignalGridPanel';
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const SPRING_TRANSITION = { type: 'spring', stiffness: 300, damping: 20 };
 
-// --- ANIMATION VARIANTS FOR ORCHESTRATED REVEALS ---
+// --- ANIMATION VARIANTS ---
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -34,6 +34,7 @@ const fadeUpItem: Variants = {
   },
 };
 
+// --- CUSTOM HOOKS ---
 function useMagnetic(strength = 0.2) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -59,6 +60,7 @@ function useMagnetic(strength = 0.2) {
   return { ref, springX, springY, handleMove, handleLeave };
 }
 
+// --- COMPONENTS ---
 function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
@@ -85,7 +87,6 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   );
 }
 
-// Restored your SplitText component just in case you need it!
 function SplitText({
   text,
   className,
@@ -131,14 +132,31 @@ function GeometricCard({
   shadowColor?: string;
 }) {
   const mag = useMagnetic(0.12);
+  
+  // UI UPGRADE: Spotlight Hover State
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    mag.handleMove(e);
+    if (!mag.ref.current) return;
+    const rect = mag.ref.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
   return (
-    // FIX: Separated the Scroll Variant wrapper from the Magnetic wrapper to prevent Y-axis conflicts
     <motion.div variants={fadeUpItem} className={`relative h-full w-full ${className}`}>
       <motion.div
         ref={mag.ref}
-        onMouseMove={mag.handleMove}
-        onMouseLeave={mag.handleLeave}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => {
+          mag.handleLeave();
+          setIsHovering(false);
+        }}
         style={{ x: mag.springX, y: mag.springY }}
         className="relative h-full w-full"
       >
@@ -151,12 +169,23 @@ function GeometricCard({
           }}
           className="relative h-full w-full overflow-hidden"
           style={{
-            border: '2px solid var(--color-secondary)',
-            boxShadow: `6px 6px 0 ${shadowColor}`,
+            border: '1px solid rgba(255,255,255,0.1)', // Refined outer border
+            boxShadow: `6px 6px 0 ${shadowColor}, inset 0px 1px 1px rgba(255,255,255,0.15)`, // UI UPGRADE: Inner glassmorphism rim light
             ...cardStyle,
           }}
         >
-          {children}
+          {/* UI UPGRADE: The Cursor Spotlight */}
+          <motion.div
+            className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
+            style={{
+              opacity: isHovering ? 1 : 0,
+              background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(164,108,252,0.1), transparent 40%)`,
+            }}
+          />
+          {/* Content wrapper to sit above the spotlight */}
+          <div className="relative z-10 h-full w-full flex flex-col">
+            {children}
+          </div>
         </motion.div>
       </motion.div>
     </motion.div>
@@ -175,16 +204,17 @@ function SectionBadge({ label }: { label: string }) {
       <motion.div
         whileHover={{ scale: 1.05, backgroundColor: '#ffffff' }}
         transition={SPRING_TRANSITION}
-        className="inline-flex items-center gap-3 px-5 py-2 cursor-default group"
+        className="inline-flex items-center gap-3 px-6 py-2 cursor-default group"
         style={{
-          border: '1px solid rgba(255,255,255,0.2)',
+          border: '1px solid rgba(255,255,255,0.15)',
           borderRadius: '100px',
           backdropFilter: 'blur(10px)',
-          background: 'rgba(255,255,255,0.03)',
+          background: 'rgba(255,255,255,0.02)',
+          boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)', // Micro rim light
         }}
       >
         <span
-          className="text-xs font-bold uppercase tracking-[0.2em] transition-colors duration-300 group-hover:text-[var(--color-primary)]"
+          className="text-[0.65rem] font-bold uppercase tracking-[0.25em] transition-colors duration-300 group-hover:text-[var(--color-primary)]"
           style={{
             fontFamily: 'var(--font-stack-heading)',
             color: '#ffffff',
@@ -208,7 +238,7 @@ function CellLabel({ text }: { text: string }) {
         textTransform: 'uppercase',
         color: 'var(--color-secondary)',
         fontFamily: 'var(--font-stack-heading)',
-        opacity: 0.8,
+        opacity: 0.9,
         marginBottom: '1rem',
       }}
     >
@@ -255,11 +285,20 @@ export function AboutStory() {
         padding: 'clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 3rem)'
       }}
     >
-      {/* Dynamic Background Mesh */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-0 opacity-40"
+      {/* UI UPGRADE: Breathing Background Mesh */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none z-0"
+        animate={{ 
+          scale: [1, 1.05, 1],
+          opacity: [0.3, 0.5, 0.3]
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
         style={{
-          background: 'radial-gradient(circle at 50% 0%, rgba(164,108,252,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle at 50% 10%, rgba(164,108,252,0.18) 0%, transparent 60%)',
         }}
       />
 
@@ -285,7 +324,7 @@ export function AboutStory() {
               }}
             >
               <motion.span
-                className="block drop-shadow-lg"
+                className="block drop-shadow-2xl"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-100px' }}
@@ -327,27 +366,24 @@ export function AboutStory() {
           <div className="md:col-span-12 lg:col-span-8 lg:col-start-3 h-full">
             <GeometricCard
               cardStyle={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
                 padding: 'clamp(2.5rem, 5vw, 4rem)',
                 backdropFilter: 'blur(16px)',
-                display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 textAlign: 'center',
               }}
             >
               <AccentLine />
-              <p className="relative z-10 max-w-2xl text-white/95" style={{
+              <p className="font-medium max-w-2xl text-white/95" style={{
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
                   lineHeight: 1.5,
-                  fontWeight: 500,
                   letterSpacing: '-0.01em',
                 }}>
                 At H2H we believe the most impactful brands are the ones that know how to
                 connect, not just communicate.
               </p>
-              <p className="relative z-10 max-w-xl text-white/60 mt-6" style={{
+              <p className="max-w-xl text-white/60 mt-6" style={{
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
                   lineHeight: 1.6,
@@ -364,11 +400,11 @@ export function AboutStory() {
             <GeometricCard
               cardStyle={{
                 padding: 0,
-                background: 'rgba(0,0,0,0.2)',
+                background: 'rgba(0,0,0,0.3)',
                 minHeight: '280px',
               }}
             >
-              <div className="absolute inset-0 opacity-80 mix-blend-screen">
+              <div className="absolute inset-0 opacity-80 mix-blend-screen pointer-events-none">
                 <SignalGridPanel />
               </div>
             </GeometricCard>
@@ -381,14 +417,12 @@ export function AboutStory() {
               cardStyle={{
                 background: 'var(--color-secondary)',
                 padding: 'clamp(2rem, 4vw, 3rem)',
-                display: 'flex',
-                flexDirection: 'column',
                 justifyContent: 'center',
                 minHeight: '280px',
               }}
             >
               <CellLabel text="01 / Social-First" />
-              <p className="relative z-10 font-bold" style={{
+              <p className="font-bold" style={{
                   color: 'var(--color-primary)',
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.15rem, 2vw, 1.35rem)',
@@ -405,9 +439,10 @@ export function AboutStory() {
           <div className="md:col-span-12 lg:col-span-10 lg:col-start-2 h-full">
             <GeometricCard
               cardStyle={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
                 padding: 'clamp(2rem, 4vw, 3rem)',
                 backdropFilter: 'blur(16px)',
+                justifyContent: 'center',
               }}
             >
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
@@ -448,6 +483,7 @@ export function AboutStory() {
                         fontSize: '0.75rem',
                         textTransform: 'uppercase',
                         fontWeight: 600,
+                        boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.1)'
                       }}
                     >
                       {tag}

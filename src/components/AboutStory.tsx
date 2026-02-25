@@ -9,7 +9,6 @@ import {
 } from 'motion/react';
 import { SignalGridPanel } from './SignalGridPanel';
 
-// EASE_OUT_EXPO is great, but adding a custom spring for interactions adds that "Awwwards" feel.
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const SPRING_TRANSITION = { type: 'spring', stiffness: 300, damping: 20 };
 
@@ -64,7 +63,7 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   );
 }
 
-// UPGRADE 1: Added overflow masking for a premium text reveal
+// FIX 1: Added padding to the overflow wrapper so the font metrics don't clip and hide the text
 function SplitText({
   text,
   className,
@@ -82,11 +81,11 @@ function SplitText({
       style={{ ...style, display: 'flex', flexWrap: 'wrap', gap: '0 0.3em' }}
     >
       {text.split(' ').map((word, i) => (
-        <span key={i} style={{ overflow: 'hidden', display: 'inline-flex' }}>
+        <span key={i} style={{ overflow: 'hidden', display: 'inline-flex', paddingBottom: '0.15em', marginBottom: '-0.15em' }}>
           <motion.span
             style={{ display: 'inline-block', transformOrigin: 'bottom' }}
-            initial={{ y: '110%', rotate: 2 }}
-            whileInView={{ y: '0%', rotate: 0 }}
+            initial={{ y: '110%', rotate: 2, opacity: 0 }}
+            whileInView={{ y: '0%', rotate: 0, opacity: 1 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.8, delay: delay + i * 0.04, ease: EASE_OUT_EXPO }}
           >
@@ -98,7 +97,6 @@ function SplitText({
   );
 }
 
-// UPGRADE 2: Replaced CSS transitions with Framer Motion spring physics
 function GeometricCard({
   children,
   className = '',
@@ -220,13 +218,11 @@ function AccentLine({ delay = 0.3 }: { delay?: number }) {
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
   
-  // UPGRADE 3: Setting up scroll tracking for Parallax depth
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
   });
 
-  // Parallax for floating background elements and content
   const starsParallax = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
   const contentParallax = useTransform(scrollYProgress, [0, 1], ['10%', '-5%']);
 
@@ -262,10 +258,10 @@ export function AboutStory() {
         className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-col items-center"
         style={{ y: contentParallax }}
       >
-        {/* CENTERED HERO TEXT */}
         <div className="flex flex-col items-center text-center mb-24 md:mb-32">
           <SectionBadge label="About Us" />
 
+          {/* FIX 2: Updated typography colors to strictly rely on var(--color-secondary) instead of white, improving contrast */}
           <div className="mt-8 flex flex-col items-center justify-center" style={{ perspective: 800 }}>
             <SplitText
               text="From Brand Voice"
@@ -273,12 +269,13 @@ export function AboutStory() {
               style={{
                 fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                 fontFamily: 'var(--font-stack-heading)',
-                color: '#ffffff',
+                color: 'var(--color-secondary)', 
                 lineHeight: 1,
                 fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '-0.03em',
-                textAlign: 'center'
+                textAlign: 'center',
+                textShadow: '0px 4px 20px rgba(0,0,0,0.1)' // Helps pop off the background
               }}
             />
             <div className="flex items-center justify-center flex-wrap mt-2" style={{ gap: '0 0.25em' }}>
@@ -288,7 +285,7 @@ export function AboutStory() {
                 style={{
                   fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                   fontFamily: 'var(--font-stack-heading)',
-                  color: 'transparent',
+                  color: 'rgba(164, 108, 252, 0.1)', // Subtle fill instead of pure transparent
                   WebkitTextStroke: '2px var(--color-secondary)',
                   lineHeight: 1,
                   fontWeight: 800,
@@ -302,11 +299,12 @@ export function AboutStory() {
                 style={{
                   fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                   fontFamily: 'var(--font-stack-heading)',
-                  color: '#ffffff',
+                  color: 'var(--color-secondary)',
                   lineHeight: 1,
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '-0.03em',
+                  textShadow: '0px 4px 20px rgba(0,0,0,0.1)'
                 }}
               />
             </div>
@@ -315,8 +313,6 @@ export function AboutStory() {
 
         {/* ORBITAL BENTO GRID */}
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
-          
-          {/* Main Intro Card - Spans 8 columns, centered */}
           <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
             <GeometricCard
               delay={0.1}
@@ -332,7 +328,8 @@ export function AboutStory() {
             >
               <AccentLine />
               <p className="relative z-10 font-medium max-w-2xl mt-4" style={{
-                  color: 'rgba(255,255,255,0.95)',
+                  color: 'var(--color-secondary)',
+                  opacity: 0.95,
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
                   lineHeight: 1.6,
@@ -341,7 +338,8 @@ export function AboutStory() {
                 connect, not just communicate.
               </p>
               <p className="relative z-10 max-w-xl" style={{
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--color-secondary)',
+                  opacity: 0.7,
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
                   lineHeight: 1.7,
@@ -354,14 +352,12 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          {/* Signal Grid Panel as a decorative block */}
           <div className="md:col-span-6 lg:col-span-4 lg:col-start-3">
              <div className="h-full min-h-[250px] relative overflow-hidden rounded-sm border-2 border-[var(--color-secondary)] opacity-80 mix-blend-screen bg-black/20">
                 <SignalGridPanel />
              </div>
           </div>
 
-          {/* Social First Card */}
           <div className="md:col-span-6 lg:col-span-4">
             <GeometricCard
               delay={0.2}
@@ -388,7 +384,6 @@ export function AboutStory() {
             </GeometricCard>
           </div>
 
-          {/* Extended Team Card - Spans full width underneath */}
           <div className="md:col-span-12 lg:col-span-8 lg:col-start-3">
             <GeometricCard
               delay={0.4}
@@ -402,7 +397,8 @@ export function AboutStory() {
                 <div className="flex-1">
                   <CellLabel text="02 / Your Extended Team" />
                   <p style={{
-                      color: 'rgba(255,255,255,0.7)',
+                      color: 'var(--color-secondary)',
+                      opacity: 0.8,
                       fontFamily: 'var(--font-stack-body)',
                       fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
                       lineHeight: 1.6,
@@ -440,7 +436,6 @@ export function AboutStory() {
               </div>
             </GeometricCard>
           </div>
-
         </div>
       </motion.div>
     </section>

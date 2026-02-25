@@ -63,7 +63,6 @@ function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   );
 }
 
-// FIX 1: Added padding to the overflow wrapper so the font metrics don't clip and hide the text
 function SplitText({
   text,
   className,
@@ -78,7 +77,7 @@ function SplitText({
   return (
     <span
       className={className}
-      style={{ ...style, display: 'flex', flexWrap: 'wrap', gap: '0 0.3em' }}
+      style={{ ...style, display: 'flex', flexWrap: 'wrap', gap: '0 0.3em', justifyContent: 'center' }}
     >
       {text.split(' ').map((word, i) => (
         <span key={i} style={{ overflow: 'hidden', display: 'inline-flex', paddingBottom: '0.15em', marginBottom: '-0.15em' }}>
@@ -261,7 +260,7 @@ export function AboutStory() {
         <div className="flex flex-col items-center text-center mb-24 md:mb-32">
           <SectionBadge label="About Us" />
 
-          {/* FIX 2: Updated typography colors to strictly rely on var(--color-secondary) instead of white, improving contrast */}
+          {/* UPDATED UI: White text with a high-contrast stroke on two words */}
           <div className="mt-8 flex flex-col items-center justify-center" style={{ perspective: 800 }}>
             <SplitText
               text="From Brand Voice"
@@ -269,24 +268,24 @@ export function AboutStory() {
               style={{
                 fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                 fontFamily: 'var(--font-stack-heading)',
-                color: 'var(--color-secondary)', 
+                color: '#ffffff', // Pure white
                 lineHeight: 1,
                 fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '-0.03em',
                 textAlign: 'center',
-                textShadow: '0px 4px 20px rgba(0,0,0,0.1)' // Helps pop off the background
+                textShadow: '0px 4px 20px rgba(255,255,255,0.15)' // Subtle white glow
               }}
             />
             <div className="flex items-center justify-center flex-wrap mt-2" style={{ gap: '0 0.25em' }}>
               <SplitText
-                text="To Human"
+                text="To Human" // The two stroked words
                 delay={0.3}
                 style={{
                   fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                   fontFamily: 'var(--font-stack-heading)',
-                  color: 'rgba(164, 108, 252, 0.1)', // Subtle fill instead of pure transparent
-                  WebkitTextStroke: '2px var(--color-secondary)',
+                  color: 'transparent', // Transparent fill to show background
+                  WebkitTextStroke: '2px #ffffff', // Solid white stroke
                   lineHeight: 1,
                   fontWeight: 800,
                   textTransform: 'uppercase',
@@ -299,12 +298,12 @@ export function AboutStory() {
                 style={{
                   fontSize: 'clamp(2.5rem, 7vw, 6.5rem)',
                   fontFamily: 'var(--font-stack-heading)',
-                  color: 'var(--color-secondary)',
+                  color: '#ffffff', // Pure white
                   lineHeight: 1,
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '-0.03em',
-                  textShadow: '0px 4px 20px rgba(0,0,0,0.1)'
+                  textShadow: '0px 4px 20px rgba(255,255,255,0.15)'
                 }}
               />
             </div>

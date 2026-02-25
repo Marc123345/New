@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, SERVICES } from '../constants/ecosystem';
 
@@ -10,15 +10,18 @@ interface OrbitNodeProps {
   index: number;
   total: number;
   onSelect: (serviceIndex: number) => void;
+  activeLabel: number | null;
+  onToggleLabel: (index: number) => void;
 }
 
-const OrbitNode = ({ item, index, total, onSelect }: OrbitNodeProps) => {
+const OrbitNode = ({ item, index, total, onSelect, activeLabel, onToggleLabel }: OrbitNodeProps) => {
   const angle = (index / total) * 2 * Math.PI;
   const radius = 300;
   const x = Math.cos(angle) * radius;
   const y = Math.sin(angle) * radius;
 
   const serviceIndex = SERVICES.indexOf(item);
+  const showLabel = activeLabel === index;
 
   return (
     <motion.div
@@ -27,12 +30,18 @@ const OrbitNode = ({ item, index, total, onSelect }: OrbitNodeProps) => {
     >
       <motion.button
         onClick={() => onSelect(serviceIndex)}
+        onPointerDown={(e) => {
+          if (e.pointerType === 'touch') {
+            e.stopPropagation();
+            onToggleLabel(index);
+          }
+        }}
         animate={{ rotate: -360 }}
         transition={{ duration: 100, ease: 'linear', repeat: Infinity }}
         className="group relative flex items-center justify-center p-4 focus:outline-none"
       >
         <div
-          className="relative z-10 w-14 h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
           style={{
             background: 'linear-gradient(135deg, var(--color-primary), rgba(164,108,252,0.4))',
             border: '2px solid var(--color-secondary)',
@@ -44,7 +53,11 @@ const OrbitNode = ({ item, index, total, onSelect }: OrbitNodeProps) => {
           </div>
         </div>
 
-        <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-50">
+        <div
+          className={`absolute left-full ml-3 top-1/2 -translate-y-1/2 transition-opacity duration-500 pointer-events-none z-50 ${
+            showLabel ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+        >
           <span
             className="text-xs uppercase tracking-[0.2em] whitespace-nowrap px-3 py-1"
             style={{
@@ -65,11 +78,16 @@ const OrbitNode = ({ item, index, total, onSelect }: OrbitNodeProps) => {
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
+  const [activeLabel, setActiveLabel] = useState<number | null>(null);
+
+  const handleToggleLabel = (index: number) => {
+    setActiveLabel(prev => prev === index ? null : index);
+  };
 
   return (
     <section
       id="ecosystem"
-      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-32"
+      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-32"
       style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -114,7 +132,7 @@ export function EcosystemServices() {
             className="leading-[0.9] tracking-tighter uppercase mb-4"
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(4rem, 10vw, 9rem)',
+              fontSize: 'clamp(2.5rem, 10vw, 9rem)',
               textShadow: '0 20px 40px rgba(41,30,86,0.6)',
               color: 'transparent',
               WebkitTextStroke: '1.5px #ffffff',
@@ -134,7 +152,7 @@ export function EcosystemServices() {
             className="leading-[0.9] tracking-tighter uppercase"
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(4rem, 10vw, 9rem)',
+              fontSize: 'clamp(2.5rem, 10vw, 9rem)',
               color: 'var(--color-secondary)',
               opacity: 0.08,
             }}
@@ -149,7 +167,7 @@ export function EcosystemServices() {
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >
-        <div className="relative w-[600px] h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
+        <div className="relative w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             animate={{ rotate: 360 }}
@@ -167,6 +185,8 @@ export function EcosystemServices() {
                 index={i}
                 total={PILLARS.length}
                 onSelect={setSelectedService}
+                activeLabel={activeLabel}
+                onToggleLabel={handleToggleLabel}
               />
             ))}
           </motion.div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import {
   Globe,
@@ -106,15 +106,12 @@ export function ArcSlider() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [overlayService, setOverlayService] = useState<typeof SERVICES[number] | null>(null);
-  // We use a ref to track the active index during the drag loop
-  // to avoid reading stale state in the event listener
   const activeIndexRef = useRef(0);
+  const isDraggingRef = useRef(false);
 
-  // --- CONFIGURATION ---
-  const THETA = 20; // Angle between cards
-  const RADIUS = 1500; // Arc radius
+  const THETA = 20;
+  const RADIUS = 1500;
 
-  // --- VISUAL UPDATE FUNCTION ---
   const updateCardVisuals = (currentRotation: number) => {
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
@@ -153,7 +150,6 @@ export function ArcSlider() {
     const maxRotation = 0;
     const minRotation = -((totalCards - 1) * THETA);
 
-    // 1. Setup initial state
     gsap.set(wheel, {
       y: RADIUS,
       transformOrigin: "50% 50%",
@@ -171,7 +167,6 @@ export function ArcSlider() {
       }
     });
 
-    // 2. Drag Logic
     let isDragging = false;
     let startX = 0;
     let rotationAtStart = 0;
@@ -180,14 +175,12 @@ export function ArcSlider() {
       const dx = currentX - startX;
       let newRotation = rotationAtStart + dx / 5;
 
-      // Bounds
       if (newRotation > maxRotation) newRotation = maxRotation;
       if (newRotation < minRotation) newRotation = minRotation;
 
       gsap.set(wheel, { rotation: newRotation });
       updateCardVisuals(newRotation);
 
-      // PERFORMANCE FIX: Only update React state if the index actually changes
       const newIndex = Math.round(Math.abs(newRotation / THETA));
       if (newIndex !== activeIndexRef.current) {
         activeIndexRef.current = newIndex;
@@ -197,10 +190,11 @@ export function ArcSlider() {
 
     const onStart = (e: MouseEvent | TouchEvent) => {
       isDragging = true;
+      isDraggingRef.current = true;
       startX = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
       rotationAtStart = gsap.getProperty(wheel, "rotation") as number;
       gsap.killTweensOf(wheel);
-      
+
       if (container) {
         container.style.cursor = "grabbing";
       }
@@ -208,6 +202,9 @@ export function ArcSlider() {
 
     const onMove = (e: MouseEvent | TouchEvent) => {
       if (!isDragging) return;
+      if ("touches" in e) {
+        e.preventDefault();
+      }
       const x = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
       handleMove(x);
     };
@@ -215,12 +212,12 @@ export function ArcSlider() {
     const onEnd = () => {
       if (!isDragging) return;
       isDragging = false;
+      isDraggingRef.current = false;
 
       if (container) {
         container.style.cursor = "grab";
       }
 
-      // Snap logic
       const currentR = gsap.getProperty(wheel, "rotation") as number;
       const snappedR = Math.round(currentR / THETA) * THETA;
 
@@ -231,7 +228,7 @@ export function ArcSlider() {
         onUpdate: () =>
           updateCardVisuals(gsap.getProperty(wheel, "rotation") as number),
       });
-      
+
       const index = Math.round(Math.abs(snappedR / THETA));
       if (index !== activeIndexRef.current) {
         activeIndexRef.current = index;
@@ -239,13 +236,10 @@ export function ArcSlider() {
       }
     };
 
-    // 3. Attach listeners
     container.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
 
-    // Passive false is important for preventing scroll while dragging horizontally, 
-    // but we handle touch-action in CSS now.
     container.addEventListener("touchstart", onStart, { passive: false });
     window.addEventListener("touchmove", onMove, { passive: false });
     window.addEventListener("touchend", onEnd);
@@ -268,7 +262,7 @@ export function ArcSlider() {
     if (!wheel) return;
 
     const targetRotation = -(index * THETA);
-    
+
     gsap.to(wheel, {
       rotation: targetRotation,
       duration: 0.8,
@@ -277,21 +271,21 @@ export function ArcSlider() {
         updateCardVisuals(gsap.getProperty(wheel, "rotation") as number);
       },
     });
-    
+
     activeIndexRef.current = index;
     setActiveIndex(index);
   };
 
   return (
     <>
-      <div className="relative w-full bg-[var(--color-background-light)] py-16 overflow-hidden">
+      <div className="relative w-full bg-[var(--color-background-light)] py-10 md:py-16 overflow-hidden">
         <h2
           className="relative z-30 text-center px-8 tracking-tight"
           style={{
             fontSize: "clamp(2.5rem, 5vw, 4rem)",
             fontFamily: "var(--font-stack-heading)",
             color: "var(--color-text-dark)",
-            marginBottom: "240px",
+            marginBottom: "clamp(80px, 12vw, 200px)",
           }}
         >
           <span
@@ -303,47 +297,42 @@ export function ArcSlider() {
           Services
         </h2>
 
-        {/* The Interaction Zone */}
         <div
           ref={containerRef}
-          className="relative w-full h-[600px] cursor-grab active:cursor-grabbing"
+          className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] cursor-grab active:cursor-grabbing"
           style={{
             overflow: "visible",
-            marginTop: "0px", 
+            marginTop: "0px",
             marginBottom: "96px",
             userSelect: "none",
             WebkitUserSelect: "none",
-            touchAction: "pan-y", 
+            touchAction: "none",
             zIndex: 10,
           }}
         >
-          {/* The Giant Wheel (Invisible Pivot) */}
           <div
             ref={wheelRef}
             className="absolute left-1/2 top-0 w-0 h-0"
           >
             {SERVICES.map((service, i) => {
               const IconComponent = service.icon;
-              const isLight = false;
               const textColor = "#FFFFFF";
 
               return (
                 <div
                   key={service.id}
                   ref={(el) => (cardsRef.current[i] = el)}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[420px] aspect-[3/4] overflow-hidden will-change-transform"
+                  className="absolute -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-[340px] md:w-[420px] md:max-w-none aspect-[3/4] overflow-hidden will-change-transform"
                   style={{
                     top: 0,
                     left: 0,
                     backgroundColor: service.bgColor,
                     pointerEvents: "auto",
-                    border: isLight ? '2px solid var(--color-surface-dark)' : '2px solid rgba(255,255,255,0.15)',
+                    border: '2px solid rgba(255,255,255,0.15)',
                     boxShadow: 'var(--shadow-geometric)',
                   }}
                 >
-                  {/* Card Content */}
-                  <div className="relative h-full w-full p-10 flex flex-col justify-between">
-                    {/* Top: Category & Icon */}
+                  <div className="relative h-full w-full p-6 sm:p-10 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
                       <div>
                         <span
@@ -373,12 +362,11 @@ export function ArcSlider() {
                       </div>
                     </div>
 
-                    {/* Middle: Title + Learn More */}
                     <div>
                       <h3
-                        className="tracking-tight leading-[0.85] mb-8"
+                        className="tracking-tight leading-[0.85] mb-6 sm:mb-8"
                         style={{
-                          fontSize: "clamp(2rem, 5vw, 3rem)",
+                          fontSize: "clamp(1.75rem, 5vw, 3rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: textColor,
                         }}
@@ -409,7 +397,7 @@ export function ArcSlider() {
                           className="transition-transform duration-200 group-hover:translate-x-1"
                           style={{ display: 'inline-block' }}
                         >
-                          →
+                          &#8594;
                         </span>
                       </button>
                     </div>
@@ -420,8 +408,7 @@ export function ArcSlider() {
           </div>
         </div>
 
-        {/* Footer Navigation (Synced) */}
-        <div className="absolute bottom-12 z-20 flex gap-2 left-1/2 -translate-x-1/2">
+        <div className="relative z-20 flex gap-2 justify-center pb-4">
           {SERVICES.map((_, i) => (
             <button
               key={i}
@@ -441,7 +428,6 @@ export function ArcSlider() {
         </div>
       </div>
 
-      {/* OVERLAY FIX: Moved entirely outside the overflow-hidden wrapper */}
       <ServiceCardOverlay
         service={overlayService}
         onClose={() => setOverlayService(null)}

@@ -35,7 +35,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
+            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
             onClick={onClose}
           >
             <AnimatePresence mode="wait">
@@ -46,9 +46,10 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                 exit={{ opacity: 0, y: -20, scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 28 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full overflow-hidden"
+                className="relative w-full overflow-y-auto flex flex-col"
                 style={{
                   maxWidth: 700,
+                  maxHeight: '92dvh',
                   background: 'var(--color-background-light)',
                   border: '2px solid var(--color-surface-dark)',
                   boxShadow: 'var(--shadow-geometric)',
@@ -65,14 +66,15 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                   <button
                     onClick={onClose}
                     aria-label="Close overlay"
-                    className="absolute top-6 right-6 flex items-center justify-center transition-all hover:scale-110 z-20"
+                    className="absolute top-4 right-4 sm:top-6 sm:right-6 flex items-center justify-center transition-all hover:scale-110 z-20"
                     style={{
                       width: 44,
                       height: 44,
-                      color: 'var(--color-background-light)',
-                      backgroundColor: 'var(--color-primary)',
-                      border: '2px solid var(--color-text-dark)',
-                      boxShadow: 'var(--shadow-button)',
+                      color: '#fff',
+                      backgroundColor: 'rgba(0,0,0,0.6)',
+                      backdropFilter: 'blur(8px)',
+                      border: '2px solid rgba(255,255,255,0.2)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                     }}
                   >
                     <X size={20} strokeWidth={2.5} />
@@ -82,7 +84,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.1, duration: 0.4 }}
-                    className="relative w-full h-64 overflow-hidden"
+                    className="relative w-full h-40 sm:h-64 overflow-hidden flex-shrink-0"
                   >
                     <img
                       src={SECONDARY_SERVICES[serviceIndex].image}
@@ -97,7 +99,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                     />
                   </motion.div>
 
-                  <div style={{ padding: 'clamp(28px, 5vw, 40px)' }}>
+                  <div style={{ padding: 'clamp(20px, 5vw, 40px)' }}>
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}

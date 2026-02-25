@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ArrowLeft, ArrowRight, Check, ChevronRight } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
 import { useOverlay } from '../../hooks/useOverlay';
 
@@ -28,7 +28,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
     const timer = setTimeout(() => modalRef.current?.focus(), 100);
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { onClose(); return; }
       if (e.key === 'ArrowLeft' && pillarIndex > 0) { e.preventDefault(); onNavigate(pillarIndex - 1); }
       if (e.key === 'ArrowRight' && pillarIndex < ALL_SERVICES.length - 1) { e.preventDefault(); onNavigate(pillarIndex + 1); }
     };
@@ -66,7 +65,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
+            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -85,14 +84,13 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                 className="relative w-full focus:outline-none flex flex-col"
                 style={{
                   maxWidth: 760,
-                  maxHeight: '92dvh',
+                  maxHeight: '88dvh',
                   borderRadius: '0',
                   background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
                   border: `1px solid ${accent.border}`,
                   boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px -16px rgba(0,0,0,0.8), 0 0 60px -20px ${accent.from}55`,
                 }}
               >
-                {/* Accent top bar */}
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
@@ -101,14 +99,12 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   style={{ background: `linear-gradient(to right, ${accent.from}, ${accent.to}, transparent)` }}
                 />
 
-                {/* Header zone */}
                 <div
                   className="relative flex-shrink-0 px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-7"
                   style={{ borderBottom: `1px solid rgba(255,255,255,0.06)` }}
                 >
-                  {/* Decorative number */}
                   <div
-                    className="absolute right-6 top-4 select-none pointer-events-none font-black leading-none"
+                    className="absolute right-6 top-4 select-none pointer-events-none font-black leading-none hidden sm:block"
                     aria-hidden="true"
                     style={{
                       fontSize: 'clamp(5rem, 12vw, 8rem)',
@@ -120,14 +116,13 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     {String(pillarIndex + 1).padStart(2, '0')}
                   </div>
 
-                  {/* Close */}
                   <motion.button
                     onClick={onClose}
                     aria-label="Close overlay"
                     initial={{ opacity: 0, scale: 0.7 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.25, type: 'spring', stiffness: 320, damping: 22 }}
-                    className="absolute top-5 left-5 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
+                    className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
                     style={{
                       border: '1px solid rgba(255,255,255,0.12)',
                       background: 'rgba(255,255,255,0.05)',
@@ -139,13 +134,11 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     <X size={16} strokeWidth={2} />
                   </motion.button>
 
-                  {/* Subtitle row */}
                   <motion.div
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.12, duration: 0.45 }}
                     className="flex items-center gap-3 mb-4 sm:mb-5"
-                    style={{ paddingLeft: '44px' }}
                   >
                     <span
                       className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.35em]"
@@ -165,7 +158,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     </span>
                   </motion.div>
 
-                  {/* Icon + Title row */}
                   <div className="flex items-start gap-5">
                     <motion.div
                       initial={{ opacity: 0, scale: 0.6 }}
@@ -200,7 +192,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   </div>
                 </div>
 
-                {/* Scrollable body */}
                 <div
                   ref={contentRef}
                   className="flex-1 overflow-y-auto"
@@ -208,7 +199,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                 >
                   <div className="px-5 py-5 sm:px-8 sm:py-7 space-y-6 sm:space-y-8">
 
-                    {/* Description */}
                     <motion.p
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -219,7 +209,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                       {activeService.description}
                     </motion.p>
 
-                    {/* Stats row */}
                     <motion.div
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -256,7 +245,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                       ))}
                     </motion.div>
 
-                    {/* What We Deliver */}
                     <motion.div
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -307,7 +295,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                       </ul>
                     </motion.div>
 
-                    {/* Closing note */}
                     {activeService.closingNote && (
                       <motion.blockquote
                         initial={{ opacity: 0, y: 10 }}
@@ -327,19 +314,18 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   </div>
                 </div>
 
-                {/* Footer navigation */}
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
-                  className="flex-shrink-0 flex items-center justify-between px-4 py-4 sm:px-8 sm:py-5"
+                  className="flex-shrink-0 flex items-center justify-between px-3 py-3 sm:px-8 sm:py-5"
                   style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.25)' }}
                 >
                   <button
                     onClick={() => hasPrev && onNavigate(pillarIndex - 1)}
                     disabled={!hasPrev}
                     aria-label="Previous pillar"
-                    className="group inline-flex items-center gap-2 transition-all duration-200 px-4 py-2.5"
+                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-2.5 py-2 sm:px-4 sm:py-2.5"
                     style={{
                       fontFamily: 'var(--font-stack-heading)',
                       fontSize: 11,
@@ -354,7 +340,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     onMouseLeave={e => { if (hasPrev) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'none'; } }}
                   >
                     <ArrowLeft size={13} />
-                    Prev
+                    <span className="hidden sm:inline">Prev</span>
                   </button>
 
                   <nav className="flex items-center gap-2" aria-label="Pillar pagination">
@@ -382,7 +368,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     onClick={() => hasNext && onNavigate(pillarIndex + 1)}
                     disabled={!hasNext}
                     aria-label="Next pillar"
-                    className="group inline-flex items-center gap-2 transition-all duration-200 px-4 py-2.5"
+                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-2.5 py-2 sm:px-4 sm:py-2.5"
                     style={{
                       fontFamily: 'var(--font-stack-heading)',
                       fontSize: 11,
@@ -396,7 +382,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     onMouseEnter={e => { if (hasNext) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
                     onMouseLeave={e => { if (hasNext) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'none'; } }}
                   >
-                    Next
+                    <span className="hidden sm:inline">Next</span>
                     <ArrowRight size={13} />
                   </button>
                 </motion.div>

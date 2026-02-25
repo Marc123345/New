@@ -7,6 +7,7 @@ import {
   useMotionValue,
   useInView,
 } from 'motion/react';
+import { SignalGridPanel } from './SignalGridPanel';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -212,121 +213,6 @@ function AccentLine({ delay = 0.3 }: { delay?: number }) {
   );
 }
 
-function VideoPanel() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start end', 'end start'],
-  });
-  const scale = useTransform(scrollYProgress, [0, 1], [1.08, 1.0]);
-
-  return (
-    <div
-      ref={ref}
-      className="relative w-full h-full overflow-hidden"
-      style={{ minHeight: 'clamp(360px, 60vh, 780px)' }}
-    >
-      <motion.video
-        autoPlay
-        muted
-        loop
-        playsInline
-        style={{ scale }}
-        className="absolute inset-0 w-full h-full object-cover"
-        src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful%20(1).mp4?updatedAt=1771264402365"
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(to right, transparent 60%, var(--color-primary) 100%), linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.4) 100%)',
-        }}
-      />
-
-      <motion.div
-        className="absolute bottom-8 left-8"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-      >
-        <div
-          className="flex gap-8"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: 'var(--space-4x)' }}
-        >
-          {[
-            { value: 50, suffix: '+', label: 'Brands' },
-            { value: 12, suffix: '+', label: 'Markets' },
-            { value: 98, suffix: '%', label: 'Retention' },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <div
-                className="font-black"
-                style={{
-                  fontSize: '2rem',
-                  fontFamily: 'var(--font-stack-heading)',
-                  color: 'var(--color-secondary)',
-                  lineHeight: 1,
-                  letterSpacing: '-0.03em',
-                }}
-              >
-                <CountUp target={stat.value} suffix={stat.suffix} />
-              </div>
-              <div
-                className="text-xs uppercase"
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  color: 'rgba(255,255,255,0.45)',
-                  letterSpacing: '0.2em',
-                  marginTop: 4,
-                }}
-              >
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      <motion.div
-        className="absolute top-6 left-6"
-        initial={{ opacity: 0, x: -10 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-      >
-        <div
-          className="inline-flex items-center gap-2 px-3 py-1.5"
-          style={{
-            background: 'rgba(0,0,0,0.45)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            backdropFilter: 'blur(8px)',
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'var(--color-secondary)',
-              display: 'inline-block',
-            }}
-          />
-          <span
-            className="text-xs uppercase"
-            style={{
-              color: 'rgba(255,255,255,0.7)',
-              letterSpacing: '0.2em',
-              fontFamily: 'var(--font-stack-heading)',
-            }}
-          >
-            H2H Agency
-          </span>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
 
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -377,7 +263,7 @@ export function AboutStory() {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
         >
-          <VideoPanel />
+          <SignalGridPanel />
         </motion.div>
 
         <div

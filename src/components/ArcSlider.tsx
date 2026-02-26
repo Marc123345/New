@@ -125,6 +125,7 @@ export function ArcSlider() {
       let opacity: number;
       let zIndex: number;
 
+      // Adjusted translation values slightly to give cards more breathing room
       if (absOffset === 0) {
         translateX = 0;
         rotateY = 0;
@@ -133,21 +134,21 @@ export function ArcSlider() {
         opacity = 1;
         zIndex = 10;
       } else if (absOffset === 1) {
-        translateX = offset * 360;
+        translateX = offset * 360; // Increased from 340
         rotateY = offset < 0 ? 30 : -30;
         translateZ = -120;
         scale = 0.82;
         opacity = 0.6;
         zIndex = 5;
       } else if (absOffset === 2) {
-        translateX = offset * 580;
+        translateX = offset * 580; // Increased from 540
         rotateY = offset < 0 ? 45 : -45;
         translateZ = -240;
         scale = 0.65;
         opacity = 0.25;
         zIndex = 2;
       } else {
-        translateX = offset * 760;
+        translateX = offset * 760; // Increased from 700
         rotateY = offset < 0 ? 55 : -55;
         translateZ = -350;
         scale = 0.5;
@@ -155,9 +156,9 @@ export function ArcSlider() {
         zIndex = 1;
       }
 
-      const shadow = absOffset === 0 ? "10px 10px 0 rgba(164,108,252,0.6)" : "none";
-      // Crucial fix: disable pointer events on background cards so they don't intercept clicks
-      const pointerEvents = absOffset === 0 ? "auto" : "none"; 
+      const shadow = absOffset === 0
+        ? "10px 10px 0 rgba(164,108,252,0.6)"
+        : "none";
 
       if (animate) {
         gsap.to(card, {
@@ -171,9 +172,6 @@ export function ArcSlider() {
           duration: 0.7,
           ease: "power2.out",
           overwrite: true,
-          onStart: () => {
-             card.style.pointerEvents = pointerEvents;
-          }
         });
       } else {
         gsap.set(card, {
@@ -185,7 +183,6 @@ export function ArcSlider() {
           zIndex: zIndex,
           boxShadow: shadow,
         });
-        card.style.pointerEvents = pointerEvents;
       }
     });
   }, []);
@@ -206,51 +203,57 @@ export function ArcSlider() {
     positionCards(0, false);
   }, [positionCards]);
 
-  // Unified Pointer Events for cleaner drag handling
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const onPointerDown = (e: PointerEvent) => {
+    const onStart = (e: MouseEvent | TouchEvent) => {
       dragRef.current.isDragging = true;
       dragRef.current.hasMoved = false;
-      dragRef.current.startX = e.clientX;
+      dragRef.current.startX = "touches" in e ? e.touches[0].clientX : e.clientX;
       container.style.cursor = "grabbing";
-      container.setPointerCapture(e.pointerId); // Captures the pointer to the container
     };
 
-    const onPointerMove = (e: PointerEvent) => {
+    const onMove = (e: MouseEvent | TouchEvent) => {
       if (!dragRef.current.isDragging) return;
-      if (Math.abs(e.clientX - dragRef.current.startX) > 8) {
+      const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+      if (Math.abs(x - dragRef.current.startX) > 8) {
         dragRef.current.hasMoved = true;
       }
     };
 
-    const onPointerUp = (e: PointerEvent) => {
+    const onEnd = (e: MouseEvent | TouchEvent) => {
       if (!dragRef.current.isDragging) return;
       dragRef.current.isDragging = false;
       container.style.cursor = "grab";
-      container.releasePointerCapture(e.pointerId);
 
       if (!dragRef.current.hasMoved) return;
 
-      const delta = e.clientX - dragRef.current.startX;
+      const endX = "changedTouches" in e
+        ? e.changedTouches[0].clientX
+        : (e as MouseEvent).clientX;
+      const delta = endX - dragRef.current.startX;
+
       if (Math.abs(delta) > 40) {
         const dir = delta < 0 ? 1 : -1;
         navigateTo(activeIndexRef.current + dir);
       }
     };
 
-    container.addEventListener("pointerdown", onPointerDown);
-    container.addEventListener("pointermove", onPointerMove);
-    container.addEventListener("pointerup", onPointerUp);
-    container.addEventListener("pointercancel", onPointerUp);
+    container.addEventListener("mousedown", onStart);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+    container.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
 
     return () => {
-      container.removeEventListener("pointerdown", onPointerDown);
-      container.removeEventListener("pointermove", onPointerMove);
-      container.removeEventListener("pointerup", onPointerUp);
-      container.removeEventListener("pointercancel", onPointerUp);
+      container.removeEventListener("mousedown", onStart);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+      container.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onEnd);
     };
   }, [navigateTo]);
 
@@ -316,10 +319,16 @@ export function ArcSlider() {
                 padding: "10px 20px",
                 whiteSpace: "nowrap",
                 border: "2px solid var(--color-secondary)",
-                background: i === activeIndex ? "var(--color-secondary)" : "transparent",
-                color: i === activeIndex ? "var(--color-background-light)" : "var(--color-text-dark)",
+                background: i === activeIndex
+                  ? "var(--color-secondary)"
+                  : "transparent",
+                color: i === activeIndex
+                  ? "var(--color-background-light)"
+                  : "var(--color-text-dark)",
                 cursor: "pointer",
-                boxShadow: i === activeIndex ? "var(--shadow-button)" : "none",
+                boxShadow: i === activeIndex
+                  ? "var(--shadow-button)"
+                  : "none",
               }}
             >
               {service.title}
@@ -359,6 +368,7 @@ export function ArcSlider() {
                   }}
                 >
                   <div
+                    // ADJUSTMENT: Increased padding to p-6 sm:p-8 for more breathing room
                     className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8"
                     style={{
                       backgroundColor: service.bgColor,
@@ -379,7 +389,7 @@ export function ArcSlider() {
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.2em] opacity-35 block"
+                          className="text-[10px] tracking-[0.2em] opacity-35"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             color: "#fff",
@@ -396,7 +406,7 @@ export function ArcSlider() {
                       </div>
                     </div>
 
-                    {/* Bottom Section */}
+                    {/* Bottom Section - ADJUSTMENT: Grouped in a flex container with gaps */}
                     <div className="flex flex-col gap-4">
                       <h3
                         className="tracking-tight leading-[1]"
@@ -404,7 +414,7 @@ export function ArcSlider() {
                           fontSize: "clamp(1.4rem, 3vw, 2.25rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
-                          margin: 0, 
+                          margin: 0, // Removed individual margins in favor of flex gap
                         }}
                       >
                         {service.fullTitle}
@@ -414,7 +424,7 @@ export function ArcSlider() {
                         className="line-clamp-2 opacity-80"
                         style={{
                           fontSize: "0.85rem",
-                          lineHeight: 1.6, 
+                          lineHeight: 1.6, // Increased line height for better readability
                           fontFamily: "var(--font-stack-body)",
                           color: "#fff",
                           margin: 0,
@@ -474,7 +484,9 @@ export function ArcSlider() {
               style={{
                 width: i === activeIndex ? 32 : 8,
                 height: 4,
-                background: i === activeIndex ? "var(--color-secondary)" : "rgba(164,108,252,0.2)",
+                background: i === activeIndex
+                  ? "var(--color-secondary)"
+                  : "rgba(164,108,252,0.2)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,

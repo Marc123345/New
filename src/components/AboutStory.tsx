@@ -8,6 +8,7 @@ import {
   Variants,
   AnimatePresence,
 } from 'motion/react';
+import { SignalGridPanel } from './SignalGridPanel';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -231,6 +232,7 @@ export function AboutStory() {
   });
 
   const contentParallax = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
+  const networkFloat = useTransform(scrollYProgress, [0.2, 0.8], [10, -10]);
 
   return (
     <section
@@ -377,6 +379,51 @@ export function AboutStory() {
           </div>
 
           <div className="lg:col-span-5 flex flex-col gap-4">
+            <motion.div className="flex-1" style={{ y: networkFloat }}>
+              <GlassCard
+                cardStyle={{
+                  padding: 0,
+                  background: 'rgba(14,11,31,0.6)',
+                  minHeight: '300px',
+                  display: 'flex',
+                  alignItems: 'stretch',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
+                noHoverLift
+              >
+                <div className="relative w-full h-full" style={{ minHeight: '300px' }}>
+                  <SignalGridPanel />
+                  <div
+                    className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5"
+                    style={{
+                      background: 'rgba(14,11,31,0.7)',
+                      border: '1px solid rgba(164,108,252,0.12)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: 4,
+                    }}
+                  >
+                    <span
+                      className="text-[0.55rem] uppercase"
+                      style={{
+                        color: 'rgba(232,226,255,0.5)',
+                        letterSpacing: '0.15em',
+                        fontFamily: 'var(--font-stack-heading)',
+                      }}
+                    >
+                      Live Network
+                    </span>
+                    <motion.span
+                      className="inline-block rounded-full"
+                      style={{ width: 5, height: 5, background: '#4ade80' }}
+                      animate={{ opacity: [1, 0.3, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </div>
+                </div>
+              </GlassCard>
+            </motion.div>
+
             <GlassCard
               cardStyle={{
                 background: 'var(--color-text-dark)',

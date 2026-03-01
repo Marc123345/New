@@ -11,20 +11,21 @@ import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { PageLoader } from "./components/PageLoader";
 
+// Lazy Loaded Components
 const AboutStory = lazy(() =>
-  import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
+  import("./components/AboutStory").then((m) => ({ default: m.AboutStory }))
 );
 const EcosystemServices = lazy(() =>
-  import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),
+  import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices }))
 );
 const ArcSlider = lazy(() =>
-  import("./components/ArcSlider").then((m) => ({ default: m.ArcSlider })),
+  import("./components/ArcSlider").then((m) => ({ default: m.ArcSlider }))
 );
 const Testimonials = lazy(() =>
-  import("./components/Testimonials").then((m) => ({ default: m.Testimonials })),
+  import("./components/Testimonials").then((m) => ({ default: m.Testimonials }))
 );
 const BlogSection = lazy(() =>
-  import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
+  import("./components/BlogSection").then((m) => ({ default: m.BlogSection }))
 );
 
 interface SectionProps {
@@ -36,6 +37,7 @@ interface SectionProps {
   noPadding?: boolean;
 }
 
+// Added Suspense directly into the Section component to safely handle any lazy-loaded children
 const Section = ({
   id,
   className = "",
@@ -54,14 +56,15 @@ const Section = ({
   >
     <LazySection>
       <ScrollReveal mode={revealMode} delay={delay}>
-        {children}
+        <Suspense fallback={<SectionLoader />}>
+          {children}
+        </Suspense>
       </ScrollReveal>
     </LazySection>
   </section>
 );
 
 function AppContent() {
-
   return (
     <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
@@ -73,7 +76,10 @@ function AppContent() {
       <StorySection />
 
       <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
-        <EcosystemServices />
+        {/* FIX: Added Suspense wrapper for lazy-loaded EcosystemServices */}
+        <Suspense fallback={<SectionLoader />}>
+          <EcosystemServices />
+        </Suspense>
       </div>
 
       <div id="about" className="relative" style={{ zIndex: 2 }}>
@@ -82,10 +88,12 @@ function AppContent() {
         </Suspense>
       </div>
 
+      {/* ArcSlider is lazy-loaded, and Section now safely handles it with an internal Suspense */}
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
         <ArcSlider />
       </Section>
 
+      {/* Testimonials is lazy-loaded, and Section now safely handles it */}
       <Section id="testimonials" className="bg-[var(--color-background-light)]">
         <Testimonials />
       </Section>
@@ -98,6 +106,7 @@ function AppContent() {
         </LazySection>
       </div>
 
+      {/* ContactForm is statically imported, so it renders normally inside Section */}
       <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
         <ContactForm />
       </Section>

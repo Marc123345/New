@@ -31,11 +31,11 @@ const CARDS: PhilosophyCard[] = [
     body: 'We take craft seriously. Every pixel, every word, every touchpoint built with intention and precision.',
     icon: <Sparkles size={22} />,
     accent: {
-      from: '#374151',
-      to: '#6b7280',
-      light: 'rgba(156,163,175,0.12)',
-      border: 'rgba(156,163,175,0.3)',
-      dot: '#d1d5db',
+      from: '#291e56',
+      to: '#4a2d8a',
+      light: 'rgba(164,108,252,0.1)',
+      border: 'rgba(164,108,252,0.25)',
+      dot: '#a46cfc',
     },
     delay: 0,
   },
@@ -45,10 +45,10 @@ const CARDS: PhilosophyCard[] = [
     body: 'They want personality. They want to see and hear brands that speak like humans and offer something meaningful.',
     icon: <Heart size={22} />,
     accent: {
-      from: '#6b21a8',
-      to: '#9333ea',
-      light: 'rgba(147,51,234,0.15)',
-      border: 'rgba(147,51,234,0.4)',
+      from: '#3d2670',
+      to: '#6b3fbc',
+      light: 'rgba(164,108,252,0.15)',
+      border: 'rgba(164,108,252,0.4)',
       dot: '#c084fc',
     },
     delay: 0.1,
@@ -59,11 +59,11 @@ const CARDS: PhilosophyCard[] = [
     body: 'A social-first agency that helps brands grow by making their digital presence feel more human — thoughtful, strategic, and real.',
     icon: <Globe size={22} />,
     accent: {
-      from: '#5b21b6',
-      to: '#a855f7',
-      light: 'rgba(168,85,247,0.15)',
-      border: 'rgba(168,85,247,0.45)',
-      dot: '#e879f9',
+      from: '#4a2d8a',
+      to: '#a46cfc',
+      light: 'rgba(177,129,252,0.15)',
+      border: 'rgba(177,129,252,0.45)',
+      dot: '#b181fc',
     },
     delay: 0.2,
   },
@@ -104,7 +104,7 @@ function PhilosophyCardItem({ card }: { card: PhilosophyCard }) {
       transition={{ duration: 0.7, delay: card.delay, ease: EASE_OUT_EXPO }}
       className="group relative w-full overflow-hidden backdrop-blur-sm border-2 transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
       style={{
-        background: 'rgba(14,8,32,0.7)',
+        background: 'rgba(41,30,86,0.55)',
         borderColor: card.accent.border,
         boxShadow: `4px 4px 0px ${card.accent.dot}55`,
       }}
@@ -340,7 +340,7 @@ export function PhilosophyAct() {
               className="w-full"
               style={{
                 height: lineHeight,
-                background: 'linear-gradient(to bottom, rgba(164,108,252,0.5), rgba(164,108,252,0.05))',
+                background: 'linear-gradient(to bottom, var(--color-secondary, #a46cfc), rgba(164,108,252,0.08))',
               }}
             />
           </div>

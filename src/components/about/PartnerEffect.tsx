@@ -109,8 +109,11 @@ function DayInLifeChapter({ progress }: { progress: any }) {
             transition={{ delay: i * 0.1, duration: 0.6, ease: EASE_OUT_EXPO }}
             className="flex flex-col items-center gap-1"
           >
-            <span className="text-3xl md:text-4xl font-black text-white tracking-tight">{stat.value}</span>
-            <span className="text-[0.6rem] uppercase tracking-[0.25em] text-white/40 font-mono">{stat.label}</span>
+            <span
+              className="text-3xl md:text-4xl font-black tracking-tight"
+              style={{ color: 'var(--color-secondary, #a46cfc)' }}
+            >{stat.value}</span>
+            <span className="text-[0.6rem] uppercase tracking-[0.25em] text-white/50 font-mono">{stat.label}</span>
           </motion.div>
         ))}
       </div>
@@ -133,7 +136,7 @@ function HumanityChapter({ progress }: { progress: any }) {
           &ldquo;Real conversations. Real creative. Real results — with people who genuinely care about your brand.&rdquo;
         </p>
         <footer className="mt-6">
-          <div className="w-12 h-px bg-white/30 mx-auto mb-4" />
+          <div className="w-12 h-px mx-auto mb-4" style={{ background: 'rgba(164,108,252,0.5)' }} />
           <span className="text-[0.6rem] uppercase tracking-[0.3em] text-white/40 font-mono">The H2H Way</span>
         </footer>
       </blockquote>
@@ -164,8 +167,18 @@ function ClosingChapter({ progress }: { progress: any }) {
       <div className="pointer-events-auto">
         <motion.a
           href="#contact"
-          className="inline-flex items-center gap-3 px-8 py-4 border border-white/30 bg-white/5 backdrop-blur-sm text-white text-sm font-bold uppercase tracking-[0.2em] transition-all duration-300 hover:bg-white hover:text-black"
-          whileHover={{ scale: 1.02 }}
+          className="inline-flex items-center gap-3 px-8 py-4 text-sm font-bold uppercase tracking-[0.2em] transition-all duration-300"
+          style={{
+            border: '2px solid #fbfbfc',
+            background: 'transparent',
+            color: '#fbfbfc',
+            boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+          }}
+          whileHover={{
+            x: -2,
+            y: -2,
+            boxShadow: '6px 6px 0 #a46cfc',
+          }}
           whileTap={{ scale: 0.98 }}
         >
           Work With Us
@@ -282,7 +295,7 @@ export function PartnerEffect() {
         {/* Scan line */}
         <motion.div
           className="absolute left-0 right-0 h-[1px] z-[2] pointer-events-none"
-          style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent)' }}
+          style={{ background: 'linear-gradient(to right, transparent, rgba(164,108,252,0.25), transparent)' }}
           animate={{ top: ['0%', '100%'] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
         />
@@ -300,21 +313,21 @@ export function PartnerEffect() {
           className="absolute left-0 bottom-0 h-[2px] z-20 pointer-events-none"
           style={{
             width: useTransform(smoothProgress, [0, 1], ['0%', '100%']),
-            background: 'linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.6))',
+            background: 'linear-gradient(to right, var(--color-primary, #291e56), var(--color-secondary, #a46cfc))',
           }}
         />
 
         {/* Corner UI — top right */}
         <div className="absolute top-10 right-10 z-20 pointer-events-none">
-          <div className="w-10 h-10 border border-white/15 rounded-full flex items-center justify-center">
-            <div className="w-1 h-1 bg-white rounded-full animate-ping" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ border: '1px solid rgba(164,108,252,0.3)' }}>
+            <div className="w-1.5 h-1.5 rounded-full animate-ping" style={{ background: 'var(--color-secondary, #a46cfc)' }} />
           </div>
         </div>
 
         {/* Corner UI — bottom left */}
         <div className="absolute bottom-10 left-10 z-20 flex items-center gap-4 pointer-events-none">
-          <div className="h-px w-16 bg-white/25" />
-          <span className="text-[10px] text-white/35 uppercase tracking-[0.3em] font-mono">Partner.Effect</span>
+          <div className="h-px w-16" style={{ background: 'rgba(164,108,252,0.35)' }} />
+          <span className="text-[10px] uppercase tracking-[0.3em] font-mono" style={{ color: 'rgba(164,108,252,0.5)' }}>Partner.Effect</span>
         </div>
 
         {/* Scroll hint (only at start) */}
@@ -325,7 +338,7 @@ export function PartnerEffect() {
           <span className="text-[0.55rem] uppercase tracking-[0.3em] text-white/30 font-mono">Scroll to explore</span>
           <motion.div
             className="w-px h-8"
-            style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)' }}
+            style={{ background: 'linear-gradient(to bottom, rgba(164,108,252,0.6), transparent)' }}
             animate={{ scaleY: [0, 1, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />

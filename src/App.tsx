@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useState, useCallback } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
@@ -9,6 +9,7 @@ import { StorySection } from "./components/StorySection";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
+import { PageLoader } from "./components/PageLoader";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -107,8 +108,12 @@ function AppContent() {
 }
 
 export default function App() {
+  const [loaded, setLoaded] = useState(false);
+  const handleLoaderComplete = useCallback(() => setLoaded(true), []);
+
   return (
     <ErrorBoundary>
+      {!loaded && <PageLoader onComplete={handleLoaderComplete} />}
       <AppContent />
     </ErrorBoundary>
   );

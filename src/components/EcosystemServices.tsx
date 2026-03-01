@@ -200,7 +200,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: { pillarIndex: numb
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             onClick={onClose}
-            className="fixed inset-0 z-[150]"
+            className="fixed inset-0 z-[200]"
             style={{ background: 'rgba(4,4,8,0.82)', backdropFilter: 'blur(20px)' }}
           />
 
@@ -209,7 +209,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: { pillarIndex: numb
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-2 sm:p-4 md:p-8"
+            className="fixed inset-0 z-[201] flex items-end sm:items-center justify-center p-2 sm:p-4 md:p-8"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -225,10 +225,10 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: { pillarIndex: numb
                 exit={{ opacity: 0, y: -24, scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 280, damping: 28, mass: 0.85 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full focus:outline-none flex flex-col rounded-t-xl sm:rounded-none"
+                className="relative w-full focus:outline-none flex flex-col rounded-t-2xl sm:rounded-xl"
                 style={{
                   maxWidth: 760,
-                  maxHeight: '88dvh',
+                  maxHeight: '92dvh',
                   background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
                   border: `1px solid ${accent.border}`,
                   boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px -16px rgba(0,0,0,0.8), 0 0 60px -20px ${accent.from}55`,

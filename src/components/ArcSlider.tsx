@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import gsap from "gsap";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -22,7 +22,12 @@ const SERVICES = [
     color: "#7B2FF2",
     bgColor: "#5A05E6",
     image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    details: [],
+    details: [
+      "Company page strategy & setup",
+      "Content calendar & posting cadence",
+      "Community management & engagement",
+      "Analytics & performance reporting",
+    ],
   },
   {
     id: 2,
@@ -35,7 +40,12 @@ const SERVICES = [
     color: "#9B59F5",
     bgColor: "#6F11F5",
     image: "https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    details: [],
+    details: [
+      "Personal brand audit & strategy",
+      "Executive profile optimisation",
+      "Ghostwritten thought-leadership posts",
+      "Audience growth & engagement tactics",
+    ],
   },
   {
     id: 3,
@@ -48,7 +58,12 @@ const SERVICES = [
     color: "#B181FC",
     bgColor: "#8338EC",
     image: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    details: [],
+    details: [
+      "Advocacy programme design & rollout",
+      "Ready-to-share content library",
+      "Team training & onboarding",
+      "Participation tracking & reporting",
+    ],
   },
   {
     id: 4,
@@ -116,24 +131,29 @@ interface OverlayProps {
 function ServiceOverlay({ service, onClose }: OverlayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [showHint, setShowHint] = useState(true);
+  const [showHint, setShowHint] = useState(false);
   const touchRef = useRef({ startY: 0, atTop: false });
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; });
 
   useEffect(() => {
     if (!service) return;
     setScrollProgress(0);
-    setShowHint(true);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    const el = scrollRef.current;
+    const isScrollable = el ? el.scrollHeight > el.clientHeight : false;
+    setShowHint(isScrollable);
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
+    const prevOverflow = document.body.style.overflow;
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
+      document.body.style.overflow = prevOverflow;
     };
-  }, [service, onClose]);
+  }, [service]);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -151,8 +171,8 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (!touchRef.current.atTop) return;
     const delta = e.changedTouches[0].clientY - touchRef.current.startY;
-    if (delta > 100) onClose();
-  }, [onClose]);
+    if (delta > 100) onCloseRef.current();
+  }, []);
 
   return (
     <AnimatePresence>
@@ -663,6 +683,7 @@ export function ArcSlider() {
                         <button
                           onClick={(e) => {
                             if (dragRef.current.hasMoved) return;
+                            if (i !== activeIndex) { navigateTo(i); return; }
                             e.stopPropagation();
                             setOverlayService(service);
                           }}

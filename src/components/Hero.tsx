@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion'; // Note: Ensure you are importing from 'framer-motion'
+import { motion } from 'framer-motion';
 import * as THREE from 'three';
-import { brandLogos } from '../lib/brandLogos'; // Adjust path if needed
-import { ScrollReveal } from './ScrollReveal'; // Adjust path if needed
-import { VideoOverlay } from './VideoOverlay'; // Adjust path if needed
+import { brandLogos } from '../lib/brandLogos';
+import { ScrollReveal } from './ScrollReveal';
+import { VideoOverlay } from './VideoOverlay';
 
 const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -18,21 +18,19 @@ const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
 const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.8 : 2.2));
 const N = ALL_URLS.length;
 
-// --- PHYSICS TWEAKS FOR LUSHION EFFECT ---
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
-const CURSOR_SPHERE_R = 5.0; // Slightly larger mouse presence
+const CURSOR_SPHERE_R = 5.0; 
 const CURSOR_SMOOTH = 8.0;
 const CURSOR_FIELD_R = 16.0;
-const SPRING_HOME = 0.15; // Increased to pull items together more cohesively
-const FRICTION = 0.92; // Decreased slightly for a more viscous, "underwater" drag
+const SPRING_HOME = 0.15; 
+const FRICTION = 0.92; 
 const MAX_SPEED = 40.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
-const JELLY_SPRING = 18.0; // Softer jelly bounce
+const JELLY_SPRING = 18.0; 
 const JELLY_DAMPING = 4.0;
 
-// --- SHADERS UPDATED FOR SPHERES ---
-const SPHERE_VERT = `
+const CUBE_VERT = `
 varying vec3 vNormal;
 varying vec3 vViewDir;
 varying vec2 vUv;
@@ -43,12 +41,11 @@ void main() {
   vec4 vp = viewMatrix * wp;
   vViewDir = normalize(-vp.xyz);
   vNormal = normalize(normalMatrix * normal);
-  // Smoother fresnel for spheres
   vFresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
   gl_Position = projectionMatrix * vp;
 }`;
 
-const SPHERE_FRAG = `
+const CUBE_FRAG = `
 uniform sampler2D uMap;
 uniform vec3 uRimColor;
 uniform float uRimStr;
@@ -59,16 +56,13 @@ varying vec2 vUv;
 varying float vFresnel;
 
 void main() {
-  // Map texture equirectangularly or normally based on UV
   vec4 tex = texture2D(uMap, vUv);
   
-  // Glassy Rim lighting
   vec3 rim = uRimColor * vFresnel * uRimStr * (1.0 + uHover * 1.2);
   vec3 L = normalize(vec3(0.5, 0.8, 1.0));
   float diff = max(dot(vNormal, L), 0.0);
   vec3 H = normalize(L + vViewDir);
   
-  // High specularity for wet/bubble look
   float spec = pow(max(dot(vNormal, H), 0.0), 128.0) * (1.0 + uHover * 0.8);
   
   vec3 ambient = tex.rgb * 0.6;
@@ -126,7 +120,6 @@ void main() {
   vec2 displacement = dir * falloff * uStrength * 0.012;
   displacement += vel * falloff * 0.008 * min(velMag * 2.0, 1.0);
   
-  // RGB shift for chromatic aberration
   vec2 r = texture2D(uScene, uv + displacement * 1.05).rg;
   float g = texture2D(uScene, uv + displacement).g;
   vec2 b = texture2D(uScene, uv + displacement * 0.95).ba;
@@ -211,14 +204,15 @@ function HeroCanvas() {
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
 
-    // CHANGE: Using SphereGeometry instead of BoxGeometry
-    const geoCache = new Map<number, [THREE.SphereGeometry, THREE.SphereGeometry]>();
+    // CHANGE: Back to BoxGeometry!
+    const geoCache = new Map<number, [THREE.BoxGeometry, THREE.BoxGeometry]>();
     const getGeos = (r: number) => {
       const key = Math.round(r * 10);
       if (!geoCache.has(key)) {
+        const s = r * 2;
         geoCache.set(key, [
-          new THREE.SphereGeometry(r, 64, 64), 
-          new THREE.SphereGeometry(r * 1.06, 64, 64) // Shell slightly larger
+          new THREE.BoxGeometry(s, s, s), 
+          new THREE.BoxGeometry(s * 1.08, s * 1.08, s * 1.08)
         ]);
       }
       return geoCache.get(key)!;
@@ -266,7 +260,7 @@ function HeroCanvas() {
 
     const meshes: THREE.Group[] = [];
     const innerGroups: THREE.Group[] = [];
-    const sphereMaterials: THREE.ShaderMaterial[] = [];
+    const cubeMaterials: THREE.ShaderMaterial[] = [];
     const shellMaterials: THREE.ShaderMaterial[] = [];
     const loadedTextures: THREE.Texture[] = [];
     const textureLoader = new THREE.TextureLoader();
@@ -289,7 +283,6 @@ function HeroCanvas() {
       baseRotY[i] = (Math.random() - 0.5) * 0.02;
       baseRotZ[i] = (Math.random() - 0.5) * 0.01;
 
-      // Group them a bit tighter to match the Lushion style cluster
       const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
       const dist = 0.2 + Math.random() * 0.4; 
       homeX[i] = Math.cos(angle) * BOUNDS_X * dist;
@@ -311,7 +304,7 @@ function HeroCanvas() {
       inner.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
 
       const rimColor = SHELL_COLORS[i % SHELL_COLORS.length];
-      const [sphereGeo, shellGeo] = getGeos(r);
+      const [cubeGeo, shellGeo] = getGeos(r);
 
       const tex = textureLoader.load(ALL_URLS[i], (t) => {
         t.colorSpace = THREE.SRGBColorSpace;
@@ -320,9 +313,9 @@ function HeroCanvas() {
       }, undefined, () => {});
       loadedTextures.push(tex);
 
-      const sphereMat = new THREE.ShaderMaterial({
-        vertexShader: SPHERE_VERT,
-        fragmentShader: SPHERE_FRAG,
+      const cubeMat = new THREE.ShaderMaterial({
+        vertexShader: CUBE_VERT,
+        fragmentShader: CUBE_FRAG,
         uniforms: {
           uMap: { value: tex },
           uRimColor: { value: rimColor },
@@ -330,8 +323,8 @@ function HeroCanvas() {
           uHover: { value: 0 },
         },
       });
-      sphereMaterials.push(sphereMat);
-      inner.add(new THREE.Mesh(sphereGeo, sphereMat));
+      cubeMaterials.push(cubeMat);
+      inner.add(new THREE.Mesh(cubeGeo, cubeMat));
 
       const shellMat = new THREE.ShaderMaterial({
         vertexShader: SHELL_VERT,
@@ -469,7 +462,6 @@ function HeroCanvas() {
           py[i] += vy[i] * subDt;
           pz[i] += vz[i] * subDt;
 
-          // Soften the boundary collisions
           const r = radii[i];
           const mX = BOUNDS_X - r, mY = BOUNDS_Y - r, mZ = 4.0;
           if (px[i] > mX) { px[i] = mX; vx[i] *= -0.2; }
@@ -486,7 +478,7 @@ function HeroCanvas() {
             const ddy = py[j] - py[i];
             const ddz = pz[j] - pz[i];
             const distSq = ddx * ddx + ddy * ddy + ddz * ddz;
-            const minD = (radii[i] + radii[j]) * 1.05; // Slightly larger padding for spheres
+            const minD = (radii[i] + radii[j]) * 1.05; 
             if (distSq >= minD * minD || distSq < 0.0001) continue;
 
             const dist = Math.sqrt(distSq);
@@ -494,7 +486,6 @@ function HeroCanvas() {
             const overlap = minD - dist;
             const mA = masses[i], mB = masses[j], mT = mA + mB;
 
-            // Resolve overlap gently
             px[i] -= nx * overlap * 0.4 * (mB / mT);
             py[i] -= ny * overlap * 0.4 * (mB / mT);
             pz[i] -= nz * overlap * 0.4 * (mB / mT);
@@ -505,7 +496,6 @@ function HeroCanvas() {
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
             
-            // Softer restitution
             const imp = (-(1 + 0.3) * rvn) / mT;
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
@@ -540,7 +530,7 @@ function HeroCanvas() {
 
               const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
               if (relVn < 0) {
-                const restitution = 0.5; // Softer bounce against mouse
+                const restitution = 0.5;
                 const impulseMag = -(1 + restitution) * relVn;
                 vx[i] += nx * impulseMag;
                 vy[i] += ny * impulseMag;
@@ -616,7 +606,7 @@ function HeroCanvas() {
         );
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        const targetRotVelX = baseRotX[i] + vy[i] * 0.05; // Less aggressive rotation for spheres
+        const targetRotVelX = baseRotX[i] + vy[i] * 0.05; 
         const targetRotVelY = baseRotY[i] - vx[i] * 0.05;
         const rLerp = 1 - Math.exp(-4 * dt);
         rotVelX[i] += (targetRotVelX - rotVelX[i]) * rLerp;
@@ -637,7 +627,7 @@ function HeroCanvas() {
           }
         }
         hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.exp(-5 * dt));
-        sphereMaterials[i].uniforms.uHover.value = hoverAmount[i];
+        cubeMaterials[i].uniforms.uHover.value = hoverAmount[i];
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
 
@@ -795,7 +785,7 @@ export function Hero() {
                 transition={{ duration: 1, delay: 0.4 }}
               >
                 <div
-                  className="relative mx-auto w-full h-[340px] sm:h-[480px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-xl" // Added rounded-xl for softer bounds
+                  className="relative mx-auto w-full h-[340px] sm:h-[480px] md:h-[700px] lg:h-[820px] overflow-hidden rounded-xl"
                   style={{
                     border: "3px solid var(--color-text-dark)",
                     boxShadow: "10px 10px 0 var(--color-surface-dark)",

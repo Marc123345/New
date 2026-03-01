@@ -1,72 +1,59 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
-import { motion, useSpring, AnimatePresence } from 'framer-motion';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { motion, useSpring, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 
-// Refined data for a "Space Nebula" feel
+// depth: 1 (front) to 3 (back)
 const NODES_DATA = [
-  { id: 'strategy', label: 'Strategy', subLabel: 'Brand Direction', size: 80, x: '20%', y: '30%' },
-  { id: 'creative', label: 'Creative', subLabel: 'Visual Storytelling', size: 70, x: '70%', y: '20%' },
-  { id: 'growth', label: 'Growth', subLabel: 'Performance', size: 65, x: '80%', y: '60%' },
-  { id: 'social', label: 'Social', subLabel: 'Community', size: 75, x: '15%', y: '70%' },
-  { id: 'content', label: 'Content', subLabel: 'Editorial', size: 60, x: '45%', y: '15%' },
-  { id: 'analytics', label: 'Analytics', subLabel: 'Data Insight', size: 85, x: '55%', y: '80%' },
+  { id: '1', label: 'Strategy', x: 20, y: 30, depth: 1.2, size: 90 },
+  { id: '2', label: 'Creative', x: 70, y: 25, depth: 1.8, size: 70 },
+  { id: '3', label: 'Growth', x: 85, y: 65, depth: 1.1, size: 80 },
+  { id: '4', label: 'Social', x: 15, y: 75, depth: 2.2, size: 60 },
+  { id: '5', label: 'Data', x: 45, y: 85, depth: 1.5, size: 75 },
+  { id: '6', label: 'Narrative', x: 55, y: 15, depth: 2.5, size: 55 },
 ];
 
-function FloatingNode({ node, containerRef }: { node: any; containerRef: React.RefObject<HTMLDivElement> }) {
-  const [hovered, setHovered] = useState(false);
+function InteractiveNode({ node, mouseX, mouseY }: { node: any, mouseX: any, mouseY: any }) {
+  // Parallax movement based on depth
+  const x = useTransform(mouseX, (val: number) => (val * 50) / node.depth);
+  const y = useTransform(mouseY, (val: number) => (val * 50) / node.depth);
   
-  // Physics for organic floating
-  const springX = useSpring(0, { stiffness: 30, damping: 15 });
-  const springY = useSpring(0, { stiffness: 30, damping: 15 });
-
-  useEffect(() => {
-    // Subtle continuous movement
-    const move = () => {
-      springX.set(Math.random() * 20 - 10);
-      springY.set(Math.random() * 20 - 10);
-    };
-    const interval = setInterval(move, 3000);
-    move();
-    return () => clearInterval(interval);
-  }, [springX, springY]);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
-      className="absolute z-20"
-      style={{ 
-        left: node.x, 
-        top: node.y, 
-        x: springX, 
-        y: springY 
+      style={{
+        left: `${node.x}%`,
+        top: `${node.y}%`,
+        x,
+        y,
+        filter: `blur(${node.depth > 2 ? '2px' : '0px'})`,
+        opacity: 1 / node.depth + 0.3,
       }}
+      className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
     >
       <motion.div
-        onHoverStart={() => setHovered(true)}
-        onHoverEnd={() => setHovered(false)}
-        className="relative flex items-center justify-center rounded-full cursor-pointer group"
-        style={{
-          width: node.size,
-          height: node.size,
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-        }}
-        whileHover={{ scale: 1.1, borderColor: 'rgba(255, 255, 255, 0.5)' }}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+        whileHover={{ scale: 1.1, boxShadow: "0 0 40px rgba(255,255,255,0.2)" }}
+        className="relative flex items-center justify-center rounded-full cursor-pointer border border-white/20 bg-white/5 backdrop-blur-xl transition-colors hover:bg-white/10"
+        style={{ width: node.size, height: node.size }}
       >
-        <span className="text-[10px] font-bold uppercase tracking-widest text-white text-center px-2">
+        {/* Subtle Inner Glow */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
+        
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white text-center px-2 leading-tight">
           {node.label}
         </span>
 
+        {/* Floating Detail Tag */}
         <AnimatePresence>
-          {hovered && (
+          {isHovered && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="absolute -bottom-10 whitespace-nowrap bg-white/10 px-3 py-1 rounded-full border border-white/20 backdrop-blur-md"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-3 py-1 bg-white text-black text-[9px] font-black uppercase tracking-tighter"
             >
-              <span className="text-[9px] font-medium uppercase tracking-widest text-white">
-                {node.subLabel}
-              </span>
+              Explore Node
             </motion.div>
           )}
         </AnimatePresence>
@@ -75,68 +62,98 @@ function FloatingNode({ node, containerRef }: { node: any; containerRef: React.R
   );
 }
 
-export function VideoCinematicAct() {
+export default function CinematicUniverse() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoUrl = "https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4?updatedAt=1772017940529";
+  
+  // Track normalized mouse position (-0.5 to 0.5)
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smoothed versions for the video and text
+  const smoothX = useSpring(mouseX, { damping: 20, stiffness: 100 });
+  const smoothY = useSpring(mouseY, { damping: 20, stiffness: 100 });
+
+  // Video and Text parallax transforms
+  const videoScale = useTransform(smoothX, [-0.5, 0.5], [1.1, 1.15]);
+  const videoX = useTransform(smoothX, [-0.5, 0.5], [-20, 20]);
+  const textX = useTransform(smoothX, [-0.5, 0.5], [10, -10]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
 
   return (
-    <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black flex items-center">
-      
-      {/* Background Video */}
-      <div className="absolute inset-0 z-0">
+    <section 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full h-screen overflow-hidden bg-[#050505] flex items-center justify-center"
+    >
+      {/* 1. Cinematic Background Video Layer */}
+      <motion.div 
+        style={{ scale: videoScale, x: videoX }}
+        className="absolute inset-0 z-0 pointer-events-none"
+      >
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover opacity-70"
         >
-          <source src={videoUrl} type="video/mp4" />
+          <source src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4?updatedAt=1772017940529" type="video/mp4" />
         </video>
-        {/* Dark overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-      </div>
+        {/* Vignette Overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />
+      </motion.div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-12">
-        {/* Content Side */}
-        <div className="flex flex-col justify-center">
-          <motion.h4 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-white/60 text-xs font-bold tracking-[0.5em] uppercase mb-4"
-          >
-            Digital Frontiers
-          </motion.h4>
-          <motion.h2 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.1 }}
-             className="text-6xl md:text-7xl font-light text-white leading-tight mb-8"
-          >
-            Expand <br /> 
-            <span className="italic font-serif">Your Vision</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="max-w-md text-gray-300 text-lg leading-relaxed"
-          >
-            We merge cinematic storytelling with deep technical expertise to build 
-            the ecosystems of tomorrow.
-          </motion.p>
-        </div>
+      {/* 2. Middle Ground: Hero Text */}
+      <motion.div 
+        style={{ x: textX }}
+        className="relative z-10 text-center pointer-events-none px-4"
+      >
+        <motion.h4 
+          initial={{ opacity: 0, letterSpacing: "0.2em" }}
+          animate={{ opacity: 0.6, letterSpacing: "0.5em" }}
+          className="text-white text-xs font-bold uppercase mb-4"
+        >
+          The Future of Digital
+        </motion.h4>
+        <h2 className="text-7xl md:text-9xl font-black text-white uppercase leading-[0.85] tracking-tighter italic">
+          Deep <br /> Space
+        </h2>
+      </motion.div>
 
-        {/* Interactive Side */}
-        <div className="relative h-[500px] lg:h-[600px]">
+      {/* 3. Foreground: Interactive Parallax Nodes */}
+      <div className="absolute inset-0 z-20 overflow-hidden pointer-events-none">
+        <div className="relative w-full h-full pointer-events-auto">
           {NODES_DATA.map((node) => (
-            <FloatingNode key={node.id} node={node} containerRef={containerRef} />
+            <InteractiveNode 
+              key={node.id} 
+              node={node} 
+              mouseX={smoothX} 
+              mouseY={smoothY} 
+            />
           ))}
         </div>
       </div>
 
-      {/* Aesthetic Border Glow */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent z-10" />
+      {/* 4. Decorative UI Elements */}
+      <div className="absolute bottom-10 left-10 z-30 flex items-center gap-4">
+         <div className="h-[1px] w-20 bg-white/30" />
+         <span className="text-[10px] text-white/50 uppercase tracking-[0.3em]">System.Active</span>
+      </div>
+      
+      <div className="absolute top-10 right-10 z-30">
+        <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center">
+            <div className="w-1 h-1 bg-white rounded-full animate-ping" />
+        </div>
+      </div>
+
     </section>
   );
 }

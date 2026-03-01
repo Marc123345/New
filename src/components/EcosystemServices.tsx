@@ -1,3 +1,99 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Building2, Users, Megaphone, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+
+const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
+
+const PILLARS = [
+  {
+    subtitle: 'Pillar 01',
+    title: 'Company Pages',
+    description: "Your company's social presence is your digital storefront, but most brands leave it looking empty or generic. We turn your pages into platforms for thought leadership, brand storytelling, and meaningful engagement.",
+    whatWeDo: ['Brand awareness campaigns', 'Product promotion', 'Employer branding', 'Community engagement', 'Video content'],
+    closingNote: null,
+    icon: <Building2 size={32} />,
+    stats: [{ label: 'Avg. Engagement Lift', value: '3.2x' }, { label: 'Brand Impressions', value: '+180%' }, { label: 'Follower Growth', value: '+45%' }],
+  },
+  {
+    subtitle: 'Pillar 02',
+    title: 'Leadership Branding',
+    description: 'People want to hear from other people. We help your executives step into the spotlight with purpose, clarity, and authenticity — positioning them as respected voices in your industry.',
+    whatWeDo: ['Tailored content creation', 'Strategic alignment', 'Industry thought leadership', 'Ghost-writing'],
+    closingNote: 'By helping leaders build presence, we position your company as the home of the voices shaping the industry.',
+    icon: <Users size={32} />,
+    stats: [{ label: 'Profile Views', value: '+240%' }, { label: 'Connection Growth', value: '5x' }, { label: 'Content Reach', value: '+320%' }],
+  },
+  {
+    subtitle: 'Pillar 03',
+    title: 'Advocacy Program',
+    description: "The most trusted voices in your company aren't always in the C-suite — they're on your teams. Our Advocacy Program turns employees into empowered storytellers.",
+    whatWeDo: ['Monthly workshops', 'Shareable content kits', 'Scalable infrastructure', 'Culture-first programming'],
+    closingNote: 'We create internal champions who amplify your message and expand your reach through real human connection.',
+    icon: <Megaphone size={32} />,
+    stats: [{ label: 'Employee Reach', value: '10x' }, { label: 'Organic Amplification', value: '+560%' }, { label: 'Team Participation', value: '78%' }],
+  },
+];
+
+const PILLAR_ACCENTS = [
+  { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.14)', border: 'rgba(147,51,234,0.3)', dot: '#c084fc' },
+  { from: '#4a1d96', to: '#7c3aed', light: 'rgba(74,29,150,0.14)', border: 'rgba(124,58,237,0.3)', dot: '#a78bfa' },
+  { from: '#2e1065', to: '#5b21b6', light: 'rgba(46,16,101,0.14)', border: 'rgba(91,33,182,0.3)', dot: '#8b5cf6' },
+];
+
+/**
+ * OrbitNode: Individual interactive icons in the desktop orbit
+ */
+function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggleLabel }: any) {
+  const angle = (index / total) * 2 * Math.PI;
+  const x = Math.cos(angle) * radius;
+  const y = Math.sin(angle) * radius;
+  const showLabel = activeLabel === index;
+  const isRightHalf = x > 0;
+
+  return (
+    <motion.div
+      className="absolute top-1/2 left-1/2 z-30"
+      style={{ x, y, marginLeft: -32, marginTop: -32 }} 
+    >
+      <motion.button
+        onClick={() => onSelect(index)}
+        onMouseEnter={() => onToggleLabel(index)}
+        onMouseLeave={() => onToggleLabel(null)}
+        animate={{ rotate: -360 }}
+        transition={{ duration: 120, ease: 'linear', repeat: Infinity }}
+        className="group relative flex items-center justify-center w-16 h-16 rounded-full focus:outline-none pointer-events-auto"
+      >
+        <div
+          className="relative z-10 w-full h-full rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110 border-2"
+          style={{
+            background: 'linear-gradient(135deg, #2e1065, rgba(164,108,252,0.4))',
+            borderColor: '#9333ea',
+            boxShadow: '0 0 24px rgba(164,108,252,0.35)',
+          }}
+        >
+          <div className="text-white">{item.icon}</div>
+        </div>
+
+        <AnimatePresence>
+          {showLabel && (
+            <motion.div
+              initial={{ opacity: 0, x: isRightHalf ? 10 : -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRightHalf ? 10 : -10 }}
+              className={`absolute whitespace-nowrap z-50 pointer-events-none ${isRightHalf ? 'left-full ml-4' : 'right-full mr-4'}`}
+            >
+              <span className="text-xs uppercase tracking-widest px-3 py-1 bg-black/90 border border-white/20 text-white rounded">
+                {item.subtitle}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+    </motion.div>
+  );
+}
+
 /**
  * PillarOverlay: Full-screen detail view using createPortal
  */
@@ -5,8 +101,8 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   
-  // Cache the index using a Ref. This is completely immune to render-cycle crashes
-  // and keeps the data alive perfectly for Framer Motion's exit animation.
+  // Cache the index using a Ref. This prevents Framer Motion's exit animation
+  // from crashing when pillarIndex becomes null upon closing.
   const activeIndexRef = useRef<number | null>(null);
   if (pillarIndex !== null) {
     activeIndexRef.current = pillarIndex;
@@ -19,7 +115,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     setMounted(true);
   }, []);
 
-  // Handle body scroll locking and Escape key
+  // Handle body scroll locking and Escape key for desktop
   useEffect(() => {
     if (pillarIndex !== null) {
       document.body.style.overflow = 'hidden';
@@ -38,6 +134,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     }
   }, [pillarIndex, onClose]);
 
+  // Wait for client-side hydration before rendering portal
   if (!mounted) return null;
 
   return createPortal(
@@ -49,15 +146,14 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          // Added pointer-events-auto to forcefully break out of any invisible traps
           className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh] pointer-events-auto"
         >
-          {/* Close Button - Changed to fixed and added explicit z-index/pointer rules */}
+          {/* Close Button - Fixed positioning guarantees it stays put and stays clickable */}
           <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              e.stopPropagation(); // Stop clicks from bleeding through
+              e.stopPropagation();
               onClose();
             }}
             className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white cursor-pointer active:scale-95"
@@ -66,7 +162,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
             <X size={20} />
           </button>
 
-          {/* Content Area */}
+          {/* Content Area - min-h-0 allows flexbox to calculate remaining space properly */}
           <div 
             ref={scrollRef} 
             className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-0" 
@@ -146,5 +242,107 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
       )}
     </AnimatePresence>,
     document.body
+  );
+}
+
+export function EcosystemServices() {
+  const [selectedService, setSelectedService] = useState<number | null>(null);
+  const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
+  const [activeLabel, setActiveLabel] = useState<number | null>(null);
+  const [orbitRadius, setOrbitRadius] = useState(300);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setOrbitRadius(window.innerWidth < 640 ? 140 : window.innerWidth < 1024 ? 220 : 300);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return (
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0e0820]">
+      {/* Background Video */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-20">
+          <source src={VIDEO_URL} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0e0820]/80 to-[#0e0820]" />
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 text-center pointer-events-none">
+        <h1 className="text-6xl md:text-9xl font-bold text-white/10 uppercase tracking-tighter mb-4">
+          Framework
+        </h1>
+        <p className="text-purple-400 font-mono tracking-widest uppercase text-sm">Three Pillars. One Ecosystem.</p>
+      </div>
+
+      {/* Interactive Orbit (Desktop) */}
+      <div 
+        className="hidden sm:flex absolute inset-0 z-20 items-center justify-center pointer-events-none"
+      >
+        <div 
+          className="relative w-[600px] h-[600px] pointer-events-auto"
+          onMouseEnter={() => setIsHoveringOrbit(true)}
+          onMouseLeave={() => setIsHoveringOrbit(false)}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              animation: 'spin-orbit 120s linear infinite',
+              animationPlayState: isHoveringOrbit ? 'paused' : 'running'
+            }}
+          >
+            {PILLARS.map((pillar, i) => (
+              <OrbitNode
+                key={i}
+                item={pillar}
+                index={i}
+                total={PILLARS.length}
+                radius={orbitRadius}
+                onSelect={setSelectedService}
+                activeLabel={activeLabel}
+                onToggleLabel={setActiveLabel}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Grid */}
+      <div className="relative z-30 sm:hidden w-full px-6 mt-12 space-y-4">
+        {PILLARS.map((p, i) => (
+          <button 
+            key={i} 
+            onClick={() => setSelectedService(i)}
+            className="w-full p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between text-white active:scale-95 transition-transform"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-purple-600/20 rounded-lg text-purple-400">{p.icon}</div>
+              <div className="text-left">
+                <div className="text-[10px] text-purple-400 uppercase">{p.subtitle}</div>
+                <div className="font-bold">{p.title}</div>
+              </div>
+            </div>
+            <ArrowRight size={20} className="text-purple-500" />
+          </button>
+        ))}
+      </div>
+
+      <PillarOverlay
+        pillarIndex={selectedService}
+        onClose={() => setSelectedService(null)}
+        onNavigate={setSelectedService}
+      />
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes spin-orbit {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+      `}} />
+    </section>
   );
 }

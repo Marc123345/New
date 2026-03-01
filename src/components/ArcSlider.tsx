@@ -171,7 +171,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="fixed top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(255,255,255,0.06)" }}>
+          <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(255,255,255,0.06)" }}>
             <motion.div
               className="h-full"
               style={{ width: `${scrollProgress * 100}%`, background: `linear-gradient(to right, ${service.bgColor}, ${service.color})` }}
@@ -184,7 +184,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
             initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-            className="fixed top-4 right-4 md:top-8 md:right-8 z-10 flex h-11 w-11 items-center justify-center transition-all duration-200 hover:rotate-90"
+            className="absolute top-4 right-4 md:top-8 md:right-8 z-10 flex h-11 w-11 items-center justify-center transition-all duration-200 hover:rotate-90"
             style={{
               border: "1px solid rgba(255,255,255,0.15)",
               background: "rgba(255,255,255,0.07)",
@@ -318,7 +318,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none"
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none"
             >
               <motion.div animate={{ y: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: "rgba(255,255,255,0.35)" }}>

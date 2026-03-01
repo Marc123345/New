@@ -71,7 +71,7 @@ export function Testimonials() {
       {/* STICKY CANVAS */}
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
 
-        <div className="text-center mb-8 px-4 md:px-8">
+        <div className="text-center mb-4 sm:mb-6 md:mb-8 px-4 md:px-8">
           <div
             className="inline-block mb-4 px-4 py-2"
             style={{
@@ -89,7 +89,7 @@ export function Testimonials() {
           <h2
             className="tracking-tight"
             style={{
-              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontSize: 'clamp(1.5rem, 5vw, 3rem)',
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
             }}
@@ -98,8 +98,8 @@ export function Testimonials() {
           </h2>
         </div>
 
-        <div className="max-w-[1400px] mx-auto w-full h-[600px] lg:h-[650px] flex gap-6 px-4 md:px-8">
-          <div className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0" style={{ border: '4px solid var(--color-secondary)', boxShadow: 'var(--shadow-geometric)' }}>
+        <div className="max-w-[1400px] mx-auto w-full h-[70vw] sm:h-[560px] lg:h-[640px] flex gap-4 lg:gap-6 px-4 md:px-8">
+          <div className="hidden lg:flex w-[380px] xl:w-[420px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0" style={{ border: '4px solid var(--color-secondary)', boxShadow: 'var(--shadow-geometric)' }}>
             <div className="text-center z-10 mt-4">
               <p className="text-lg leading-tight" style={{ fontFamily: 'var(--font-stack-heading)' }}>
                 <span className="text-[var(--color-secondary)]">Trusted</span>
@@ -230,8 +230,8 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
 
 function TestimonialSlider({ scrollProgress }: { scrollProgress: any }) {
   return (
-    <div className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col justify-center" style={{ border: '2px solid rgba(255,255,255,0.15)', boxShadow: 'var(--shadow-geometric)' }}>
-      <div className="relative w-full h-[400px] flex items-center justify-center perspective-[1000px]">
+    <div className="flex-1 min-w-0 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col justify-center" style={{ border: '2px solid rgba(255,255,255,0.15)', boxShadow: 'var(--shadow-geometric)' }}>
+      <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
         {TESTIMONIALS.map((testimonial, i) => (
           <TestimonialCard
             key={testimonial.id}
@@ -284,23 +284,26 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[85%] md:w-[80%] bg-[var(--color-primary)] text-white p-8 md:p-12"
+      className="absolute w-[92%] sm:w-[85%] bg-[var(--color-primary)] text-white p-5 sm:p-8 md:p-10"
       data-geometric-card
     >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ border: '4px solid rgba(255,255,255,0.2)', boxShadow: 'var(--shadow-geometric)' }}
       />
-      <div className="relative flex flex-col gap-8">
+      <div className="relative flex flex-col gap-5 sm:gap-7">
         <h3
-          className="text-2xl md:text-4xl leading-[1.1] tracking-tight"
-          style={{ fontFamily: "var(--font-stack-heading)" }}
+          className="leading-[1.15] tracking-tight"
+          style={{
+            fontFamily: "var(--font-stack-heading)",
+            fontSize: "clamp(1rem, 3.5vw, 2.1rem)",
+          }}
         >
           "{testimonial.quote}"
         </h3>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <motion.div
-            className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/30"
+            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white/30 flex-shrink-0"
             style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
@@ -318,15 +321,19 @@ function TestimonialCard({
               className="w-full h-full object-cover"
             />
           </motion.div>
-          <div>
+          <div className="min-w-0">
             <div
-              className="text-3xl leading-none mb-1 text-[#FBFBFC]"
-              style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic" }}
+              className="leading-none mb-1 text-[#FBFBFC] truncate"
+              style={{
+                fontFamily: "var(--font-stack-body)",
+                fontStyle: "italic",
+                fontSize: "clamp(1rem, 3vw, 1.75rem)",
+              }}
             >
               {testimonial.name}
             </div>
             <div
-              className="inline-block bg-[var(--color-secondary)] px-3 py-1 text-xs tracking-widest text-[var(--color-background-light)]"
+              className="inline-block bg-[var(--color-secondary)] px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs tracking-widest text-[var(--color-background-light)]"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {testimonial.role}

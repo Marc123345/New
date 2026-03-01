@@ -1,0 +1,1 @@
+import{j as r,S as a,B as i}from"./index-B9-0Cfa0.js";const o=i.slice(0,6).map((e,t)=>({title:e.title,excerpt:e.excerpt,content:e.content,author:e.author,date:e.date,readTime:e.readTime,category:e.category,featured:t===0,image:e.img}));function n(){return r.jsx(a,{posts:o})}export{n as BlogSection};

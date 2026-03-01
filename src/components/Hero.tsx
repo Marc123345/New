@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { ScrollReveal } from './ScrollReveal';
 import { VideoOverlay } from './VideoOverlay';
+import { brandLogos } from '../lib/brandLogos';
 
 function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
   const isPrimary = variant === 'primary';
@@ -39,6 +40,15 @@ const LIFT_MAX = 22;
 const SCALE_MAX = 1.18;
 const SMOOTH = 0.12;
 
+const LOGO_POSITIONS: [number, number][] = [
+  [1, 1], [4, 2], [7, 1], [10, 2],
+  [2, 4], [6, 3], [9, 4],
+  [1, 7], [4, 6], [8, 7], [11, 6],
+  [3, 9], [7, 10], [10, 9],
+  [1, 12], [5, 11], [9, 12], [11, 13],
+  [2, 14], [6, 14], [8, 15], [10, 14],
+];
+
 interface Tile {
   col: number;
   row: number;
@@ -52,6 +62,7 @@ interface Tile {
   targetLift: number;
   targetScale: number;
   targetBrightness: number;
+  logoIdx: number;
 }
 
 function LusionGrid() {
@@ -60,8 +71,36 @@ function LusionGrid() {
   const mouseRef = useRef({ x: -9999, y: -9999, active: false });
   const tilesRef = useRef<Tile[]>([]);
   const rafRef = useRef<number>(0);
+  const logoImagesRef = useRef<HTMLImageElement[]>([]);
+  const logosLoadedRef = useRef(false);
+
+  useEffect(() => {
+    const imgs = brandLogos.map((src) => {
+      const img = new Image();
+      img.src = src;
+      return img;
+    });
+    logoImagesRef.current = imgs;
+    let loaded = 0;
+    imgs.forEach((img) => {
+      img.onload = () => {
+        loaded++;
+        if (loaded === imgs.length) logosLoadedRef.current = true;
+      };
+      img.onerror = () => { loaded++; };
+    });
+  }, []);
+
+  const logoMap = useRef<Map<string, number>>(new Map());
 
   const initTiles = useCallback(() => {
+    const map = new Map<string, number>();
+    const shuffled = [...brandLogos.keys()].sort(() => Math.random() - 0.5);
+    LOGO_POSITIONS.forEach(([c, r], i) => {
+      map.set(`${c},${r}`, shuffled[i % shuffled.length]);
+    });
+    logoMap.current = map;
+
     const tiles: Tile[] = [];
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
@@ -69,6 +108,7 @@ function LusionGrid() {
           col: c, row: r,
           rotX: 0, rotY: 0, lift: 0, scale: 1, brightness: 1,
           targetRotX: 0, targetRotY: 0, targetLift: 0, targetScale: 1, targetBrightness: 1,
+          logoIdx: map.get(`${c},${r}`) ?? -1,
         });
       }
     }
@@ -189,6 +229,21 @@ function LusionGrid() {
 
         ctx.fillStyle = grd;
         ctx.fill();
+
+        if (tile.logoIdx >= 0) {
+          const img = logoImagesRef.current[tile.logoIdx];
+          if (img && img.complete && img.naturalWidth > 0) {
+            const pad = tileW * 0.12;
+            const imgSize = Math.min(tileW, tileH) - pad * 2;
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(-rw + pad * 0.5, -rh + pad * 0.5, tileW - pad, tileH - pad, Math.max(2, rx - 1));
+            ctx.clip();
+            ctx.globalAlpha = 0.92 + liftFrac * 0.08;
+            ctx.drawImage(img, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
+            ctx.restore();
+          }
+        }
 
         if (liftFrac > 0.05) {
           ctx.beginPath();

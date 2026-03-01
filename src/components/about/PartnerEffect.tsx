@@ -40,18 +40,20 @@ const CHAPTERS = [
 
 function SectionBadge({ label }: { label: string }) {
   return (
-    <div className="relative inline-flex items-center gap-3 px-4 py-2 mb-6">
-      {/* Corner marks — geometric box */}
-      <span className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/60" />
-      <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/60" />
-      <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/60" />
-      <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/60" />
-      <motion.div
-        className="w-1 h-1 bg-white/80 shrink-0"
-        animate={{ opacity: [0.3, 1, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <span className="text-[0.6rem] font-bold uppercase tracking-[0.3em] text-white/70">
+    <div
+      className="inline-block px-4 py-2 mb-6"
+      style={{
+        border: '2px solid var(--color-secondary, #a46cfc)',
+        boxShadow: '4px 4px 0 var(--color-secondary, #a46cfc)',
+      }}
+    >
+      <span
+        className="text-xs font-bold uppercase tracking-[0.3em]"
+        style={{
+          color: 'var(--color-secondary, #a46cfc)',
+          fontFamily: 'var(--font-stack-heading)',
+        }}
+      >
         {label}
       </span>
     </div>

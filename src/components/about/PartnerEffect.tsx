@@ -40,10 +40,15 @@ const CHAPTERS = [
 
 function SectionBadge({ label }: { label: string }) {
   return (
-    <div className="inline-flex items-center gap-4 px-5 py-2 border border-white/20 bg-black/30 backdrop-blur-sm mb-6">
+    <div className="relative inline-flex items-center gap-3 px-4 py-2 mb-6">
+      {/* Corner marks — geometric box */}
+      <span className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/60" />
+      <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/60" />
+      <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/60" />
+      <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/60" />
       <motion.div
-        className="w-1.5 h-1.5 bg-white"
-        animate={{ opacity: [0.4, 1, 0.4] }}
+        className="w-1 h-1 bg-white/80 shrink-0"
+        animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       />
       <span className="text-[0.6rem] font-bold uppercase tracking-[0.3em] text-white/70">
@@ -258,24 +263,12 @@ export function PartnerEffect() {
           </motion.video>
 
           {/* Purple dark overlay */}
-          <div className="absolute inset-0 bg-[#1a0a2e]/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-[#0d0618]/75 pointer-events-none" />
           {/* Top vignette */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/70 pointer-events-none" />
           {/* Radial vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.55)_100%)] pointer-events-none" />
         </motion.div>
-
-        {/* Grid texture */}
-        <div
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)
-            `,
-            backgroundSize: '3.5rem 3.5rem',
-          }}
-        />
 
         {/* Cursor glow */}
         <div

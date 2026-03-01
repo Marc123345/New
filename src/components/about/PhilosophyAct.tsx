@@ -1,8 +1,13 @@
-import { useRef } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'motion/react';
 import { Sparkles, Heart, Globe } from 'lucide-react';
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1];
+
+interface MousePos {
+  x: number;
+  y: number;
+}
 
 interface PhilosophyCard {
   subtitle: string;
@@ -63,6 +68,29 @@ const CARDS: PhilosophyCard[] = [
     delay: 0.2,
   },
 ];
+
+function SectionBadge() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+      className="inline-block mb-8"
+    >
+      <div className="inline-flex items-center gap-4 px-5 py-2 border border-white/20 bg-white/5 backdrop-blur-sm">
+        <motion.div
+          className="w-1.5 h-1.5 bg-[#a46cfc]"
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <span className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-white">
+          Our Philosophy
+        </span>
+      </div>
+    </motion.div>
+  );
+}
 
 function PhilosophyCardItem({ card }: { card: PhilosophyCard }) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -135,6 +163,44 @@ function PhilosophyCardItem({ card }: { card: PhilosophyCard }) {
 
 export function PhilosophyAct() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const rafRef = useRef<number>(0);
+  const smoothMouseRef = useRef<MousePos>({ x: -9999, y: -9999 });
+  const targetMouseRef = useRef<MousePos>({ x: -9999, y: -9999 });
+  const [displayMouse, setDisplayMouse] = useState<MousePos>({ x: -9999, y: -9999 });
+
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  const animateSmooth = useCallback(() => {
+    const sm = smoothMouseRef.current;
+    const tg = targetMouseRef.current;
+    const newX = lerp(sm.x, tg.x, 0.08);
+    const newY = lerp(sm.y, tg.y, 0.08);
+    smoothMouseRef.current = { x: newX, y: newY };
+    setDisplayMouse({ x: newX, y: newY });
+    rafRef.current = requestAnimationFrame(animateSmooth);
+  }, []);
+
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(animateSmooth);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [animateSmooth]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    targetMouseRef.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    targetMouseRef.current = { x: -9999, y: -9999 };
+    smoothMouseRef.current = { x: -9999, y: -9999 };
+  };
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -143,9 +209,14 @@ export function PhilosophyAct() {
 
   const lineHeight = useTransform(scrollYProgress, [0, 0.5], ['0%', '100%']);
 
+  const glowX = displayMouse.x === -9999 ? '50%' : `${displayMouse.x}px`;
+  const glowY = displayMouse.y === -9999 ? '50%' : `${displayMouse.y}px`;
+
   return (
     <div
       ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="relative w-full py-24 md:py-40 overflow-hidden"
       style={{ background: '#0e0820' }}
     >
@@ -157,38 +228,91 @@ export function PhilosophyAct() {
           muted
           playsInline
           className="w-full h-full object-cover"
-          style={{ opacity: 0.22 }}
+          style={{ opacity: 0.35 }}
         >
           <source src="https://ik.imagekit.io/qcvroy8xpd/space-shuttle-and-astronut-in-space-2026-01-28-02-50-17-utc.mp4?updatedAt=1771174796925" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0e0820]/80 via-[#0e0820]/50 to-[#0e0820]/90" />
+        {/* Purple overlay */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(88, 28, 135, 0.45)' }}
+        />
+        {/* Dark gradient fade */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e0820]/70 via-transparent to-[#0e0820]/80" />
       </div>
 
+      {/* Grid lines — from HookAct */}
       <div
-        className="absolute inset-0 z-1 pointer-events-none"
+        className="absolute inset-0 z-[1] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle at 50% 0%, rgba(147,51,234,0.1) 0%, transparent 60%)`,
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px)
+          `,
+          backgroundSize: '3.5rem 3.5rem',
         }}
       />
 
+      {/* Radial purple bloom */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 50% 0%, rgba(147,51,234,0.18) 0%, transparent 60%)`,
+        }}
+      />
+
+      {/* Cursor glow — from HookAct */}
+      <div
+        className="absolute inset-0 z-[2] pointer-events-none transition-opacity duration-300"
+        style={{
+          opacity: isHovering ? 1 : 0.3,
+          background: `radial-gradient(circle 420px at ${glowX} ${glowY}, rgba(164,108,252,0.22) 0%, rgba(100,60,200,0.08) 40%, transparent 70%)`,
+        }}
+      />
+
+      {/* Scan line animation */}
+      <motion.div
+        className="absolute left-0 right-0 h-[1px] z-[2] pointer-events-none"
+        style={{ background: 'linear-gradient(to right, transparent, rgba(164,108,252,0.4), transparent)' }}
+        animate={{ top: ['0%', '100%'] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+      />
+
+      {/* Corner decorative — top right ping dot (from OrbitalAct) */}
+      <div className="absolute top-10 right-10 z-[3] pointer-events-none">
+        <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center">
+          <div className="w-1 h-1 bg-white rounded-full animate-ping" />
+        </div>
+      </div>
+
+      {/* Corner decorative — bottom left label (from OrbitalAct) */}
+      <div className="absolute bottom-10 left-10 z-[3] flex items-center gap-4 pointer-events-none">
+        <div className="h-[1px] w-20 bg-white/30" />
+        <span className="text-[10px] text-white/50 uppercase tracking-[0.3em]">Philosophy.Active</span>
+      </div>
+
+      {/* Content */}
       <div className="max-w-[1100px] mx-auto px-6 md:px-12 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 md:mb-24">
-          <motion.h2
-            className="text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold text-white uppercase tracking-[-0.04em] leading-[1.05]"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-          >
-            Structure
-            <br />
-            <span
-              className="text-transparent"
-              style={{ WebkitTextStroke: '1.5px rgba(164,108,252,0.7)' }}
+          <div>
+            <SectionBadge />
+            <motion.h2
+              className="text-[clamp(2rem,4.5vw,3.5rem)] font-extrabold text-white uppercase tracking-[-0.04em] leading-[1.05]"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: EASE_OUT_EXPO }}
             >
-              & Soul
-            </span>
-          </motion.h2>
+              Structure
+              <br />
+              <span
+                className="text-transparent"
+                style={{ WebkitTextStroke: '1.5px rgba(164,108,252,0.7)' }}
+              >
+                & Soul
+              </span>
+            </motion.h2>
+          </div>
 
           <motion.p
             className="max-w-xs text-sm md:text-base leading-relaxed"

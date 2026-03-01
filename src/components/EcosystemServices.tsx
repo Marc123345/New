@@ -53,7 +53,7 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
   return (
     <motion.div
       className="absolute top-1/2 left-1/2 z-30"
-      style={{ x, y, marginLeft: -32, marginTop: -32 }} // Offset by half size (64px/2)
+      style={{ x, y, marginLeft: -32, marginTop: -32 }} 
     >
       <motion.button
         onClick={() => onSelect(index)}
@@ -99,7 +99,6 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
 function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeService = pillarIndex !== null ? PILLARS[pillarIndex] : null;
-  const accent = pillarIndex !== null ? PILLAR_ACCENTS[pillarIndex] : PILLAR_ACCENTS[0];
 
   // Prevent background scroll when open
   useEffect(() => {
@@ -117,18 +116,24 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[1000] flex flex-col bg-black/95 backdrop-blur-xl"
+          // Added h-[100dvh] here to fix mobile browser bottom bar cut-offs
+          className="fixed inset-0 z-[1000] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh]"
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[1010] min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[1010] min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white"
           >
             <X size={20} />
           </button>
 
           {/* Content Area */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 sm:px-6 scrollbar-hide" style={{ paddingTop: 'max(5rem, calc(3.5rem + env(safe-area-inset-top)))', paddingBottom: '2rem' }}>
+          {/* Added min-h-0 so flexbox allows it to shrink, and increased bottom padding to 4rem */}
+          <div 
+            ref={scrollRef} 
+            className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-0" 
+            style={{ paddingTop: 'max(5rem, calc(3.5rem + env(safe-area-inset-top)))', paddingBottom: '4rem' }}
+          >
             <div className="max-w-3xl mx-auto space-y-12">
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
@@ -163,7 +168,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                 <div className="grid md:grid-cols-2 gap-3">
                   {activeService.whatWeDo.map((item: string, i: number) => (
                     <div key={i} className="flex items-center gap-3 p-4 bg-white/5 border border-white/5 rounded">
-                      <Check size={16} className="text-purple-500" />
+                      <Check size={16} className="text-purple-500 flex-shrink-0" />
                       <span className="text-sm text-white/80">{item}</span>
                     </div>
                   ))}
@@ -173,7 +178,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           </div>
 
           {/* Navigation Footer */}
-          <div className="p-4 sm:p-6 border-t border-white/10 bg-black/50 backdrop-blur-md flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+          <div className="p-4 sm:p-6 border-t border-white/10 bg-black/50 backdrop-blur-md flex justify-between items-center z-10" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
              <button
                disabled={pillarIndex === 0}
                onClick={() => onNavigate(pillarIndex - 1)}

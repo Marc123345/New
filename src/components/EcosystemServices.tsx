@@ -13,6 +13,7 @@ const PILLARS = [
     whatWeDo: ['Brand awareness campaigns', 'Product promotion', 'Employer branding', 'Community engagement', 'Video content'],
     closingNote: null,
     icon: <Building2 size={28} />,
+    image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200',
     stats: [{ label: 'Avg. Engagement Lift', value: '3.2x' }, { label: 'Brand Impressions', value: '+180%' }, { label: 'Follower Growth', value: '+45%' }],
   },
   {
@@ -22,6 +23,7 @@ const PILLARS = [
     whatWeDo: ['Tailored content creation', 'Strategic alignment', 'Industry thought leadership', 'Ghost-writing'],
     closingNote: 'By helping leaders build presence, we position your company as the home of the voices shaping the industry.',
     icon: <Users size={28} />,
+    image: 'https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=1200',
     stats: [{ label: 'Profile Views', value: '+240%' }, { label: 'Connection Growth', value: '5x' }, { label: 'Content Reach', value: '+320%' }],
   },
   {
@@ -31,6 +33,7 @@ const PILLARS = [
     whatWeDo: ['Monthly workshops', 'Shareable content kits', 'Scalable infrastructure', 'Culture-first programming'],
     closingNote: 'We create internal champions who amplify your message and expand your reach through real human connection.',
     icon: <Megaphone size={28} />,
+    image: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200',
     stats: [{ label: 'Employee Reach', value: '10x' }, { label: 'Organic Amplification', value: '+560%' }, { label: 'Team Participation', value: '78%' }],
   },
 ];
@@ -189,17 +192,46 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
             style={{ paddingTop: 'max(5rem, calc(3.5rem + env(safe-area-inset-top)))', paddingBottom: '4rem' }}
           >
             <div className="max-w-3xl mx-auto space-y-12">
-              <motion.div 
+              {/* Hero Image */}
+              {displayService?.image && (
+                <motion.div
+                  key={`image-${displayIndex}`}
+                  initial={{ opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="relative w-full overflow-hidden"
+                  style={{
+                    height: 'clamp(200px, 35vw, 360px)',
+                    border: `2px solid ${accent.border}`,
+                    boxShadow: `6px 6px 0 ${accent.dot}55`,
+                  }}
+                >
+                  <img
+                    src={displayService.image}
+                    alt={displayService.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: `linear-gradient(to top, #0e0820 0%, transparent 50%, ${accent.from}88 100%)` }}
+                  />
+                  <div className="absolute bottom-4 left-5">
+                    <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm" style={{ color: accent.dot }}>
+                      <span className="h-px w-8" style={{ backgroundColor: accent.dot }} />
+                      {displayService.subtitle}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              <motion.div
                 key={`header-${displayIndex}`}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4 }}
                 className="space-y-4"
               >
-                <div className="flex items-center gap-4 font-mono tracking-tighter uppercase text-sm" style={{ color: accent.dot }}>
-                  <span className="h-px w-12" style={{ backgroundColor: accent.dot }} />
-                  {displayService?.subtitle}
-                </div>
                 <h2 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white uppercase tracking-tighter leading-none">
                   {displayService?.title}
                 </h2>

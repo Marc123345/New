@@ -71,25 +71,25 @@ export function Testimonials() {
       {/* STICKY CANVAS */}
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
 
-        <div className="text-center mb-4 sm:mb-6 md:mb-8 px-4 md:px-8">
+        <div className="text-center mb-6 sm:mb-8 md:mb-10 px-4 md:px-8">
           <div
-            className="inline-block mb-4 px-4 py-2"
+            className="inline-block mb-4 px-4 py-2 bg-[var(--color-surface-dark)]"
             style={{
               border: '2px solid var(--color-secondary)',
               boxShadow: '4px 4px 0 var(--color-secondary)',
             }}
           >
             <span
-              className="text-xs tracking-[0.3em] uppercase"
+              className="text-xs font-bold tracking-[0.3em] uppercase"
               style={{ fontFamily: 'var(--font-stack-heading)', color: 'var(--color-secondary)' }}
             >
               Testimonials
             </span>
           </div>
           <h2
-            className="tracking-tight"
+            className="tracking-tight font-bold"
             style={{
-              fontSize: 'clamp(1.5rem, 5vw, 3rem)',
+              fontSize: 'clamp(1.8rem, 5vw, 3rem)',
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
             }}
@@ -121,16 +121,16 @@ export function Testimonials() {
                   <path
                     d="M190.023 369.047V379.047L189.52 379.045..."
                     stroke="currentColor"
-                    strokeOpacity="0.2"
+                    strokeOpacity="0.3"
                   />
                   <circle
                     cx="190"
                     cy="190"
                     r="189"
                     stroke="white"
-                    strokeWidth="1"
+                    strokeWidth="1.5"
                     strokeDasharray="2 10"
-                    opacity="0.2"
+                    opacity="0.3"
                   />
                 </svg>
 
@@ -143,7 +143,7 @@ export function Testimonials() {
                     cx="190"
                     cy="190"
                     r="184.5"
-                    stroke="rgba(232,226,255,0.12)"
+                    stroke="rgba(255,255,255,0.15)"
                     strokeWidth="11"
                     fill="none"
                     style={{
@@ -205,7 +205,7 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
   const active = TESTIMONIALS[currentIndex];
 
   return (
-    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
+    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/40">
       <motion.div
         className="relative w-full h-full"
         animate={{
@@ -221,7 +221,7 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
         <img
           src="https://cdn.prod.website-files.com/68a5787bba0829184628bd51/68b6b0d7f637ee0f1ff47780_BASE.avif"
           alt="World Map Base"
-          className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
+          className="absolute top-0 left-0 w-full h-full object-cover opacity-60 grayscale"
         />
       </motion.div>
     </div>
@@ -230,7 +230,7 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
 
 function TestimonialSlider({ scrollProgress }: { scrollProgress: any }) {
   return (
-    <div className="flex-1 min-w-0 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col justify-center" style={{ border: '2px solid rgba(255,255,255,0.15)', boxShadow: 'var(--shadow-geometric)' }}>
+    <div className="flex-1 min-w-0 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col justify-center" style={{ border: '2px solid rgba(255,255,255,0.25)', boxShadow: 'var(--shadow-geometric)' }}>
       <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
         {TESTIMONIALS.map((testimonial, i) => (
           <TestimonialCard
@@ -284,32 +284,33 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[92%] sm:w-[85%] bg-[var(--color-primary)] text-white p-5 sm:p-8 md:p-10"
+      className="absolute w-[92%] sm:w-[85%] bg-[var(--color-primary)] text-white p-6 sm:p-8 md:p-10"
       data-geometric-card
     >
+      {/* Strengthened border contrast for mobile */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ border: '4px solid rgba(255,255,255,0.2)', boxShadow: 'var(--shadow-geometric)' }}
+        className="absolute inset-0 pointer-events-none border-[3px] sm:border-[4px] border-white/40"
+        style={{ boxShadow: 'var(--shadow-geometric)' }}
       />
-      <div className="relative flex flex-col gap-5 sm:gap-7">
+      <div className="relative flex flex-col gap-6 sm:gap-7">
         <h3
-          className="leading-[1.15] tracking-tight"
+          className="leading-[1.25] tracking-tight text-white/95 font-medium"
           style={{
             fontFamily: "var(--font-stack-heading)",
-            fontSize: "clamp(1rem, 3.5vw, 2.1rem)",
+            fontSize: "clamp(1.1rem, 3.5vw, 2.1rem)",
           }}
         >
           "{testimonial.quote}"
         </h3>
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
           <motion.div
-            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white/30 flex-shrink-0"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white/60 flex-shrink-0 bg-black/20"
             style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
               boxShadow: [
                 "0 0 0 0 rgba(164, 108, 252, 0)",
-                "0 0 20px 4px rgba(164, 108, 252, 0.4)",
+                "0 0 20px 6px rgba(164, 108, 252, 0.7)", // Brighter pulse for dark screens
                 "0 0 0 0 rgba(164, 108, 252, 0)",
               ],
             }}
@@ -323,17 +324,18 @@ function TestimonialCard({
           </motion.div>
           <div className="min-w-0">
             <div
-              className="leading-none mb-1 text-[#FBFBFC] truncate"
+              className="leading-none mb-2 text-white font-bold truncate"
               style={{
                 fontFamily: "var(--font-stack-body)",
                 fontStyle: "italic",
-                fontSize: "clamp(1rem, 3vw, 1.75rem)",
+                fontSize: "clamp(1.1rem, 3vw, 1.75rem)",
               }}
             >
               {testimonial.name}
             </div>
+            {/* Dark text on light accent background ensures perfect contrast */}
             <div
-              className="inline-block bg-[var(--color-secondary)] px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs tracking-widest text-[var(--color-background-light)]"
+              className="inline-block bg-[var(--color-secondary)] px-2.5 py-1 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold tracking-widest text-[#050505]"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {testimonial.role}

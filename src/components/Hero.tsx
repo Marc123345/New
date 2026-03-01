@@ -685,13 +685,13 @@ export function Hero() {
     <section
       id="hero"
       className="relative min-h-screen overflow-hidden"
-      style={{ background: '#000' }}
+      style={{ background: '#0e0b1f' }}
     >
       <div className="absolute inset-0 overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, #020408 0%, #060210 40%, #020408 100%)',
+            background: 'linear-gradient(135deg, #06040f 0%, #0e0b1f 40%, #06040f 100%)',
           }}
         />
         <div

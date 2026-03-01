@@ -277,7 +277,7 @@ export function StorySection() {
     <div
       ref={containerRef}
       className="relative"
-      style={{ height: `${chapters.length * 100}vh`, background: '#000' }}
+      style={{ height: `${chapters.length * 100}vh`, background: '#0e0b1f' }}
     >
       <div className="sticky top-0 h-screen overflow-hidden">
         {VIDEOS.map((src, i) => (

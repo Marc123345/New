@@ -217,8 +217,9 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 background: hovered ? "var(--color-primary)" : "transparent",
                 color: hovered ? "var(--color-background-light)" : "var(--color-text-dark)",
                 cursor: "pointer",
-                transition: "background 0.25s ease, color 0.25s ease",
-                boxShadow: "var(--shadow-button)",
+                transition: "background 0.25s ease, color 0.25s ease, box-shadow 0.18s ease, transform 0.18s ease",
+                boxShadow: hovered ? "var(--shadow-button-hover)" : "var(--shadow-button)",
+                transform: hovered ? "translate(-2px, -2px)" : "translate(0, 0)",
               }}
             >
               Read Article
@@ -337,12 +338,20 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
                     fontFamily: "var(--font-stack-heading)",
-                    border: "1.5px solid var(--color-text-dark)",
+                    border: "2px solid var(--color-text-dark)",
                     background: activeCategory === cat ? "var(--color-primary)" : "transparent",
                     color: activeCategory === cat ? "var(--color-background-light)" : "var(--color-text-dark)",
                     cursor: "pointer",
-                    transition: "background 0.2s, color 0.2s",
+                    transition: "background 0.2s, color 0.2s, box-shadow 0.18s ease, transform 0.18s ease",
                     boxShadow: activeCategory === cat ? "var(--shadow-button)" : "none",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = "var(--shadow-button-hover)";
+                    e.currentTarget.style.transform = "translate(-2px, -2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = activeCategory === cat ? "var(--shadow-button)" : "none";
+                    e.currentTarget.style.transform = "translate(0, 0)";
                   }}
                 >
                   {cat}
@@ -390,6 +399,15 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                   border: "2px solid var(--color-text-dark)",
                   cursor: "pointer",
                   boxShadow: "var(--shadow-button)",
+                  transition: "box-shadow 0.18s ease, transform 0.18s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = "var(--shadow-button-hover)";
+                  e.currentTarget.style.transform = "translate(-2px, -2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = "var(--shadow-button)";
+                  e.currentTarget.style.transform = "translate(0, 0)";
                 }}
               >
                 Show All

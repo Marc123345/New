@@ -13,24 +13,24 @@ const NAV_LINKS = [
 
 function HamburgerIcon({ open }: { open: boolean }) {
   return (
-    <div className="relative w-6 h-5 flex flex-col justify-between">
+    <div className="relative flex flex-col justify-center items-end gap-[5px]" style={{ width: 24, height: 20 }}>
       <motion.span
-        animate={open ? { rotate: 45, y: 9 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="block h-[1.5px] w-full origin-center"
-        style={{ background: "rgba(232,226,255,0.85)" }}
+        animate={open ? { rotate: 45, y: 7, width: "100%" } : { rotate: 0, y: 0, width: "100%" }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        className="block h-[1.5px] origin-center"
+        style={{ background: "rgba(232,226,255,0.9)" }}
       />
       <motion.span
         animate={open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
         transition={{ duration: 0.2 }}
-        className="block h-[1.5px] w-4 origin-left"
-        style={{ background: "rgba(232,226,255,0.85)" }}
+        className="block h-[1.5px] origin-right"
+        style={{ background: "rgba(232,226,255,0.9)", width: "65%" }}
       />
       <motion.span
-        animate={open ? { rotate: -45, y: -9 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="block h-[1.5px] w-full origin-center"
-        style={{ background: "rgba(232,226,255,0.85)" }}
+        animate={open ? { rotate: -45, y: -7, width: "100%" } : { rotate: 0, y: 0, width: "100%" }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        className="block h-[1.5px] origin-center"
+        style={{ background: "rgba(232,226,255,0.9)", width: "100%" }}
       />
     </div>
   );
@@ -39,6 +39,7 @@ function HamburgerIcon({ open }: { open: boolean }) {
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,14 +56,21 @@ export function Navigation() {
     if (open) {
       window.addEventListener("keydown", onKey);
       window.addEventListener("mousedown", onOutside);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("mousedown", onOutside);
+      document.body.style.overflow = "";
     };
   }, [open]);
 
-  const handleLinkClick = () => setOpen(false);
+  const handleLinkClick = (href: string) => {
+    setActiveLink(href);
+    setOpen(false);
+  };
 
   return (
     <>
@@ -70,24 +78,61 @@ export function Navigation() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-between px-6 md:px-10"
+        className="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-between"
         style={{
-          height: 68,
-          background: scrolled || open ? "rgba(14,11,31,0.92)" : "transparent",
-          backdropFilter: scrolled || open ? "blur(20px)" : "none",
-          borderBottom: scrolled || open ? "1px solid rgba(164,108,252,0.12)" : "1px solid transparent",
-          transition: "background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease",
+          height: 72,
+          padding: "0 clamp(1.5rem, 5vw, 3rem)",
+          background: scrolled || open ? "rgba(10,7,22,0.94)" : "transparent",
+          backdropFilter: scrolled || open ? "blur(24px) saturate(1.5)" : "none",
+          borderBottom: scrolled || open ? "1px solid rgba(164,108,252,0.1)" : "1px solid transparent",
+          transition: "background 0.45s ease, backdrop-filter 0.45s ease, border-color 0.45s ease",
         }}
       >
-        <a href="#" aria-label="H2H Home">
-          <H2HLogo height={36} />
+        <a href="#" aria-label="H2H Home" style={{ display: "flex", alignItems: "center" }}>
+          <H2HLogo height={34} />
         </a>
 
-        <div ref={menuRef} className="relative">
+        <div ref={menuRef} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <motion.a
+            href="#contact"
+            onClick={() => handleLinkClick("#contact")}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: scrolled ? 1 : 0, pointerEvents: scrolled ? "auto" : "none" }}
+            transition={{ duration: 0.3 }}
+            className="hidden md:flex items-center"
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontFamily: "var(--font-stack-heading)",
+              fontWeight: 600,
+              color: "rgba(232,226,255,0.75)",
+              padding: "8px 20px",
+              border: "1px solid rgba(164,108,252,0.3)",
+              background: "rgba(164,108,252,0.07)",
+              marginRight: 8,
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#fff";
+              e.currentTarget.style.background = "rgba(164,108,252,0.15)";
+              e.currentTarget.style.borderColor = "rgba(164,108,252,0.55)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(232,226,255,0.75)";
+              e.currentTarget.style.background = "rgba(164,108,252,0.07)";
+              e.currentTarget.style.borderColor = "rgba(164,108,252,0.3)";
+            }}
+          >
+            Get Started
+          </motion.a>
+
           <button
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
-            className="flex items-center justify-center w-10 h-10 focus:outline-none"
+            aria-expanded={open}
+            className="flex items-center justify-center focus:outline-none"
+            style={{ width: 44, height: 44 }}
           >
             <HamburgerIcon open={open} />
           </button>
@@ -102,104 +147,250 @@ export function Navigation() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.35 }}
               className="fixed inset-0 z-[9990]"
-              style={{ background: "rgba(8,5,20,0.6)", backdropFilter: "blur(4px)" }}
+              style={{ background: "rgba(4,2,14,0.7)", backdropFilter: "blur(6px)" }}
               onClick={() => setOpen(false)}
             />
 
             <motion.nav
               key="nav-panel"
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "100%", opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1] }}
               className="fixed top-0 right-0 bottom-0 z-[9995] flex flex-col"
+              aria-label="Main navigation"
               style={{
-                width: "min(420px, 90vw)",
-                background: "rgba(10,7,24,0.97)",
-                backdropFilter: "blur(32px)",
-                borderLeft: "1px solid rgba(164,108,252,0.15)",
+                width: "min(440px, 92vw)",
+                background: "rgba(9,6,22,0.98)",
+                backdropFilter: "blur(40px)",
+                borderLeft: "1px solid rgba(164,108,252,0.12)",
               }}
             >
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: "radial-gradient(ellipse at top right, rgba(164,108,252,0.08) 0%, transparent 65%)",
+                  background: "radial-gradient(ellipse 60% 50% at 100% 0%, rgba(164,108,252,0.1) 0%, transparent 70%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse 50% 40% at 0% 100%, rgba(100,60,200,0.06) 0%, transparent 70%)",
                 }}
               />
 
-              <div className="flex items-center justify-between px-8 pt-5 pb-4" style={{ height: 68 }}>
+              <div
+                className="relative flex items-center justify-between flex-shrink-0"
+                style={{
+                  height: 72,
+                  padding: "0 clamp(1.5rem, 5vw, 2.5rem)",
+                  borderBottom: "1px solid rgba(164,108,252,0.08)",
+                }}
+              >
                 <H2HLogo height={32} />
                 <button
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center w-10 h-10 focus:outline-none"
+                  className="flex items-center justify-center focus:outline-none"
                   aria-label="Close menu"
+                  style={{ width: 44, height: 44 }}
                 >
                   <HamburgerIcon open={true} />
                 </button>
               </div>
 
               <div
-                className="mx-8 mb-6"
-                style={{ height: "1px", background: "rgba(164,108,252,0.12)" }}
-              />
-
-              <ul className="flex flex-col flex-1 px-8 gap-1">
-                {NAV_LINKS.map((link, i) => (
-                  <motion.li
-                    key={link.label}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.07 + i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="relative flex flex-col flex-1 overflow-y-auto"
+                style={{ padding: "clamp(1.5rem, 4vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem)" }}
+              >
+                <div style={{ marginBottom: "clamp(1rem, 3vw, 1.75rem)" }}>
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.3em",
+                      textTransform: "uppercase",
+                      color: "rgba(164,108,252,0.45)",
+                      fontFamily: "var(--font-stack-heading)",
+                      fontWeight: 600,
+                    }}
                   >
-                    <a
-                      href={link.href}
-                      onClick={handleLinkClick}
-                      className="group flex items-center justify-between py-4 text-[13px] font-medium uppercase tracking-widest border-b"
-                      style={{
-                        color: "rgba(232,226,255,0.55)",
-                        borderColor: "rgba(164,108,252,0.08)",
-                        transition: "color 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = "#fff";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = "rgba(232,226,255,0.55)";
-                      }}
+                    Navigation
+                  </span>
+                </div>
+
+                <ul className="flex flex-col" style={{ gap: 2 }}>
+                  {NAV_LINKS.map((link, i) => (
+                    <motion.li
+                      key={link.label}
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.06 + i * 0.055, duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      <span>{link.label}</span>
-                      <motion.span
-                        initial={{ opacity: 0, x: -6 }}
-                        whileHover={{ opacity: 1, x: 0 }}
-                        className="text-[10px] tracking-wider"
-                        style={{ color: "#a46cfc" }}
+                      <a
+                        href={link.href}
+                        onClick={() => handleLinkClick(link.href)}
+                        className="group flex items-center justify-between"
+                        style={{
+                          padding: "clamp(0.85rem, 2.5vw, 1.1rem) 0",
+                          borderBottom: "1px solid rgba(164,108,252,0.07)",
+                          textDecoration: "none",
+                          transition: "all 0.22s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          const el = e.currentTarget;
+                          el.style.paddingLeft = "8px";
+                          el.style.borderBottomColor = "rgba(164,108,252,0.2)";
+                          const label = el.querySelector<HTMLElement>(".nav-label");
+                          if (label) label.style.color = "#fff";
+                          const arrow = el.querySelector<HTMLElement>(".nav-arrow");
+                          if (arrow) { arrow.style.opacity = "1"; arrow.style.transform = "translate(0,0)"; }
+                        }}
+                        onMouseLeave={(e) => {
+                          const el = e.currentTarget;
+                          el.style.paddingLeft = "0";
+                          el.style.borderBottomColor = "rgba(164,108,252,0.07)";
+                          const label = el.querySelector<HTMLElement>(".nav-label");
+                          if (label) label.style.color = activeLink === link.href ? "rgba(232,226,255,0.9)" : "rgba(232,226,255,0.5)";
+                          const arrow = el.querySelector<HTMLElement>(".nav-arrow");
+                          if (arrow) { arrow.style.opacity = "0"; arrow.style.transform = "translate(-6px, 0)"; }
+                        }}
                       >
-                        ↗
-                      </motion.span>
-                    </a>
-                  </motion.li>
-                ))}
-              </ul>
+                        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                          <span
+                            style={{
+                              fontSize: "0.6rem",
+                              letterSpacing: "0.1em",
+                              color: "rgba(164,108,252,0.4)",
+                              fontFamily: "var(--font-stack-heading)",
+                              fontWeight: 600,
+                              minWidth: 20,
+                              lineHeight: 1,
+                            }}
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span
+                            className="nav-label"
+                            style={{
+                              fontSize: "clamp(1.4rem, 4.5vw, 1.85rem)",
+                              fontFamily: "var(--font-stack-heading)",
+                              fontWeight: 700,
+                              letterSpacing: "-0.02em",
+                              color: activeLink === link.href ? "rgba(232,226,255,0.9)" : "rgba(232,226,255,0.5)",
+                              lineHeight: 1,
+                              transition: "color 0.22s ease",
+                            }}
+                          >
+                            {link.label}
+                          </span>
+                        </div>
+                        <span
+                          className="nav-arrow"
+                          style={{
+                            fontSize: "0.8rem",
+                            color: "rgba(164,108,252,0.7)",
+                            opacity: 0,
+                            transform: "translate(-6px, 0)",
+                            transition: "opacity 0.22s ease, transform 0.22s ease",
+                          }}
+                        >
+                          ↗
+                        </span>
+                      </a>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.52, duration: 0.4 }}
+                  style={{ marginTop: "clamp(2rem, 5vw, 3rem)" }}
+                >
+                  <a
+                    href="#contact"
+                    onClick={() => handleLinkClick("#contact")}
+                    className="flex items-center justify-center"
+                    style={{
+                      padding: "clamp(0.9rem, 2.5vw, 1.1rem) 2rem",
+                      border: "1px solid rgba(164,108,252,0.35)",
+                      background: "rgba(164,108,252,0.08)",
+                      fontSize: "0.72rem",
+                      fontFamily: "var(--font-stack-heading)",
+                      fontWeight: 600,
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      color: "rgba(232,226,255,0.8)",
+                      textDecoration: "none",
+                      transition: "all 0.25s ease",
+                      width: "100%",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "rgba(164,108,252,0.18)";
+                      e.currentTarget.style.borderColor = "rgba(164,108,252,0.6)";
+                      e.currentTarget.style.color = "#fff";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "rgba(164,108,252,0.08)";
+                      e.currentTarget.style.borderColor = "rgba(164,108,252,0.35)";
+                      e.currentTarget.style.color = "rgba(232,226,255,0.8)";
+                    }}
+                  >
+                    Start a Project &nbsp;→
+                  </a>
+                </motion.div>
+              </div>
 
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-                className="px-8 pb-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.4 }}
+                className="relative flex-shrink-0 flex items-center justify-between flex-wrap"
+                style={{
+                  padding: "clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 5vw, 2.5rem)",
+                  borderTop: "1px solid rgba(164,108,252,0.08)",
+                  gap: 8,
+                }}
               >
-                <div
-                  className="pt-6 mt-2"
-                  style={{ borderTop: "1px solid rgba(164,108,252,0.1)" }}
-                >
-                  <p className="text-[11px] uppercase tracking-widest mb-1" style={{ color: "rgba(164,108,252,0.6)" }}>
+                <div>
+                  <p
+                    style={{
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      color: "rgba(164,108,252,0.55)",
+                      fontFamily: "var(--font-stack-heading)",
+                      fontWeight: 600,
+                      margin: 0,
+                    }}
+                  >
                     Human to Human
                   </p>
-                  <p className="text-[11px] uppercase tracking-widest" style={{ color: "rgba(232,226,255,0.2)" }}>
+                  <p
+                    style={{
+                      fontSize: "0.62rem",
+                      letterSpacing: "0.15em",
+                      textTransform: "uppercase",
+                      color: "rgba(232,226,255,0.2)",
+                      fontFamily: "var(--font-stack-heading)",
+                      margin: "3px 0 0 0",
+                    }}
+                  >
                     LinkedIn Growth Agency
                   </p>
                 </div>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "rgba(164,108,252,0.5)",
+                    boxShadow: "0 0 8px rgba(164,108,252,0.4)",
+                  }}
+                />
               </motion.div>
             </motion.nav>
           </>

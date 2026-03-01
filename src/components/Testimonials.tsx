@@ -61,6 +61,8 @@ const TESTIMONIALS = [
 
 export function Testimonials() {
   const containerRef = useRef(null);
+  
+  // Track scroll progress within this specific container
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -71,6 +73,7 @@ export function Testimonials() {
       {/* STICKY CANVAS */}
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
 
+        {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8 md:mb-10 px-4 md:px-8">
           <div
             className="inline-block mb-4 px-4 py-2"
@@ -99,7 +102,10 @@ export function Testimonials() {
           </h2>
         </div>
 
+        {/* Main Content Layout */}
         <div className="max-w-[1400px] mx-auto w-full h-[70vw] sm:h-[560px] lg:h-[640px] flex gap-4 lg:gap-6 px-4 md:px-8">
+          
+          {/* --- LEFT COLUMN: GLOBE MAP --- */}
           <div className="hidden lg:flex w-[380px] xl:w-[420px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0" style={{ border: '4px solid var(--color-secondary)', boxShadow: 'var(--shadow-geometric)' }}>
             <div className="text-center z-10 mt-4">
               <p className="text-lg leading-tight" style={{ fontFamily: 'var(--font-stack-heading)' }}>
@@ -135,7 +141,7 @@ export function Testimonials() {
                   />
                 </svg>
 
-                {/* Animated Progress Circle */}
+                {/* Animated Progress Circle mapped to scroll */}
                 <svg
                   viewBox="0 0 380 380"
                   className="absolute inset-0 w-full h-full -rotate-90"
@@ -188,6 +194,7 @@ export function Testimonials() {
 }
 
 function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
+  // Map the overall scroll progress to the current active testimonial index
   const testimonialIndex = useTransform(
     scrollProgress, 
     [0, 0.2, 0.4, 0.6, 0.8, 1], 
@@ -258,28 +265,34 @@ function TestimonialCard({
   total: number;
   scrollProgress: any;
 }) {
+  // Calculate when this specific card should start and end its animation
   const start = index / total;
   const end = (index + 1) / total;
 
+  // Check if this is the final card in our list
+  const isLast = index === total - 1;
+
+  // Animation values mapped to scroll progress.
+  // We use `isLast` to prevent the final card from fading out or moving away.
   const opacity = useTransform(
     scrollProgress,
     [start, start + 0.05, end - 0.05, end],
-    [0, 1, 1, 0]
+    [0, 1, 1, isLast ? 1 : 0]
   );
   const y = useTransform(
     scrollProgress,
     [start, start + 0.1, end - 0.1, end],
-    [60, 0, 0, -60]
+    [60, 0, 0, isLast ? 0 : -60]
   );
   const rotateX = useTransform(
     scrollProgress,
     [start, start + 0.1, end - 0.1, end],
-    [-45, 0, 0, 45]
+    [-45, 0, 0, isLast ? 0 : 45]
   );
   const scale = useTransform(
     scrollProgress,
     [start, start + 0.1, end - 0.1, end],
-    [0.9, 1, 1, 0.9]
+    [0.9, 1, 1, isLast ? 1 : 0.9]
   );
 
   return (

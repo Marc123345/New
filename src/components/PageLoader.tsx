@@ -2,47 +2,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { H2HLogo } from "./H2HLogo";
 
-// Stripped down to just the sleek hardware
-function PhoneSVG() {
-  return (
-    <svg
-      viewBox="0 0 120 220"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ width: "100%", height: "100%", filter: "drop-shadow(0px 20px 40px rgba(164,108,252,0.15))" }}
-    >
-      <defs>
-        <linearGradient id="phoneBody" x1="0" y1="0" x2="120" y2="220" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#1a1a24" />
-          <stop offset="50%" stopColor="#0a0a12" />
-          <stop offset="100%" stopColor="#1a1a24" />
-        </linearGradient>
-        <linearGradient id="gloss" x1="0" y1="0" x2="120" y2="220">
-          <stop offset="0%" stopColor="white" stopOpacity="0.1" />
-          <stop offset="40%" stopColor="white" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-
-      {/* Outer Chassis */}
-      <rect x="2" y="1" width="116" height="218" rx="20" fill="url(#phoneBody)" />
-      
-      {/* Inner Screen Bezel */}
-      <rect x="6" y="5" width="108" height="210" rx="16" fill="#050505" />
-      
-      {/* Screen Display (Now Pure Black) */}
-      <rect x="8" y="7" width="104" height="206" rx="14" fill="#000000" />
-      
-      {/* Glass Reflection */}
-      <rect x="2" y="1" width="116" height="218" rx="20" fill="url(#gloss)" />
-
-      {/* Hardware Buttons */}
-      <rect x="0" y="60" width="2" height="24" rx="1" fill="#2a2a34" />
-      <rect x="0" y="90" width="2" height="24" rx="1" fill="#2a2a34" />
-      <rect x="118" y="75" width="2" height="32" rx="1" fill="#2a2a34" />
-    </svg>
-  );
-}
-
 interface PageLoaderProps {
   onComplete: () => void;
 }
@@ -91,83 +50,70 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           exit={{ opacity: 0, scale: 1.05 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[99999] flex flex-col items-center justify-center overflow-hidden"
-          // Main canvas is now pure black
-          style={{ background: "#000000" }} 
+          style={{ background: "#0e0b1f" }}
         >
-          <div className="relative z-10 flex flex-col items-center w-full max-w-sm px-8">
-            
-            {/* The Floating Phone Component (Scaled up slightly for better UI fit) */}
+          {/* Background video */}
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: 0.85 }}
+          >
+            <source
+              src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214"
+              type="video/mp4"
+            />
+          </video>
+
+          {/* Dark overlay so text/logo remains readable */}
+          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+
+          {/* Logo + progress UI */}
+          <div className="relative z-10 flex flex-col items-center w-full max-w-xs px-8">
             <motion.div
-              initial={{ opacity: 0, y: 30, rotateX: 10 }}
-              animate={{ opacity: 1, y: [0, -12, 0], rotateX: 0 }}
-              transition={{
-                opacity: { duration: 1.2, ease: [0.22, 1, 0.36, 1] },
-                rotateX: { duration: 1.2, ease: [0.22, 1, 0.36, 1] },
-                y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
-              }}
-              className="relative flex items-center justify-center w-[220px] h-[420px]"
-              style={{ perspective: "1000px" }}
+              initial={{ opacity: 0, scale: 0.85, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-12 drop-shadow-[0_0_24px_rgba(255,255,255,0.25)]"
             >
-              <PhoneSVG />
-              
-              {/* Screen Content Wrapper - Everything inside here is ON the phone screen */}
-              <div className="absolute inset-0 top-[3.5%] left-[7%] right-[7%] bottom-[3.5%] rounded-[18px] flex flex-col items-center justify-center overflow-hidden bg-black">
-                
-                {/* Simulated Dynamic Island */}
-                <div className="absolute top-3 w-[35%] h-[14px] bg-[#050505] rounded-full border border-white/5 z-20 shadow-inner" />
-                
-                {/* Subtle Screen Glow (Optional, keeps it from looking flat) */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#a46cfc]/5 to-transparent opacity-50 pointer-events-none" />
-
-                {/* The Logo (Centered on screen) */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative z-10 drop-shadow-[0_0_15px_rgba(164,108,252,0.4)] mb-8"
-                >
-                  <H2HLogo height={42} />
-                </motion.div>
-
-                {/* Premium Loading Indicator (Now inside the phone, anchored to the bottom) */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute bottom-10 w-[75%] flex flex-col space-y-3"
-                >
-                  <div className="flex justify-between items-end px-1">
-                    <span
-                      className="text-[8px] uppercase tracking-[0.3em] font-medium"
-                      style={{ color: "rgba(255,255,255,0.5)" }}
-                    >
-                      Loading
-                    </span>
-                    <span
-                      className="text-[9px] tabular-nums font-light tracking-wider"
-                      style={{ color: "rgba(255,255,255,0.9)" }}
-                    >
-                      {progress}%
-                    </span>
-                  </div>
-
-                  {/* 1px hairline progress bar */}
-                  <div className="w-full h-[1px] bg-white/10 relative overflow-hidden rounded-full">
-                    <motion.div
-                      className="absolute top-0 left-0 h-full rounded-full"
-                      style={{
-                        width: `${progress}%`,
-                        background: "linear-gradient(90deg, transparent, #c084fc, #fff)",
-                        boxShadow: "0 0 10px #a46cfc",
-                        transition: "width 0.1s linear",
-                      }}
-                    />
-                  </div>
-                </motion.div>
-
-              </div>
+              <H2HLogo height={56} />
             </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full flex flex-col space-y-3"
+            >
+              <div className="flex justify-between items-end px-1">
+                <span
+                  className="text-[9px] uppercase tracking-[0.3em] font-medium"
+                  style={{ color: "rgba(255,255,255,0.55)" }}
+                >
+                  Loading
+                </span>
+                <span
+                  className="text-[10px] tabular-nums font-light tracking-wider"
+                  style={{ color: "rgba(255,255,255,0.9)" }}
+                >
+                  {progress}%
+                </span>
+              </div>
+
+              <div className="w-full h-[1px] bg-white/15 relative overflow-hidden rounded-full">
+                <motion.div
+                  className="absolute top-0 left-0 h-full rounded-full"
+                  style={{
+                    width: `${progress}%`,
+                    background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.8), #fff)",
+                    boxShadow: "0 0 12px rgba(255,255,255,0.5)",
+                    transition: "width 0.1s linear",
+                  }}
+                />
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       ) : (
@@ -177,7 +123,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           animate={{ opacity: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[99999]"
-          style={{ background: "#000000", pointerEvents: "none" }}
+          style={{ background: "#0e0b1f", pointerEvents: "none" }}
         />
       )}
     </AnimatePresence>

@@ -1,6 +1,5 @@
-import React, { Suspense, lazy, useState, useCallback } from "react";
+import React, { Suspense, lazy } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Loader } from "./components/Loader";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Navigation } from "./components/Navigation";
@@ -160,21 +159,9 @@ function AppContent() {
 }
 
 export default function App() {
-  const [loaded, setLoaded] = useState(false);
-  const handleLoaderComplete = useCallback(() => setLoaded(true), []);
-
   return (
     <ErrorBoundary>
-      <Loader onComplete={handleLoaderComplete} />
-      <div
-        style={{
-          opacity: loaded ? 1 : 0,
-          transition: 'opacity 0.5s ease',
-          pointerEvents: loaded ? 'all' : 'none',
-        }}
-      >
-        <AppContent />
-      </div>
+      <AppContent />
     </ErrorBoundary>
   );
 }

@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'motion/react';
+import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1];
 
@@ -8,49 +8,19 @@ interface MousePos {
   y: number;
 }
 
-const CHAPTERS = [
-  {
-    id: 'opening',
-    badge: '01 — Partnership',
-    headline: ["You don't hire H2H.", 'You work with H2H.'],
-    body: null,
-  },
-  {
-    id: 'dayinlife',
-    badge: '02 — Adaptability',
-    headline: null,
-    body: 'Embedded across industries. Fluent in every brand voice. We move at your pace, match your ambition, and show up like a team member — not a vendor.',
-    stats: [
-      { value: '50+', label: 'Active Clients' },
-      { value: '12+', label: 'Industries Served' },
-      { value: '360°', label: 'Brand Coverage' },
-    ],
-  },
-  {
-    id: 'humanity',
-    badge: '03 — Culture',
-    quote: '"Real conversations. Real creative. Real results — with people who genuinely care about your brand."',
-  },
-  {
-    id: 'closing',
-    badge: '04 — Process',
-    closing: ['Because at H2H,', 'partnership isn\'t a promise —', 'it\'s our process.'],
-  },
-];
-
 function SectionBadge({ label }: { label: string }) {
   return (
     <div
       className="inline-block px-4 py-2 mb-6"
       style={{
-        border: '2px solid var(--color-secondary, #a46cfc)',
-        boxShadow: '4px 4px 0 var(--color-secondary, #a46cfc)',
+        border: '2px solid rgba(255,255,255,0.55)',
+        boxShadow: '4px 4px 0 rgba(255,255,255,0.2)',
       }}
     >
       <span
         className="text-xs font-bold uppercase tracking-[0.3em]"
         style={{
-          color: 'var(--color-secondary, #a46cfc)',
+          color: 'rgba(255,255,255,0.8)',
           fontFamily: 'var(--font-stack-heading)',
         }}
       >
@@ -72,10 +42,7 @@ function OpeningChapter({ progress }: { progress: any }) {
       <SectionBadge label="01 — Partnership" />
       <h2 className="text-[clamp(2.6rem,6.5vw,5.5rem)] font-extrabold uppercase tracking-[-0.04em] leading-[1.02] text-white">
         <span className="block">You don&apos;t hire H2H.</span>
-        <span
-          className="block mt-2 text-transparent"
-          style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.6)' }}
-        >
+        <span className="block mt-2 text-white/50">
           You work with H2H.
         </span>
       </h2>
@@ -112,8 +79,7 @@ function DayInLifeChapter({ progress }: { progress: any }) {
             className="flex flex-col items-center gap-1"
           >
             <span
-              className="text-3xl md:text-4xl font-black tracking-tight"
-              style={{ color: 'var(--color-secondary, #a46cfc)' }}
+              className="text-3xl md:text-4xl font-black tracking-tight text-white"
             >{stat.value}</span>
             <span className="text-[0.6rem] uppercase tracking-[0.25em] text-white/50 font-mono">{stat.label}</span>
           </motion.div>
@@ -138,7 +104,7 @@ function HumanityChapter({ progress }: { progress: any }) {
           &ldquo;Real conversations. Real creative. Real results — with people who genuinely care about your brand.&rdquo;
         </p>
         <footer className="mt-6">
-          <div className="w-12 h-px mx-auto mb-4" style={{ background: 'rgba(164,108,252,0.5)' }} />
+          <div className="w-12 h-px mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.3)' }} />
           <span className="text-[0.6rem] uppercase tracking-[0.3em] text-white/40 font-mono">The H2H Way</span>
         </footer>
       </blockquote>
@@ -158,10 +124,7 @@ function ClosingChapter({ progress }: { progress: any }) {
       <SectionBadge label="04 — Process" />
       <h2 className="text-[clamp(2rem,5vw,4.2rem)] font-extrabold uppercase tracking-[-0.04em] leading-[1.06] text-white mb-8">
         <span className="block">Because at H2H,</span>
-        <span
-          className="block mt-1 text-transparent"
-          style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.5)' }}
-        >
+        <span className="block mt-1 text-white/50">
           partnership isn&apos;t a promise —
         </span>
         <span className="block mt-1">it&apos;s our process.</span>
@@ -174,12 +137,12 @@ function ClosingChapter({ progress }: { progress: any }) {
             border: '2px solid #fbfbfc',
             background: 'transparent',
             color: '#fbfbfc',
-            boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+            boxShadow: '4px 4px 0 rgba(255,255,255,0.25)',
           }}
           whileHover={{
             x: -2,
             y: -2,
-            boxShadow: '6px 6px 0 #a46cfc',
+            boxShadow: '6px 6px 0 rgba(255,255,255,0.4)',
           }}
           whileTap={{ scale: 0.98 }}
         >
@@ -277,9 +240,7 @@ export function PartnerEffect() {
             />
           </motion.video>
 
-          {/* Purple dark overlay */}
-          <div className="absolute inset-0 bg-[#0d0618]/45 pointer-events-none" />
-          {/* Top vignette */}
+          {/* Top/bottom vignette */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none" />
           {/* Radial vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.35)_100%)] pointer-events-none" />
@@ -297,7 +258,7 @@ export function PartnerEffect() {
         {/* Scan line */}
         <motion.div
           className="absolute left-0 right-0 h-[1px] z-[2] pointer-events-none"
-          style={{ background: 'linear-gradient(to right, transparent, rgba(164,108,252,0.25), transparent)' }}
+          style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent)' }}
           animate={{ top: ['0%', '100%'] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
         />
@@ -315,21 +276,21 @@ export function PartnerEffect() {
           className="absolute left-0 bottom-0 h-[2px] z-20 pointer-events-none"
           style={{
             width: useTransform(smoothProgress, [0, 1], ['0%', '100%']),
-            background: 'linear-gradient(to right, var(--color-primary, #291e56), var(--color-secondary, #a46cfc))',
+            background: 'linear-gradient(to right, rgba(255,255,255,0.3), rgba(255,255,255,0.8))',
           }}
         />
 
         {/* Corner UI — top right */}
         <div className="absolute top-10 right-10 z-20 pointer-events-none">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ border: '1px solid rgba(164,108,252,0.3)' }}>
-            <div className="w-1.5 h-1.5 rounded-full animate-ping" style={{ background: 'var(--color-secondary, #a46cfc)' }} />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ border: '1px solid rgba(255,255,255,0.2)' }}>
+            <div className="w-1.5 h-1.5 rounded-full animate-ping" style={{ background: 'rgba(255,255,255,0.6)' }} />
           </div>
         </div>
 
         {/* Corner UI — bottom left */}
         <div className="absolute bottom-10 left-10 z-20 flex items-center gap-4 pointer-events-none">
-          <div className="h-px w-16" style={{ background: 'rgba(164,108,252,0.35)' }} />
-          <span className="text-[10px] uppercase tracking-[0.3em] font-mono" style={{ color: 'rgba(164,108,252,0.5)' }}>Partner.Effect</span>
+          <div className="h-px w-16" style={{ background: 'rgba(255,255,255,0.25)' }} />
+          <span className="text-[10px] uppercase tracking-[0.3em] font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>Partner.Effect</span>
         </div>
 
         {/* Scroll hint (only at start) */}
@@ -340,7 +301,7 @@ export function PartnerEffect() {
           <span className="text-[0.55rem] uppercase tracking-[0.3em] text-white/30 font-mono">Scroll to explore</span>
           <motion.div
             className="w-px h-8"
-            style={{ background: 'linear-gradient(to bottom, rgba(164,108,252,0.6), transparent)' }}
+            style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)' }}
             animate={{ scaleY: [0, 1, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />

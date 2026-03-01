@@ -417,19 +417,23 @@ export function EcosystemServices() {
         <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-[0.15]">
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0e0820_80%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#0e0820_90%)]" />
       </div>
 
       {/* Central Hub & Text — hidden on mobile, shown on desktop */}
       <div className="hidden sm:flex absolute inset-0 items-center justify-center pointer-events-none z-10">
         <div
           className="absolute w-64 h-64 md:w-96 md:h-96 rounded-full blur-[100px]"
-          style={{ background: 'rgba(164,108,252,0.18)' }}
+          style={{ background: 'rgba(164,108,252,0.08)' }}
         />
         <div className="relative text-center">
           <h1
-            className="font-bold text-white/10 uppercase tracking-tighter mb-4"
-            style={{ fontSize: 'clamp(3rem, 12vw, 9rem)' }}
+            className="font-bold uppercase tracking-tighter mb-4"
+            style={{
+              fontSize: 'clamp(3rem, 12vw, 9rem)',
+              color: 'transparent',
+              WebkitTextStroke: '1px rgba(255,255,255,0.2)',
+            }}
           >
             Framework
           </h1>
@@ -487,9 +491,10 @@ export function EcosystemServices() {
             className="font-bold uppercase tracking-tighter mb-3"
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(3rem, 16vw, 5rem)',
+              fontSize: 'clamp(2.2rem, 11vw, 5rem)',
               lineHeight: 1.05,
-              color: 'rgba(255,255,255,0.1)',
+              color: 'transparent',
+              WebkitTextStroke: '1px rgba(255,255,255,0.25)',
               letterSpacing: '-0.02em',
             }}
           >

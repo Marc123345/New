@@ -482,16 +482,26 @@ export function EcosystemServices() {
 
       {/* Mobile Grid */}
       <div className="relative z-30 sm:hidden w-full px-6 py-16 space-y-4 flex flex-col">
-        <div className="text-center mb-6">
+        <div className="text-center mb-8">
           <h1
-            className="font-bold text-white/10 uppercase tracking-tighter mb-3"
-            style={{ fontSize: 'clamp(3rem, 18vw, 5rem)' }}
+            className="font-bold uppercase tracking-tighter mb-3"
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: 'clamp(3rem, 16vw, 5rem)',
+              lineHeight: 1.05,
+              color: 'rgba(255,255,255,0.1)',
+              letterSpacing: '-0.02em',
+            }}
           >
             Framework
           </h1>
           <p
-            className="font-mono tracking-widest uppercase text-xs"
-            style={{ color: 'var(--color-secondary, #a46cfc)' }}
+            className="font-mono uppercase"
+            style={{
+              fontSize: 'clamp(0.65rem, 3vw, 0.8rem)',
+              letterSpacing: '0.2em',
+              color: 'var(--color-secondary)',
+            }}
           >
             Three Pillars. One Ecosystem.
           </p>

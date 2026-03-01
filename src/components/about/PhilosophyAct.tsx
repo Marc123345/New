@@ -102,10 +102,17 @@ function PhilosophyCardItem({ card }: { card: PhilosophyCard }) {
       initial={{ opacity: 0, y: 28 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
       transition={{ duration: 0.7, delay: card.delay, ease: EASE_OUT_EXPO }}
-      className="group relative w-full overflow-hidden rounded-2xl border backdrop-blur-sm"
+      className="group relative w-full overflow-hidden backdrop-blur-sm border-2 transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
       style={{
-        background: 'rgba(255,255,255,0.03)',
+        background: 'rgba(14,8,32,0.7)',
         borderColor: card.accent.border,
+        boxShadow: `4px 4px 0px ${card.accent.dot}55`,
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = `8px 8px 0px ${card.accent.dot}88`;
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = `4px 4px 0px ${card.accent.dot}55`;
       }}
     >
       <div
@@ -118,10 +125,11 @@ function PhilosophyCardItem({ card }: { card: PhilosophyCard }) {
       <div className="relative z-10 p-6 md:p-10 flex flex-col sm:flex-row items-start gap-6 md:gap-10">
         <div className="flex-shrink-0">
           <div
-            className="w-14 h-14 rounded-xl flex items-center justify-center shadow-inner border border-white/10 text-white"
+            className="w-14 h-14 flex items-center justify-center border-2 text-white"
             style={{
               background: `linear-gradient(135deg, ${card.accent.from}, ${card.accent.to})`,
-              boxShadow: `inset 0 0 10px rgba(255,255,255,0.15), 0 0 20px ${card.accent.light}`,
+              borderColor: card.accent.dot,
+              boxShadow: `3px 3px 0px ${card.accent.dot}66`,
             }}
           >
             {card.icon}

@@ -94,13 +94,13 @@ export function AboutStory() {
                   className="h-1 rounded-full transition-all duration-500"
                   style={{
                     width: i === index ? '2rem' : '0.4rem',
-                    background: i === index ? 'rgba(164,108,252,0.9)' : 'rgba(255,255,255,0.2)',
+                    background: i === index ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)',
                   }}
                 />
                 <span
                   className="text-[0.55rem] font-bold uppercase tracking-[0.2em] transition-all duration-300 hidden sm:block"
                   style={{
-                    color: i === index ? 'rgba(164,108,252,0.9)' : 'rgba(255,255,255,0.25)',
+                    color: i === index ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)',
                     opacity: i === index ? 1 : 0,
                     width: i === index ? 'auto' : 0,
                     overflow: 'hidden',

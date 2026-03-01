@@ -97,12 +97,27 @@ export function HookAct() {
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden cursor-none select-none"
       style={{ background: '#030303' }}
     >
+      {/* Video Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+          style={{ opacity: 0.28 }}
+        >
+          <source src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful%20(1).mp4?updatedAt=1771264402365" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-[#030303]" />
+      </div>
+
       <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-1 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)
+            linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px)
           `,
           backgroundSize: '3.5rem 3.5rem',
         }}

@@ -149,10 +149,25 @@ export function PhilosophyAct() {
       className="relative w-full py-24 md:py-40 overflow-hidden"
       style={{ background: '#0e0820' }}
     >
+      {/* Video Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+          style={{ opacity: 0.22 }}
+        >
+          <source src="https://ik.imagekit.io/qcvroy8xpd/space-shuttle-and-astronut-in-space-2026-01-28-02-50-17-utc.mp4?updatedAt=1771174796925" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0e0820]/80 via-[#0e0820]/50 to-[#0e0820]/90" />
+      </div>
+
       <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-1 pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle at 50% 0%, rgba(147,51,234,0.08) 0%, transparent 60%)`,
+          backgroundImage: `radial-gradient(circle at 50% 0%, rgba(147,51,234,0.1) 0%, transparent 60%)`,
         }}
       />
 

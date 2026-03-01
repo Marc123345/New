@@ -75,14 +75,13 @@ function AppContent() {
 
       <StorySection />
 
-      <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
-        {/* FIX: Added Suspense wrapper for lazy-loaded EcosystemServices */}
+      <div id="ecosystem" className="relative bg-[var(--color-background-light)]" style={{ zIndex: 2 }}>
         <Suspense fallback={<SectionLoader />}>
           <EcosystemServices />
         </Suspense>
       </div>
 
-      <div id="about" className="relative" style={{ zIndex: 2 }}>
+      <div id="about" className="relative bg-[var(--color-background-light)]" style={{ zIndex: 2 }}>
         <Suspense fallback={<SectionLoader />}>
           <AboutStory />
         </Suspense>
@@ -98,7 +97,7 @@ function AppContent() {
         <Testimonials />
       </Section>
 
-      <div id="blog">
+      <div id="blog" className="bg-[var(--color-background-light)]">
         <LazySection>
           <Suspense fallback={<SectionLoader />}>
             <BlogSection />

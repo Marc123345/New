@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom'; // 1. Added Portal import
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Users, Megaphone, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
@@ -94,11 +95,17 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
 }
 
 /**
- * PillarOverlay: Full-screen detail view
+ * PillarOverlay: Full-screen detail view using createPortal
  */
 function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const activeService = pillarIndex !== null ? PILLARS[pillarIndex] : null;
+
+  // 2. Ensure we only render the portal on the client to avoid hydration errors
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Prevent background scroll when open
   useEffect(() => {
@@ -107,28 +114,37 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     } else {
       document.body.style.overflow = 'unset';
     }
+    
+    // Safety cleanup
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [pillarIndex]);
 
-  return (
+  // If not mounted on client yet, render nothing
+  if (!mounted) return null;
+
+  // 3. Render at the document body level
+  return createPortal(
     <AnimatePresence>
       {pillarIndex !== null && activeService && (
         <motion.div
+          key="overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          // Added h-[100dvh] here to fix mobile browser bottom bar cut-offs
-          className="fixed inset-0 z-[1000] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh]"
+          // Bumped z-index to 9999 to guarantee it sits above external site navs
+          className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh]"
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[1010] min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[10000] min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white"
           >
             <X size={20} />
           </button>
 
           {/* Content Area */}
-          {/* Added min-h-0 so flexbox allows it to shrink, and increased bottom padding to 4rem */}
           <div 
             ref={scrollRef} 
             className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-0" 
@@ -177,8 +193,8 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
             </div>
           </div>
 
-          {/* Navigation Footer */}
-          <div className="p-4 sm:p-6 border-t border-white/10 bg-black/50 backdrop-blur-md flex justify-between items-center z-10" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+          {/* Navigation Footer - 4. Added "relative z-20" here! */}
+          <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-black/80 backdrop-blur-md flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
              <button
                disabled={pillarIndex === 0}
                onClick={() => onNavigate(pillarIndex - 1)}
@@ -204,7 +220,8 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body // Portal target
   );
 }
 
@@ -226,7 +243,7 @@ export function EcosystemServices() {
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0e0820]">
       {/* Background Video */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none z-0">
         <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-20">
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
@@ -274,7 +291,7 @@ export function EcosystemServices() {
       </div>
 
       {/* Mobile Grid */}
-      <div className="relative z-20 sm:hidden w-full px-6 mt-12 space-y-4">
+      <div className="relative z-30 sm:hidden w-full px-6 mt-12 space-y-4">
         {PILLARS.map((p, i) => (
           <button 
             key={i} 
@@ -293,6 +310,9 @@ export function EcosystemServices() {
         ))}
       </div>
 
+      {/* The overlay component is still placed here, but the Portal inside it 
+        will teleport the actual visual elements to document.body 
+      */}
       <PillarOverlay
         pillarIndex={selectedService}
         onClose={() => setSelectedService(null)}

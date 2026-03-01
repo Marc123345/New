@@ -420,14 +420,12 @@ export function EcosystemServices() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0e0820_80%)]" />
       </div>
 
-      {/* Central Hub & Text */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-        {/* Glowing core behind text */}
+      {/* Central Hub & Text — hidden on mobile, shown on desktop */}
+      <div className="hidden sm:flex absolute inset-0 items-center justify-center pointer-events-none z-10">
         <div
           className="absolute w-64 h-64 md:w-96 md:h-96 rounded-full blur-[100px]"
           style={{ background: 'rgba(164,108,252,0.18)' }}
         />
-
         <div className="relative text-center">
           <h1
             className="font-bold text-white/10 uppercase tracking-tighter mb-4"
@@ -483,7 +481,21 @@ export function EcosystemServices() {
       </div>
 
       {/* Mobile Grid */}
-      <div className="relative z-30 sm:hidden w-full px-6 mt-32 space-y-4">
+      <div className="relative z-30 sm:hidden w-full px-6 py-16 space-y-4 flex flex-col">
+        <div className="text-center mb-6">
+          <h1
+            className="font-bold text-white/10 uppercase tracking-tighter mb-3"
+            style={{ fontSize: 'clamp(3rem, 18vw, 5rem)' }}
+          >
+            Framework
+          </h1>
+          <p
+            className="font-mono tracking-widest uppercase text-xs"
+            style={{ color: 'var(--color-secondary, #a46cfc)' }}
+          >
+            Three Pillars. One Ecosystem.
+          </p>
+        </div>
         {PILLARS.map((p, i) => {
           const accent = PILLAR_ACCENTS[i];
           return (

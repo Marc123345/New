@@ -553,7 +553,7 @@ export function EcosystemServices() {
   return (
     <section
       id="ecosystem"
-      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-32"
+      className="relative w-full min-h-[auto] sm:min-h-screen flex flex-col items-center justify-center overflow-hidden py-16 sm:py-32"
       style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary, #2e1065) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -638,17 +638,16 @@ export function EcosystemServices() {
       </style>
 
       <div
-        className="absolute inset-0 z-20 overflow-visible pointer-events-none flex items-center justify-center"
+        className="hidden sm:flex absolute inset-0 z-20 overflow-visible pointer-events-none items-center justify-center"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >
-        <div className="relative w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
-          {/* Changed framer-motion rotate to CSS spin to correctly support animationPlayState */}
+        <div className="relative w-[600px] h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
           <div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ 
+            style={{
               animation: 'spin-orbit 120s linear infinite',
-              animationPlayState: isHoveringOrbit ? 'paused' : 'running' 
+              animationPlayState: isHoveringOrbit ? 'paused' : 'running'
             }}
           >
             {PILLARS.map((pillar, i) => (
@@ -657,7 +656,7 @@ export function EcosystemServices() {
                 item={pillar}
                 index={i}
                 total={PILLARS.length}
-                radius={orbitRadius} // Pass the dynamic radius
+                radius={orbitRadius}
                 onSelect={setSelectedService}
                 activeLabel={activeLabel}
                 onToggleLabel={handleToggleLabel}
@@ -665,6 +664,51 @@ export function EcosystemServices() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="relative z-20 sm:hidden w-full px-5 mt-8 grid grid-cols-1 gap-4">
+        {PILLARS.map((pillar, i) => {
+          const accent = PILLAR_ACCENTS[i];
+          return (
+            <button
+              key={i}
+              onClick={() => setSelectedService(i)}
+              className="w-full text-left flex items-center gap-4 p-4 rounded-xl focus:outline-none active:scale-[0.98] transition-transform"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: `1px solid ${accent.border}`,
+                boxShadow: `0 0 24px -8px ${accent.from}66`,
+              }}
+            >
+              <div
+                className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`,
+                  border: `1px solid ${accent.border}`,
+                  color: '#fff',
+                  boxShadow: `0 0 16px -4px ${accent.from}88`,
+                }}
+              >
+                {pillar.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[10px] uppercase tracking-[0.3em] mb-0.5"
+                  style={{ color: accent.dot, fontFamily: 'var(--font-stack-heading)' }}
+                >
+                  {pillar.subtitle}
+                </p>
+                <p
+                  className="font-bold text-base leading-tight"
+                  style={{ color: '#fff', fontFamily: 'var(--font-stack-heading)' }}
+                >
+                  {pillar.title}
+                </p>
+              </div>
+              <ArrowRight size={18} style={{ color: accent.dot, flexShrink: 0 }} />
+            </button>
+          );
+        })}
       </div>
 
       <PillarOverlay

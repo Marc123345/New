@@ -178,52 +178,68 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
     <AnimatePresence>
       {service && (
         <motion.div
-          key="service-overlay"
+          key="service-overlay-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[200]"
-          style={{ background: "rgba(4,4,8,0.95)", backdropFilter: "blur(24px)" }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8"
+          style={{ background: "rgba(4,4,8,0.75)", backdropFilter: "blur(12px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           role="dialog"
           aria-modal="true"
           aria-labelledby="service-card-title"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
         >
-          <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <motion.div
-              className="h-full"
-              style={{ width: `${scrollProgress * 100}%`, background: `linear-gradient(to right, ${service.bgColor}, ${service.color})` }}
-            />
-          </div>
-
-          <motion.button
-            onClick={onClose}
-            aria-label="Close overlay"
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-            className="absolute top-4 right-4 md:top-8 md:right-8 z-10 flex h-11 w-11 items-center justify-center transition-all duration-200 hover:rotate-90"
+          <motion.div
+            key="service-overlay-panel"
+            initial={{ opacity: 0, y: 24, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.97 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full overflow-hidden"
             style={{
-              border: "1px solid rgba(255,255,255,0.15)",
-              background: "rgba(255,255,255,0.07)",
-              color: "rgba(255,255,255,0.7)",
-              borderRadius: 2,
+              maxWidth: "680px",
+              maxHeight: "85vh",
+              background: "rgba(10,8,20,0.98)",
+              border: `1px solid ${service.color}44`,
+              boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${service.color}22`,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
           >
-            <X size={18} strokeWidth={2} />
-          </motion.button>
+            <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <motion.div
+                className="h-full"
+                style={{ width: `${scrollProgress * 100}%`, background: `linear-gradient(to right, ${service.bgColor}, ${service.color})` }}
+              />
+            </div>
 
-          <div
-            ref={scrollRef}
-            className="h-screen overflow-y-auto overscroll-contain"
-            style={{ WebkitOverflowScrolling: "touch", paddingBottom: "80px" }}
-            onScroll={handleScroll}
-          >
-            <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 md:pt-24 pb-12 space-y-8 sm:space-y-10">
+            <motion.button
+              onClick={onClose}
+              aria-label="Close overlay"
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
+              className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
+              style={{
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(255,255,255,0.07)",
+                color: "rgba(255,255,255,0.7)",
+                borderRadius: 2,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+            >
+              <X size={16} strokeWidth={2} />
+            </motion.button>
+
+            <div
+              ref={scrollRef}
+              className="overflow-y-auto overscroll-contain"
+              style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
+              onScroll={handleScroll}
+            >
+              <div className="px-6 sm:px-8 pt-10 pb-8 space-y-6">
               {service.image && (
                 <motion.div
                   key={`img-${service.id}`}
@@ -232,7 +248,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                   transition={{ duration: 0.5 }}
                   className="relative w-full overflow-hidden"
                   style={{
-                    height: 'clamp(200px, 35vw, 340px)',
+                    height: 'clamp(160px, 28vw, 220px)',
                     border: `2px solid ${service.color}55`,
                     boxShadow: `6px 6px 0 ${service.color}44`,
                   }}
@@ -331,23 +347,24 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                 </motion.div>
               )}
             </div>
-          </div>
+            </div>
 
-          {showHint && scrollProgress === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none"
-            >
-              <motion.div animate={{ y: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+            {showHint && scrollProgress === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-none"
+              >
+                <motion.div animate={{ y: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ color: "rgba(255,255,255,0.35)" }}>
+                    <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </motion.div>
+                <span className="text-[10px] tracking-[0.15em] uppercase" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-stack-heading)" }}>Scroll</span>
               </motion.div>
-              <span className="text-[11px] tracking-[0.15em] uppercase" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-stack-heading)" }}>Scroll</span>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

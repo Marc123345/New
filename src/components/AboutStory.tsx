@@ -1,271 +1,176 @@
-import { useRef, useState, useEffect } from 'react';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-  useSpring,
-} from 'motion/react';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { SignalGridPanel } from './SignalGridPanel';
 
-// Ultra-smooth easing curve common in award-winning sites
-const CUSTOM_EASE = [0.16, 1, 0.3, 1];
-
 const CAPABILITIES = [
-  { tag: 'Strategy', desc: 'Brand positioning, market analysis, and defining your unique digital footprint.' },
-  { tag: 'Creative', desc: 'Visual storytelling and high-end content creation that stops the scroll.' },
-  { tag: 'Growth', desc: 'Performance marketing and scaling ecosystems to capture real market share.' },
-  { tag: 'Social', desc: 'Community management, authentic engagement, and audience retention.' },
-  { tag: 'Content', desc: 'Editorial planning, copywriting, and end-to-end production pipelines.' },
-  { tag: 'Analytics', desc: 'Data-driven insights, iterative optimization, and ROI tracking.' },
+  { 
+    id: '01', 
+    tag: 'Strategy', 
+    title: 'Brand Ecosystems',
+    desc: 'We don’t just post; we architect. We define your unique digital footprint, positioning, and market gaps to ensure every piece of content drives measurable business goals.' 
+  },
+  { 
+    id: '02', 
+    tag: 'Creative', 
+    title: 'Visual Storytelling',
+    desc: 'High-end content creation that stops the scroll. From kinetic typography to cinematic video editing, we build assets that demand attention and command authority.' 
+  },
+  { 
+    id: '03', 
+    tag: 'Growth', 
+    title: 'Performance Scaling',
+    desc: 'Organic reach meets precision amplification. We scale your ecosystem to capture real market share, utilizing data-driven loops to maximize your return on attention.' 
+  },
+  { 
+    id: '04', 
+    tag: 'Community', 
+    title: 'Human Connection',
+    desc: 'Brands talk at people; humans talk with them. We manage your community, fostering authentic engagement and turning passive followers into vocal advocates.' 
+  },
 ];
 
 /**
- * Animated Word for cinematic headline reveals
+ * Individual Stacking Card
  */
-function AnimatedWord({ text, delay = 0 }: { text: string; delay?: number }) {
-  return (
-    <span className="inline-block overflow-hidden pb-2 mr-4">
-      <motion.span
-        className="inline-block origin-bottom"
-        initial={{ y: '120%', rotateZ: 5, opacity: 0 }}
-        whileInView={{ y: '0%', rotateZ: 0, opacity: 1 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 1.2, delay, ease: CUSTOM_EASE }}
-      >
-        {text}
-      </motion.span>
-    </span>
-  );
-}
+function StackingCard({ cap, index, total }: { cap: typeof CAPABILITIES[0], index: number, total: number }) {
+  // Sticky top positioning calculates the offset so cards stack visibly like a deck
+  const topOffset = `calc(15vh + ${index * 40}px)`;
 
-/**
- * Expansive Interactive Row for Capabilities
- */
-function CapabilityRow({
-  cap,
-  index,
-  isHovered,
-  hasActiveHover,
-  onHover,
-  onLeave,
-}: {
-  cap: typeof CAPABILITIES[0];
-  index: number;
-  isHovered: boolean;
-  hasActiveHover: boolean;
-  onHover: () => void;
-  onLeave: () => void;
-}) {
   return (
-    <motion.div
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      className="group relative border-b border-white/10 cursor-pointer overflow-hidden"
-      animate={{
-        opacity: hasActiveHover ? (isHovered ? 1 : 0.3) : 1,
-      }}
-      transition={{ duration: 0.4, ease: CUSTOM_EASE }}
+    <div 
+      className="sticky w-full"
+      style={{ top: topOffset, paddingBottom: '40px' }}
     >
-      <div className="flex flex-col justify-center py-8 md:py-12 px-4 md:px-8 relative z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-start gap-6">
-            <span className="text-purple-400 font-mono text-xs md:text-sm mt-2 opacity-50">
-              0{index + 1}
-            </span>
-            <h3 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter text-white transition-transform duration-500 group-hover:translate-x-4">
-              {cap.tag}
-            </h3>
-          </div>
-          <motion.div
-            className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500"
-            animate={{ rotate: isHovered ? 45 : 0 }}
-          >
-            <span className="text-white">↗</span>
-          </motion.div>
-        </div>
-
-        <AnimatePresence>
-          {isHovered && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.5, ease: CUSTOM_EASE }}
-              className="ml-12 md:ml-16 overflow-hidden"
-            >
-              <p className="pt-6 text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed">
-                {cap.desc}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-      
-      {/* Background highlight pill */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent z-0 origin-left"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.6, ease: CUSTOM_EASE }}
-      />
-    </motion.div>
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full rounded-2xl md:rounded-3xl overflow-hidden relative shadow-[0_-10px_30px_rgba(0,0,0,0.5)]"
+        style={{
+          background: '#0a0616', // Very dark, solid background for contrast
+          borderTop: '1px solid rgba(164,108,252,0.4)',
+          borderLeft: '1px solid rgba(255,255,255,0.1)',
+          borderRight: '1px solid rgba(255,255,255,0.05)',
+        }}
+      >
+        {/* Subtle inner gradient strictly for texture, no text wash-out */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent pointer-events-none" />
+        
+        <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row gap-8 md:gap-12 min-h-[350px]">
+          {/* Left Column of Card */}
+          <div className="md:w-1/3 flex flex-col justify-between">
+            <span className="font-mono text-sm tracking-widest text-purple-400">
+              // {cap.id}
+            </span>
+            <div className="mt-8 md:mt-0">
+              <span className="inline-block px-3 py-1 rounded-full border border-purple-500/30 text-xs font-bold uppercase tracking-widest text-white/80 mb-4 bg-purple-500/10">
+                {cap.tag}
+              </span>
+            </div>
+          </div>
+
+          {/* Right Column of Card */}
+          <div className="md:w-2/3 flex flex-col justify-center">
+            <h3 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-none mb-6">
+              {cap.title}
+            </h3>
+            <p className="text-lg md:text-xl leading-relaxed text-[#E2DDF0]">
+              {cap.desc}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
 export function AboutStory() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [activeCap, setActiveCap] = useState<number | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
+    target: containerRef,
+    offset: ['start start', 'end end'],
   });
 
-  const parallaxY = useTransform(scrollYProgress, [0, 1], ['10%', '-10%']);
-  const signalParallax = useTransform(scrollYProgress, [0, 1], ['-5%', '15%']);
-
-  // Smooth mouse tracking for ambient glow
-  const smoothX = useSpring(mousePos.x, { damping: 50, stiffness: 400 });
-  const smoothY = useSpring(mousePos.y, { damping: 50, stiffness: 400 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  // Smooth out the scroll progress for a parallax effect on the background
+  const smoothProgress = useSpring(scrollYProgress, { damping: 20, stiffness: 100 });
+  const bgY = useTransform(smoothProgress, [0, 1], ['0%', '20%']);
 
   return (
     <section
-      ref={sectionRef}
+      ref={containerRef}
       id="about"
-      className="relative w-full bg-[#050505] overflow-hidden"
-      style={{ minHeight: '100vh', paddingBottom: '8rem' }}
+      className="relative w-full bg-[#03000a] selection:bg-purple-500/30"
     >
-      {/* Ambient Mouse Tracking Light */}
-      <motion.div
-        className="pointer-events-none fixed top-0 left-0 w-[800px] h-[800px] rounded-full blur-[120px] opacity-20"
-        style={{
-          background: 'radial-gradient(circle, rgba(164,108,252,0.8) 0%, transparent 60%)',
-          x: useTransform(smoothX, x => x - 400),
-          y: useTransform(smoothY, y => y - 400),
-          zIndex: 0,
+      {/* Background Texture - Deep and unobtrusive */}
+      <motion.div 
+        className="absolute inset-0 z-0 opacity-20 pointer-events-none"
+        style={{ 
+          y: bgY,
+          backgroundImage: 'radial-gradient(circle at 50% 0%, #2e1065 0%, transparent 60%)' 
         }}
       />
 
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-12 pt-32 md:pt-48">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-12 relative z-10">
         
-        {/* --- Header / Hook Section --- */}
-        <div className="mb-32 md:mb-48">
+        {/* Intro Header - High Contrast */}
+        <div className="pt-32 pb-16 md:pt-48 md:pb-32 border-b border-white/10">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-4 mb-12"
-          >
-            <div className="w-12 h-px bg-purple-500" />
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-purple-400">
-              The Paradigm Shift
-            </span>
-          </motion.div>
-
-          <h2 className="text-[clamp(3rem,8vw,8rem)] leading-[0.9] font-bold uppercase tracking-tighter text-white">
-            <div className="flex flex-wrap">
-              <AnimatedWord text="From" delay={0.1} />
-              <AnimatedWord text="Brand" delay={0.15} />
-              <AnimatedWord text="Voice" delay={0.2} />
-            </div>
-            <div className="flex flex-wrap text-transparent" style={{ WebkitTextStroke: '2px rgba(255,255,255,0.8)' }}>
-              <AnimatedWord text="To" delay={0.25} />
-              <AnimatedWord text="Human" delay={0.3} />
-            </div>
-            <div className="flex flex-wrap text-purple-400">
-              <AnimatedWord text="Connection." delay={0.35} />
-            </div>
-          </h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.6, ease: CUSTOM_EASE }}
-            className="mt-12 text-xl md:text-3xl text-white/50 max-w-3xl leading-snug"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            We believe the most impactful brands are the ones that know how to connect, not just communicate. People want personality.
-          </motion.p>
+            <h2 className="text-[clamp(2.5rem,6vw,6rem)] leading-[1.05] font-bold tracking-tighter text-white uppercase max-w-5xl">
+              We engineer digital presence that <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-[#E2DDF0]">feels alive.</span>
+            </h2>
+          </motion.div>
         </div>
 
-        {/* --- Story & Signal Overlap Section --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-0 mb-32 md:mb-48 relative">
+        {/* Pinned Scroll Section */}
+        <div className="flex flex-col lg:flex-row relative">
           
-          <motion.div 
-            className="lg:col-span-7 lg:pr-12 z-20"
-            style={{ y: parallaxY }}
-          >
-            <div className="bg-[#0a0a0a] border border-white/10 p-8 md:p-16 rounded-2xl backdrop-blur-xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-transparent opacity-50" />
-              <h3 className="text-3xl md:text-5xl font-bold text-white mb-8 tracking-tight">
-                A social-first agency built to make your digital presence feel alive.
+          {/* Left Side: Sticky Information & Signal Grid */}
+          <div className="lg:w-5/12 relative">
+            <div className="lg:sticky lg:top-0 lg:h-screen py-16 md:py-32 flex flex-col justify-center pr-0 lg:pr-12">
+              
+              <h3 className="text-2xl md:text-3xl font-semibold text-white mb-6">
+                The Paradigm Shift
               </h3>
-              <p className="text-lg md:text-xl text-white/60 leading-relaxed">
-                We help companies build authentic relationships through strategic
-                content, thought leadership, and employee advocacy — turning every
-                touchpoint into a meaningful conversation. We combine insight with efficiency to build ecosystems that work across every stage of growth.
+              <p className="text-[#E2DDF0] text-lg md:text-xl leading-relaxed mb-12 max-w-md">
+                We believe the most impactful brands are the ones that know how to connect, not just communicate. People want personality. We combine insight with efficiency to build ecosystems that work across every platform.
               </p>
+
+              {/* Contained, high-contrast container for the Signal Grid */}
+              <div className="w-full h-[300px] md:h-[400px] rounded-2xl border border-white/10 bg-black overflow-hidden relative shadow-[0_0_40px_rgba(164,108,252,0.1)]">
+                <SignalGridPanel />
+                
+                {/* Overlay UI to give it a tech/dashboard feel */}
+                <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded border border-white/10">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-white/80">Network Active</span>
+                </div>
+              </div>
+
             </div>
-          </motion.div>
-
-          <motion.div 
-            className="lg:col-span-5 h-[400px] lg:h-auto lg:absolute lg:right-0 lg:top-24 lg:w-[45%] z-10"
-            style={{ y: signalParallax }}
-          >
-            <div className="w-full h-full bg-[#111] border border-white/5 rounded-2xl overflow-hidden relative group">
-               <SignalGridPanel />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
-               <div className="absolute bottom-6 left-6 flex items-center gap-3">
-                 <span className="relative flex h-3 w-3">
-                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                 </span>
-                 <span className="font-mono text-xs uppercase tracking-widest text-white/70">Live Ecosystem</span>
-               </div>
-            </div>
-          </motion.div>
-
-        </div>
-
-        {/* --- Capabilities Accordion --- */}
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-4 mb-16"
-          >
-             <span className="font-mono text-xs uppercase tracking-[0.3em] text-white/40">
-              Our Capabilities
-            </span>
-            <div className="flex-1 h-px bg-white/10" />
-          </motion.div>
-
-          <div className="border-t border-white/10">
-            {CAPABILITIES.map((cap, i) => (
-              <CapabilityRow
-                key={cap.tag}
-                cap={cap}
-                index={i}
-                isHovered={activeCap === i}
-                hasActiveHover={activeCap !== null}
-                onHover={() => setActiveCap(i)}
-                onLeave={() => setActiveCap(null)}
-              />
-            ))}
           </div>
-        </div>
 
+          {/* Right Side: Scrolling Card Stack */}
+          <div className="lg:w-7/12 relative pb-[20vh] lg:pb-[30vh] pt-16 lg:pt-32">
+            <div className="flex flex-col gap-4">
+              {CAPABILITIES.map((cap, i) => (
+                <StackingCard 
+                  key={cap.id} 
+                  cap={cap} 
+                  index={i} 
+                  total={CAPABILITIES.length} 
+                />
+              ))}
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   );

@@ -36,9 +36,9 @@ const PILLARS = [
 ];
 
 const PILLAR_ACCENTS = [
-  { from: '#6b21a8', to: '#9333ea', light: 'rgba(147,51,234,0.15)', border: 'rgba(147,51,234,0.4)', dot: '#c084fc' },
-  { from: '#1e3a8a', to: '#3b82f6', light: 'rgba(59,130,246,0.15)', border: 'rgba(59,130,246,0.4)', dot: '#93c5fd' },
-  { from: '#064e3b', to: '#10b981', light: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', dot: '#6ee7b7' },
+  { from: '#291e56', to: '#4a2d8a', light: 'rgba(164,108,252,0.12)', border: 'rgba(164,108,252,0.35)', dot: '#a46cfc' },
+  { from: '#3d2670', to: '#7c4bc0', light: 'rgba(177,129,252,0.15)', border: 'rgba(177,129,252,0.45)', dot: '#c084fc' },
+  { from: '#4a2d8a', to: '#a46cfc', light: 'rgba(177,129,252,0.18)', border: 'rgba(177,129,252,0.5)', dot: '#b181fc' },
 ];
 
 /**
@@ -90,9 +90,9 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
               transition={{ duration: 0.2 }}
               className={`absolute whitespace-nowrap z-50 pointer-events-none ${isRightHalf ? 'left-full ml-6' : 'right-full mr-6'}`}
             >
-              <div 
-                className="px-4 py-2 bg-[#0e0820]/90 backdrop-blur-xl border rounded-lg shadow-xl"
-                style={{ borderColor: accent.border }}
+              <div
+                className="px-4 py-2 bg-[#0e0820]/90 backdrop-blur-xl border shadow-xl"
+                style={{ borderColor: accent.border, boxShadow: `4px 4px 0 ${accent.dot}44` }}
               >
                 <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: accent.dot }}>
                   {item.subtitle}
@@ -217,8 +217,17 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                 className="grid grid-cols-3 gap-3 sm:gap-6"
               >
                 {displayService?.stats?.map((s: any, i: number) => (
-                  <div key={i} className="p-4 sm:p-6 border border-white/10 bg-black/20 backdrop-blur-md rounded-xl text-center relative overflow-hidden group">
-                    <div 
+                  <div
+                    key={i}
+                    className="p-4 sm:p-6 bg-black/20 backdrop-blur-md text-center relative overflow-hidden group transition-all duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5"
+                    style={{
+                      border: `2px solid ${accent.border}`,
+                      boxShadow: `4px 4px 0 ${accent.dot}44`,
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `6px 6px 0 ${accent.dot}66`; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `4px 4px 0 ${accent.dot}44`; }}
+                  >
+                    <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
                     />
@@ -239,9 +248,19 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                 <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold">What We Deliver</h4>
                 <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
                   {displayService?.whatWeDo?.map((item: string, i: number) => (
-                    <div key={i} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                      <div className="p-1 rounded-full bg-white/5 border border-white/10" style={{ color: accent.dot }}>
-                        <Check size={14} strokeWidth={3} />
+                    <div
+                      key={i}
+                      className="flex items-center gap-4 p-4 bg-white/5 border hover:bg-white/10 transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5"
+                      style={{
+                        borderColor: accent.border,
+                        boxShadow: `3px 3px 0 ${accent.dot}33`,
+                      }}
+                    >
+                      <div
+                        className="flex-shrink-0 w-6 h-6 flex items-center justify-center border"
+                        style={{ borderColor: accent.dot, color: accent.dot, boxShadow: `2px 2px 0 ${accent.dot}44` }}
+                      >
+                        <Check size={12} strokeWidth={3} />
                       </div>
                       <span className="text-sm sm:text-base text-white/90">{item}</span>
                     </div>
@@ -255,7 +274,8 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="p-6 border border-white/10 rounded-xl bg-white/5 text-center"
+                  className="p-6 bg-white/5 text-center"
+                  style={{ border: `2px solid ${accent.border}`, boxShadow: `4px 4px 0 ${accent.dot}44` }}
                 >
                    <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
                 </motion.div>
@@ -274,24 +294,20 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                  fontFamily: 'var(--font-stack-heading)',
                  fontSize: '0.7rem',
                  letterSpacing: '0.15em',
-                 border: '2px solid rgba(255,255,255,0.3)',
-                 color: 'rgba(255,255,255,0.7)',
+                 border: '2px solid #fbfbfc',
+                 color: '#fbfbfc',
                  background: 'transparent',
-                 boxShadow: '4px 4px 0 rgba(255,255,255,0.15)',
-                 transition: 'box-shadow 0.18s ease, transform 0.18s ease, color 0.18s ease, border-color 0.18s ease',
+                 boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+                 transition: 'box-shadow 0.18s ease, transform 0.18s ease',
                }}
                onMouseEnter={(e) => {
                  if (displayIndex === 0) return;
-                 e.currentTarget.style.boxShadow = '6px 6px 0 rgba(255,255,255,0.25)';
+                 e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
                  e.currentTarget.style.transform = 'translate(-2px, -2px)';
-                 e.currentTarget.style.color = '#fff';
-                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
                }}
                onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(255,255,255,0.15)';
+                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                  e.currentTarget.style.transform = 'translate(0, 0)';
-                 e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
-                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
                }}
              >
                <ArrowLeft size={16} /> <span className="hidden sm:inline">Prev</span>
@@ -321,24 +337,20 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                  fontFamily: 'var(--font-stack-heading)',
                  fontSize: '0.7rem',
                  letterSpacing: '0.15em',
-                 border: '2px solid rgba(255,255,255,0.3)',
-                 color: 'rgba(255,255,255,0.7)',
+                 border: '2px solid #fbfbfc',
+                 color: '#fbfbfc',
                  background: 'transparent',
-                 boxShadow: '4px 4px 0 rgba(255,255,255,0.15)',
-                 transition: 'box-shadow 0.18s ease, transform 0.18s ease, color 0.18s ease, border-color 0.18s ease',
+                 boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+                 transition: 'box-shadow 0.18s ease, transform 0.18s ease',
                }}
                onMouseEnter={(e) => {
                  if (displayIndex === PILLARS.length - 1) return;
-                 e.currentTarget.style.boxShadow = '6px 6px 0 rgba(255,255,255,0.25)';
+                 e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
                  e.currentTarget.style.transform = 'translate(-2px, -2px)';
-                 e.currentTarget.style.color = '#fff';
-                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
                }}
                onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(255,255,255,0.15)';
+                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                  e.currentTarget.style.transform = 'translate(0, 0)';
-                 e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
-                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
                }}
              >
                <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
@@ -379,13 +391,22 @@ export function EcosystemServices() {
       {/* Central Hub & Text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
         {/* Glowing core behind text */}
-        <div className="absolute w-64 h-64 md:w-96 md:h-96 bg-purple-600/20 rounded-full blur-[100px]" />
-        
+        <div
+          className="absolute w-64 h-64 md:w-96 md:h-96 rounded-full blur-[100px]"
+          style={{ background: 'rgba(164,108,252,0.18)' }}
+        />
+
         <div className="relative text-center">
-          <h1 className="text-5xl sm:text-7xl md:text-9xl font-bold text-white/10 uppercase tracking-tighter mb-4">
+          <h1
+            className="font-bold text-white/10 uppercase tracking-tighter mb-4"
+            style={{ fontSize: 'clamp(3rem, 12vw, 9rem)' }}
+          >
             Framework
           </h1>
-          <p className="text-purple-400 font-mono tracking-widest uppercase text-xs sm:text-sm">
+          <p
+            className="font-mono tracking-widest uppercase text-xs sm:text-sm"
+            style={{ color: 'var(--color-secondary, #a46cfc)' }}
+          >
             Three Pillars. One Ecosystem.
           </p>
         </div>
@@ -401,9 +422,9 @@ export function EcosystemServices() {
           onMouseLeave={() => setIsHoveringOrbit(false)}
         >
           {/* Faint Orbit Track */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-white/5 rounded-full pointer-events-none"
-            style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+            style={{ width: orbitRadius * 2, height: orbitRadius * 2, border: '1px solid rgba(164,108,252,0.12)' }}
           />
 
           <div
@@ -459,9 +480,13 @@ export function EcosystemServices() {
                 style={{ background: `linear-gradient(90deg, ${accent.light}, transparent)` }}
               />
               <div className="flex items-center gap-4 relative z-10">
-                <div 
-                  className="p-3 rounded-xl shadow-inner border border-white/10" 
-                  style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})` }}
+                <div
+                  className="p-3 border"
+                  style={{
+                    background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`,
+                    borderColor: accent.dot,
+                    boxShadow: `3px 3px 0 ${accent.dot}55`,
+                  }}
                 >
                   {p.icon}
                 </div>

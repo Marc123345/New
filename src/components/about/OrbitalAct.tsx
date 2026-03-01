@@ -62,7 +62,7 @@ function InteractiveNode({ node, mouseX, mouseY }: { node: any, mouseX: any, mou
   );
 }
 
-export default function CinematicUniverse() {
+export function OrbitalAct() {
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Track normalized mouse position (-0.5 to 0.5)

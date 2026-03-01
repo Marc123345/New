@@ -31,7 +31,7 @@ const SERVICES = [
       "Elevate your executives into thought leaders with strategic personal branding and content.",
     icon: Users,
     color: "#9B59F5",
-    bgColor: "#6F11F5", // Darkened for #fff contrast
+    bgColor: "#6F11F5",
     details: [],
   },
   {
@@ -43,7 +43,7 @@ const SERVICES = [
       "Turn your team into brand ambassadors with structured employee advocacy programs.",
     icon: TrendingUp,
     color: "#B181FC",
-    bgColor: "#8338EC", // Darkened for #fff contrast
+    bgColor: "#8338EC",
     details: [],
   },
   {
@@ -55,7 +55,7 @@ const SERVICES = [
       "Your website is often your first impression. We make sure it's the right one. Beautiful, high-converting websites with SEO built in from day one.",
     icon: Globe,
     color: "#6610E6",
-    bgColor: "#4A00D8", // Darkened for #fff contrast
+    bgColor: "#4A00D8",
     details: [
       "Strategic design & copywriting",
       "Responsive build (mobile-first)",
@@ -89,7 +89,7 @@ const SERVICES = [
       "When it comes to storytelling, words matter! We craft clear, engaging, and on-brand content that connects.",
     icon: Sparkles,
     color: "#C9A3FF",
-    bgColor: "#3A0CA3", // Darkened for #fff contrast
+    bgColor: "#3A0CA3",
     details: [
       "Social captions and campaigns",
       "Long-form blog and thought leadership",
@@ -111,7 +111,7 @@ export function ArcSlider() {
   const dragRef = useRef({ startX: 0, hasMoved: false, isDragging: false });
 
   const positionCards = useCallback((index: number, animate: boolean) => {
-    // Determine screen size for responsive spreading
+    // Determine screen size for responsive spreading so cards don't fall off mobile screens
     const isMobile = window.innerWidth < 768;
     const spreadStep1 = isMobile ? 240 : 360;
     const spreadStep2 = isMobile ? 420 : 580;
@@ -129,7 +129,7 @@ export function ArcSlider() {
       let translateZ: number;
       let scale: number;
       let opacity: number;
-      let zIndex: number;
+      let targetZIndex: number;
 
       if (absOffset === 0) {
         translateX = 0;
@@ -137,46 +137,48 @@ export function ArcSlider() {
         translateZ = 0;
         scale = 1;
         opacity = 1;
-        zIndex = 10;
+        targetZIndex = 10;
       } else if (absOffset === 1) {
-        translateX = offset * spreadStep1; 
+        translateX = offset * spreadStep1;
         rotateY = offset < 0 ? 30 : -30;
         translateZ = -120;
         scale = 0.82;
         opacity = 0.6;
-        zIndex = 5;
+        targetZIndex = 5;
       } else if (absOffset === 2) {
-        translateX = offset * spreadStep2; 
+        translateX = offset * spreadStep2;
         rotateY = offset < 0 ? 45 : -45;
         translateZ = -240;
         scale = 0.65;
         opacity = 0.25;
-        zIndex = 2;
+        targetZIndex = 2;
       } else {
-        translateX = offset * spreadStep3; 
+        translateX = offset * spreadStep3;
         rotateY = offset < 0 ? 55 : -55;
         translateZ = -350;
         scale = 0.5;
         opacity = 0;
-        zIndex = 1;
+        targetZIndex = 1;
       }
 
-      // Softer, deeper shadow
+      // Restore sharp shadow design
       const shadow = absOffset === 0
-        ? "0 24px 48px rgba(0,0,0,0.25), 0 8px 16px rgba(164,108,252,0.4)"
+        ? "10px 10px 0 rgba(164,108,252,0.6)"
         : "none";
 
       if (animate) {
+        // FIX: Set zIndex instantly to prevent cards from clipping through each other during transit
+        gsap.set(card, { zIndex: targetZIndex });
+        
         gsap.to(card, {
           x: translateX,
           rotateY: rotateY,
           z: translateZ,
           scale: scale,
           opacity: opacity,
-          zIndex: zIndex,
           boxShadow: shadow,
           duration: 0.7,
-          ease: "power3.out", // Slightly smoother ease
+          ease: "power3.out",
           overwrite: true,
         });
       } else {
@@ -186,7 +188,7 @@ export function ArcSlider() {
           z: translateZ,
           scale: scale,
           opacity: opacity,
-          zIndex: zIndex,
+          zIndex: targetZIndex,
           boxShadow: shadow,
         });
       }
@@ -207,8 +209,6 @@ export function ArcSlider() {
 
   useEffect(() => {
     positionCards(0, false);
-
-    // Recalculate on window resize to fix mobile/desktop breakpoints
     const handleResize = () => positionCards(activeIndexRef.current, false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -305,6 +305,7 @@ export function ArcSlider() {
           </h2>
         </div>
 
+        {/* Top Tab Bar Navigation */}
         <div
           ref={tabBarRef}
           className="relative z-30 flex gap-2 justify-start md:justify-center px-6 mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
@@ -321,7 +322,7 @@ export function ArcSlider() {
               role="tab"
               aria-selected={i === activeIndex}
               onClick={() => navigateTo(i)}
-              className="flex-shrink-0 transition-all duration-300 font-semibold rounded-full"
+              className="flex-shrink-0 transition-all duration-300 font-semibold"
               style={{
                 fontFamily: "var(--font-stack-heading)",
                 fontSize: "0.75rem",
@@ -330,6 +331,7 @@ export function ArcSlider() {
                 padding: "10px 24px",
                 whiteSpace: "nowrap",
                 border: "2px solid var(--color-secondary, #9B59F5)",
+                borderRadius: "0", // Restored sharp edges
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
@@ -347,11 +349,12 @@ export function ArcSlider() {
           ))}
         </div>
 
+        {/* 3D Carousel Container */}
         <div
           ref={containerRef}
           className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            height: "clamp(440px, 60vw, 560px)", // Slightly shortened max-height for better aspect ratio fitting
+            height: "clamp(440px, 60vw, 560px)",
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
             touchAction: "pan-y",
@@ -376,17 +379,17 @@ export function ArcSlider() {
                     aspectRatio: "3 / 4",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
-                    borderRadius: "16px", // Added modern border-radius to the parent wrapper
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8 rounded-2xl transition-colors duration-500"
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8 transition-colors duration-500"
                     style={{
                       backgroundColor: service.bgColor,
-                      border: "1px solid rgba(255,255,255,0.15)", // Softened the border slightly
+                      border: "2px solid rgba(255,255,255,0.12)", // Restored sharp edges and border
+                      borderRadius: "0", 
                     }}
                   >
-                    {/* Top Section */}
+                    {/* Card Top Section: Category & Icon */}
                     <div className="flex justify-between items-start">
                       <div>
                         <span
@@ -417,12 +420,12 @@ export function ArcSlider() {
                       </div>
                     </div>
 
-                    {/* Bottom Section */}
-                    <div className="flex flex-col gap-5">
+                    {/* Card Bottom Section: Title & Button (Paragraph removed) */}
+                    <div className="flex flex-col gap-6">
                       <h3
-                        className="tracking-tight leading-[1.1] font-bold"
+                        className="tracking-tight leading-[1] font-bold"
                         style={{
-                          fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
+                          fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
                           margin: 0,
@@ -431,19 +434,6 @@ export function ArcSlider() {
                         {service.fullTitle}
                       </h3>
 
-                      <p
-                        className="line-clamp-3 opacity-80"
-                        style={{
-                          fontSize: "0.9rem",
-                          lineHeight: 1.6,
-                          fontFamily: "var(--font-stack-body)",
-                          color: "#fff",
-                          margin: 0,
-                        }}
-                      >
-                        {service.description}
-                      </p>
-
                       <div className="mt-2">
                         <button
                           onClick={(e) => {
@@ -451,26 +441,25 @@ export function ArcSlider() {
                             e.stopPropagation();
                             setOverlayService(service);
                           }}
-                          className="group inline-flex items-center gap-3 transition-all duration-300 rounded-full"
+                          className="group inline-flex items-center gap-3 transition-all duration-300"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             fontSize: "0.75rem",
                             letterSpacing: "0.15em",
                             textTransform: "uppercase",
                             color: "#fff",
-                            background: "rgba(255,255,255,0.1)",
-                            border: "1px solid rgba(255,255,255,0.2)",
-                            padding: "10px 24px",
+                            background: "rgba(255,255,255,0.08)",
+                            border: "1px solid rgba(255,255,255,0.25)",
+                            borderRadius: "0", // Restored sharp button edge
+                            padding: "12px 24px",
                             cursor: "pointer",
                             pointerEvents: "auto",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.2)";
-                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
                           }}
                         >
                           Discover
@@ -487,17 +476,18 @@ export function ArcSlider() {
           </div>
         </div>
 
-        {/* Pagination Dots */}
+        {/* Bottom Pagination Dots */}
         <div className="relative z-20 flex gap-2 justify-center mt-6 md:mt-10">
           {SERVICES.map((_, i) => (
             <button
               key={i}
               onClick={() => navigateTo(i)}
-              className="transition-all duration-300 rounded-full"
+              className="transition-all duration-300"
               aria-label={`Go to service ${i + 1}`}
               style={{
                 width: i === activeIndex ? 32 : 8,
-                height: 8,
+                height: 4, // Restored sharp, flat line height
+                borderRadius: "0", // Removed rounding
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "rgba(155, 89, 245, 0.2)",

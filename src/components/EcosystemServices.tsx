@@ -269,11 +269,34 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                type="button"
                disabled={displayIndex === 0}
                onClick={() => onNavigate(displayIndex - 1)}
-               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2 cursor-pointer transition-colors"
+               className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase"
+               style={{
+                 fontFamily: 'var(--font-stack-heading)',
+                 fontSize: '0.7rem',
+                 letterSpacing: '0.15em',
+                 border: '2px solid rgba(255,255,255,0.3)',
+                 color: 'rgba(255,255,255,0.7)',
+                 background: 'transparent',
+                 boxShadow: '4px 4px 0 rgba(255,255,255,0.15)',
+                 transition: 'box-shadow 0.18s ease, transform 0.18s ease, color 0.18s ease, border-color 0.18s ease',
+               }}
+               onMouseEnter={(e) => {
+                 if (displayIndex === 0) return;
+                 e.currentTarget.style.boxShadow = '6px 6px 0 rgba(255,255,255,0.25)';
+                 e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                 e.currentTarget.style.color = '#fff';
+                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
+               }}
+               onMouseLeave={(e) => {
+                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(255,255,255,0.15)';
+                 e.currentTarget.style.transform = 'translate(0, 0)';
+                 e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+               }}
              >
-               <ArrowLeft size={20} /> <span className="hidden sm:inline font-medium uppercase tracking-widest text-xs">Prev</span>
+               <ArrowLeft size={16} /> <span className="hidden sm:inline">Prev</span>
              </button>
-             
+
              <div className="flex gap-3">
                 {PILLARS.map((_, i) => (
                   <button
@@ -293,9 +316,32 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                type="button"
                disabled={displayIndex === PILLARS.length - 1}
                onClick={() => onNavigate(displayIndex + 1)}
-               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2 cursor-pointer transition-colors"
+               className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase"
+               style={{
+                 fontFamily: 'var(--font-stack-heading)',
+                 fontSize: '0.7rem',
+                 letterSpacing: '0.15em',
+                 border: '2px solid rgba(255,255,255,0.3)',
+                 color: 'rgba(255,255,255,0.7)',
+                 background: 'transparent',
+                 boxShadow: '4px 4px 0 rgba(255,255,255,0.15)',
+                 transition: 'box-shadow 0.18s ease, transform 0.18s ease, color 0.18s ease, border-color 0.18s ease',
+               }}
+               onMouseEnter={(e) => {
+                 if (displayIndex === PILLARS.length - 1) return;
+                 e.currentTarget.style.boxShadow = '6px 6px 0 rgba(255,255,255,0.25)';
+                 e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                 e.currentTarget.style.color = '#fff';
+                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)';
+               }}
+               onMouseLeave={(e) => {
+                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(255,255,255,0.15)';
+                 e.currentTarget.style.transform = 'translate(0, 0)';
+                 e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+               }}
              >
-               <span className="hidden sm:inline font-medium uppercase tracking-widest text-xs">Next</span> <ArrowRight size={20} />
+               <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
              </button>
           </div>
         </motion.div>
@@ -388,11 +434,25 @@ export function EcosystemServices() {
         {PILLARS.map((p, i) => {
           const accent = PILLAR_ACCENTS[i];
           return (
-            <button 
-              key={i} 
+            <button
+              key={i}
               onClick={() => setSelectedService(i)}
-              className="group w-full p-5 bg-white/5 backdrop-blur-sm border rounded-2xl flex items-center justify-between text-white active:scale-95 transition-all duration-300 overflow-hidden relative"
-              style={{ borderColor: accent.border }}
+              className="group w-full p-5 bg-white/5 backdrop-blur-sm border flex items-center justify-between text-white overflow-hidden relative"
+              style={{
+                borderColor: accent.border,
+                borderWidth: '2px',
+                borderRadius: 0,
+                boxShadow: `4px 4px 0 ${accent.dot}55`,
+                transition: 'box-shadow 0.18s ease, transform 0.18s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = `6px 6px 0 ${accent.dot}88`;
+                e.currentTarget.style.transform = 'translate(-2px, -2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = `4px 4px 0 ${accent.dot}55`;
+                e.currentTarget.style.transform = 'translate(0, 0)';
+              }}
             >
               <div 
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"

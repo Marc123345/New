@@ -9,7 +9,7 @@ import {
 } from 'framer-motion';
 
 const VIDEOS = [
-  'https://ik.imagekit.io/qcvroy8xpd/astronaut-discussing-with-colleague-conducting-sci-2026-01-22-07-18-24-utc.mp4',
+  'https://ik.imagekit.io/qcvroy8xpd/MASK_SH_01.mp4',
   'https://ik.imagekit.io/qcvroy8xpd/two-astronauts-wearing-space-suits-work-on-a-lapto-2026-01-20-12-26-32-utc.mp4',
 ];
 

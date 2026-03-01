@@ -1,185 +1,70 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import * as THREE from "three";
 import { H2HLogo } from "./H2HLogo";
 
 const VIDEO_URL =
   "https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful%20(1).mp4?updatedAt=1771264402365";
 
-function LoaderPhone() {
-  const mountRef = useRef<HTMLDivElement>(null);
+function PhoneSVG() {
+  return (
+    <svg
+      viewBox="0 0 120 220"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ width: "100%", height: "100%" }}
+    >
+      <defs>
+        <linearGradient id="phoneBody" x1="0" y1="0" x2="120" y2="220" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#1a1a2e" />
+          <stop offset="100%" stopColor="#0d0d1a" />
+        </linearGradient>
+        <linearGradient id="screen" x1="10" y1="20" x2="110" y2="200" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0a0618" />
+          <stop offset="50%" stopColor="#110d24" />
+          <stop offset="100%" stopColor="#0a0618" />
+        </linearGradient>
+        <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="white" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id="glow" cx="50%" cy="45%" r="35%">
+          <stop offset="0%" stopColor="#a46cfc" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#a46cfc" stopOpacity="0" />
+        </radialGradient>
+        <filter id="shadow" x="-20%" y="-10%" width="140%" height="120%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#a46cfc" floodOpacity="0.3" />
+        </filter>
+      </defs>
 
-  useEffect(() => {
-    const el = mountRef.current;
-    if (!el) return;
+      <rect x="4" y="2" width="112" height="216" rx="18" fill="url(#phoneBody)" filter="url(#shadow)" />
+      <rect x="4" y="2" width="112" height="216" rx="18" fill="url(#gloss)" />
 
-    const w = el.clientWidth;
-    const h = el.clientHeight;
+      <rect x="8" y="6" width="104" height="208" rx="15" fill="url(#screen)" />
+      <rect x="8" y="6" width="104" height="208" rx="15" fill="url(#glow)" />
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(w, h);
-    el.appendChild(renderer.domElement);
+      <rect x="38" y="10" width="44" height="6" rx="3" fill="#0d0d1a" />
+      <circle cx="88" cy="13" r="2.5" fill="#1a1a2e" />
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
-    camera.position.set(0, 0, 5.5);
+      <rect x="20" y="185" width="80" height="4" rx="2" fill="#2a2a3e" />
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambient);
-    const key = new THREE.DirectionalLight(0xffffff, 1.4);
-    key.position.set(3, 5, 4);
-    scene.add(key);
-    const fill = new THREE.DirectionalLight(0x88ccff, 0.5);
-    fill.position.set(-3, -2, 3);
-    scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xffd0a0, 0.4);
-    rim.position.set(0, -4, -3);
-    scene.add(rim);
+      <rect x="0" y="60" width="4" height="24" rx="2" fill="#1e1e30" />
+      <rect x="0" y="90" width="4" height="24" rx="2" fill="#1e1e30" />
+      <rect x="116" y="75" width="4" height="32" rx="2" fill="#1e1e30" />
 
-    const phone = new THREE.Group();
-    scene.add(phone);
+      <circle cx="60" cy="85" r="22" fill="#a46cfc" fillOpacity="0.1" />
+      <circle cx="60" cy="85" r="14" fill="#a46cfc" fillOpacity="0.15" />
 
-    const bodyGeo = new THREE.BoxGeometry(1.4, 2.8, 0.14);
-    const bodyMat = new THREE.MeshPhysicalMaterial({
-      color: 0x111111,
-      metalness: 0.6,
-      roughness: 0.2,
-      clearcoat: 0.8,
-      clearcoatRoughness: 0.1,
-    });
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    phone.add(body);
+      <text x="60" y="128" textAnchor="middle" fill="#a46cfc" fontSize="8" fontFamily="Arial" fontWeight="bold" fillOpacity="0.9">H2H DIGITAL</text>
+      <text x="60" y="140" textAnchor="middle" fill="white" fontSize="5.5" fontFamily="Arial" fillOpacity="0.4">Human to Human</text>
 
-    const screenGeo = new THREE.PlaneGeometry(1.15, 2.45);
-    const screenCanvas = document.createElement("canvas");
-    screenCanvas.width = 256;
-    screenCanvas.height = 512;
-    const ctx = screenCanvas.getContext("2d")!;
-    const grad = ctx.createLinearGradient(0, 0, 256, 512);
-    grad.addColorStop(0, "#060412");
-    grad.addColorStop(0.5, "#0d0820");
-    grad.addColorStop(1, "#060412");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 256, 512);
-    ctx.fillStyle = "rgba(164,108,252,0.15)";
-    ctx.beginPath();
-    ctx.arc(128, 160, 70, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "rgba(164,108,252,0.6)";
-    ctx.font = "bold 16px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("H2H DIGITAL", 128, 210);
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
-    ctx.font = "11px Arial";
-    ctx.fillText("Human to Human", 128, 230);
-    const screenTex = new THREE.CanvasTexture(screenCanvas);
-    const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
-    const screen = new THREE.Mesh(screenGeo, screenMat);
-    screen.position.z = 0.075;
-    phone.add(screen);
+      <rect x="20" y="152" width="80" height="18" rx="4" fill="#a46cfc" fillOpacity="0.12" />
+      <text x="60" y="164" textAnchor="middle" fill="#c084fc" fontSize="6" fontFamily="Arial" fillOpacity="0.7">Get in Touch</text>
 
-    const notchGeo = new THREE.BoxGeometry(0.35, 0.07, 0.02);
-    const notchMat = new THREE.MeshPhysicalMaterial({ color: 0x050505, metalness: 0.5, roughness: 0.3 });
-    const notch = new THREE.Mesh(notchGeo, notchMat);
-    notch.position.set(0, 1.34, 0.075);
-    phone.add(notch);
-
-    const homeGeo = new THREE.BoxGeometry(0.4, 0.04, 0.01);
-    const homeIndicator = new THREE.Mesh(homeGeo, new THREE.MeshPhysicalMaterial({ color: 0x555555, metalness: 0.3, roughness: 0.5 }));
-    homeIndicator.position.set(0, -1.3, 0.076);
-    phone.add(homeIndicator);
-
-    const btnMat = new THREE.MeshPhysicalMaterial({ color: 0x222222, metalness: 0.7, roughness: 0.2 });
-    const volUpGeo = new THREE.BoxGeometry(0.04, 0.3, 0.08);
-    const volUp = new THREE.Mesh(volUpGeo, btnMat);
-    volUp.position.set(-0.72, 0.6, 0);
-    phone.add(volUp);
-    const volDn = volUp.clone();
-    volDn.position.set(-0.72, 0.2, 0);
-    phone.add(volDn);
-    const pwrGeo = new THREE.BoxGeometry(0.04, 0.4, 0.1);
-    const pwr = new THREE.Mesh(pwrGeo, btnMat);
-    pwr.position.set(0.72, 0.3, 0);
-    phone.add(pwr);
-
-    const rings: THREE.Mesh[] = [];
-    for (let i = 0; i < 3; i++) {
-      const rGeo = new THREE.TorusGeometry(0.3 + i * 0.25, 0.015, 8, 40);
-      const rMat = new THREE.MeshBasicMaterial({
-        color: new THREE.Color().setHSL(0.75 + i * 0.03, 0.9, 0.65),
-        transparent: true,
-        opacity: 0.6 - i * 0.15,
-      });
-      const ring = new THREE.Mesh(rGeo, rMat);
-      ring.position.set(0.8, 1.2, 0.3);
-      ring.rotation.x = Math.PI / 4;
-      scene.add(ring);
-      rings.push(ring);
-    }
-
-    const dots: THREE.Mesh[] = [];
-    const dotColors = [0xa46cfc, 0xc084fc, 0x7c3aed];
-    dotColors.forEach((c, i) => {
-      const dGeo = new THREE.SphereGeometry(0.06, 12, 12);
-      const dMat = new THREE.MeshPhysicalMaterial({ color: c, emissive: c, emissiveIntensity: 0.8, metalness: 0.3, roughness: 0.3 });
-      const dot = new THREE.Mesh(dGeo, dMat);
-      dot.position.set(-0.55 + i * 0.55, -0.9, 0.12);
-      phone.add(dot);
-      dots.push(dot);
-    });
-
-    let t = 0;
-    const clock = new THREE.Clock();
-
-    function animate() {
-      const raf = requestAnimationFrame(animate);
-      const dt = clock.getDelta();
-      t += dt;
-
-      phone.rotation.y = Math.sin(t * 0.8) * 0.35;
-      phone.rotation.x = Math.sin(t * 0.5) * 0.12;
-      phone.rotation.z = Math.sin(t * 0.6) * 0.08;
-      phone.position.y = Math.sin(t * 1.2) * 0.15;
-      phone.position.x = Math.sin(t * 0.7) * 0.08;
-
-      rings.forEach((r, i) => {
-        const scale = 1 + Math.sin(t * 2 + i * 0.8) * 0.3;
-        r.scale.setScalar(scale);
-        (r.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.5 - i * 0.1 + Math.sin(t * 2 + i) * 0.2);
-        r.rotation.z = t * 0.5 + i * Math.PI / 3;
-      });
-
-      dots.forEach((d, i) => {
-        d.position.y = -0.9 + Math.sin(t * 2 + i * 1.2) * 0.05;
-        (d.material as THREE.MeshPhysicalMaterial).emissiveIntensity = 0.6 + Math.sin(t * 3 + i) * 0.4;
-      });
-
-      renderer.render(scene, camera);
-      return raf;
-    }
-
-    const rafId = animate();
-
-    const handleResize = () => {
-      if (!el) return;
-      const nw = el.clientWidth;
-      const nh = el.clientHeight;
-      camera.aspect = nw / nh;
-      camera.updateProjectionMatrix();
-      renderer.setSize(nw, nh);
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", handleResize);
-      renderer.dispose();
-      if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
-    };
-  }, []);
-
-  return <div ref={mountRef} style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }} />;
+      <circle cx="38" cy="175" r="3" fill="#a46cfc" fillOpacity="0.6" />
+      <circle cx="60" cy="175" r="3" fill="#c084fc" fillOpacity="0.6" />
+      <circle cx="82" cy="175" r="3" fill="#7c3aed" fillOpacity="0.6" />
+    </svg>
+  );
 }
 
 interface PageLoaderProps {
@@ -256,12 +141,15 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
 
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="relative"
-              style={{ width: 160, height: 280 }}
+              animate={{ opacity: 1, scale: 1, y: [0, -10, 0] }}
+              transition={{
+                opacity: { duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] },
+                scale: { duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] },
+                y: { duration: 3, delay: 0.9, repeat: Infinity, ease: "easeInOut" },
+              }}
+              style={{ width: 130, height: 240 }}
             >
-              <LoaderPhone />
+              <PhoneSVG />
             </motion.div>
 
             <motion.div

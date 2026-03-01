@@ -244,7 +244,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: { pillarIndex: numb
             style={{ WebkitOverflowScrolling: 'touch', paddingBottom: '100px' }}
             onScroll={handleScroll}
           >
-            <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 md:pt-24 pb-12">
+            <div className="max-w-3xl mx-auto px-4 sm:px-8 pt-16 md:pt-24 pb-12">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={pillarIndex}
@@ -329,18 +329,18 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: { pillarIndex: numb
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.32 + i * 0.07 }}
-                        className="flex flex-col items-center justify-center py-5 px-3 sm:py-7 text-center"
+                        className="flex flex-col items-center justify-center py-4 px-1.5 sm:py-7 sm:px-3 text-center"
                         style={{ background: 'rgba(4,4,8,0.9)' }}
                       >
                         <div
-                          className="font-extrabold leading-none tracking-[-0.03em] mb-1.5"
-                          style={{ fontSize: 'clamp(1.2rem, 4vw, 2rem)', color: accent.dot, fontFamily: 'var(--font-stack-heading)' }}
+                          className="font-extrabold leading-none tracking-[-0.03em] mb-1"
+                          style={{ fontSize: 'clamp(0.95rem, 5.5vw, 2rem)', color: accent.dot, fontFamily: 'var(--font-stack-heading)' }}
                         >
                           {stat.value}
                         </div>
                         <div
-                          className="text-[10px] sm:text-[11px] leading-[1.4] tracking-[0.05em] uppercase"
-                          style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-stack-body)' }}
+                          className="text-[9px] sm:text-[11px] leading-[1.4] tracking-[0.03em] uppercase"
+                          style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-stack-body)', wordBreak: 'break-word' }}
                         >
                           {stat.label}
                         </div>

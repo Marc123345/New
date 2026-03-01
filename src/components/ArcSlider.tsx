@@ -21,6 +21,7 @@ const SERVICES = [
     icon: Globe,
     color: "#7B2FF2",
     bgColor: "#5A05E6",
+    image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [],
   },
   {
@@ -33,6 +34,7 @@ const SERVICES = [
     icon: Users,
     color: "#9B59F5",
     bgColor: "#6F11F5",
+    image: "https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [],
   },
   {
@@ -45,6 +47,7 @@ const SERVICES = [
     icon: TrendingUp,
     color: "#B181FC",
     bgColor: "#8338EC",
+    image: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [],
   },
   {
@@ -57,6 +60,7 @@ const SERVICES = [
     icon: Globe,
     color: "#6610E6",
     bgColor: "#4A00D8",
+    image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Strategic design & copywriting",
       "Responsive build (mobile-first)",
@@ -74,6 +78,7 @@ const SERVICES = [
     icon: Target,
     color: "#e8e2ff",
     bgColor: "#1a1535",
+    image: "https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Paid strategy & audience targeting",
       "Ad copy and creative production",
@@ -91,6 +96,7 @@ const SERVICES = [
     icon: Sparkles,
     color: "#C9A3FF",
     bgColor: "#3A0CA3",
+    image: "https://images.pexels.com/photos/3182781/pexels-photo-3182781.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Social captions and campaigns",
       "Long-form blog and thought leadership",
@@ -198,6 +204,36 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
             onScroll={handleScroll}
           >
             <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 md:pt-24 pb-12 space-y-8 sm:space-y-10">
+              {service.image && (
+                <motion.div
+                  key={`img-${service.id}`}
+                  initial={{ opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="relative w-full overflow-hidden"
+                  style={{
+                    height: 'clamp(200px, 35vw, 340px)',
+                    border: `2px solid ${service.color}55`,
+                    boxShadow: `6px 6px 0 ${service.color}44`,
+                  }}
+                >
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: `linear-gradient(to top, rgba(4,4,8,0.95) 0%, transparent 55%, ${service.bgColor}55 100%)` }}
+                  />
+                  <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs" style={{ color: service.color }}>
+                    <span className="h-px w-8 inline-block" style={{ backgroundColor: service.color }} />
+                    {service.category}
+                  </div>
+                </motion.div>
+              )}
+
               <div>
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}

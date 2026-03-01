@@ -218,7 +218,7 @@ const ChapterSlide = ({
   );
 };
 
-export function HeroStory() {
+export function StorySection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState(0);
 

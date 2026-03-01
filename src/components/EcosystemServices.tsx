@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom'; // 1. Added Portal import
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Users, Megaphone, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
@@ -100,40 +100,37 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
 function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const activeService = pillarIndex !== null ? PILLARS[pillarIndex] : null;
+  
+  // NEW: Cache the active service to prevent crashes during exit animation
+  const [displayService, setDisplayService] = useState<any>(null);
 
-  // 2. Ensure we only render the portal on the client to avoid hydration errors
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Prevent background scroll when open
   useEffect(() => {
     if (pillarIndex !== null) {
+      setDisplayService(PILLARS[pillarIndex]);
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
     
-    // Safety cleanup
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [pillarIndex]);
 
-  // If not mounted on client yet, render nothing
   if (!mounted) return null;
 
-  // 3. Render at the document body level
   return createPortal(
     <AnimatePresence>
-      {pillarIndex !== null && activeService && (
+      {pillarIndex !== null && displayService && (
         <motion.div
           key="overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          // Bumped z-index to 9999 to guarantee it sits above external site navs
           className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh]"
         >
           {/* Close Button */}
@@ -158,19 +155,19 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
               >
                 <div className="flex items-center gap-4 text-purple-400 font-mono tracking-tighter">
                   <span className="h-px w-8 bg-purple-500" />
-                  {activeService.subtitle}
+                  {displayService?.subtitle}
                 </div>
                 <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white uppercase tracking-tighter">
-                  {activeService.title}
+                  {displayService?.title}
                 </h2>
                 <p className="text-xl text-white/60 leading-relaxed">
-                  {activeService.description}
+                  {displayService?.description}
                 </p>
               </motion.div>
 
               {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                {activeService.stats.map((s: any, i: number) => (
+                {displayService?.stats?.map((s: any, i: number) => (
                   <div key={i} className="p-3 sm:p-6 border border-white/10 bg-white/5 rounded-lg text-center">
                     <div className="text-lg sm:text-2xl font-bold text-purple-400 leading-tight">{s.value}</div>
                     <div className="text-[9px] sm:text-[10px] uppercase text-white/40 mt-1">{s.label}</div>
@@ -182,7 +179,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
               <div className="space-y-4">
                 <h4 className="text-xs uppercase tracking-widest text-white/30">What We Deliver</h4>
                 <div className="grid md:grid-cols-2 gap-3">
-                  {activeService.whatWeDo.map((item: string, i: number) => (
+                  {displayService?.whatWeDo?.map((item: string, i: number) => (
                     <div key={i} className="flex items-center gap-3 p-4 bg-white/5 border border-white/5 rounded">
                       <Check size={16} className="text-purple-500 flex-shrink-0" />
                       <span className="text-sm text-white/80">{item}</span>
@@ -193,7 +190,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
             </div>
           </div>
 
-          {/* Navigation Footer - 4. Added "relative z-20" here! */}
+          {/* Navigation Footer */}
           <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-black/80 backdrop-blur-md flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
              <button
                disabled={pillarIndex === 0}
@@ -221,7 +218,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body // Portal target
+    document.body
   );
 }
 
@@ -310,9 +307,6 @@ export function EcosystemServices() {
         ))}
       </div>
 
-      {/* The overlay component is still placed here, but the Portal inside it 
-        will teleport the actual visual elements to document.body 
-      */}
       <PillarOverlay
         pillarIndex={selectedService}
         onClose={() => setSelectedService(null)}

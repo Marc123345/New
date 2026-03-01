@@ -25,12 +25,14 @@ export function Navigation() {
   const navigate = useNavigate();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Handle Header Background on Scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Handle Body Lock for Mobile Menu
   useEffect(() => {
     if (isOpen) {
       const scrollY = window.scrollY;
@@ -74,8 +76,9 @@ export function Navigation() {
     <>
       <div className="h-20 md:h-24 w-full" />
 
+      {/* --- HEADER --- */}
       <header
-        className="fixed top-0 left-0 w-full z-[100] py-6 transition-all duration-500"
+        className="fixed top-0 left-0 w-full z-[100] py-4 md:py-6 transition-all duration-500"
         style={{
           backgroundColor: scrolled ? "var(--color-background-light)" : "transparent",
           borderBottom: scrolled ? "1px solid var(--color-text-dark)" : "1px solid transparent",
@@ -89,7 +92,8 @@ export function Navigation() {
             onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
             className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           >
-            <H2HLogo height={56} className="transition-all duration-300" />
+            {/* Slightly smaller logo on mobile for better fit */}
+            <H2HLogo className="h-10 md:h-14 w-auto transition-all duration-300" />
           </a>
 
           <button
@@ -99,7 +103,7 @@ export function Navigation() {
             className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
-          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
+            style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
           >
             <span
               className="hidden sm:block text-[10px] uppercase tracking-[0.3em] font-medium transition-colors duration-500"
@@ -110,7 +114,7 @@ export function Navigation() {
             >
               Menu
             </span>
-            <div className="flex flex-col gap-[5px] w-6">
+            <div className="flex flex-col gap-[5px] w-6 md:w-8">
               <span className="block h-[1.5px] w-full transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
               <span className="block h-[1.5px] w-3/4 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
               <span className="block h-[1.5px] w-1/2 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
@@ -119,56 +123,61 @@ export function Navigation() {
         </div>
       </header>
 
-      {/* Fullscreen overlay */}
+      {/* --- FULLSCREEN OVERLAY --- */}
       <div
-        className={`fixed inset-0 z-[110] transition-opacity duration-700 ${
+        className={`fixed top-0 left-0 w-full z-[110] transition-opacity duration-700 flex flex-col ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
-        style={{ backgroundColor: "#0c0c0c" }}
+        style={{ 
+          height: "100dvh", // Crucial for mobile browser address bars
+          backgroundColor: "#0c0c0c",
+        }}
       >
 
         {/* Accent gradient blob */}
         <div
           className="absolute pointer-events-none"
           style={{
-            top: "-20%",
-            right: "-10%",
-            width: "60vw",
-            height: "60vw",
-            background: "radial-gradient(circle, rgba(180,140,80,0.07) 0%, transparent 70%)",
+            top: "-10%",
+            right: "-20%",
+            width: "80vw",
+            height: "80vw",
+            maxWidth: "600px",
+            maxHeight: "600px",
+            background: "radial-gradient(circle, rgba(180,140,80,0.08) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
         />
 
-        {/* Close button */}
+        {/* Close button - visually aligned with header */}
         <button
           onClick={() => setIsOpen(false)}
           onTouchEnd={(e) => { e.preventDefault(); setIsOpen(false); }}
-          className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
-          style={{ minWidth: 56, minHeight: 56, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
+          className="absolute top-4 right-4 md:top-6 md:right-10 z-[120] group flex items-center justify-center gap-3 text-white/50 hover:text-white transition-colors duration-300 p-2"
+          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
           aria-label="Close menu"
         >
           <span
-            className="text-[10px] uppercase tracking-[0.3em]"
+            className="hidden sm:block text-[10px] uppercase tracking-[0.3em]"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             Close
           </span>
-          <div className="relative w-5 h-5">
+          <div className="relative w-6 h-6 md:w-5 md:h-5">
             <span className="absolute inset-0 flex items-center justify-center">
-              <span className="absolute h-[1px] w-full bg-current rotate-45 transition-transform duration-300 group-hover:rotate-[135deg]" />
-              <span className="absolute h-[1px] w-full bg-current -rotate-45 transition-transform duration-300 group-hover:rotate-[45deg]" />
+              <span className="absolute h-[1.5px] w-full bg-current rotate-45 transition-transform duration-300 group-hover:rotate-[135deg]" />
+              <span className="absolute h-[1.5px] w-full bg-current -rotate-45 transition-transform duration-300 group-hover:rotate-[45deg]" />
             </span>
           </div>
         </button>
 
-
-        {/* Main content grid */}
-        <div className="absolute inset-0 flex flex-col lg:flex-row">
-          {/* Left: Nav links (60%) */}
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-28 lg:pt-0">
+        {/* Main content layout */}
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden pt-20 md:pt-0">
+          
+          {/* Left: Nav links (Scrollable on small screens) */}
+          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-24 overflow-y-auto pb-10 custom-scrollbar">
             <nav
-              className="flex flex-col"
+              className="flex flex-col w-full max-w-2xl mx-auto lg:mx-0 pt-4"
               onMouseLeave={() => setActiveIndex(null)}
             >
               {NAV_LINKS.map((link, i) => (
@@ -177,7 +186,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setActiveIndex(i)}
-                  className="group relative flex items-center py-3 md:py-4 border-b border-white/[0.06] overflow-hidden"
+                  className="group relative flex items-center py-4 md:py-5 border-b border-white/[0.06] overflow-hidden"
                   style={{
                     transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
                     transitionDelay: mounted ? `${i * 60}ms` : "0ms",
@@ -193,15 +202,15 @@ export function Navigation() {
 
                   {/* Number */}
                   <span
-                    className="relative z-10 w-10 text-xs text-white/20 mr-6 transition-colors duration-300 group-hover:text-white/40"
+                    className="relative z-10 w-8 md:w-12 text-[10px] md:text-xs text-white/20 mr-2 md:mr-6 transition-colors duration-300 group-hover:text-white/40"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
                   >
                     {link.id}
                   </span>
 
-                  {/* Label */}
+                  {/* Label - Scaled heavily for mobile */}
                   <span
-                    className="relative z-10 flex-1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
+                    className="relative z-10 flex-1 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter uppercase whitespace-nowrap"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex !== null && activeIndex !== i ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.9)",
@@ -211,9 +220,9 @@ export function Navigation() {
                     {link.label}
                   </span>
 
-                  {/* Sub label */}
+                  {/* Sub label - Hidden on tiny screens */}
                   <span
-                    className="relative z-10 hidden md:block text-xs tracking-widest uppercase text-white/30 transition-all duration-300 group-hover:text-white/60 group-hover:translate-x-1"
+                    className="relative z-10 hidden sm:block text-[10px] md:text-xs tracking-widest uppercase text-white/30 transition-all duration-300 group-hover:text-white/60 group-hover:translate-x-1 ml-4"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
                   >
                     {link.sub}
@@ -232,9 +241,38 @@ export function Navigation() {
                 </a>
               ))}
             </nav>
+            
+            {/* Mobile-only social links block */}
+            <div 
+              className="mt-12 lg:hidden flex flex-col gap-6"
+              style={{
+                transition: "opacity 0.8s ease",
+                transitionDelay: mounted ? "400ms" : "0ms",
+                opacity: mounted ? 1 : 0,
+              }}
+            >
+               <p
+                  className="text-[10px] uppercase tracking-[0.4em] text-white/20"
+                  style={{ fontFamily: "var(--font-stack-heading)" }}
+                >
+                  Follow us
+                </p>
+                <div className="flex gap-6">
+                  {SOCIAL.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      className="text-[11px] uppercase tracking-widest text-white/60 hover:text-white transition-colors duration-300"
+                      style={{ fontFamily: "var(--font-stack-heading)" }}
+                    >
+                      {s.label}
+                    </a>
+                  ))}
+                </div>
+            </div>
           </div>
 
-          {/* Right panel: info (40%) — desktop only */}
+          {/* Right panel: info (Desktop only) */}
           <div
             className="hidden lg:flex lg:w-[40%] flex-col justify-between py-24 px-16 border-l border-white/[0.06]"
             style={{
@@ -305,9 +343,9 @@ export function Navigation() {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* --- BOTTOM FOOTER --- */}
         <div
-          className="absolute bottom-0 left-0 right-0 px-8 md:px-16 py-5 flex items-center justify-between border-t border-white/[0.06]"
+          className="shrink-0 px-6 sm:px-12 md:px-16 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-white/[0.06] gap-4 sm:gap-0"
           style={{
             transition: "opacity 0.8s ease",
             transitionDelay: mounted ? "350ms" : "0ms",
@@ -315,25 +353,13 @@ export function Navigation() {
           }}
         >
           <p
-            className="text-[10px] uppercase tracking-[0.4em] text-white/20"
+            className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-white/20"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             &copy; {new Date().getFullYear()} H2H Digital
           </p>
-          <div className="flex lg:hidden gap-5">
-            {SOCIAL.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white/70 transition-colors duration-300"
-                style={{ fontFamily: "var(--font-stack-heading)" }}
-              >
-                {s.label}
-              </a>
-            ))}
-          </div>
           <p
-            className="text-[10px] uppercase tracking-[0.4em] text-white/20"
+            className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-white/20"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             Nairobi · Lagos · Cape Town

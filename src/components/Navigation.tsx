@@ -1,371 +1,181 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { H2HLogo } from "./H2HLogo";
 
-const NAV_LINKS = [
-  { label: "Home", href: "#hero", id: "01", sub: "Start here" },
-  { label: "About", href: "#about", id: "02", sub: "Our story" },
-  { label: "Three Pillars", href: "#ecosystem", id: "03", sub: "Core framework" },
-  { label: "Services", href: "#services", id: "04", sub: "What we offer" },
-  { label: "Testimonials", href: "#testimonials", id: "05", sub: "Client voices" },
-  { label: "Blog", href: "/blog", id: "06", sub: "Insights & ideas" },
-];
+function PhoneSVG() {
+  return (
+    <svg
+      viewBox="0 0 120 220"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ width: "100%", height: "100%", filter: "drop-shadow(0px 30px 60px rgba(164,108,252,0.2))" }}
+    >
+      <defs>
+        <linearGradient id="phoneBody" x1="0" y1="0" x2="120" y2="220" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#1a1a24" />
+          <stop offset="50%" stopColor="#05050a" />
+          <stop offset="100%" stopColor="#1a1a24" />
+        </linearGradient>
+      </defs>
+      {/* Outer Chassis */}
+      <rect x="2" y="1" width="116" height="218" rx="20" fill="url(#phoneBody)" />
+      {/* Inner Screen Bezel */}
+      <rect x="6" y="5" width="108" height="210" rx="16" fill="#050505" />
+      {/* Screen Display */}
+      <rect x="8" y="7" width="104" height="206" rx="14" fill="#000000" />
+      
+      {/* Hardware Buttons */}
+      <rect x="0" y="60" width="2" height="24" rx="1" fill="#2a2a34" />
+      <rect x="0" y="90" width="2" height="24" rx="1" fill="#2a2a34" />
+      <rect x="118" y="75" width="2" height="32" rx="1" fill="#2a2a34" />
+    </svg>
+  );
+}
 
-const SOCIAL = [
-  { label: "LinkedIn", href: "#" },
-  { label: "Twitter", href: "#" },
-  { label: "Instagram", href: "#" },
-];
+interface PageLoaderProps {
+  onComplete: () => void;
+}
 
-export function Navigation() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export function PageLoader({ onComplete }: PageLoaderProps) {
+  const [progress, setProgress] = useState(0);
+  const [exiting, setExiting] = useState(false);
 
-  // Handle Header Background on Scroll
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    let frame: number;
+    let start: number | null = null;
+    const DURATION = 3500; // Slightly longer for the dramatic 3D rotation
 
-  // Handle Body Lock for Mobile Menu
-  useEffect(() => {
-    if (isOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.top = `-${scrollY}px`;
-      timerRef.current = setTimeout(() => setMounted(true), 50);
-    } else {
-      setMounted(false);
-      const scrollY = document.body.style.top;
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      if (scrollY) window.scrollTo(0, parseInt(scrollY || "0") * -1);
+    function tick(ts: number) {
+      if (!start) start = ts;
+      const elapsed = ts - start;
+      const p = Math.min(elapsed / DURATION, 1);
+      
+      // Custom easing for a heavy, premium feel
+      const eased = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      setProgress(Math.round(eased * 100));
+      
+      if (p < 1) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        setTimeout(() => {
+          setExiting(true);
+          setTimeout(onComplete, 1200); // Wait for the zoom-in exit to finish
+        }, 500);
+      }
     }
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isOpen]);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsOpen(false);
-    if (href.startsWith("/")) {
-      setTimeout(() => navigate(href), 500);
-      return;
-    }
-    setTimeout(() => {
-      const el = document.getElementById(href.substring(1));
-      if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: "smooth" });
-    }, 550);
-  };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [onComplete]);
 
   return (
-    <>
-      <div className="h-20 md:h-24 w-full" />
-
-      {/* --- HEADER --- */}
-      <header
-        className="fixed top-0 left-0 w-full z-[100] py-4 md:py-6 transition-all duration-500"
-        style={{
-          backgroundColor: scrolled ? "var(--color-background-light)" : "transparent",
-          borderBottom: scrolled ? "1px solid var(--color-text-dark)" : "1px solid transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-        }}
-      >
-        <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-          <a
-            href="#hero"
-            aria-label="H2H Digital Home"
-            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-          >
-            {/* Slightly smaller logo on mobile for better fit */}
-            <H2HLogo className="h-10 md:h-14 w-auto transition-all duration-300" />
-          </a>
-
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={isOpen}
-            className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
-              isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
-            style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
-          >
-            <span
-              className="hidden sm:block text-[10px] uppercase tracking-[0.3em] font-medium transition-colors duration-500"
-              style={{
-                fontFamily: "var(--font-stack-heading)",
-                color: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)",
-              }}
-            >
-              Menu
-            </span>
-            <div className="flex flex-col gap-[5px] w-6 md:w-8">
-              <span className="block h-[1.5px] w-full transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
-              <span className="block h-[1.5px] w-3/4 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
-              <span className="block h-[1.5px] w-1/2 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
-            </div>
-          </button>
-        </div>
-      </header>
-
-      {/* --- FULLSCREEN OVERLAY --- */}
-      <div
-        className={`fixed top-0 left-0 w-full z-[110] transition-opacity duration-700 flex flex-col ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        style={{ 
-          height: "100dvh", // Crucial for mobile browser address bars
-          backgroundColor: "#0c0c0c",
-        }}
-      >
-
-        {/* Accent gradient blob */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "-10%",
-            right: "-20%",
-            width: "80vw",
-            height: "80vw",
-            maxWidth: "600px",
-            maxHeight: "600px",
-            background: "radial-gradient(circle, rgba(180,140,80,0.08) 0%, transparent 70%)",
-            borderRadius: "50%",
-          }}
-        />
-
-        {/* Close button - visually aligned with header */}
-        <button
-          onClick={() => setIsOpen(false)}
-          onTouchEnd={(e) => { e.preventDefault(); setIsOpen(false); }}
-          className="absolute top-4 right-4 md:top-6 md:right-10 z-[120] group flex items-center justify-center gap-3 text-white/50 hover:text-white transition-colors duration-300 p-2"
-          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
-          aria-label="Close menu"
+    <AnimatePresence>
+      {!exiting ? (
+        <motion.div
+          key="page-loader"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed inset-0 z-[99999] flex flex-col items-center justify-center overflow-hidden"
+          style={{ background: "#000000", perspective: "1200px" }}
         >
-          <span
-            className="hidden sm:block text-[10px] uppercase tracking-[0.3em]"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
-          >
-            Close
-          </span>
-          <div className="relative w-6 h-6 md:w-5 md:h-5">
-            <span className="absolute inset-0 flex items-center justify-center">
-              <span className="absolute h-[1.5px] w-full bg-current rotate-45 transition-transform duration-300 group-hover:rotate-[135deg]" />
-              <span className="absolute h-[1.5px] w-full bg-current -rotate-45 transition-transform duration-300 group-hover:rotate-[45deg]" />
-            </span>
-          </div>
-        </button>
-
-        {/* Main content layout */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden pt-20 md:pt-0">
-          
-          {/* Left: Nav links (Scrollable on small screens) */}
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-24 overflow-y-auto pb-10 custom-scrollbar">
-            <nav
-              className="flex flex-col w-full max-w-2xl mx-auto lg:mx-0 pt-4"
-              onMouseLeave={() => setActiveIndex(null)}
-            >
-              {NAV_LINKS.map((link, i) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  onMouseEnter={() => setActiveIndex(i)}
-                  className="group relative flex items-center py-4 md:py-5 border-b border-white/[0.06] overflow-hidden"
-                  style={{
-                    transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
-                    transitionDelay: mounted ? `${i * 60}ms` : "0ms",
-                    transform: mounted ? "translateY(0)" : "translateY(40px)",
-                    opacity: mounted ? 1 : 0,
-                  }}
-                >
-                  {/* Hover background fill */}
-                  <div
-                    className="absolute inset-0 bg-white/[0.03] transition-transform duration-500 origin-left"
-                    style={{ transform: activeIndex === i ? "scaleX(1)" : "scaleX(0)" }}
-                  />
-
-                  {/* Number */}
-                  <span
-                    className="relative z-10 w-8 md:w-12 text-[10px] md:text-xs text-white/20 mr-2 md:mr-6 transition-colors duration-300 group-hover:text-white/40"
-                    style={{ fontFamily: "var(--font-stack-heading)" }}
-                  >
-                    {link.id}
-                  </span>
-
-                  {/* Label - Scaled heavily for mobile */}
-                  <span
-                    className="relative z-10 flex-1 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter uppercase whitespace-nowrap"
-                    style={{
-                      fontFamily: "var(--font-stack-heading)",
-                      color: activeIndex !== null && activeIndex !== i ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.9)",
-                      transition: "color 0.4s ease",
-                    }}
-                  >
-                    {link.label}
-                  </span>
-
-                  {/* Sub label - Hidden on tiny screens */}
-                  <span
-                    className="relative z-10 hidden sm:block text-[10px] md:text-xs tracking-widest uppercase text-white/30 transition-all duration-300 group-hover:text-white/60 group-hover:translate-x-1 ml-4"
-                    style={{ fontFamily: "var(--font-stack-heading)" }}
-                  >
-                    {link.sub}
-                  </span>
-
-                  {/* Arrow */}
-                  <svg
-                    className="relative z-10 ml-4 w-5 h-5 text-white/20 transition-all duration-300 group-hover:text-white/70 group-hover:translate-x-1"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                  </svg>
-                </a>
-              ))}
-            </nav>
-            
-            {/* Mobile-only social links block */}
-            <div 
-              className="mt-12 lg:hidden flex flex-col gap-6"
-              style={{
-                transition: "opacity 0.8s ease",
-                transitionDelay: mounted ? "400ms" : "0ms",
-                opacity: mounted ? 1 : 0,
-              }}
-            >
-               <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/20"
-                  style={{ fontFamily: "var(--font-stack-heading)" }}
-                >
-                  Follow us
-                </p>
-                <div className="flex gap-6">
-                  {SOCIAL.map((s) => (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      className="text-[11px] uppercase tracking-widest text-white/60 hover:text-white transition-colors duration-300"
-                      style={{ fontFamily: "var(--font-stack-heading)" }}
-                    >
-                      {s.label}
-                    </a>
-                  ))}
-                </div>
-            </div>
-          </div>
-
-          {/* Right panel: info (Desktop only) */}
-          <div
-            className="hidden lg:flex lg:w-[40%] flex-col justify-between py-24 px-16 border-l border-white/[0.06]"
-            style={{
-              transition: "opacity 0.8s ease, transform 0.8s ease",
-              transitionDelay: mounted ? "200ms" : "0ms",
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? "translateX(0)" : "translateX(30px)",
+          {/* The Phone Container */}
+          <motion.div
+            initial={{ opacity: 0, z: -500, rotateX: 25, rotateY: -15, y: 50 }}
+            animate={{ 
+              opacity: 1, 
+              z: 0, 
+              rotateX: 0, 
+              rotateY: 0, 
+              y: [0, -10, 0] // Subtle floating
             }}
+            exit={{ 
+              scale: 15, // THE PUSH-THROUGH EFFECT
+              opacity: 0,
+              filter: "blur(10px)",
+              transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1] } 
+            }}
+            transition={{
+              opacity: { duration: 1.5, ease: "easeOut" },
+              rotateX: { duration: 3.5, ease: [0.22, 1, 0.36, 1] },
+              rotateY: { duration: 3.5, ease: [0.22, 1, 0.36, 1] },
+              z: { duration: 3.5, ease: [0.22, 1, 0.36, 1] },
+              y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 },
+            }}
+            className="relative flex items-center justify-center w-[240px] h-[460px]"
+            style={{ transformStyle: "preserve-3d" }}
           >
-            {/* Top: tagline */}
-            <div>
-              <p
-                className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6"
-                style={{ fontFamily: "var(--font-stack-heading)" }}
+            <PhoneSVG />
+            
+            {/* Screen Content */}
+            <div className="absolute inset-0 top-[3.5%] left-[7%] right-[7%] bottom-[3.5%] rounded-[18px] flex flex-col items-center justify-center overflow-hidden bg-black">
+              
+              {/* Animated Glass Shimmer */}
+              <motion.div 
+                className="absolute inset-0 z-0 pointer-events-none"
+                style={{
+                  background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 25%, transparent 30%)",
+                  backgroundSize: "200% 200%"
+                }}
+                animate={{ backgroundPosition: ["200% 0%", "-100% 0%"] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              />
+
+              {/* Dynamic Island */}
+              <div className="absolute top-3 w-[35%] h-[14px] bg-[#050505] rounded-full z-20 shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+              
+              <div className="absolute inset-0 bg-gradient-to-b from-[#a46cfc]/5 to-transparent opacity-60 z-0" />
+
+              {/* Logo */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, filter: "blur(4px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.4 } }}
+                transition={{ delay: 0.8, duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                className="relative z-10 drop-shadow-[0_0_20px_rgba(164,108,252,0.6)] mb-10"
               >
-                H2H Digital
-              </p>
-              <p className="text-white/50 text-sm leading-relaxed max-w-xs">
-                Bridging human potential with digital innovation across Africa and beyond.
-              </p>
-            </div>
+                <H2HLogo height={46} />
+              </motion.div>
 
-            {/* Middle: decorative element */}
-            <div className="flex items-center gap-4">
-              <div className="h-[1px] flex-1 bg-white/10" />
-              <div className="w-1 h-1 rounded-full bg-white/20" />
-            </div>
-
-            {/* Bottom: contact + social */}
-            <div className="space-y-8">
-              <div>
-                <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3"
-                  style={{ fontFamily: "var(--font-stack-heading)" }}
-                >
-                  Get in touch
-                </p>
-                <a
-                  href="#contact"
-                  onClick={(e) => handleNavClick(e, "#contact")}
-                  className="text-white/60 hover:text-white text-sm transition-colors duration-300"
-                >
-                  hello@h2hdigital.com
-                </a>
-              </div>
-
-              <div>
-                <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3"
-                  style={{ fontFamily: "var(--font-stack-heading)" }}
-                >
-                  Follow us
-                </p>
-                <div className="flex gap-4">
-                  {SOCIAL.map((s) => (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      className="text-[11px] uppercase tracking-widest text-white/40 hover:text-white transition-colors duration-300"
-                      style={{ fontFamily: "var(--font-stack-heading)" }}
-                    >
-                      {s.label}
-                    </a>
-                  ))}
+              {/* Loader UI */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                transition={{ duration: 1, delay: 1 }}
+                className="absolute bottom-12 w-[75%] flex flex-col space-y-3 z-10"
+              >
+                <div className="flex justify-between items-end px-1">
+                  <span
+                    className="text-[8px] uppercase tracking-[0.4em] font-medium"
+                    style={{ color: "rgba(255,255,255,0.4)" }}
+                  >
+                    System
+                  </span>
+                  <span
+                    className="text-[10px] tabular-nums font-light tracking-widest"
+                    style={{ color: "rgba(255,255,255,0.9)" }}
+                  >
+                    {progress.toString().padStart(3, '0')}%
+                  </span>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* --- BOTTOM FOOTER --- */}
-        <div
-          className="shrink-0 px-6 sm:px-12 md:px-16 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-white/[0.06] gap-4 sm:gap-0"
-          style={{
-            transition: "opacity 0.8s ease",
-            transitionDelay: mounted ? "350ms" : "0ms",
-            opacity: mounted ? 1 : 0,
-          }}
-        >
-          <p
-            className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-white/20"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
-          >
-            &copy; {new Date().getFullYear()} H2H Digital
-          </p>
-          <p
-            className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-white/20"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
-          >
-            Nairobi · Lagos · Cape Town
-          </p>
-        </div>
-      </div>
-    </>
+                {/* Progress Bar */}
+                <div className="w-full h-[1px] bg-white/10 relative overflow-hidden rounded-full">
+                  <motion.div
+                    className="absolute top-0 left-0 h-full rounded-full"
+                    style={{
+                      width: `${progress}%`,
+                      background: "linear-gradient(90deg, transparent, #c084fc, #ffffff)",
+                      boxShadow: "0 0 12px #a46cfc",
+                    }}
+                  />
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }

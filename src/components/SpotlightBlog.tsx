@@ -262,7 +262,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
         background: "var(--color-background-light)",
         paddingTop: "clamp(60px, 8vw, 100px)",
         paddingBottom: "clamp(60px, 8vw, 100px)",
-        overflow: "clip",
+        overflow: "visible",
       }}
     >
       <div className="container mx-auto px-6 md:px-12 relative" style={{ zIndex: 10 }}>

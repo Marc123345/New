@@ -19,7 +19,7 @@ const SERVICES = [
       "Strategic company page management that builds brand authority and engages your professional community.",
     icon: Globe,
     color: "#7B2FF2",
-    bgColor: "#7B2FF2",
+    bgColor: "#5A05E6", // Darkened for #fff contrast
     details: [],
   },
   {
@@ -31,7 +31,7 @@ const SERVICES = [
       "Elevate your executives into thought leaders with strategic personal branding and content.",
     icon: Users,
     color: "#9B59F5",
-    bgColor: "#9B59F5",
+    bgColor: "#6F11F5", // Darkened for #fff contrast
     details: [],
   },
   {
@@ -43,7 +43,7 @@ const SERVICES = [
       "Turn your team into brand ambassadors with structured employee advocacy programs.",
     icon: TrendingUp,
     color: "#B181FC",
-    bgColor: "#B181FC",
+    bgColor: "#8338EC", // Darkened for #fff contrast
     details: [],
   },
   {
@@ -55,7 +55,7 @@ const SERVICES = [
       "Your website is often your first impression. We make sure it's the right one. Beautiful, high-converting websites with SEO built in from day one.",
     icon: Globe,
     color: "#6610E6",
-    bgColor: "#6610E6",
+    bgColor: "#4A00D8", // Darkened for #fff contrast
     details: [
       "Strategic design & copywriting",
       "Responsive build (mobile-first)",
@@ -89,7 +89,7 @@ const SERVICES = [
       "When it comes to storytelling, words matter! We craft clear, engaging, and on-brand content that connects.",
     icon: Sparkles,
     color: "#C9A3FF",
-    bgColor: "#C9A3FF",
+    bgColor: "#3A0CA3", // Darkened for #fff contrast
     details: [
       "Social captions and campaigns",
       "Long-form blog and thought leadership",
@@ -111,6 +111,12 @@ export function ArcSlider() {
   const dragRef = useRef({ startX: 0, hasMoved: false, isDragging: false });
 
   const positionCards = useCallback((index: number, animate: boolean) => {
+    // Determine screen size for responsive spreading
+    const isMobile = window.innerWidth < 768;
+    const spreadStep1 = isMobile ? 240 : 360;
+    const spreadStep2 = isMobile ? 420 : 580;
+    const spreadStep3 = isMobile ? 540 : 760;
+
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
       if (!card) return;
@@ -125,7 +131,6 @@ export function ArcSlider() {
       let opacity: number;
       let zIndex: number;
 
-      // Adjusted translation values slightly to give cards more breathing room
       if (absOffset === 0) {
         translateX = 0;
         rotateY = 0;
@@ -134,21 +139,21 @@ export function ArcSlider() {
         opacity = 1;
         zIndex = 10;
       } else if (absOffset === 1) {
-        translateX = offset * 360; // Increased from 340
+        translateX = offset * spreadStep1; 
         rotateY = offset < 0 ? 30 : -30;
         translateZ = -120;
         scale = 0.82;
         opacity = 0.6;
         zIndex = 5;
       } else if (absOffset === 2) {
-        translateX = offset * 580; // Increased from 540
+        translateX = offset * spreadStep2; 
         rotateY = offset < 0 ? 45 : -45;
         translateZ = -240;
         scale = 0.65;
         opacity = 0.25;
         zIndex = 2;
       } else {
-        translateX = offset * 760; // Increased from 700
+        translateX = offset * spreadStep3; 
         rotateY = offset < 0 ? 55 : -55;
         translateZ = -350;
         scale = 0.5;
@@ -156,8 +161,9 @@ export function ArcSlider() {
         zIndex = 1;
       }
 
+      // Softer, deeper shadow
       const shadow = absOffset === 0
-        ? "10px 10px 0 rgba(164,108,252,0.6)"
+        ? "0 24px 48px rgba(0,0,0,0.25), 0 8px 16px rgba(164,108,252,0.4)"
         : "none";
 
       if (animate) {
@@ -170,7 +176,7 @@ export function ArcSlider() {
           zIndex: zIndex,
           boxShadow: shadow,
           duration: 0.7,
-          ease: "power2.out",
+          ease: "power3.out", // Slightly smoother ease
           overwrite: true,
         });
       } else {
@@ -201,6 +207,11 @@ export function ArcSlider() {
 
   useEffect(() => {
     positionCards(0, false);
+
+    // Recalculate on window resize to fix mobile/desktop breakpoints
+    const handleResize = () => positionCards(activeIndexRef.current, false);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [positionCards]);
 
   useEffect(() => {
@@ -270,24 +281,24 @@ export function ArcSlider() {
     <>
       <div
         className="relative w-full py-16 md:py-24 overflow-hidden"
-        style={{ background: "var(--color-background-light)" }}
+        style={{ background: "var(--color-background-light, #f8f9fa)" }}
       >
         <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
           <span
-            className="text-xs tracking-[0.3em] mb-5 block uppercase"
+            className="text-xs font-semibold tracking-[0.3em] mb-4 block uppercase"
             style={{
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-secondary)",
+              color: "var(--color-secondary, #9B59F5)",
             }}
           >
             Our Capabilities
           </span>
           <h2
-            className="tracking-tight"
+            className="tracking-tight font-bold"
             style={{
               fontSize: "clamp(2.5rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-text-dark)",
+              color: "var(--color-text-dark, #111)",
             }}
           >
             Services
@@ -310,24 +321,24 @@ export function ArcSlider() {
               role="tab"
               aria-selected={i === activeIndex}
               onClick={() => navigateTo(i)}
-              className="flex-shrink-0 transition-all duration-300"
+              className="flex-shrink-0 transition-all duration-300 font-semibold rounded-full"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.15em",
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                padding: "10px 20px",
+                padding: "10px 24px",
                 whiteSpace: "nowrap",
-                border: "2px solid var(--color-secondary)",
+                border: "2px solid var(--color-secondary, #9B59F5)",
                 background: i === activeIndex
-                  ? "var(--color-secondary)"
+                  ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
                 color: i === activeIndex
-                  ? "var(--color-background-light)"
-                  : "var(--color-text-dark)",
+                  ? "var(--color-background-light, #fff)"
+                  : "var(--color-text-dark, #111)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
-                  ? "var(--shadow-button)"
+                  ? "0 4px 14px rgba(155, 89, 245, 0.4)"
                   : "none",
               }}
             >
@@ -340,7 +351,7 @@ export function ArcSlider() {
           ref={containerRef}
           className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            height: "clamp(440px, 60vw, 620px)",
+            height: "clamp(440px, 60vw, 560px)", // Slightly shortened max-height for better aspect ratio fitting
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
             touchAction: "pan-y",
@@ -361,70 +372,70 @@ export function ArcSlider() {
                   ref={(el) => (cardsRef.current[i] = el)}
                   className="absolute will-change-transform"
                   style={{
-                    width: "clamp(280px, 28vw, 420px)",
+                    width: "clamp(280px, 28vw, 380px)",
                     aspectRatio: "3 / 4",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
+                    borderRadius: "16px", // Added modern border-radius to the parent wrapper
                   }}
                 >
                   <div
-                    // ADJUSTMENT: Increased padding to p-6 sm:p-8 for more breathing room
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8"
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8 rounded-2xl transition-colors duration-500"
                     style={{
                       backgroundColor: service.bgColor,
-                      border: "2px solid rgba(255,255,255,0.12)",
+                      border: "1px solid rgba(255,255,255,0.15)", // Softened the border slightly
                     }}
                   >
                     {/* Top Section */}
                     <div className="flex justify-between items-start">
                       <div>
                         <span
-                          className="text-[10px] tracking-[0.3em] opacity-50 block"
+                          className="text-[10px] tracking-[0.3em] opacity-60 font-semibold block"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             color: "#fff",
-                            marginBottom: "2px",
+                            marginBottom: "4px",
                           }}
                         >
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.2em] opacity-35"
+                          className="text-[10px] tracking-[0.15em] opacity-40 font-medium uppercase"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             color: "#fff",
                           }}
                         >
-                          {service.category.toUpperCase()}
+                          {service.category}
                         </span>
                       </div>
                       <div
-                        className="w-8 h-8 flex items-center justify-center opacity-15"
+                        className="w-10 h-10 flex items-center justify-center opacity-20"
                         style={{ color: "#fff" }}
                       >
-                        <IconComponent size={24} strokeWidth={1.5} />
+                        <IconComponent size={32} strokeWidth={1.5} />
                       </div>
                     </div>
 
-                    {/* Bottom Section - ADJUSTMENT: Grouped in a flex container with gaps */}
-                    <div className="flex flex-col gap-4">
+                    {/* Bottom Section */}
+                    <div className="flex flex-col gap-5">
                       <h3
-                        className="tracking-tight leading-[1]"
+                        className="tracking-tight leading-[1.1] font-bold"
                         style={{
-                          fontSize: "clamp(1.4rem, 3vw, 2.25rem)",
+                          fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
-                          margin: 0, // Removed individual margins in favor of flex gap
+                          margin: 0,
                         }}
                       >
                         {service.fullTitle}
                       </h3>
 
                       <p
-                        className="line-clamp-2 opacity-80"
+                        className="line-clamp-3 opacity-80"
                         style={{
-                          fontSize: "0.85rem",
-                          lineHeight: 1.6, // Increased line height for better readability
+                          fontSize: "0.9rem",
+                          lineHeight: 1.6,
                           fontFamily: "var(--font-stack-body)",
                           color: "#fff",
                           margin: 0,
@@ -440,28 +451,30 @@ export function ArcSlider() {
                             e.stopPropagation();
                             setOverlayService(service);
                           }}
-                          className="group inline-flex items-center gap-2 transition-all duration-200"
+                          className="group inline-flex items-center gap-3 transition-all duration-300 rounded-full"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            fontSize: "0.65rem",
-                            letterSpacing: "0.18em",
+                            fontSize: "0.75rem",
+                            letterSpacing: "0.15em",
                             textTransform: "uppercase",
                             color: "#fff",
-                            background: "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.25)",
-                            padding: "8px 20px",
+                            background: "rgba(255,255,255,0.1)",
+                            border: "1px solid rgba(255,255,255,0.2)",
+                            padding: "10px 24px",
                             cursor: "pointer",
                             pointerEvents: "auto",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
+                            e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                            e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
                           }}
                         >
                           Discover
-                          <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block">
+                          <span className="transition-transform duration-300 group-hover:translate-x-1.5 inline-block">
                             &#8594;
                           </span>
                         </button>
@@ -474,19 +487,20 @@ export function ArcSlider() {
           </div>
         </div>
 
+        {/* Pagination Dots */}
         <div className="relative z-20 flex gap-2 justify-center mt-6 md:mt-10">
           {SERVICES.map((_, i) => (
             <button
               key={i}
               onClick={() => navigateTo(i)}
-              className="transition-all duration-300"
+              className="transition-all duration-300 rounded-full"
               aria-label={`Go to service ${i + 1}`}
               style={{
                 width: i === activeIndex ? 32 : 8,
-                height: 4,
+                height: 8,
                 background: i === activeIndex
-                  ? "var(--color-secondary)"
-                  : "rgba(164,108,252,0.2)",
+                  ? "var(--color-secondary, #9B59F5)"
+                  : "rgba(155, 89, 245, 0.2)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,

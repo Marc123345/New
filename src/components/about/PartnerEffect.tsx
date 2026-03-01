@@ -252,7 +252,7 @@ export function PartnerEffect() {
             className="w-full h-full object-cover"
           >
             <source
-              src="https://ik.imagekit.io/qcvroy8xpd/envato_video%20_gen_Mar_01_2026_13_47_54.mp4"
+              src="https://ik.imagekit.io/qcvroy8xpd/envato_video_gen_Mar_01_2026_13_47_54.mp4"
               type="video/mp4"
             />
           </motion.video>

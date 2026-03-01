@@ -278,7 +278,7 @@ export function PartnerEffect() {
           </motion.video>
 
           {/* Purple dark overlay */}
-          <div className="absolute inset-0 bg-[#0d0618]/45 pointer-events-none" />
+          <div className="absolute inset-0 bg-[#0d0618]/70 pointer-events-none" />
           {/* Top vignette */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none" />
           {/* Radial vignette */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Users, Megaphone, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
@@ -101,8 +101,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   
-  // Cache the index using a Ref. This prevents Framer Motion's exit animation
-  // from crashing when pillarIndex becomes null upon closing.
+  // Cache the index using a Ref to prevent exit-animation crashes
   const activeIndexRef = useRef<number | null>(null);
   if (pillarIndex !== null) {
     activeIndexRef.current = pillarIndex;
@@ -115,7 +114,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     setMounted(true);
   }, []);
 
-  // Handle body scroll locking and Escape key for desktop
+  // Handle body scroll locking and Escape key
   useEffect(() => {
     if (pillarIndex !== null) {
       document.body.style.overflow = 'hidden';
@@ -134,7 +133,6 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     }
   }, [pillarIndex, onClose]);
 
-  // Wait for client-side hydration before rendering portal
   if (!mounted) return null;
 
   return createPortal(
@@ -148,7 +146,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh] pointer-events-auto"
         >
-          {/* Close Button - Fixed positioning guarantees it stays put and stays clickable */}
+          {/* Close Button */}
           <button
             type="button"
             onClick={(e) => {
@@ -162,7 +160,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
             <X size={20} />
           </button>
 
-          {/* Content Area - min-h-0 allows flexbox to calculate remaining space properly */}
+          {/* Content Area */}
           <div 
             ref={scrollRef} 
             className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-0" 

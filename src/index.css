@@ -31,8 +31,6 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  background-color: #0e0b1f;
-  overscroll-behavior-y: none;
 }
 
 body {
@@ -40,12 +38,6 @@ body {
   color: var(--color-text-dark);
   line-height: 1.75;
   overflow-x: hidden;
-  background-color: #0e0b1f;
-  overscroll-behavior-y: none;
-}
-
-#root {
-  background-color: #0e0b1f;
 }
 
 ::-webkit-scrollbar {

@@ -240,7 +240,7 @@ export function PartnerEffect() {
   const smoothProgress = useSpring(scrollYProgress, { damping: 25, stiffness: 80 });
 
   const videoScale = useTransform(smoothProgress, [0, 1], [1, 1.08]);
-  const videoOpacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0.6, 0.75, 0.75, 0.6]);
+  const videoOpacity = useTransform(smoothProgress, [0, 0.05, 0.95, 1], [0.8, 0.95, 0.95, 0.8]);
 
   const glowX = displayMouse.x === -9999 ? '50%' : `${displayMouse.x}px`;
   const glowY = displayMouse.y === -9999 ? '50%' : `${displayMouse.y}px`;
@@ -278,11 +278,11 @@ export function PartnerEffect() {
           </motion.video>
 
           {/* Purple dark overlay */}
-          <div className="absolute inset-0 bg-[#0d0618]/75 pointer-events-none" />
+          <div className="absolute inset-0 bg-[#0d0618]/45 pointer-events-none" />
           {/* Top vignette */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/70 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none" />
           {/* Radial vignette */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.55)_100%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.35)_100%)] pointer-events-none" />
         </motion.div>
 
         {/* Cursor glow */}

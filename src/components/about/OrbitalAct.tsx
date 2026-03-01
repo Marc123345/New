@@ -105,7 +105,7 @@ export function OrbitalAct() {
           playsInline
           className="w-full h-full object-cover opacity-70"
         >
-          <source src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4?updatedAt=1772017940529" type="video/mp4" />
+          <source src="https://ik.imagekit.io/qcvroy8xpd/envato_video_gen_Feb_23_2026_16_41_55.mp4?updatedAt=1771864939536" type="video/mp4" />
         </video>
         {/* Vignette Overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)]" />

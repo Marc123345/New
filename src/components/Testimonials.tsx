@@ -73,15 +73,16 @@ export function Testimonials() {
 
         <div className="text-center mb-6 sm:mb-8 md:mb-10 px-4 md:px-8">
           <div
-            className="inline-block mb-4 px-4 py-2 bg-[var(--color-surface-dark)]"
+            className="inline-block mb-4 px-4 py-2"
             style={{
+              background: 'var(--color-background-light)',
               border: '2px solid var(--color-secondary)',
               boxShadow: '4px 4px 0 var(--color-secondary)',
             }}
           >
             <span
               className="text-xs font-bold tracking-[0.3em] uppercase"
-              style={{ fontFamily: 'var(--font-stack-heading)', color: 'var(--color-secondary)' }}
+              style={{ fontFamily: 'var(--font-stack-heading)', color: '#ffffff' }}
             >
               Testimonials
             </span>

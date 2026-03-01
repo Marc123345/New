@@ -48,6 +48,7 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
   const x = Math.cos(angle) * radius;
   const y = Math.sin(angle) * radius;
   const showLabel = activeLabel === index;
+  const isRightHalf = x > 0;
 
   return (
     <motion.div
@@ -76,12 +77,12 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
         <AnimatePresence>
           {showLabel && (
             <motion.div
-              initial={{ opacity: 0, x: 10 }}
+              initial={{ opacity: 0, x: isRightHalf ? 10 : -10 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              className="absolute left-full ml-4 whitespace-nowrap z-50 pointer-events-none"
+              exit={{ opacity: 0, x: isRightHalf ? 10 : -10 }}
+              className={`absolute whitespace-nowrap z-50 pointer-events-none ${isRightHalf ? 'left-full ml-4' : 'right-full mr-4'}`}
             >
-              <span className="text-xs uppercase tracking-widest px-3 py-1 bg-indigo-950/90 border border-purple-500 text-white rounded">
+              <span className="text-xs uppercase tracking-widest px-3 py-1 bg-black/90 border border-white/20 text-white rounded">
                 {item.subtitle}
               </span>
             </motion.div>
@@ -119,15 +120,15 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           className="fixed inset-0 z-[1000] flex flex-col bg-black/95 backdrop-blur-xl"
         >
           {/* Close Button */}
-          <button 
+          <button
             onClick={onClose}
-            className="fixed top-6 right-6 z-[1010] p-3 rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white"
+            className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[1010] min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
 
           {/* Content Area */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-24 scrollbar-hide">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 sm:px-6 scrollbar-hide" style={{ paddingTop: 'max(5rem, calc(3.5rem + env(safe-area-inset-top)))', paddingBottom: '2rem' }}>
             <div className="max-w-3xl mx-auto space-y-12">
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
@@ -138,7 +139,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                   <span className="h-px w-8 bg-purple-500" />
                   {activeService.subtitle}
                 </div>
-                <h2 className="text-5xl md:text-7xl font-bold text-white uppercase tracking-tighter">
+                <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white uppercase tracking-tighter">
                   {activeService.title}
                 </h2>
                 <p className="text-xl text-white/60 leading-relaxed">
@@ -147,11 +148,11 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
               </motion.div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
                 {activeService.stats.map((s: any, i: number) => (
-                  <div key={i} className="p-6 border border-white/10 bg-white/5 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-purple-400">{s.value}</div>
-                    <div className="text-[10px] uppercase text-white/40 mt-1">{s.label}</div>
+                  <div key={i} className="p-3 sm:p-6 border border-white/10 bg-white/5 rounded-lg text-center">
+                    <div className="text-lg sm:text-2xl font-bold text-purple-400 leading-tight">{s.value}</div>
+                    <div className="text-[9px] sm:text-[10px] uppercase text-white/40 mt-1">{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -172,28 +173,28 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
           </div>
 
           {/* Navigation Footer */}
-          <div className="p-6 border-t border-white/10 bg-black/50 backdrop-blur-md flex justify-between items-center">
-             <button 
+          <div className="p-4 sm:p-6 border-t border-white/10 bg-black/50 backdrop-blur-md flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+             <button
                disabled={pillarIndex === 0}
                onClick={() => onNavigate(pillarIndex - 1)}
-               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20"
+               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2"
              >
-               <ArrowLeft size={20} /> Prev
+               <ArrowLeft size={20} /> <span className="hidden sm:inline">Prev</span>
              </button>
              <div className="flex gap-2">
                 {PILLARS.map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`h-1.5 transition-all duration-300 rounded-full ${i === pillarIndex ? 'w-8 bg-purple-500' : 'w-2 bg-white/20'}`} 
+                  <div
+                    key={i}
+                    className={`h-1.5 transition-all duration-300 rounded-full ${i === pillarIndex ? 'w-8 bg-purple-500' : 'w-2 bg-white/20'}`}
                   />
                 ))}
              </div>
-             <button 
+             <button
                disabled={pillarIndex === PILLARS.length - 1}
                onClick={() => onNavigate(pillarIndex + 1)}
-               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20"
+               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2"
              >
-               Next <ArrowRight size={20} />
+               <span className="hidden sm:inline">Next</span> <ArrowRight size={20} />
              </button>
           </div>
         </motion.div>

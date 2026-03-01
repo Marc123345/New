@@ -62,7 +62,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
         onMouseLeave={handleMouseLeave}
         style={{
           transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-          transition: tilt.x === 0 && tilt.y === 0
+          transition: Math.abs(tilt.x) < 0.01 && Math.abs(tilt.y) < 0.01
             ? "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease"
             : "transform 0.08s ease-out",
           border: "2px solid var(--color-text-dark)",

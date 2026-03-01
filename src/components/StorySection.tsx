@@ -271,7 +271,7 @@ export function StorySection() {
         nextVideo.play();
       }
     }
-  }, [activeSection]);
+  }, [activeSection, activeVideo]);
 
   return (
     <div

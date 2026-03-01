@@ -53,6 +53,8 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
 
   useEffect(() => {
     let frame: number;
+    let t1: ReturnType<typeof setTimeout>;
+    let t2: ReturnType<typeof setTimeout>;
     let start: number | null = null;
     const DURATION = 3000;
 
@@ -60,21 +62,24 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
       if (!start) start = ts;
       const elapsed = ts - start;
       const p = Math.min(elapsed / DURATION, 1);
-      // Cinematic easing
       const eased = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
       setProgress(Math.round(eased * 100));
       if (p < 1) {
         frame = requestAnimationFrame(tick);
       } else {
-        setTimeout(() => {
+        t1 = setTimeout(() => {
           setExiting(true);
-          setTimeout(onComplete, 1000); 
+          t2 = setTimeout(onComplete, 1000);
         }, 400);
       }
     }
 
     frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [onComplete]);
 
   return (

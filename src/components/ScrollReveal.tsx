@@ -19,8 +19,7 @@ export const ScrollReveal = ({
 }: ScrollRevealProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
-  const hasBeenViewed = isInView;
-  
+
   // For Parallax Mode
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -60,13 +59,13 @@ export const ScrollReveal = ({
     <div ref={ref} style={{ width }} className={className}>
       <motion.div
         initial={{ opacity: 0, y: 75, scale: 0.95 }}
-        animate={hasBeenViewed ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 75, scale: 0.95 }}
+        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 75, scale: 0.95 }}
         transition={{
           duration: 0.9,
           delay: delay,
           ease: [0.25, 0.4, 0.25, 1]
         }}
-        style={{ willChange: hasBeenViewed ? 'auto' : 'opacity, transform' }}
+        style={{ willChange: isInView ? 'auto' : 'opacity, transform' }}
       >
         {children}
       </motion.div>

@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'; // Changed to standard framer-motion
 import { Building2, Users, Megaphone, X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import React from 'react';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
 
@@ -80,14 +79,14 @@ interface OrbitNodeProps {
   item: typeof PILLARS[number];
   index: number;
   total: number;
+  radius: number; // Added dynamic radius prop
   onSelect: (index: number) => void;
   activeLabel: number | null;
   onToggleLabel: (index: number) => void;
 }
 
-function OrbitNode({ item, index, total, onSelect, activeLabel, onToggleLabel }: OrbitNodeProps) {
+function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggleLabel }: OrbitNodeProps) {
   const angle = (index / total) * 2 * Math.PI;
-  const radius = 300;
   const x = Math.cos(angle) * radius;
   const y = Math.sin(angle) * radius;
   const showLabel = activeLabel === index;
@@ -105,19 +104,20 @@ function OrbitNode({ item, index, total, onSelect, activeLabel, onToggleLabel }:
             onToggleLabel(index);
           }
         }}
+        // The inverse rotation to keep the icon upright while the parent spins
         animate={{ rotate: -360 }}
-        transition={{ duration: 100, ease: 'linear', repeat: Infinity }}
+        transition={{ duration: 120, ease: 'linear', repeat: Infinity }}
         className="group relative flex items-center justify-center p-4 focus:outline-none"
       >
         <div
-          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+          className="relative z-10 w-12 h-12 sm:w-16 sm:h-16 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
           style={{
-            background: 'linear-gradient(135deg, var(--color-primary), rgba(164,108,252,0.4))',
-            border: '2px solid var(--color-secondary)',
+            background: 'linear-gradient(135deg, var(--color-primary, #2e1065), rgba(164,108,252,0.4))',
+            border: '2px solid var(--color-secondary, #9333ea)',
             boxShadow: '0 0 24px rgba(164,108,252,0.35), inset 0 0 12px rgba(164,108,252,0.15)',
           }}
         >
-          <div className="transition-colors" style={{ color: '#ffffff' }}>
+          <div className="transition-colors text-white">
             {item.icon}
           </div>
         </div>
@@ -128,12 +128,12 @@ function OrbitNode({ item, index, total, onSelect, activeLabel, onToggleLabel }:
           }`}
         >
           <span
-            className="text-xs uppercase tracking-[0.2em] whitespace-nowrap px-3 py-1"
+            className="text-xs uppercase tracking-[0.2em] whitespace-nowrap px-3 py-1 rounded-sm"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
               background: 'rgba(41,30,86,0.95)',
-              border: '1px solid var(--color-secondary)',
+              border: '1px solid var(--color-secondary, #9333ea)',
             }}
           >
             {item.subtitle}
@@ -144,15 +144,7 @@ function OrbitNode({ item, index, total, onSelect, activeLabel, onToggleLabel }:
   );
 }
 
-function PillarOverlay({
-  pillarIndex,
-  onClose,
-  onNavigate,
-}: {
-  pillarIndex: number | null;
-  onClose: () => void;
-  onNavigate: (index: number) => void;
-}) {
+function PillarOverlay({ pillarIndex, onClose, onNavigate }: { pillarIndex: number | null; onClose: () => void; onNavigate: (index: number) => void; }) {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -217,7 +209,7 @@ function PillarOverlay({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
+            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-2 sm:p-4 md:p-8"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -233,11 +225,10 @@ function PillarOverlay({
                 exit={{ opacity: 0, y: -24, scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 280, damping: 28, mass: 0.85 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full focus:outline-none flex flex-col"
+                className="relative w-full focus:outline-none flex flex-col rounded-t-xl sm:rounded-none"
                 style={{
                   maxWidth: 760,
                   maxHeight: '88dvh',
-                  borderRadius: '0',
                   background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
                   border: `1px solid ${accent.border}`,
                   boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px -16px rgba(0,0,0,0.8), 0 0 60px -20px ${accent.from}55`,
@@ -274,7 +265,7 @@ function PillarOverlay({
                     initial={{ opacity: 0, scale: 0.7 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.25, type: 'spring', stiffness: 320, damping: 22 }}
-                    className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
+                    className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90 rounded-full"
                     style={{
                       border: '1px solid rgba(255,255,255,0.12)',
                       background: 'rgba(255,255,255,0.05)',
@@ -307,12 +298,12 @@ function PillarOverlay({
                     </span>
                   </motion.div>
 
-                  <div className="flex items-start gap-5">
+                  <div className="flex items-start gap-4 sm:gap-5">
                     <motion.div
                       initial={{ opacity: 0, scale: 0.6 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.2, type: 'spring', stiffness: 280, damping: 20 }}
-                      className="flex-shrink-0 flex h-14 w-14 items-center justify-center"
+                      className="flex-shrink-0 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-lg"
                       style={{
                         border: `1px solid ${accent.border}`,
                         background: accent.light,
@@ -330,7 +321,7 @@ function PillarOverlay({
                         transition={{ delay: 0.22, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                         className="font-bold leading-[1.1] tracking-[-0.025em]"
                         style={{
-                          fontSize: 'clamp(1.9rem, 4.5vw, 2.6rem)',
+                          fontSize: 'clamp(1.5rem, 4.5vw, 2.6rem)',
                           color: '#fff',
                           fontFamily: 'var(--font-stack-heading)',
                         }}
@@ -351,8 +342,8 @@ function PillarOverlay({
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.28, duration: 0.5 }}
-                      className="leading-[1.75] text-base"
-                      style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'var(--font-stack-body)' }}
+                      className="leading-[1.6] sm:leading-[1.75] text-sm sm:text-base"
+                      style={{ color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-stack-body)' }}
                     >
                       {activeService.description}
                     </motion.p>
@@ -361,7 +352,7 @@ function PillarOverlay({
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.34, duration: 0.5 }}
-                      className="grid grid-cols-3 gap-px overflow-hidden"
+                      className="grid grid-cols-3 gap-px overflow-hidden rounded-md"
                       style={{ border: `1px solid ${accent.border}`, background: accent.border }}
                     >
                       {activeService.stats.map((stat, i) => (
@@ -376,7 +367,7 @@ function PillarOverlay({
                           <div
                             className="font-extrabold leading-none tracking-[-0.03em] mb-1.5"
                             style={{
-                              fontSize: 'clamp(1.1rem, 4vw, 1.85rem)',
+                              fontSize: 'clamp(1rem, 4vw, 1.85rem)',
                               color: accent.dot,
                               fontFamily: 'var(--font-stack-heading)',
                             }}
@@ -384,8 +375,8 @@ function PillarOverlay({
                             {stat.value}
                           </div>
                           <div
-                            className="text-[10px] sm:text-[11px] leading-[1.4] tracking-[0.03em]"
-                            style={{ color: 'rgba(255,255,255,0.32)', fontFamily: 'var(--font-stack-body)' }}
+                            className="text-[9px] sm:text-[11px] leading-[1.4] tracking-[0.03em] uppercase"
+                            style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-stack-body)' }}
                           >
                             {stat.label}
                           </div>
@@ -401,11 +392,11 @@ function PillarOverlay({
                       <div className="flex items-center gap-3 mb-4">
                         <span
                           className="text-[10px] uppercase tracking-[0.35em]"
-                          style={{ color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-stack-heading)' }}
+                          style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-stack-heading)' }}
                         >
                           What We Deliver
                         </span>
-                        <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                        <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
                       </div>
 
                       <ul className="grid sm:grid-cols-2 gap-2">
@@ -415,18 +406,18 @@ function PillarOverlay({
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.52 + i * 0.045, duration: 0.38 }}
-                            className="flex items-start gap-3 py-2.5 px-3"
+                            className="flex items-start gap-3 py-2.5 px-3 rounded-md"
                             style={{
-                              background: 'rgba(255,255,255,0.025)',
-                              border: '1px solid rgba(255,255,255,0.05)',
+                              background: 'rgba(255,255,255,0.03)',
+                              border: '1px solid rgba(255,255,255,0.08)',
                             }}
                           >
-                            <span className="mt-[1px] flex-shrink-0" style={{ color: accent.dot }}>
-                              <Check size={13} strokeWidth={2.5} />
+                            <span className="mt-[2px] flex-shrink-0" style={{ color: accent.dot }}>
+                              <Check size={14} strokeWidth={2.5} />
                             </span>
                             <span
                               className="text-[0.875rem] leading-snug"
-                              style={{ color: 'rgba(255,255,255,0.62)', fontFamily: 'var(--font-stack-body)' }}
+                              style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-stack-body)' }}
                             >
                               {item}
                             </span>
@@ -440,9 +431,9 @@ function PillarOverlay({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.72, duration: 0.5 }}
-                        className="relative pl-5 text-[0.9rem] leading-[1.75] italic"
+                        className="relative pl-4 sm:pl-5 text-[0.85rem] sm:text-[0.9rem] leading-[1.6] sm:leading-[1.75] italic"
                         style={{
-                          color: 'rgba(255,255,255,0.42)',
+                          color: 'rgba(255,255,255,0.5)',
                           fontFamily: 'var(--font-stack-body)',
                           borderLeft: `2px solid ${accent.dot}`,
                         }}
@@ -464,21 +455,21 @@ function PillarOverlay({
                     onClick={() => hasPrev && onNavigate(pillarIndex - 1)}
                     disabled={!hasPrev}
                     aria-label="Previous pillar"
-                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-2.5 py-2 sm:px-4 sm:py-2.5"
+                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-3 py-2 sm:px-4 sm:py-2.5 rounded-md"
                     style={{
                       fontFamily: 'var(--font-stack-heading)',
                       fontSize: 11,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
-                      color: hasPrev ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.12)',
+                      color: hasPrev ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)',
                       cursor: hasPrev ? 'pointer' : 'default',
                       border: hasPrev ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
                       background: 'none',
                     }}
-                    onMouseEnter={e => { if (hasPrev) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
-                    onMouseLeave={e => { if (hasPrev) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'none'; } }}
+                    onMouseEnter={e => { if (hasPrev) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; } }}
+                    onMouseLeave={e => { if (hasPrev) { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'none'; } }}
                   >
-                    <ArrowLeft size={13} />
+                    <ArrowLeft size={14} />
                     <span className="hidden sm:inline">Prev</span>
                   </button>
 
@@ -489,15 +480,14 @@ function PillarOverlay({
                         onClick={() => onNavigate(i)}
                         aria-label={`Go to ${PILLARS[i].title}`}
                         aria-current={i === pillarIndex ? 'step' : undefined}
-                        className="transition-all duration-300"
+                        className="transition-all duration-300 rounded-full"
                         style={{
-                          width: i === pillarIndex ? 28 : 7,
-                          height: 7,
-                          background: i === pillarIndex ? accent.dot : 'rgba(255,255,255,0.1)',
+                          width: i === pillarIndex ? 24 : 8,
+                          height: 8,
+                          background: i === pillarIndex ? accent.dot : 'rgba(255,255,255,0.2)',
                           border: 'none',
                           cursor: 'pointer',
                           padding: 0,
-                          borderRadius: 0,
                         }}
                       />
                     ))}
@@ -507,22 +497,22 @@ function PillarOverlay({
                     onClick={() => hasNext && onNavigate(pillarIndex + 1)}
                     disabled={!hasNext}
                     aria-label="Next pillar"
-                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-2.5 py-2 sm:px-4 sm:py-2.5"
+                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-3 py-2 sm:px-4 sm:py-2.5 rounded-md"
                     style={{
                       fontFamily: 'var(--font-stack-heading)',
                       fontSize: 11,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
-                      color: hasNext ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.12)',
+                      color: hasNext ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)',
                       cursor: hasNext ? 'pointer' : 'default',
                       border: hasNext ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
                       background: 'none',
                     }}
-                    onMouseEnter={e => { if (hasNext) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
-                    onMouseLeave={e => { if (hasNext) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'none'; } }}
+                    onMouseEnter={e => { if (hasNext) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; } }}
+                    onMouseLeave={e => { if (hasNext) { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.background = 'none'; } }}
                   >
                     <span className="hidden sm:inline">Next</span>
-                    <ArrowRight size={13} />
+                    <ArrowRight size={14} />
                   </button>
                 </motion.div>
               </motion.div>
@@ -538,6 +528,23 @@ export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
   const [activeLabel, setActiveLabel] = useState<number | null>(null);
+  const [orbitRadius, setOrbitRadius] = useState(300);
+
+  // Dynamic radius for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setOrbitRadius(140); // Mobile
+      } else if (window.innerWidth < 1024) {
+        setOrbitRadius(220); // Tablet
+      } else {
+        setOrbitRadius(300); // Desktop
+      }
+    };
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleToggleLabel = (index: number) => {
     setActiveLabel(prev => prev === index ? null : index);
@@ -547,7 +554,7 @@ export function EcosystemServices() {
     <section
       id="ecosystem"
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-32"
-      style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
+      style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary, #2e1065) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
         <video
@@ -555,7 +562,7 @@ export function EcosystemServices() {
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-30"
           style={{ filter: 'brightness(0.7) contrast(1.05)' }}
         >
           <source src={VIDEO_URL} type="video/mp4" />
@@ -572,15 +579,15 @@ export function EcosystemServices() {
           <div
             className="inline-block mb-8 px-4 py-2"
             style={{
-              border: '2px solid var(--color-secondary)',
-              boxShadow: '4px 4px 0 var(--color-secondary)',
+              border: '2px solid var(--color-secondary, #9333ea)',
+              boxShadow: '4px 4px 0 var(--color-secondary, #9333ea)',
             }}
           >
             <span
               className="text-xs uppercase tracking-[0.3em]"
               style={{
                 fontFamily: 'var(--font-stack-heading)',
-                color: 'var(--color-secondary)',
+                color: 'var(--color-secondary, #9333ea)',
               }}
             >
               The Framework
@@ -601,7 +608,7 @@ export function EcosystemServices() {
             <span
               style={{
                 color: 'transparent',
-                WebkitTextStroke: '1.5px var(--color-secondary)',
+                WebkitTextStroke: '1.5px var(--color-secondary, #9333ea)',
               }}
             >
               One Ecosystem.
@@ -612,7 +619,7 @@ export function EcosystemServices() {
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
-              color: 'var(--color-secondary)',
+              color: 'var(--color-secondary, #9333ea)',
               opacity: 0.08,
             }}
           >
@@ -621,21 +628,28 @@ export function EcosystemServices() {
         </motion.div>
       </div>
 
+      <style>
+        {`
+          @keyframes spin-orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+
       <div
         className="absolute inset-0 z-20 overflow-visible pointer-events-none flex items-center justify-center"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >
-        <div className="relative w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
-          <motion.div
+        <div className="relative w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
+          {/* Changed framer-motion rotate to CSS spin to correctly support animationPlayState */}
+          <div
             className="absolute inset-0 flex items-center justify-center"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: isHoveringOrbit ? 0 : 120,
-              ease: 'linear',
-              repeat: Infinity,
+            style={{ 
+              animation: 'spin-orbit 120s linear infinite',
+              animationPlayState: isHoveringOrbit ? 'paused' : 'running' 
             }}
-            style={{ animationPlayState: isHoveringOrbit ? 'paused' : 'running' }}
           >
             {PILLARS.map((pillar, i) => (
               <OrbitNode
@@ -643,12 +657,13 @@ export function EcosystemServices() {
                 item={pillar}
                 index={i}
                 total={PILLARS.length}
+                radius={orbitRadius} // Pass the dynamic radius
                 onSelect={setSelectedService}
                 activeLabel={activeLabel}
                 onToggleLabel={handleToggleLabel}
               />
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 

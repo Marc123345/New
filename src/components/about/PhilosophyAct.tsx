@@ -1,6 +1,6 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'motion/react';
-import { Sparkles, Heart, Globe } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Sparkles, Heart, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1];
 
@@ -16,7 +16,6 @@ interface PhilosophyCard {
     border: string;
     dot: string;
   };
-  delay: number;
 }
 
 const CARDS: PhilosophyCard[] = [
@@ -32,7 +31,6 @@ const CARDS: PhilosophyCard[] = [
       border: 'rgba(156,163,175,0.3)',
       dot: '#d1d5db',
     },
-    delay: 0,
   },
   {
     subtitle: '02 — Humanity',
@@ -46,7 +44,6 @@ const CARDS: PhilosophyCard[] = [
       border: 'rgba(147,51,234,0.4)',
       dot: '#c084fc',
     },
-    delay: 0.1,
   },
   {
     subtitle: '03 — Social-First',
@@ -60,92 +57,49 @@ const CARDS: PhilosophyCard[] = [
       border: 'rgba(168,85,247,0.45)',
       dot: '#e879f9',
     },
-    delay: 0.2,
   },
 ];
 
-function PhilosophyCard({ card }: { card: PhilosophyCard }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(cardRef, { once: true, margin: '-10%' });
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 28 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-      transition={{ duration: 0.7, delay: card.delay, ease: EASE_OUT_EXPO }}
-      className="group relative w-full overflow-hidden rounded-2xl border backdrop-blur-sm"
-      style={{
-        background: 'rgba(255,255,255,0.03)',
-        borderColor: card.accent.border,
-      }}
-    >
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at 30% 50%, ${card.accent.light}, transparent 70%)`,
-        }}
-      />
-
-      <div className="relative z-10 p-6 md:p-10 flex flex-col sm:flex-row items-start gap-6 md:gap-10">
-        <div className="flex-shrink-0">
-          <div
-            className="w-14 h-14 rounded-xl flex items-center justify-center shadow-inner border border-white/10 text-white"
-            style={{
-              background: `linear-gradient(135deg, ${card.accent.from}, ${card.accent.to})`,
-              boxShadow: `inset 0 0 10px rgba(255,255,255,0.15), 0 0 20px ${card.accent.light}`,
-            }}
-          >
-            {card.icon}
-          </div>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div
-            className="text-[0.6rem] font-bold uppercase tracking-[0.3em] mb-3 flex items-center gap-3"
-            style={{ color: card.accent.dot }}
-          >
-            <span
-              className="h-px w-8 flex-shrink-0"
-              style={{ backgroundColor: card.accent.dot }}
-            />
-            {card.subtitle}
-          </div>
-
-          <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-snug mb-3">
-            {card.headline}
-          </h3>
-
-          <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(226,221,240,0.65)' }}>
-            {card.body}
-          </p>
-        </div>
-      </div>
-
-      <motion.div
-        className="absolute bottom-0 left-0 h-[2px] pointer-events-none"
-        initial={{ width: '0%' }}
-        animate={isInView ? { width: '100%' } : { width: '0%' }}
-        transition={{ duration: 1.1, delay: card.delay + 0.3, ease: EASE_OUT_EXPO }}
-        style={{ background: `linear-gradient(to right, ${card.accent.from}, ${card.accent.to})` }}
-      />
-    </motion.div>
-  );
-}
+const SLIDE_VARIANTS = {
+  enter: (dir: number) => ({
+    x: dir > 0 ? '100%' : '-100%',
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (dir: number) => ({
+    x: dir > 0 ? '-100%' : '100%',
+    opacity: 0,
+  }),
+};
 
 export function PhilosophyAct() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const dragStartX = useRef(0);
+  const card = CARDS[index];
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
+  const navigate = (newDir: number) => {
+    const next = index + newDir;
+    if (next < 0 || next >= CARDS.length) return;
+    setDirection(newDir);
+    setIndex(next);
+  };
 
-  const lineHeight = useTransform(scrollYProgress, [0, 0.5], ['0%', '100%']);
+  const handleDragStart = (_: any, info: any) => {
+    dragStartX.current = info.point.x;
+  };
+
+  const handleDragEnd = (_: any, info: any) => {
+    const delta = info.offset.x;
+    if (delta < -50) navigate(1);
+    else if (delta > 50) navigate(-1);
+  };
 
   return (
     <div
-      ref={sectionRef}
       className="relative w-full py-24 md:py-40 overflow-hidden"
       style={{ background: '#0e0820' }}
     >
@@ -187,20 +141,107 @@ export function PhilosophyAct() {
           </motion.p>
         </div>
 
-        <div className="relative flex flex-col gap-4 md:gap-5">
-          <div className="absolute left-0 top-0 bottom-0 w-px hidden md:block overflow-hidden" style={{ left: '-1.5rem' }}>
-            <motion.div
-              className="w-full"
-              style={{
-                height: lineHeight,
-                background: 'linear-gradient(to bottom, rgba(164,108,252,0.5), rgba(164,108,252,0.05))',
-              }}
-            />
+        <div className="relative">
+          <div className="overflow-hidden rounded-2xl" style={{ touchAction: 'pan-y' }}>
+            <AnimatePresence initial={false} custom={direction} mode="popLayout">
+              <motion.div
+                key={index}
+                custom={direction}
+                variants={SLIDE_VARIANTS}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.15}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                className="group relative w-full overflow-hidden rounded-2xl border backdrop-blur-sm cursor-grab active:cursor-grabbing select-none"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  borderColor: card.accent.border,
+                }}
+              >
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(ellipse at 30% 50%, ${card.accent.light}, transparent 70%)`,
+                  }}
+                />
+
+                <div className="relative z-10 p-8 md:p-14 flex flex-col sm:flex-row items-start gap-6 md:gap-10 min-h-[220px]">
+                  <div className="flex-shrink-0">
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center border border-white/10 text-white"
+                      style={{
+                        background: `linear-gradient(135deg, ${card.accent.from}, ${card.accent.to})`,
+                        boxShadow: `inset 0 0 10px rgba(255,255,255,0.15), 0 0 20px ${card.accent.light}`,
+                      }}
+                    >
+                      {card.icon}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div
+                      className="text-[0.6rem] font-bold uppercase tracking-[0.3em] mb-3 flex items-center gap-3"
+                      style={{ color: card.accent.dot }}
+                    >
+                      <span className="h-px w-8 flex-shrink-0" style={{ backgroundColor: card.accent.dot }} />
+                      {card.subtitle}
+                    </div>
+
+                    <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-snug mb-3">
+                      {card.headline}
+                    </h3>
+
+                    <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(226,221,240,0.65)' }}>
+                      {card.body}
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="absolute bottom-0 left-0 h-[2px] w-full pointer-events-none"
+                  style={{ background: `linear-gradient(to right, ${card.accent.from}, ${card.accent.to})` }}
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {CARDS.map((card) => (
-            <PhilosophyCard key={card.subtitle} card={card} />
-          ))}
+          <div className="flex items-center justify-between mt-6">
+            <div className="flex gap-2">
+              {CARDS.map((c, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setDirection(i > index ? 1 : -1); setIndex(i); }}
+                  className="relative h-1.5 transition-all duration-500 rounded-full overflow-hidden"
+                  style={{
+                    width: i === index ? '2.5rem' : '0.5rem',
+                    backgroundColor: i === index ? card.accent.dot : 'rgba(255,255,255,0.2)',
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate(-1)}
+                disabled={index === 0}
+                className="flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white disabled:opacity-25 transition-all active:scale-95"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => navigate(1)}
+                disabled={index === CARDS.length - 1}
+                className="flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-white disabled:opacity-25 transition-all active:scale-95"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

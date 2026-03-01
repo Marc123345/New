@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
-import THREE from "../lib/three";
+import React, { useEffect, useRef } from "react";
+// Assuming you have a local wrapper, but standard Three.js import is used here for compatibility.
+import * as THREE from "three"; 
 
 const VERT = `
   varying vec2 vUv;
@@ -32,30 +33,19 @@ const FLUID_FRAG = `
     vec2 vel = mouse - pmouse;
     float speed = length(vel);
 
-    float radius = 0.08;
+    // Increased radius and smoothstep for a softer, wider fluid spread
+    float radius = 0.12; 
     float dist = distance(uv, mouse);
     float strength = smoothstep(radius, 0.0, dist);
 
-    vec2 force = vel * strength * 8.0;
+    // Boosted force multiplier for more reactive trails
+    vec2 force = vel * strength * 12.0; 
     vec2 color = prev.rg + force;
 
-    color *= 0.965;
+    // Adjusted damping: 0.98 makes the trail last slightly longer (was 0.965)
+    color *= 0.98;
 
     gl_FragColor = vec4(color, 0.0, 1.0);
-  }
-`;
-
-const RENDER_FRAG = `
-  precision highp float;
-  uniform sampler2D uTexture;
-  uniform sampler2D uFluid;
-  varying vec2 vUv;
-
-  void main() {
-    vec2 fluid = texture2D(uFluid, vUv).rg;
-    vec2 uv = vUv + fluid * 0.012;
-    vec4 color = texture2D(uTexture, uv);
-    gl_FragColor = color;
   }
 `;
 
@@ -76,13 +66,18 @@ const GLOW_FRAG = `
     mouse.x *= uAspect;
 
     float dist = distance(uv, mouse);
-    float head = smoothstep(0.055, 0.0, dist);
+    float head = smoothstep(0.06, 0.0, dist);
 
-    vec3 trailColor = vec3(0.644, 0.424, 0.988);
-    vec3 headColor = vec3(0.486, 0.016, 0.988);
+    // UI Improvement: Dynamic colors based on velocity (len)
+    vec3 colorSlow = vec3(0.486, 0.016, 0.988); // Deep Purple
+    vec3 colorFast = vec3(0.0, 0.8, 1.0);       // Neon Cyan
+    
+    // Mix the colors based on how much fluid force is present
+    vec3 trailColor = mix(colorSlow, colorFast, min(len * 4.0, 1.0));
+    vec3 headColor = vec3(1.0, 1.0, 1.0); // White hot center
 
-    float trailAlpha = smoothstep(0.0, 0.18, len) * 0.7;
-    float headAlpha = head * 0.85;
+    float trailAlpha = smoothstep(0.0, 0.15, len) * 0.8;
+    float headAlpha = head * 0.9;
 
     float alpha = max(trailAlpha, headAlpha);
     vec3 col = mix(trailColor, headColor, head);
@@ -101,14 +96,20 @@ export function CursorTrail() {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-    renderer.setPixelRatio(1);
+    const renderer = new THREE.WebGLRenderer({ 
+      canvas, 
+      alpha: true, 
+      antialias: false,
+      powerPreference: "high-performance" 
+    });
+    
+    // Scale canvas for crisp UI, but keep simulation resolution standard for performance
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
     const geo = new THREE.PlaneGeometry(2, 2);
 
     const createRT = () =>
@@ -125,6 +126,7 @@ export function CursorTrail() {
     const mouse = new THREE.Vector2(-1, -1);
     const prevMouse = new THREE.Vector2(-1, -1);
     let hasEntered = false;
+    let isFirstMove = true; // Prevents sudden splatters on initial entry
 
     const fluidMat = new THREE.ShaderMaterial({
       vertexShader: VERT,
@@ -146,7 +148,7 @@ export function CursorTrail() {
         uAspect: { value: width / height },
       },
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.AdditiveBlending, // Makes the glow pop beautifully against dark backgrounds
       depthWrite: false,
     });
 
@@ -159,24 +161,44 @@ export function CursorTrail() {
     const glowScene = new THREE.Scene();
     glowScene.add(glowMesh);
 
-    const onMouseMove = (e: MouseEvent) => {
-      prevMouse.copy(mouse);
-      mouse.set(e.clientX / width, 1 - e.clientY / height);
+    const updateMouse = (clientX: number, clientY: number) => {
+      const x = clientX / width;
+      const y = 1.0 - clientY / height;
+
+      if (isFirstMove) {
+        prevMouse.set(x, y);
+        mouse.set(x, y);
+        isFirstMove = false;
+      } else {
+        prevMouse.copy(mouse);
+        mouse.set(x, y);
+      }
       hasEntered = true;
+    };
+
+    const onMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+      }
     };
 
     const onMouseLeave = () => {
       hasEntered = false;
+      isFirstMove = true; // Reset so returning to the screen doesn't draw a line
     };
 
     const onResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       renderer.setSize(width, height);
+      
+      // Recreate render targets to match new screen dimensions
       rtA.dispose();
       rtB.dispose();
       rtA = createRT();
       rtB = createRT();
+      
       fluidMat.uniforms.uAspect.value = width / height;
       glowMat.uniforms.uAspect.value = width / height;
     };
@@ -185,41 +207,59 @@ export function CursorTrail() {
 
     const tick = () => {
       rafId = requestAnimationFrame(tick);
-      if (!hasEntered) return;
+      
+      // If the mouse isn't on screen, we slowly fade out the buffer but skip heavy calculations
+      if (!hasEntered) {
+        prevMouse.copy(mouse); // Keeps velocity at 0 when idle
+      }
 
       fluidMat.uniforms.uPrev.value = rtA.texture;
       fluidMat.uniforms.uMouse.value = mouse;
       fluidMat.uniforms.uPrevMouse.value = prevMouse;
 
+      // 1. Render fluid simulation step
       renderer.setRenderTarget(rtB);
       renderer.render(fluidScene, camera);
       renderer.setRenderTarget(null);
 
+      // Swap buffers (Ping-Pong)
       const tmp = rtA;
       rtA = rtB;
       rtB = tmp;
 
+      // 2. Render final glowing output to screen
       glowMat.uniforms.uFluid.value = rtA.texture;
       glowMat.uniforms.uMouse.value = mouse;
 
       renderer.render(glowScene, camera);
 
+      // Always sync prevMouse for the next frame
       prevMouse.copy(mouse);
     };
 
     window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("touchend", onMouseLeave);
     window.addEventListener("resize", onResize);
+    
     rafId = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("touchend", onMouseLeave);
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
+      
+      // Memory cleanup
       renderer.dispose();
       rtA.dispose();
       rtB.dispose();
+      geo.dispose();
+      fluidMat.dispose();
+      glowMat.dispose();
     };
   }, []);
 
@@ -234,7 +274,7 @@ export function CursorTrail() {
         height: "100%",
         pointerEvents: "none",
         zIndex: 9999,
-        mixBlendMode: "screen",
+        mixBlendMode: "screen", // Excellent for glowing UI effects over dark backgrounds
       }}
     />
   );

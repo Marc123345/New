@@ -8,6 +8,16 @@ interface LoaderProps {
 const DURATION = 3200;
 const REVEAL_DURATION = 1000;
 
+// Moved outside the component to prevent recreation on every render
+const STATUS_STAGES = [
+  { at: 0, text: 'Initializing' },
+  { at: 20, text: 'Loading Assets' },
+  { at: 45, text: 'Building Scene' },
+  { at: 70, text: 'Rendering World' },
+  { at: 90, text: 'Almost Ready' },
+  { at: 99, text: 'Launching' },
+];
+
 export function Loader({ onComplete }: LoaderProps) {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<'loading' | 'reveal' | 'done'>('loading');
@@ -15,26 +25,20 @@ export function Loader({ onComplete }: LoaderProps) {
   const [glitchActive, setGlitchActive] = useState(false);
   const progressRef = useRef(0);
 
-  const STATUS_STAGES = [
-    { at: 0, text: 'Initializing' },
-    { at: 20, text: 'Loading Assets' },
-    { at: 45, text: 'Building Scene' },
-    { at: 70, text: 'Rendering World' },
-    { at: 90, text: 'Almost Ready' },
-    { at: 99, text: 'Launching' },
-  ];
-
   const triggerGlitch = useCallback(() => {
     setGlitchActive(true);
     setTimeout(() => setGlitchActive(false), 180);
   }, []);
 
   useEffect(() => {
+    let frameId: number;
+    let revealTimeout: ReturnType<typeof setTimeout>;
     const start = performance.now();
 
     const tick = () => {
       const elapsed = performance.now() - start;
       const p = Math.min(elapsed / DURATION, 1);
+      // Easing function
       const eased = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
       const prog = Math.round(eased * 100);
 
@@ -53,17 +57,23 @@ export function Loader({ onComplete }: LoaderProps) {
       }
 
       if (p < 1) {
-        requestAnimationFrame(tick);
+        frameId = requestAnimationFrame(tick);
       } else {
         setPhase('reveal');
-        setTimeout(() => {
+        revealTimeout = setTimeout(() => {
           setPhase('done');
           onComplete?.();
         }, REVEAL_DURATION);
       }
     };
 
-    requestAnimationFrame(tick);
+    frameId = requestAnimationFrame(tick);
+
+    // Cleanup function prevents memory leaks if component unmounts early
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(revealTimeout);
+    };
   }, [onComplete, triggerGlitch]);
 
   if (phase === 'done') return null;
@@ -459,28 +469,33 @@ export function Loader({ onComplete }: LoaderProps) {
         { top: 24, right: 24, rotate: 90 },
         { bottom: 24, right: 24, rotate: 180 },
         { bottom: 24, left: 24, rotate: 270 },
-      ].map((pos, i) => (
-        <div
-          key={i}
-          style={{
-            position: 'absolute',
-            ...pos,
-            width: 20,
-            height: 20,
-            opacity: isRevealing ? 0 : 0.3,
-            transition: isRevealing ? 'opacity 0.2s ease' : 'none',
-          }}
-        >
-          <svg viewBox="0 0 20 20" fill="none">
-            <path
-              d="M0 10 L0 0 L10 0"
-              stroke="rgba(255,255,255,0.5)"
-              strokeWidth="1.5"
-              strokeLinecap="square"
-            />
-          </svg>
-        </div>
-      ))}
+      ].map((pos, i) => {
+        // Bug Fix: Extracting rotation to properly apply it via 'transform'
+        const { rotate, ...positionProps } = pos; 
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              ...positionProps,
+              transform: `rotate(${rotate}deg)`,
+              width: 20,
+              height: 20,
+              opacity: isRevealing ? 0 : 0.3,
+              transition: isRevealing ? 'opacity 0.2s ease' : 'none',
+            }}
+          >
+            <svg viewBox="0 0 20 20" fill="none">
+              <path
+                d="M0 10 L0 0 L10 0"
+                stroke="rgba(255,255,255,0.5)"
+                strokeWidth="1.5"
+                strokeLinecap="square"
+              />
+            </svg>
+          </div>
+        );
+      })}
     </div>
   );
 }

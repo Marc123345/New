@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-// Assuming you have a local wrapper, but standard Three.js import is used here for compatibility.
 import * as THREE from "three"; 
 
 const VERT = `
@@ -33,17 +32,17 @@ const FLUID_FRAG = `
     vec2 vel = mouse - pmouse;
     float speed = length(vel);
 
-    // Increased radius and smoothstep for a softer, wider fluid spread
-    float radius = 0.12; 
+    // 1. SMALLER: Reduced radius from 0.12 to 0.04
+    float radius = 0.04; 
     float dist = distance(uv, mouse);
     float strength = smoothstep(radius, 0.0, dist);
 
-    // Boosted force multiplier for more reactive trails
-    vec2 force = vel * strength * 12.0; 
+    // 2. WEAKER: Reduced force from 12.0 to 4.0
+    vec2 force = vel * strength * 4.0; 
     vec2 color = prev.rg + force;
 
-    // Adjusted damping: 0.98 makes the trail last slightly longer (was 0.965)
-    color *= 0.98;
+    // 3. FASTER FADE: Reduced damping from 0.98 to 0.92 so it doesn't linger
+    color *= 0.92;
 
     gl_FragColor = vec4(color, 0.0, 1.0);
   }
@@ -66,18 +65,19 @@ const GLOW_FRAG = `
     mouse.x *= uAspect;
 
     float dist = distance(uv, mouse);
-    float head = smoothstep(0.06, 0.0, dist);
+    // Smaller head point
+    float head = smoothstep(0.03, 0.0, dist); 
 
-    // UI Improvement: Dynamic colors based on velocity (len)
-    vec3 colorSlow = vec3(0.486, 0.016, 0.988); // Deep Purple
-    vec3 colorFast = vec3(0.0, 0.8, 1.0);       // Neon Cyan
+    // 4. STRICTLY PURPLE: Locked the color palette to purple hues
+    vec3 colorSlow = vec3(0.4, 0.1, 0.8);  // Deep Purple
+    vec3 colorFast = vec3(0.7, 0.3, 1.0);  // Bright Neon Purple
     
-    // Mix the colors based on how much fluid force is present
-    vec3 trailColor = mix(colorSlow, colorFast, min(len * 4.0, 1.0));
-    vec3 headColor = vec3(1.0, 1.0, 1.0); // White hot center
+    vec3 trailColor = mix(colorSlow, colorFast, min(len * 8.0, 1.0));
+    vec3 headColor = vec3(0.9, 0.7, 1.0);  // Very light purple center
 
-    float trailAlpha = smoothstep(0.0, 0.15, len) * 0.8;
-    float headAlpha = head * 0.9;
+    // Reduced alpha overall so it's less visually overpowering
+    float trailAlpha = smoothstep(0.0, 0.08, len) * 0.6;
+    float headAlpha = head * 0.7;
 
     float alpha = max(trailAlpha, headAlpha);
     vec3 col = mix(trailColor, headColor, head);
@@ -103,7 +103,6 @@ export function CursorTrail() {
       powerPreference: "high-performance" 
     });
     
-    // Scale canvas for crisp UI, but keep simulation resolution standard for performance
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
@@ -126,7 +125,7 @@ export function CursorTrail() {
     const mouse = new THREE.Vector2(-1, -1);
     const prevMouse = new THREE.Vector2(-1, -1);
     let hasEntered = false;
-    let isFirstMove = true; // Prevents sudden splatters on initial entry
+    let isFirstMove = true; 
 
     const fluidMat = new THREE.ShaderMaterial({
       vertexShader: VERT,
@@ -148,7 +147,7 @@ export function CursorTrail() {
         uAspect: { value: width / height },
       },
       transparent: true,
-      blending: THREE.AdditiveBlending, // Makes the glow pop beautifully against dark backgrounds
+      blending: THREE.AdditiveBlending, 
       depthWrite: false,
     });
 
@@ -185,7 +184,7 @@ export function CursorTrail() {
 
     const onMouseLeave = () => {
       hasEntered = false;
-      isFirstMove = true; // Reset so returning to the screen doesn't draw a line
+      isFirstMove = true; 
     };
 
     const onResize = () => {
@@ -193,7 +192,6 @@ export function CursorTrail() {
       height = window.innerHeight;
       renderer.setSize(width, height);
       
-      // Recreate render targets to match new screen dimensions
       rtA.dispose();
       rtB.dispose();
       rtA = createRT();
@@ -208,32 +206,27 @@ export function CursorTrail() {
     const tick = () => {
       rafId = requestAnimationFrame(tick);
       
-      // If the mouse isn't on screen, we slowly fade out the buffer but skip heavy calculations
       if (!hasEntered) {
-        prevMouse.copy(mouse); // Keeps velocity at 0 when idle
+        prevMouse.copy(mouse); 
       }
 
       fluidMat.uniforms.uPrev.value = rtA.texture;
       fluidMat.uniforms.uMouse.value = mouse;
       fluidMat.uniforms.uPrevMouse.value = prevMouse;
 
-      // 1. Render fluid simulation step
       renderer.setRenderTarget(rtB);
       renderer.render(fluidScene, camera);
       renderer.setRenderTarget(null);
 
-      // Swap buffers (Ping-Pong)
       const tmp = rtA;
       rtA = rtB;
       rtB = tmp;
 
-      // 2. Render final glowing output to screen
       glowMat.uniforms.uFluid.value = rtA.texture;
       glowMat.uniforms.uMouse.value = mouse;
 
       renderer.render(glowScene, camera);
 
-      // Always sync prevMouse for the next frame
       prevMouse.copy(mouse);
     };
 
@@ -253,7 +246,6 @@ export function CursorTrail() {
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
       
-      // Memory cleanup
       renderer.dispose();
       rtA.dispose();
       rtB.dispose();
@@ -274,7 +266,7 @@ export function CursorTrail() {
         height: "100%",
         pointerEvents: "none",
         zIndex: 9999,
-        mixBlendMode: "screen", // Excellent for glowing UI effects over dark backgrounds
+        mixBlendMode: "screen",
       }}
     />
   );

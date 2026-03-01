@@ -12,7 +12,7 @@ const PILLARS = [
     description: "Your company's social presence is your digital storefront, but most brands leave it looking empty or generic. We turn your pages into platforms for thought leadership, brand storytelling, and meaningful engagement.",
     whatWeDo: ['Brand awareness campaigns', 'Product promotion', 'Employer branding', 'Community engagement', 'Video content'],
     closingNote: null,
-    icon: <Building2 size={32} />,
+    icon: <Building2 size={28} />,
     stats: [{ label: 'Avg. Engagement Lift', value: '3.2x' }, { label: 'Brand Impressions', value: '+180%' }, { label: 'Follower Growth', value: '+45%' }],
   },
   {
@@ -21,7 +21,7 @@ const PILLARS = [
     description: 'People want to hear from other people. We help your executives step into the spotlight with purpose, clarity, and authenticity — positioning them as respected voices in your industry.',
     whatWeDo: ['Tailored content creation', 'Strategic alignment', 'Industry thought leadership', 'Ghost-writing'],
     closingNote: 'By helping leaders build presence, we position your company as the home of the voices shaping the industry.',
-    icon: <Users size={32} />,
+    icon: <Users size={28} />,
     stats: [{ label: 'Profile Views', value: '+240%' }, { label: 'Connection Growth', value: '5x' }, { label: 'Content Reach', value: '+320%' }],
   },
   {
@@ -30,15 +30,15 @@ const PILLARS = [
     description: "The most trusted voices in your company aren't always in the C-suite — they're on your teams. Our Advocacy Program turns employees into empowered storytellers.",
     whatWeDo: ['Monthly workshops', 'Shareable content kits', 'Scalable infrastructure', 'Culture-first programming'],
     closingNote: 'We create internal champions who amplify your message and expand your reach through real human connection.',
-    icon: <Megaphone size={32} />,
+    icon: <Megaphone size={28} />,
     stats: [{ label: 'Employee Reach', value: '10x' }, { label: 'Organic Amplification', value: '+560%' }, { label: 'Team Participation', value: '78%' }],
   },
 ];
 
 const PILLAR_ACCENTS = [
-  { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.14)', border: 'rgba(147,51,234,0.3)', dot: '#c084fc' },
-  { from: '#4a1d96', to: '#7c3aed', light: 'rgba(74,29,150,0.14)', border: 'rgba(124,58,237,0.3)', dot: '#a78bfa' },
-  { from: '#2e1065', to: '#5b21b6', light: 'rgba(46,16,101,0.14)', border: 'rgba(91,33,182,0.3)', dot: '#8b5cf6' },
+  { from: '#6b21a8', to: '#9333ea', light: 'rgba(147,51,234,0.15)', border: 'rgba(147,51,234,0.4)', dot: '#c084fc' },
+  { from: '#1e3a8a', to: '#3b82f6', light: 'rgba(59,130,246,0.15)', border: 'rgba(59,130,246,0.4)', dot: '#93c5fd' },
+  { from: '#064e3b', to: '#10b981', light: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.4)', dot: '#6ee7b7' },
 ];
 
 /**
@@ -50,6 +50,7 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
   const y = Math.sin(angle) * radius;
   const showLabel = activeLabel === index;
   const isRightHalf = x > 0;
+  const accent = PILLAR_ACCENTS[index];
 
   return (
     <motion.div
@@ -64,28 +65,42 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
         transition={{ duration: 120, ease: 'linear', repeat: Infinity }}
         className="group relative flex items-center justify-center w-16 h-16 rounded-full focus:outline-none pointer-events-auto"
       >
+        {/* Glow effect */}
+        <div 
+          className="absolute inset-0 rounded-full blur-md opacity-50 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ background: accent.dot }}
+        />
+
         <div
-          className="relative z-10 w-full h-full rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110 border-2"
+          className="relative z-10 w-full h-full rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110 border border-white/20"
           style={{
-            background: 'linear-gradient(135deg, #2e1065, rgba(164,108,252,0.4))',
-            borderColor: '#9333ea',
-            boxShadow: '0 0 24px rgba(164,108,252,0.35)',
+            background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`,
+            boxShadow: `inset 0 0 12px rgba(255,255,255,0.2), 0 0 24px ${accent.light}`,
           }}
         >
-          <div className="text-white">{item.icon}</div>
+          <div className="text-white drop-shadow-md">{item.icon}</div>
         </div>
 
         <AnimatePresence>
           {showLabel && (
             <motion.div
-              initial={{ opacity: 0, x: isRightHalf ? 10 : -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isRightHalf ? 10 : -10 }}
-              className={`absolute whitespace-nowrap z-50 pointer-events-none ${isRightHalf ? 'left-full ml-4' : 'right-full mr-4'}`}
+              initial={{ opacity: 0, x: isRightHalf ? 10 : -10, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: isRightHalf ? 10 : -10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className={`absolute whitespace-nowrap z-50 pointer-events-none ${isRightHalf ? 'left-full ml-6' : 'right-full mr-6'}`}
             >
-              <span className="text-xs uppercase tracking-widest px-3 py-1 bg-black/90 border border-white/20 text-white rounded">
-                {item.subtitle}
-              </span>
+              <div 
+                className="px-4 py-2 bg-[#0e0820]/90 backdrop-blur-xl border rounded-lg shadow-xl"
+                style={{ borderColor: accent.border }}
+              >
+                <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: accent.dot }}>
+                  {item.subtitle}
+                </div>
+                <div className="text-white text-sm font-semibold tracking-wide">
+                  {item.title}
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -101,7 +116,6 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   
-  // Cache the index using a Ref to prevent exit-animation crashes
   const activeIndexRef = useRef<number | null>(null);
   if (pillarIndex !== null) {
     activeIndexRef.current = pillarIndex;
@@ -109,18 +123,20 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   
   const displayIndex = pillarIndex !== null ? pillarIndex : activeIndexRef.current;
   const displayService = displayIndex !== null ? PILLARS[displayIndex] : null;
+  const accent = displayIndex !== null ? PILLAR_ACCENTS[displayIndex] : PILLAR_ACCENTS[0];
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Handle body scroll locking and Escape key
   useEffect(() => {
     if (pillarIndex !== null) {
       document.body.style.overflow = 'hidden';
       
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
+        if (e.key === 'ArrowRight' && displayIndex < PILLARS.length - 1) onNavigate(displayIndex + 1);
+        if (e.key === 'ArrowLeft' && displayIndex > 0) onNavigate(displayIndex - 1);
       };
       window.addEventListener('keydown', handleKeyDown);
       
@@ -131,7 +147,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     } else {
       document.body.style.overflow = 'unset';
     }
-  }, [pillarIndex, onClose]);
+  }, [pillarIndex, onClose, displayIndex, onNavigate]);
 
   if (!mounted) return null;
 
@@ -140,12 +156,18 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
       {pillarIndex !== null && displayService && (
         <motion.div
           key="pillar-overlay-modal"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-xl h-[100dvh] pointer-events-auto"
+          initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+          animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
+          exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+          transition={{ duration: 0.4 }}
+          className="fixed inset-0 z-[9999] flex flex-col bg-[#0e0820]/80 h-[100dvh] pointer-events-auto"
         >
+          {/* Ambient Glow */}
+          <div 
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[40vh] blur-[120px] rounded-full opacity-30 pointer-events-none transition-colors duration-700"
+            style={{ backgroundColor: accent.dot }}
+          />
+
           {/* Close Button */}
           <button
             type="button"
@@ -154,86 +176,126 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
               e.stopPropagation();
               onClose();
             }}
-            className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-colors text-white cursor-pointer active:scale-95"
+            className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group"
             aria-label="Close overlay"
           >
-            <X size={20} />
+            <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
           </button>
 
           {/* Content Area */}
           <div 
             ref={scrollRef} 
-            className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-0" 
+            className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-10" 
             style={{ paddingTop: 'max(5rem, calc(3.5rem + env(safe-area-inset-top)))', paddingBottom: '4rem' }}
           >
             <div className="max-w-3xl mx-auto space-y-12">
               <motion.div 
+                key={`header-${displayIndex}`}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4 }}
                 className="space-y-4"
               >
-                <div className="flex items-center gap-4 text-purple-400 font-mono tracking-tighter">
-                  <span className="h-px w-8 bg-purple-500" />
+                <div className="flex items-center gap-4 font-mono tracking-tighter uppercase text-sm" style={{ color: accent.dot }}>
+                  <span className="h-px w-12" style={{ backgroundColor: accent.dot }} />
                   {displayService?.subtitle}
                 </div>
-                <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white uppercase tracking-tighter">
+                <h2 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white uppercase tracking-tighter leading-none">
                   {displayService?.title}
                 </h2>
-                <p className="text-xl text-white/60 leading-relaxed">
+                <p className="text-lg sm:text-xl text-white/70 leading-relaxed max-w-2xl">
                   {displayService?.description}
                 </p>
               </motion.div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              <motion.div 
+                key={`stats-${displayIndex}`}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="grid grid-cols-3 gap-3 sm:gap-6"
+              >
                 {displayService?.stats?.map((s: any, i: number) => (
-                  <div key={i} className="p-3 sm:p-6 border border-white/10 bg-white/5 rounded-lg text-center">
-                    <div className="text-lg sm:text-2xl font-bold text-purple-400 leading-tight">{s.value}</div>
-                    <div className="text-[9px] sm:text-[10px] uppercase text-white/40 mt-1">{s.label}</div>
+                  <div key={i} className="p-4 sm:p-6 border border-white/10 bg-black/20 backdrop-blur-md rounded-xl text-center relative overflow-hidden group">
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
+                    />
+                    <div className="relative z-10 text-2xl sm:text-4xl font-bold leading-tight" style={{ color: accent.dot }}>{s.value}</div>
+                    <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mt-2">{s.label}</div>
                   </div>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Deliverables */}
-              <div className="space-y-4">
-                <h4 className="text-xs uppercase tracking-widest text-white/30">What We Deliver</h4>
-                <div className="grid md:grid-cols-2 gap-3">
+              <motion.div 
+                key={`deliv-${displayIndex}`}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="space-y-6"
+              >
+                <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold">What We Deliver</h4>
+                <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
                   {displayService?.whatWeDo?.map((item: string, i: number) => (
-                    <div key={i} className="flex items-center gap-3 p-4 bg-white/5 border border-white/5 rounded">
-                      <Check size={16} className="text-purple-500 flex-shrink-0" />
-                      <span className="text-sm text-white/80">{item}</span>
+                    <div key={i} className="flex items-center gap-4 p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      <div className="p-1 rounded-full bg-white/5 border border-white/10" style={{ color: accent.dot }}>
+                        <Check size={14} strokeWidth={3} />
+                      </div>
+                      <span className="text-sm sm:text-base text-white/90">{item}</span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
+
+              {displayService?.closingNote && (
+                <motion.div
+                  key={`close-${displayIndex}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="p-6 border border-white/10 rounded-xl bg-white/5 text-center"
+                >
+                   <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
+                </motion.div>
+              )}
             </div>
           </div>
 
           {/* Navigation Footer */}
-          <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-black/80 backdrop-blur-md flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+          <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-[#0e0820]/90 backdrop-blur-xl flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
              <button
                type="button"
                disabled={displayIndex === 0}
                onClick={() => onNavigate(displayIndex - 1)}
-               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2 cursor-pointer"
+               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2 cursor-pointer transition-colors"
              >
-               <ArrowLeft size={20} /> <span className="hidden sm:inline">Prev</span>
+               <ArrowLeft size={20} /> <span className="hidden sm:inline font-medium uppercase tracking-widest text-xs">Prev</span>
              </button>
-             <div className="flex gap-2">
+             
+             <div className="flex gap-3">
                 {PILLARS.map((_, i) => (
-                  <div
+                  <button
                     key={i}
-                    className={`h-1.5 transition-all duration-300 rounded-full ${i === displayIndex ? 'w-8 bg-purple-500' : 'w-2 bg-white/20'}`}
-                  />
+                    onClick={() => onNavigate(i)}
+                    className="group relative flex items-center justify-center h-8"
+                  >
+                    <div
+                      className={`h-1.5 transition-all duration-500 rounded-full ${i === displayIndex ? 'w-10' : 'w-2 bg-white/20 group-hover:bg-white/40'}`}
+                      style={{ backgroundColor: i === displayIndex ? accent.dot : undefined }}
+                    />
+                  </button>
                 ))}
              </div>
+
              <button
                type="button"
                disabled={displayIndex === PILLARS.length - 1}
                onClick={() => onNavigate(displayIndex + 1)}
-               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2 cursor-pointer"
+               className="flex items-center gap-2 text-white/50 hover:text-white disabled:opacity-20 min-h-[44px] min-w-[44px] px-2 cursor-pointer transition-colors"
              >
-               <span className="hidden sm:inline">Next</span> <ArrowRight size={20} />
+               <span className="hidden sm:inline font-medium uppercase tracking-widest text-xs">Next</span> <ArrowRight size={20} />
              </button>
           </div>
         </motion.div>
@@ -260,20 +322,27 @@ export function EcosystemServices() {
 
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#0e0820]">
-      {/* Background Video */}
+      {/* Background Video with Radial Fade */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-20">
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-[0.15]">
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0e0820]/80 to-[#0e0820]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0e0820_80%)]" />
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 text-center pointer-events-none">
-        <h1 className="text-6xl md:text-9xl font-bold text-white/10 uppercase tracking-tighter mb-4">
-          Framework
-        </h1>
-        <p className="text-purple-400 font-mono tracking-widest uppercase text-sm">Three Pillars. One Ecosystem.</p>
+      {/* Central Hub & Text */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+        {/* Glowing core behind text */}
+        <div className="absolute w-64 h-64 md:w-96 md:h-96 bg-purple-600/20 rounded-full blur-[100px]" />
+        
+        <div className="relative text-center">
+          <h1 className="text-5xl sm:text-7xl md:text-9xl font-bold text-white/10 uppercase tracking-tighter mb-4">
+            Framework
+          </h1>
+          <p className="text-purple-400 font-mono tracking-widest uppercase text-xs sm:text-sm">
+            Three Pillars. One Ecosystem.
+          </p>
+        </div>
       </div>
 
       {/* Interactive Orbit (Desktop) */}
@@ -285,6 +354,12 @@ export function EcosystemServices() {
           onMouseEnter={() => setIsHoveringOrbit(true)}
           onMouseLeave={() => setIsHoveringOrbit(false)}
         >
+          {/* Faint Orbit Track */}
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-white/5 rounded-full pointer-events-none"
+            style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
+          />
+
           <div
             className="absolute inset-0"
             style={{
@@ -309,23 +384,38 @@ export function EcosystemServices() {
       </div>
 
       {/* Mobile Grid */}
-      <div className="relative z-30 sm:hidden w-full px-6 mt-12 space-y-4">
-        {PILLARS.map((p, i) => (
-          <button 
-            key={i} 
-            onClick={() => setSelectedService(i)}
-            className="w-full p-6 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between text-white active:scale-95 transition-transform"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-600/20 rounded-lg text-purple-400">{p.icon}</div>
-              <div className="text-left">
-                <div className="text-[10px] text-purple-400 uppercase">{p.subtitle}</div>
-                <div className="font-bold">{p.title}</div>
+      <div className="relative z-30 sm:hidden w-full px-6 mt-32 space-y-4">
+        {PILLARS.map((p, i) => {
+          const accent = PILLAR_ACCENTS[i];
+          return (
+            <button 
+              key={i} 
+              onClick={() => setSelectedService(i)}
+              className="group w-full p-5 bg-white/5 backdrop-blur-sm border rounded-2xl flex items-center justify-between text-white active:scale-95 transition-all duration-300 overflow-hidden relative"
+              style={{ borderColor: accent.border }}
+            >
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: `linear-gradient(90deg, ${accent.light}, transparent)` }}
+              />
+              <div className="flex items-center gap-4 relative z-10">
+                <div 
+                  className="p-3 rounded-xl shadow-inner border border-white/10" 
+                  style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})` }}
+                >
+                  {p.icon}
+                </div>
+                <div className="text-left">
+                  <div className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: accent.dot }}>
+                    {p.subtitle}
+                  </div>
+                  <div className="font-bold tracking-wide">{p.title}</div>
+                </div>
               </div>
-            </div>
-            <ArrowRight size={20} className="text-purple-500" />
-          </button>
-        ))}
+              <ArrowRight size={20} className="relative z-10 transition-transform group-hover:translate-x-1" style={{ color: accent.dot }} />
+            </button>
+          );
+        })}
       </div>
 
       <PillarOverlay

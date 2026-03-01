@@ -113,7 +113,7 @@ function OrbitNode({ item, index, total, radius, onSelect, activeLabel, onToggle
 }
 
 /**
- * PillarOverlay: Full-screen detail view using createPortal
+ * PillarOverlay: Modal view using createPortal
  */
 function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -158,236 +158,247 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
     <AnimatePresence>
       {pillarIndex !== null && displayService && (
         <motion.div
-          key="pillar-overlay-modal"
+          key="pillar-overlay-backdrop"
           initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-          animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
+          animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
           exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-          transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-[9999] flex flex-col bg-[#0e0820]/80 h-[100dvh] pointer-events-auto"
+          transition={{ duration: 0.3 }}
+          // We added an onClick here to close the modal when clicking outside of it
+          onClick={onClose}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0e0820]/80 p-4 sm:p-6 md:p-12 pointer-events-auto"
         >
-          {/* Ambient Glow */}
-          <div 
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[40vh] blur-[120px] rounded-full opacity-30 pointer-events-none transition-colors duration-700"
-            style={{ backgroundColor: accent.dot }}
-          />
-
-          {/* Close Button */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onClose();
+          {/* Inner Modal Container */}
+          <motion.div
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: 20, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            // We stop propagation here so clicking INSIDE the modal doesn't trigger the close
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex flex-col w-full max-w-4xl bg-[#0e0820] rounded-2xl shadow-2xl overflow-hidden"
+            style={{
+              maxHeight: 'calc(100vh - 2rem)', // Ensures it doesn't touch the top/bottom of screen
+              border: `2px solid ${accent.border}`,
+              boxShadow: `0 25px 50px -12px rgba(0,0,0,0.5), 0 0 30px ${accent.light}`,
             }}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group"
-            aria-label="Close overlay"
           >
-            <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-          </button>
+            {/* Ambient Glow */}
+            <div 
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-64 blur-[100px] rounded-full opacity-30 pointer-events-none transition-colors duration-700"
+              style={{ backgroundColor: accent.dot }}
+            />
 
-          {/* Content Area */}
-          <div 
-            ref={scrollRef} 
-            className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 scrollbar-hide relative z-10" 
-            style={{ paddingTop: 'max(5rem, calc(3.5rem + env(safe-area-inset-top)))', paddingBottom: '4rem' }}
-          >
-            <div className="max-w-3xl mx-auto space-y-12">
-              {/* Hero Image */}
-              {displayService?.image && (
-                <motion.div
-                  key={`image-${displayIndex}`}
-                  initial={{ opacity: 0, scale: 1.03 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="relative w-full overflow-hidden"
-                  style={{
-                    height: 'clamp(200px, 35vw, 360px)',
-                    border: `2px solid ${accent.border}`,
-                    boxShadow: `6px 6px 0 ${accent.dot}55`,
-                  }}
-                >
-                  <img
-                    src={displayService.image}
-                    alt={displayService.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: `linear-gradient(to top, #0e0820 0%, transparent 50%, ${accent.from}88 100%)` }}
-                  />
-                  <div className="absolute bottom-4 left-5">
-                    <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm font-semibold" style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-                      <span className="h-px w-8" style={{ backgroundColor: accent.dot }} />
-                      {displayService.subtitle}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+            {/* Close Button Inside the Modal */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-4 right-4 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-black/40 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group backdrop-blur-md"
+              aria-label="Close overlay"
+            >
+              <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+            </button>
 
-              <motion.div
-                key={`header-${displayIndex}`}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-4"
-              >
-                <h2 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white uppercase tracking-tighter leading-none">
-                  {displayService?.title}
-                </h2>
-                <p className="text-lg sm:text-xl text-white/70 leading-relaxed max-w-2xl">
-                  {displayService?.description}
-                </p>
-              </motion.div>
-
-              {/* Stats Grid */}
-              <motion.div 
-                key={`stats-${displayIndex}`}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-                className="grid grid-cols-3 gap-3 sm:gap-6"
-              >
-                {displayService?.stats?.map((s: any, i: number) => (
-                  <div
-                    key={i}
-                    className="p-4 sm:p-6 bg-black/20 backdrop-blur-md text-center relative overflow-hidden group transition-all duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5"
+            {/* Content Area */}
+            <div 
+              ref={scrollRef} 
+              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 py-10 scrollbar-hide relative z-10" 
+            >
+              <div className="max-w-3xl mx-auto space-y-12">
+                {/* Hero Image */}
+                {displayService?.image && (
+                  <motion.div
+                    key={`image-${displayIndex}`}
+                    initial={{ opacity: 0, scale: 1.03 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="relative w-full overflow-hidden rounded-xl"
                     style={{
+                      height: 'clamp(200px, 30vw, 320px)',
                       border: `2px solid ${accent.border}`,
-                      boxShadow: `4px 4px 0 ${accent.dot}44`,
+                      boxShadow: `6px 6px 0 ${accent.dot}55`,
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `6px 6px 0 ${accent.dot}66`; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `4px 4px 0 ${accent.dot}44`; }}
                   >
-                    <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
+                    <img
+                      src={displayService.image}
+                      alt={displayService.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
                     />
-                    <div className="relative z-10 text-2xl sm:text-4xl font-bold leading-tight" style={{ color: accent.dot }}>{s.value}</div>
-                    <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mt-2">{s.label}</div>
-                  </div>
-                ))}
-              </motion.div>
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: `linear-gradient(to top, #0e0820 0%, transparent 50%, ${accent.from}88 100%)` }}
+                    />
+                    <div className="absolute bottom-4 left-5">
+                      <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm font-semibold" style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+                        <span className="h-px w-8" style={{ backgroundColor: accent.dot }} />
+                        {displayService.subtitle}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
-              {/* Deliverables */}
-              <motion.div 
-                key={`deliv-${displayIndex}`}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                className="space-y-6"
-              >
-                <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold">What We Deliver</h4>
-                <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
-                  {displayService?.whatWeDo?.map((item: string, i: number) => (
+                <motion.div
+                  key={`header-${displayIndex}`}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4 pt-2"
+                >
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none">
+                    {displayService?.title}
+                  </h2>
+                  <p className="text-lg sm:text-xl text-white/70 leading-relaxed max-w-2xl">
+                    {displayService?.description}
+                  </p>
+                </motion.div>
+
+                {/* Stats Grid */}
+                <motion.div 
+                  key={`stats-${displayIndex}`}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="grid grid-cols-3 gap-3 sm:gap-6"
+                >
+                  {displayService?.stats?.map((s: any, i: number) => (
                     <div
                       key={i}
-                      className="flex items-center gap-4 p-4 bg-white/5 border hover:bg-white/10 transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5"
+                      className="p-4 sm:p-6 bg-black/20 backdrop-blur-md text-center relative overflow-hidden group transition-all duration-300 rounded-lg"
                       style={{
-                        borderColor: accent.border,
-                        boxShadow: `3px 3px 0 ${accent.dot}33`,
+                        border: `1px solid ${accent.border}`,
+                        boxShadow: `4px 4px 0 ${accent.dot}44`,
                       }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `6px 6px 0 ${accent.dot}66`; (e.currentTarget as HTMLDivElement).style.transform = `translate(-2px, -2px)`;}}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `4px 4px 0 ${accent.dot}44`; (e.currentTarget as HTMLDivElement).style.transform = `translate(0, 0)`;}}
                     >
                       <div
-                        className="flex-shrink-0 w-6 h-6 flex items-center justify-center border"
-                        style={{ borderColor: accent.dot, color: accent.dot, boxShadow: `2px 2px 0 ${accent.dot}44` }}
-                      >
-                        <Check size={12} strokeWidth={3} />
-                      </div>
-                      <span className="text-sm sm:text-base text-white/90">{item}</span>
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
+                      />
+                      <div className="relative z-10 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: accent.dot }}>{s.value}</div>
+                      <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mt-2">{s.label}</div>
                     </div>
                   ))}
-                </div>
-              </motion.div>
-
-              {displayService?.closingNote && (
-                <motion.div
-                  key={`close-${displayIndex}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="p-6 bg-white/5 text-center"
-                  style={{ border: `2px solid ${accent.border}`, boxShadow: `4px 4px 0 ${accent.dot}44` }}
-                >
-                   <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
                 </motion.div>
-              )}
-            </div>
-          </div>
 
-          {/* Navigation Footer */}
-          <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-[#0e0820]/90 backdrop-blur-xl flex justify-between items-center" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-             <button
-               type="button"
-               disabled={displayIndex === 0}
-               onClick={() => onNavigate(displayIndex - 1)}
-               className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase"
-               style={{
-                 fontFamily: 'var(--font-stack-heading)',
-                 fontSize: '0.7rem',
-                 letterSpacing: '0.15em',
-                 border: '2px solid #fbfbfc',
-                 color: '#fbfbfc',
-                 background: 'transparent',
-                 boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
-                 transition: 'box-shadow 0.18s ease, transform 0.18s ease',
-               }}
-               onMouseEnter={(e) => {
-                 if (displayIndex === 0) return;
-                 e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
-                 e.currentTarget.style.transform = 'translate(-2px, -2px)';
-               }}
-               onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
-                 e.currentTarget.style.transform = 'translate(0, 0)';
-               }}
-             >
-               <ArrowLeft size={16} /> <span className="hidden sm:inline">Prev</span>
-             </button>
+                {/* Deliverables */}
+                <motion.div 
+                  key={`deliv-${displayIndex}`}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="space-y-6"
+                >
+                  <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold">What We Deliver</h4>
+                  <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
+                    {displayService?.whatWeDo?.map((item: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 p-4 bg-white/5 border rounded-lg transition-all duration-200"
+                        style={{
+                          borderColor: accent.border,
+                        }}
+                      >
+                        <div
+                          className="flex-shrink-0 w-6 h-6 flex items-center justify-center border rounded-md"
+                          style={{ borderColor: accent.dot, color: accent.dot, background: 'rgba(0,0,0,0.2)' }}
+                        >
+                          <Check size={12} strokeWidth={3} />
+                        </div>
+                        <span className="text-sm sm:text-base text-white/90">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
 
-             <div className="flex gap-3">
-                {PILLARS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => onNavigate(i)}
-                    className="group relative flex items-center justify-center h-8"
+                {displayService?.closingNote && (
+                  <motion.div
+                    key={`close-${displayIndex}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="p-6 bg-white/5 text-center rounded-lg"
+                    style={{ border: `1px solid ${accent.border}` }}
                   >
-                    <div
-                      className={`h-1.5 transition-all duration-500 rounded-full ${i === displayIndex ? 'w-10' : 'w-2 bg-white/20 group-hover:bg-white/40'}`}
-                      style={{ backgroundColor: i === displayIndex ? accent.dot : undefined }}
-                    />
-                  </button>
-                ))}
-             </div>
+                     <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
+                  </motion.div>
+                )}
+              </div>
+            </div>
 
-             <button
-               type="button"
-               disabled={displayIndex === PILLARS.length - 1}
-               onClick={() => onNavigate(displayIndex + 1)}
-               className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase"
-               style={{
-                 fontFamily: 'var(--font-stack-heading)',
-                 fontSize: '0.7rem',
-                 letterSpacing: '0.15em',
-                 border: '2px solid #fbfbfc',
-                 color: '#fbfbfc',
-                 background: 'transparent',
-                 boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
-                 transition: 'box-shadow 0.18s ease, transform 0.18s ease',
-               }}
-               onMouseEnter={(e) => {
-                 if (displayIndex === PILLARS.length - 1) return;
-                 e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
-                 e.currentTarget.style.transform = 'translate(-2px, -2px)';
-               }}
-               onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
-                 e.currentTarget.style.transform = 'translate(0, 0)';
-               }}
-             >
-               <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
-             </button>
-          </div>
+            {/* Navigation Footer */}
+            <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-black/40 backdrop-blur-xl flex justify-between items-center">
+               <button
+                 type="button"
+                 disabled={displayIndex === 0}
+                 onClick={() => onNavigate(displayIndex - 1)}
+                 className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase rounded-md"
+                 style={{
+                   fontFamily: 'var(--font-stack-heading)',
+                   fontSize: '0.7rem',
+                   letterSpacing: '0.15em',
+                   border: '1px solid #fbfbfc',
+                   color: '#fbfbfc',
+                   background: 'transparent',
+                   transition: 'background 0.2s ease, color 0.2s ease',
+                 }}
+                 onMouseEnter={(e) => {
+                   if (displayIndex === 0) return;
+                   e.currentTarget.style.background = '#fbfbfc';
+                   e.currentTarget.style.color = '#0e0820';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.background = 'transparent';
+                   e.currentTarget.style.color = '#fbfbfc';
+                 }}
+               >
+                 <ArrowLeft size={16} /> <span className="hidden sm:inline">Prev</span>
+               </button>
+
+               <div className="flex gap-3">
+                 {PILLARS.map((_, i) => (
+                   <button
+                     key={i}
+                     onClick={() => onNavigate(i)}
+                     className="group relative flex items-center justify-center h-8"
+                     aria-label={`Go to pillar ${i + 1}`}
+                   >
+                     <div
+                       className={`h-1.5 transition-all duration-500 rounded-full ${i === displayIndex ? 'w-10' : 'w-2 bg-white/20 group-hover:bg-white/40'}`}
+                       style={{ backgroundColor: i === displayIndex ? accent.dot : undefined }}
+                     />
+                   </button>
+                 ))}
+               </div>
+
+               <button
+                 type="button"
+                 disabled={displayIndex === PILLARS.length - 1}
+                 onClick={() => onNavigate(displayIndex + 1)}
+                 className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase rounded-md"
+                 style={{
+                   fontFamily: 'var(--font-stack-heading)',
+                   fontSize: '0.7rem',
+                   letterSpacing: '0.15em',
+                   border: '1px solid #fbfbfc',
+                   color: '#fbfbfc',
+                   background: 'transparent',
+                   transition: 'background 0.2s ease, color 0.2s ease',
+                 }}
+                 onMouseEnter={(e) => {
+                   if (displayIndex === PILLARS.length - 1) return;
+                   e.currentTarget.style.background = '#fbfbfc';
+                   e.currentTarget.style.color = '#0e0820';
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.background = 'transparent';
+                   e.currentTarget.style.color = '#fbfbfc';
+                 }}
+               >
+                 <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
+               </button>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>,

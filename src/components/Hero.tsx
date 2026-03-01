@@ -775,7 +775,7 @@ export function Hero() {
                   className="relative mx-auto w-full h-[340px] sm:h-[480px] md:h-[700px] lg:h-[820px] overflow-hidden"
                   style={{
                     border: "3px solid var(--color-text-dark)",
-                    boxShadow: "10px 10px 0 var(--color-surface-dark)",
+                    boxShadow: "-10px 10px 0 var(--color-surface-dark)",
                     background: "#000",
                   }}
                 >

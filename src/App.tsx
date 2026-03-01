@@ -31,16 +31,18 @@ const BlogSection = lazy(() =>
 interface SectionProps {
   id: string;
   className?: string;
+  style?: React.CSSProperties; // Added to support custom styles like zIndex
   children: React.ReactNode;
   revealMode?: "blur" | "parallax" | "3d";
   delay?: number;
   noPadding?: boolean;
 }
 
-// Added Suspense directly into the Section component to safely handle any lazy-loaded children
+// Section now handles all LazyLoading, ScrollReveal, and Suspense centrally
 const Section = ({
   id,
   className = "",
+  style = {},
   children,
   revealMode = "blur",
   delay = 0,
@@ -49,9 +51,10 @@ const Section = ({
   <section
     id={id}
     className={className}
-    style={noPadding ? {} : {
-      paddingTop: 'var(--space-8x)',
-      paddingBottom: 'var(--space-8x)'
+    style={{
+      ...style,
+      paddingTop: noPadding ? 0 : 'var(--space-8x)',
+      paddingBottom: noPadding ? 0 : 'var(--space-8x)'
     }}
   >
     <LazySection>
@@ -72,40 +75,30 @@ function AppContent() {
       <ScrollProgress />
 
       <Hero />
-
+      
       <StorySection />
 
-      <div id="ecosystem" className="relative bg-[var(--color-background-light)]" style={{ zIndex: 2 }}>
-        <Suspense fallback={<SectionLoader />}>
-          <EcosystemServices />
-        </Suspense>
-      </div>
+      {/* Replaced standard divs with the unified Section component */}
+      <Section id="ecosystem" className="relative bg-[var(--color-background-light)]" style={{ zIndex: 2 }}>
+        <EcosystemServices />
+      </Section>
 
-      <div id="about" className="relative bg-[var(--color-background-light)]" style={{ zIndex: 2 }}>
-        <Suspense fallback={<SectionLoader />}>
-          <AboutStory />
-        </Suspense>
-      </div>
+      <Section id="about" className="relative bg-[var(--color-background-light)]" style={{ zIndex: 2 }}>
+        <AboutStory />
+      </Section>
 
-      {/* ArcSlider is lazy-loaded, and Section now safely handles it with an internal Suspense */}
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
         <ArcSlider />
       </Section>
 
-      {/* Testimonials is lazy-loaded, and Section now safely handles it */}
       <Section id="testimonials" className="bg-[var(--color-background-light)]">
         <Testimonials />
       </Section>
 
-      <div id="blog" className="bg-[var(--color-background-light)]">
-        <LazySection>
-          <Suspense fallback={<SectionLoader />}>
-            <BlogSection />
-          </Suspense>
-        </LazySection>
-      </div>
+      <Section id="blog" className="bg-[var(--color-background-light)]">
+        <BlogSection />
+      </Section>
 
-      {/* ContactForm is statically imported, so it renders normally inside Section */}
       <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
         <ContactForm />
       </Section>
@@ -121,6 +114,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+      {/* Keeping AppContent mounted while PageLoader runs helps prevent layout shifts */}
       {!loaded && <PageLoader onComplete={handleLoaderComplete} />}
       <AppContent />
     </ErrorBoundary>

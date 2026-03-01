@@ -179,7 +179,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
               e.stopPropagation();
               onClose();
             }}
-            className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/5 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group"
             aria-label="Close overlay"
           >
             <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />

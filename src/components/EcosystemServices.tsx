@@ -217,7 +217,7 @@ function PillarOverlay({ pillarIndex, onClose, onNavigate }: any) {
                     style={{ background: `linear-gradient(to top, #0e0820 0%, transparent 50%, ${accent.from}88 100%)` }}
                   />
                   <div className="absolute bottom-4 left-5">
-                    <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm" style={{ color: accent.dot }}>
+                    <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm font-semibold" style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                       <span className="h-px w-8" style={{ backgroundColor: accent.dot }} />
                       {displayService.subtitle}
                     </div>

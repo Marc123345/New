@@ -127,15 +127,17 @@ export function Navigation() {
             Get Started
           </motion.a>
 
-          <button
+          <motion.button
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
+            animate={{ opacity: open ? 0 : 1, pointerEvents: open ? "none" : "auto" }}
+            transition={{ duration: 0.2 }}
             className="flex items-center justify-center focus:outline-none"
             style={{ width: 44, height: 44 }}
           >
-            <HamburgerIcon open={open} />
-          </button>
+            <HamburgerIcon open={false} />
+          </motion.button>
         </div>
       </motion.header>
 

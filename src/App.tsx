@@ -29,9 +29,6 @@ const Testimonials = lazy(() =>
 const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
 );
-const AfricaPresence = lazy(() =>
-  import("./components/africa/AfricaPresence").then((m) => ({ default: m.AfricaPresence })),
-);
 
 interface SectionProps {
   id: string;
@@ -157,14 +154,6 @@ function AppContent() {
       <Section id="testimonials" className="bg-[var(--color-background-light)]">
         <Testimonials />
       </Section>
-
-      <div id="africa-presence" className="relative" style={{ zIndex: 2 }}>
-        <LazySection>
-          <Suspense fallback={<SectionLoader />}>
-            <AfricaPresence />
-          </Suspense>
-        </LazySection>
-      </div>
 
       <div id="blog">
         <LazySection>

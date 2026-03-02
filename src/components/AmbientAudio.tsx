@@ -64,34 +64,63 @@ export function AmbientAudio() {
   const ctxRef = useRef<AudioContext | null>(null);
   const masterRef = useRef<GainNode | null>(null);
   const nodesRef = useRef<{ stop: () => void }[]>([]);
+  const autoStartedRef = useRef(false);
+
+  const startAudio = useCallback(() => {
+    if (ctxRef.current) return;
+    const ctx = new AudioContext();
+    const master = ctx.createGain();
+    master.gain.value = 0;
+    master.connect(ctx.destination);
+    master.gain.linearRampToValueAtTime(MASTER_VOLUME, ctx.currentTime + FADE_DURATION);
+    ctxRef.current = ctx;
+    masterRef.current = master;
+    nodesRef.current = createAmbientNodes(ctx, master);
+    setPlaying(true);
+  }, []);
+
+  const stopAudio = useCallback(() => {
+    const master = masterRef.current;
+    const ctx = ctxRef.current;
+    if (master && ctx) {
+      master.gain.linearRampToValueAtTime(0, ctx.currentTime + FADE_DURATION);
+      setTimeout(() => {
+        nodesRef.current.forEach((n) => { try { n.stop(); } catch {} });
+        nodesRef.current = [];
+        ctx.close();
+        ctxRef.current = null;
+        masterRef.current = null;
+      }, FADE_DURATION * 1000 + 100);
+    }
+    setPlaying(false);
+  }, []);
 
   const toggle = useCallback(() => {
-    if (playing) {
-      const master = masterRef.current;
-      const ctx = ctxRef.current;
-      if (master && ctx) {
-        master.gain.linearRampToValueAtTime(0, ctx.currentTime + FADE_DURATION);
-        setTimeout(() => {
-          nodesRef.current.forEach((n) => { try { n.stop(); } catch {} });
-          nodesRef.current = [];
-          ctx.close();
-          ctxRef.current = null;
-          masterRef.current = null;
-        }, FADE_DURATION * 1000 + 100);
-      }
-      setPlaying(false);
-    } else {
-      const ctx = new AudioContext();
-      const master = ctx.createGain();
-      master.gain.value = 0;
-      master.connect(ctx.destination);
-      master.gain.linearRampToValueAtTime(MASTER_VOLUME, ctx.currentTime + FADE_DURATION);
-      ctxRef.current = ctx;
-      masterRef.current = master;
-      nodesRef.current = createAmbientNodes(ctx, master);
-      setPlaying(true);
-    }
-  }, [playing]);
+    if (playing) stopAudio();
+    else startAudio();
+  }, [playing, startAudio, stopAudio]);
+
+  useEffect(() => {
+    const autoStart = () => {
+      if (autoStartedRef.current) return;
+      autoStartedRef.current = true;
+      startAudio();
+      window.removeEventListener('click', autoStart);
+      window.removeEventListener('scroll', autoStart);
+      window.removeEventListener('keydown', autoStart);
+      window.removeEventListener('touchstart', autoStart);
+    };
+    window.addEventListener('click', autoStart, { once: false, passive: true });
+    window.addEventListener('scroll', autoStart, { once: false, passive: true });
+    window.addEventListener('keydown', autoStart, { once: false, passive: true });
+    window.addEventListener('touchstart', autoStart, { once: false, passive: true });
+    return () => {
+      window.removeEventListener('click', autoStart);
+      window.removeEventListener('scroll', autoStart);
+      window.removeEventListener('keydown', autoStart);
+      window.removeEventListener('touchstart', autoStart);
+    };
+  }, [startAudio]);
 
   useEffect(() => {
     return () => {

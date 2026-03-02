@@ -3227,6 +3227,25 @@ body {
   box-shadow: 0 0 8px #a46cfc66;
 }
 
+.hero-webgl-container {
+  height: 360px;
+}
+@media (min-width: 640px) {
+  .hero-webgl-container {
+    height: 500px;
+  }
+}
+@media (min-width: 768px) {
+  .hero-webgl-container {
+    height: 680px;
+  }
+}
+@media (min-width: 1024px) {
+  .hero-webgl-container {
+    height: 800px;
+  }
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

@@ -98,7 +98,7 @@ function AppContent() {
           <div className="max-w-8xl mx-auto">
             <HeroTitle>
               <div
-                className="relative mx-auto w-full h-[360px] sm:h-[500px] md:h-[680px] lg:h-[800px] overflow-hidden"
+                className="hero-webgl-container relative mx-auto w-full overflow-hidden"
                 style={{
                   background: "#040608",
                   borderRadius: "2px",

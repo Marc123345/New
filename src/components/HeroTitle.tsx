@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { VideoOverlay } from './VideoOverlay';
+import { HologramOverlay } from './HologramOverlay';
 import { HeroGalaxy } from './galaxy/HeroGalaxy';
 
 function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
@@ -34,6 +35,7 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
 
 export function HeroTitle({ children }: { children?: React.ReactNode }) {
   const [videoOpen, setVideoOpen] = useState(false);
+  const [hologramOpen, setHologramOpen] = useState(false);
 
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -87,13 +89,11 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
             transition={{ ...fadeInUp.transition, delay: 0.35 }}
             className="flex flex-wrap gap-4"
           >
-            <HeroButton variant="primary" onClick={() => {
-              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
-              Book a Call
-            </HeroButton>
-            <HeroButton variant="outline" onClick={() => setVideoOpen(true)}>
+            <HeroButton variant="primary" onClick={() => setVideoOpen(true)}>
               Hear Our Story
+            </HeroButton>
+            <HeroButton variant="outline" onClick={() => setHologramOpen(true)}>
+              Meet the Founder
             </HeroButton>
           </motion.div>
         </header>
@@ -121,6 +121,11 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
       <VideoOverlay
         isOpen={videoOpen}
         onClose={() => setVideoOpen(false)}
+      />
+
+      <HologramOverlay
+        isOpen={hologramOpen}
+        onClose={() => setHologramOpen(false)}
       />
 
       <style>{`

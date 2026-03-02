@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
@@ -8,9 +7,9 @@ import { useOverlay } from '../../hooks/useOverlay';
 const ALL_SERVICES = PILLARS;
 
 const PILLAR_ACCENTS = [
-  { from: '#0369a1', to: '#0ea5e9', light: 'rgba(3,105,161,0.12)', border: 'rgba(14,165,233,0.28)', dot: '#38bdf8' },
-  { from: '#0f766e', to: '#14b8a6', light: 'rgba(15,118,110,0.12)', border: 'rgba(20,184,166,0.28)', dot: '#2dd4bf' },
-  { from: '#1d4ed8', to: '#3b82f6', light: 'rgba(29,78,216,0.12)', border: 'rgba(59,130,246,0.28)', dot: '#60a5fa' },
+  { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.14)', border: 'rgba(147,51,234,0.3)', dot: '#c084fc' },
+  { from: '#4a1d96', to: '#7c3aed', light: 'rgba(74,29,150,0.14)', border: 'rgba(124,58,237,0.3)', dot: '#a78bfa' },
+  { from: '#2e1065', to: '#5b21b6', light: 'rgba(46,16,101,0.14)', border: 'rgba(91,33,182,0.3)', dot: '#8b5cf6' },
 ];
 
 interface PillarOverlayProps {
@@ -46,7 +45,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
   const hasPrev = pillarIndex !== null && pillarIndex > 0;
   const hasNext = pillarIndex !== null && pillarIndex < ALL_SERVICES.length - 1;
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {pillarIndex !== null && activeService && (
         <>
@@ -57,8 +56,8 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             onClick={onClose}
-            className="fixed inset-0 z-[200]"
-            style={{ background: 'rgba(4,4,8,0.96)' }}
+            className="fixed inset-0 z-[150]"
+            style={{ background: 'rgba(4,4,8,0.82)', backdropFilter: 'blur(20px)' }}
           />
 
           <motion.div
@@ -66,7 +65,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[201] flex items-center justify-center p-4 md:p-8"
+            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -77,15 +76,15 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                 ref={modalRef}
                 key={pillarIndex}
                 tabIndex={-1}
-                initial={{ opacity: 0, y: 32, scale: 0.94 }}
+                initial={{ opacity: 0, y: 48, scale: 0.92 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -16, scale: 0.96 }}
+                exit={{ opacity: 0, y: -24, scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 280, damping: 28, mass: 0.85 }}
                 onClick={(e) => e.stopPropagation()}
                 className="relative w-full focus:outline-none flex flex-col"
                 style={{
                   maxWidth: 760,
-                  maxHeight: 'calc(100dvh - 2rem)',
+                  maxHeight: '88dvh',
                   borderRadius: '0',
                   background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
                   border: `1px solid ${accent.border}`,
@@ -393,7 +392,6 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
           </motion.div>
         </>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
 }

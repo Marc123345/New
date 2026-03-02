@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { createPortal } from "react-dom";
 import { X, ArrowLeft, ArrowRight } from "lucide-react";
 import { BlogPost, BLOG_POSTS } from "../constants/blog";
 import gsap from "gsap";
@@ -41,10 +40,10 @@ export function BlogOverlay({ post, onClose, onNavigate }: BlogOverlayProps) {
     if (e.target === e.currentTarget) handleClose();
   };
 
-  return createPortal(
+  return (
     <div
-      className="blog-overlay fixed inset-0 z-[200] flex items-center justify-center"
-      style={{ backgroundColor: "rgba(0,0,0,0.97)" }}
+      className="blog-overlay fixed inset-0 z-[150] flex items-center justify-center"
+      style={{ backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)" }}
       onClick={handleOverlayClick}
     >
       <div
@@ -54,7 +53,7 @@ export function BlogOverlay({ post, onClose, onNavigate }: BlogOverlayProps) {
         {/* Fixed top bar */}
         <div
           className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-12 py-4"
-          style={{ background: "rgba(14,11,31,0.98)", borderBottom: "1px solid rgba(164,108,252,0.15)" }}
+          style={{ background: "rgba(14,11,31,0.95)", backdropFilter: "blur(8px)", borderBottom: "1px solid rgba(164,108,252,0.15)" }}
         >
           <button
             onClick={handleClose}
@@ -179,7 +178,7 @@ export function BlogOverlay({ post, onClose, onNavigate }: BlogOverlayProps) {
         {/* Bottom navigation bar */}
         <div
           className="sticky bottom-0 z-20"
-          style={{ background: "rgba(14,11,31,0.98)", borderTop: "1px solid rgba(164,108,252,0.15)" }}
+          style={{ background: "rgba(14,11,31,0.96)", backdropFilter: "blur(8px)", borderTop: "1px solid rgba(164,108,252,0.15)" }}
         >
           <div className="max-w-3xl mx-auto flex items-center justify-between px-6 md:px-8 py-4">
             <button
@@ -216,7 +215,6 @@ export function BlogOverlay({ post, onClose, onNavigate }: BlogOverlayProps) {
           </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }

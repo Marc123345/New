@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Play } from 'lucide-react';
 
@@ -9,7 +8,6 @@ const FOUNDER_VIDEO_URL =
 interface HologramOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
 }
 
 function FloatingParticles() {
@@ -223,7 +221,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
   );
 }
 
-export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }: HologramOverlayProps) {
+export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -424,7 +422,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }:
     setPlaying(false);
   };
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -812,13 +810,12 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }:
                   fontFamily: 'var(--font-stack-heading)',
                 }}
               >
-                {title}
+                Meet the Founder
               </motion.p>
             </div>
           </motion.div>
         </>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
 }

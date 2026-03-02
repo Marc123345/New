@@ -19,8 +19,8 @@ const SERVICES = [
     description:
       "Strategic company page management that builds brand authority and engages your professional community.",
     icon: Globe,
-    color: "#38bdf8",
-    bgColor: "#0369a1",
+    color: "#7B2FF2",
+    bgColor: "#5A05E6",
     image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Company page strategy & setup",
@@ -37,8 +37,8 @@ const SERVICES = [
     description:
       "Elevate your executives into thought leaders with strategic personal branding and content.",
     icon: Users,
-    color: "#2dd4bf",
-    bgColor: "#0f766e",
+    color: "#9B59F5",
+    bgColor: "#6F11F5",
     image: "https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Personal brand audit & strategy",
@@ -55,8 +55,8 @@ const SERVICES = [
     description:
       "Turn your team into brand ambassadors with structured employee advocacy programs.",
     icon: TrendingUp,
-    color: "#60a5fa",
-    bgColor: "#1d4ed8",
+    color: "#B181FC",
+    bgColor: "#8338EC",
     image: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Advocacy programme design & rollout",
@@ -73,8 +73,8 @@ const SERVICES = [
     description:
       "Your website is often your first impression. We make sure it's the right one. Beautiful, high-converting websites with SEO built in from day one.",
     icon: Globe,
-    color: "#34d399",
-    bgColor: "#065f46",
+    color: "#6610E6",
+    bgColor: "#4A00D8",
     image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Strategic design & copywriting",
@@ -91,8 +91,8 @@ const SERVICES = [
     description:
       "Great content deserves an audience. We create and manage paid campaigns that amplify your message and drive real business outcomes.",
     icon: Target,
-    color: "#e2e8f0",
-    bgColor: "#1e293b",
+    color: "#e8e2ff",
+    bgColor: "#1a1535",
     image: "https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Paid strategy & audience targeting",
@@ -109,8 +109,8 @@ const SERVICES = [
     description:
       "When it comes to storytelling, words matter! We craft clear, engaging, and on-brand content that connects.",
     icon: Sparkles,
-    color: "#fbbf24",
-    bgColor: "#92400e",
+    color: "#C9A3FF",
+    bgColor: "#3A0CA3",
     image: "https://images.pexels.com/photos/3182781/pexels-photo-3182781.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Social captions and campaigns",
@@ -433,7 +433,7 @@ export function ArcSlider() {
       }
 
       const shadow = absOffset === 0
-        ? "10px 10px 0 rgba(14,165,233,0.4)"
+        ? "10px 10px 0 rgba(164,108,252,0.6)"
         : "none";
 
       if (animate) {
@@ -557,7 +557,7 @@ export function ArcSlider() {
             className="text-xs font-semibold tracking-[0.3em] mb-4 block uppercase"
             style={{
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-accent, #0ea5e9)",
+              color: "var(--color-secondary, #9B59F5)",
             }}
           >
             Our Capabilities
@@ -595,17 +595,17 @@ export function ArcSlider() {
                 textTransform: "uppercase",
                 padding: "10px 24px",
                 whiteSpace: "nowrap",
-                border: "2px solid #0ea5e9",
+                border: "2px solid var(--color-secondary, #9B59F5)",
                 borderRadius: "0",
                 background: i === activeIndex
-                  ? "#0ea5e9"
+                  ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
                 color: i === activeIndex
-                  ? "#fff"
+                  ? "var(--color-background-light, #fff)"
                   : "var(--color-text-dark, #111)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
-                  ? "0 4px 14px rgba(14,165,233,0.35)"
+                  ? "0 4px 14px rgba(155, 89, 245, 0.4)"
                   : "none",
               }}
             >
@@ -751,8 +751,8 @@ export function ArcSlider() {
                 height: 4,
                 borderRadius: "0",
                 background: i === activeIndex
-                  ? "#0ea5e9"
-                  : "rgba(14,165,233,0.18)",
+                  ? "var(--color-secondary, #9B59F5)"
+                  : "rgba(155, 89, 245, 0.2)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,

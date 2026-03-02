@@ -1,4 +1,3 @@
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { SECONDARY_SERVICES } from '../constants/ecosystem';
@@ -13,7 +12,7 @@ interface ServiceOverlayProps {
 export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOverlayProps) {
   useOverlay(serviceIndex !== null, onClose);
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {serviceIndex !== null && (
         <>
@@ -24,8 +23,11 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="fixed inset-0 z-[200]"
-            style={{ backgroundColor: 'rgba(5,5,5,0.97)' }}
+            className="fixed inset-0 z-[150]"
+            style={{
+              backgroundColor: 'rgba(5,5,5,0.95)',
+              backdropFilter: 'blur(28px)'
+            }}
           />
 
           <motion.div
@@ -33,7 +35,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[201] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
+            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
             onClick={onClose}
           >
             <AnimatePresence mode="wait">
@@ -56,7 +58,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                 <div
                   style={{
                     height: 3,
-                    background: 'linear-gradient(to right, #0369a1, #0ea5e9)',
+                    background: 'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
                   }}
                 />
 
@@ -108,7 +110,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                         style={{
                           fontSize: 11,
                           letterSpacing: '0.3em',
-                          color: '#0ea5e9',
+                          color: 'var(--color-primary)',
                           opacity: 0.8,
                           textTransform: 'uppercase',
                           marginBottom: 12,
@@ -177,7 +179,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                               fontSize: 12,
                               letterSpacing: '0.04em',
                               border: '1px solid var(--color-surface-dark)',
-                              backgroundColor: 'rgba(14,165,233,0.05)',
+                              backgroundColor: 'rgba(124,4,252,0.05)',
                               color: 'var(--color-text-dark)',
                               fontFamily: 'var(--font-stack-body)',
                             }}
@@ -194,7 +196,6 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
           </motion.div>
         </>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
 }

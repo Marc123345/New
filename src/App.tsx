@@ -73,41 +73,47 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#000' }}
+        style={{ background: '#040608' }}
       >
         <div className="absolute inset-0" style={{
           background: `
-            radial-gradient(ellipse at 20% 15%, rgba(15, 25, 60, 0.7) 0%, transparent 45%),
-            radial-gradient(ellipse at 75% 20%, rgba(10, 35, 70, 0.5) 0%, transparent 40%),
-            radial-gradient(ellipse at 85% 75%, rgba(20, 30, 65, 0.6) 0%, transparent 50%),
-            radial-gradient(ellipse at 40% 80%, rgba(8, 20, 55, 0.5) 0%, transparent 45%),
-            radial-gradient(ellipse at 55% 45%, rgba(5, 12, 35, 0.8) 0%, transparent 60%),
-            radial-gradient(ellipse at 10% 60%, rgba(12, 22, 50, 0.4) 0%, transparent 35%),
-            radial-gradient(ellipse at 50% 50%, #030810 0%, #010204 100%)
+            radial-gradient(ellipse at 15% 20%, rgba(8, 18, 40, 0.6) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 15%, rgba(6, 16, 36, 0.4) 0%, transparent 45%),
+            radial-gradient(ellipse at 90% 80%, rgba(10, 20, 44, 0.5) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, #040608 0%, #020304 100%)
           `
         }}>
           <Starfield />
         </div>
 
         <div
-          className="relative z-10 px-6 md:px-12"
+          className="relative z-10 px-4 md:px-8 lg:px-12"
           style={{
             paddingTop: 'var(--space-8x)',
             paddingBottom: 'var(--space-8x)',
           }}
         >
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-8xl mx-auto">
             <HeroTitle>
               <ScrollReveal mode="blur" delay={0.2} className="w-full">
                 <div
-                  className="relative mx-auto w-full h-[340px] sm:h-[480px] md:h-[700px] lg:h-[820px] overflow-hidden"
+                  className="relative mx-auto w-full h-[360px] sm:h-[500px] md:h-[680px] lg:h-[800px] overflow-hidden"
                   style={{
-                    border: "3px solid var(--color-text-dark)",
-                    boxShadow: "10px 10px 0 var(--color-surface-dark)",
-                    background: "#000",
+                    background: "#040608",
+                    borderRadius: "2px",
+                    boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.8), 0 0 120px rgba(0,0,0,0.5)",
                   }}
                 >
                   <HeroWebGLPanel />
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.025) 0%, transparent 60%),
+                        linear-gradient(to bottom, transparent 70%, rgba(4,6,8,0.85) 100%)
+                      `,
+                    }}
+                  />
                 </div>
               </ScrollReveal>
             </HeroTitle>
@@ -116,18 +122,18 @@ function AppContent() {
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
-            className="text-xs tracking-[0.2em] uppercase"
-            style={{ color: 'var(--color-secondary)', fontFamily: 'var(--font-stack-heading)' }}
+            className="text-xs tracking-[0.25em] uppercase"
+            style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-stack-heading)', letterSpacing: '0.2em' }}
           >
-            Scroll to Explore
+            scroll to explore
           </span>
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4"
             fill="none"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth={1.5}
             viewBox="0 0 24 24"
-            style={{ color: 'var(--color-secondary)' }}
+            style={{ color: 'rgba(255,255,255,0.25)' }}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>

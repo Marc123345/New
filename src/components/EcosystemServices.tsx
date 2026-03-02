@@ -46,9 +46,10 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
         type="button"
         onClick={() => onSelect(index)}
         className="group relative flex items-center justify-center p-3 focus:outline-none cursor-pointer"
+        aria-label={`Select ${item.subtitle}`}
       >
         <div
-          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
           style={{
             background: 'linear-gradient(135deg, var(--color-primary), rgba(164,108,252,0.4))',
             border: '2px solid var(--color-secondary)',
@@ -59,7 +60,7 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
         </div>
         <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap">
           <span
-            className="text-xs uppercase tracking-[0.2em] px-3 py-1"
+            className="text-xs uppercase tracking-[0.2em] px-3 py-1 block rounded-sm"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
@@ -123,7 +124,7 @@ function LaptopCenter() {
 
   return (
     <motion.div
-      className="relative flex items-center justify-center"
+      className="relative flex items-center justify-center w-full h-full"
       style={{ perspective: 800 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -143,9 +144,8 @@ function LaptopCenter() {
           <img
             src={LAPTOP_URL}
             alt="Website at the center of everything"
+            className="w-[180px] sm:w-[240px] md:w-[340px] h-auto"
             style={{
-              width: 'clamp(180px, 24vw, 340px)',
-              height: 'auto',
               filter: 'drop-shadow(0 0 32px rgba(164,108,252,0.55)) drop-shadow(0 24px 48px rgba(0,0,0,0.8))',
               userSelect: 'none',
               pointerEvents: 'none',
@@ -158,8 +158,8 @@ function LaptopCenter() {
       <motion.div
         className="absolute rounded-full pointer-events-none"
         style={{
-          width: 'clamp(200px, 26vw, 380px)',
-          height: 'clamp(30px, 4vw, 60px)',
+          width: 'clamp(180px, 26vw, 380px)',
+          height: 'clamp(25px, 4vw, 60px)',
           bottom: '-10%',
           left: '50%',
           translateX: '-50%',
@@ -186,6 +186,7 @@ export function EcosystemServices() {
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-28"
       style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
+      {/* Background Layer */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <video
           autoPlay
@@ -219,8 +220,7 @@ export function EcosystemServices() {
             <img
               src={planet.src}
               alt=""
-              className="w-full h-full object-cover"
-              style={{ borderRadius: '50%' }}
+              className="w-full h-full object-cover rounded-full"
             />
             <div
               className="absolute inset-0 rounded-full"
@@ -235,7 +235,8 @@ export function EcosystemServices() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/50" />
       </div>
 
-      <div className="relative z-10 w-full text-center pointer-events-none select-none">
+      {/* Typography Content */}
+      <div className="relative z-10 w-full text-center pointer-events-none select-none px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -260,16 +261,16 @@ export function EcosystemServices() {
           </div>
 
           <h1
-            className="leading-[0.9] tracking-tighter uppercase mb-10 sm:mb-14"
+            className="leading-tight sm:leading-[0.9] tracking-tighter uppercase mb-12 sm:mb-16"
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(2.5rem, 10vw, 9rem)',
+              fontSize: 'clamp(2rem, 8vw, 9rem)',
               textShadow: '0 20px 40px rgba(41,30,86,0.6)',
               color: 'transparent',
               WebkitTextStroke: '1.5px #ffffff',
             }}
           >
-            Three Pillars. <br />
+            Three Pillars. <br className="hidden sm:block" />
             <span
               style={{
                 color: 'transparent',
@@ -282,8 +283,10 @@ export function EcosystemServices() {
         </motion.div>
       </div>
 
+      {/* Orbit Interaction Area */}
+      {/* ADDED: scale classes for perfect mobile view! */}
       <div
-        className="relative z-20 flex items-center justify-center"
+        className="relative z-20 flex items-center justify-center scale-[0.6] sm:scale-75 md:scale-100 transition-transform duration-500"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
         style={{ width: ORBIT_DIAMETER + 120, height: ORBIT_DIAMETER + 120 }}
@@ -292,6 +295,7 @@ export function EcosystemServices() {
           className="relative flex items-center justify-center"
           style={{ width: ORBIT_DIAMETER + 120, height: ORBIT_DIAMETER + 120 }}
         >
+          {/* Orbit Ring */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div
               className="absolute rounded-full"
@@ -304,10 +308,12 @@ export function EcosystemServices() {
             />
           </div>
 
+          {/* Center Laptop */}
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
             <LaptopCenter />
           </div>
 
+          {/* Orbiting Nodes */}
           <div className="absolute inset-0 z-30">
             {PILLARS.map((pillar, i) => (
               <OrbitNode

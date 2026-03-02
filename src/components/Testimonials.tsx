@@ -93,9 +93,9 @@ export function Testimonials() {
     <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
 
-        <div className="text-center mb-4 md:mb-8 px-4 md:px-8">
+        <div className="text-center mb-8 px-4 md:px-8">
           <div
-            className="inline-block mb-3 md:mb-4 px-3 md:px-4 py-1.5 md:py-2"
+            className="inline-block mb-4 px-4 py-2"
             style={{
               border: "2px solid var(--color-secondary)",
               boxShadow: "4px 4px 0 var(--color-secondary)",
@@ -111,7 +111,7 @@ export function Testimonials() {
           <h2
             className="tracking-tight"
             style={{
-              fontSize: "clamp(1.5rem, 4vw, 3rem)",
+              fontSize: "clamp(2rem, 4vw, 3rem)",
               fontFamily: "var(--font-stack-heading)",
               color: "#ffffff",
             }}
@@ -120,10 +120,10 @@ export function Testimonials() {
           </h2>
         </div>
 
-        <div className="max-w-[1400px] mx-auto w-full flex gap-4 md:gap-6 px-4 md:px-8" style={{ height: 'clamp(340px, 55vh, 650px)' }}>
-          {/* LEFT: Globe Panel — desktop only */}
+        <div className="max-w-[1400px] mx-auto w-full h-[600px] lg:h-[650px] flex gap-6 px-4 md:px-8">
+          {/* LEFT: Globe Panel */}
           <div
-            className="hidden lg:flex w-[360px] xl:w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-10 px-8 text-white relative shrink-0"
+            className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
             style={{
               border: "4px solid var(--color-secondary)",
               boxShadow: "var(--shadow-geometric)",
@@ -140,7 +140,7 @@ export function Testimonials() {
               </p>
             </div>
 
-            <div className="relative w-[280px] xl:w-[320px] h-[280px] xl:h-[320px] flex-shrink-0 flex items-center justify-center">
+            <div className="relative w-[340px] h-[340px] flex-shrink-0 flex items-center justify-center">
               <div className="absolute inset-0 w-full h-full">
                 <svg
                   viewBox="0 0 380 380"
@@ -191,7 +191,7 @@ export function Testimonials() {
 
             <div className="z-10 relative text-center mb-4">
               <p
-                className="text-[var(--color-secondary)] text-2xl xl:text-3xl leading-[0.8] tracking-wide -rotate-2"
+                className="text-[var(--color-secondary)] text-3xl leading-[0.8] tracking-wide -rotate-2"
                 style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic" }}
               >
                 H2H's Global
@@ -203,7 +203,7 @@ export function Testimonials() {
 
           {/* RIGHT: Testimonial Cards */}
           <div
-            className="flex-1 min-w-0 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col"
+            className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col"
             style={{
               border: "2px solid rgba(255,255,255,0.15)",
               boxShadow: "var(--shadow-geometric)",
@@ -222,12 +222,12 @@ export function Testimonials() {
             </div>
 
             {/* Contact list strip at bottom */}
-            <div className="shrink-0 border-t border-white/10 px-3 md:px-6 py-2 md:py-3">
-              <div className="flex flex-wrap gap-1.5 md:gap-2">
+            <div className="shrink-0 border-t border-white/10 px-6 py-3">
+              <div className="flex flex-wrap gap-2">
                 {CONTACTS.map((contact, i) => (
                   <div
                     key={contact.id}
-                    className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 transition-all duration-200"
+                    className="flex items-center gap-2 px-3 py-1.5 transition-all duration-200"
                     style={{
                       border: i === activeIndex
                         ? "1px solid var(--color-secondary)"
@@ -238,29 +238,20 @@ export function Testimonials() {
                     <img
                       src={`https://flagcdn.com/20x15/${contact.countryCode.toLowerCase()}.png`}
                       srcSet={`https://flagcdn.com/40x30/${contact.countryCode.toLowerCase()}.png 2x`}
-                      width={16}
-                      height={12}
+                      width={20}
+                      height={15}
                       alt={contact.country}
                       className="rounded-[2px] shrink-0"
                       style={{ opacity: i === activeIndex ? 1 : 0.45 }}
                     />
                     <span
-                      className="text-[9px] md:text-[10px] tracking-widest uppercase hidden sm:inline"
+                      className="text-[10px] tracking-widest uppercase"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
                         color: i === activeIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
                       }}
                     >
                       {contact.name.split(" ")[0]} · {contact.country}
-                    </span>
-                    <span
-                      className="text-[9px] tracking-widest uppercase sm:hidden"
-                      style={{
-                        fontFamily: "var(--font-stack-heading)",
-                        color: i === activeIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
-                      }}
-                    >
-                      {contact.name.split(" ")[0]}
                     </span>
                   </div>
                 ))}
@@ -363,7 +354,7 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[92%] sm:w-[85%] md:w-[80%] bg-[var(--color-primary)] text-white p-5 sm:p-7 md:p-10"
+      className="absolute w-[85%] md:w-[80%] bg-[var(--color-primary)] text-white p-8 md:p-10"
       data-geometric-card
     >
       <div
@@ -373,19 +364,16 @@ function TestimonialCard({
           boxShadow: "var(--shadow-geometric)",
         }}
       />
-      <div className="relative flex flex-col gap-4 md:gap-6">
+      <div className="relative flex flex-col gap-6">
         <h3
-          className="leading-[1.2] tracking-tight"
-          style={{
-            fontFamily: "var(--font-stack-heading)",
-            fontSize: "clamp(0.85rem, 2.5vw, 1.875rem)",
-          }}
+          className="text-xl md:text-3xl leading-[1.1] tracking-tight"
+          style={{ fontFamily: "var(--font-stack-heading)" }}
         >
           "{contact.quote}"
         </h3>
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-4">
           <motion.div
-            className="w-10 h-10 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white/30 shrink-0"
+            className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/30"
             style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
@@ -403,19 +391,18 @@ function TestimonialCard({
               className="w-full h-full object-cover"
             />
           </motion.div>
-          <div className="min-w-0">
+          <div>
             <div
-              className="leading-none mb-1 text-[#FBFBFC] truncate"
+              className="text-2xl leading-none mb-1 text-[#FBFBFC]"
               style={{
                 fontFamily: "var(--font-stack-body)",
                 fontStyle: "italic",
-                fontSize: "clamp(1rem, 2vw, 1.5rem)",
               }}
             >
               {contact.name}
             </div>
             <div
-              className="inline-block bg-[var(--color-secondary)] px-2 md:px-3 py-0.5 md:py-1 text-[10px] md:text-xs tracking-widest text-[var(--color-background-light)] truncate max-w-full"
+              className="inline-block bg-[var(--color-secondary)] px-3 py-1 text-xs tracking-widest text-[var(--color-background-light)]"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {contact.role} · {contact.company}

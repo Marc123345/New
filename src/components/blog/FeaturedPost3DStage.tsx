@@ -22,8 +22,7 @@ function createCategoryTexture(category: string): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 256;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return new THREE.CanvasTexture(canvas);
+  const ctx = canvas.getContext("2d")!;
 
   ctx.fillStyle = "#291e56";
   ctx.fillRect(0, 0, 512, 256);

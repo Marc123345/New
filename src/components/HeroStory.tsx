@@ -9,10 +9,8 @@ import {
 } from 'framer-motion';
 
 const VIDEOS = [
-  'https://ik.imagekit.io/qcvroy8xpd/envato_video_gen_Mar_01_2026_15_21_19.mp4',
-  'https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Refinement.mp4',
-  'https://ik.imagekit.io/qcvroy8xpd/social-network-2026-01-28-04-04-24-utc.mov/ik-video.mp4?updatedAt=1772373504160',
-  'https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4?updatedAt=1772017940529',
+  'https://ik.imagekit.io/qcvroy8xpd/astronaut-discussing-with-colleague-conducting-sci-2026-01-22-07-18-24-utc.mp4',
+  'https://ik.imagekit.io/qcvroy8xpd/two-astronauts-wearing-space-suits-work-on-a-lapto-2026-01-20-12-26-32-utc.mp4',
 ];
 
 interface Chapter {
@@ -220,7 +218,7 @@ const ChapterSlide = ({
   );
 };
 
-export function StorySection() {
+export function HeroStory() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState(0);
 
@@ -259,19 +257,21 @@ export function StorySection() {
     window.scrollTo({ top: targetScroll, behavior: 'smooth' });
   };
 
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([null, null, null, null]);
+  const videoARef = useRef<HTMLVideoElement>(null);
+  const videoBRef = useRef<HTMLVideoElement>(null);
   const [activeVideo, setActiveVideo] = useState(0);
 
   useEffect(() => {
-    if (activeSection !== activeVideo) {
-      setActiveVideo(activeSection);
-      const nextVideo = videoRefs.current[activeSection];
-      if (nextVideo) {
-        nextVideo.currentTime = 0;
-        nextVideo.play();
+    const newActiveVideo = activeSection % 2;
+    if (newActiveVideo !== activeVideo) {
+      setActiveVideo(newActiveVideo);
+      const nextRef = newActiveVideo === 0 ? videoARef : videoBRef;
+      if (nextRef.current) {
+        nextRef.current.currentTime = 0;
+        nextRef.current.play();
       }
     }
-  }, [activeSection, activeVideo]);
+  }, [activeSection]);
 
   return (
     <div
@@ -283,7 +283,7 @@ export function StorySection() {
         {VIDEOS.map((src, i) => (
           <video
             key={i}
-            ref={(el) => { videoRefs.current[i] = el; }}
+            ref={i === 0 ? videoARef : videoBRef}
             autoPlay={i === 0}
             muted
             loop
@@ -300,7 +300,7 @@ export function StorySection() {
         ))}
         <div
           className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1 }}
+          style={{ background: 'rgba(0,0,0,0.75)', zIndex: 1 }}
         />
 
         {/* Render Chapters */}

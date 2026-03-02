@@ -61,8 +61,6 @@ const TESTIMONIALS = [
 
 export function Testimonials() {
   const containerRef = useRef(null);
-  
-  // Track scroll progress within this specific container
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -73,27 +71,25 @@ export function Testimonials() {
       {/* STICKY CANVAS */}
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
 
-        {/* Section Header */}
-        <div className="text-center mb-6 sm:mb-8 md:mb-10 px-4 md:px-8">
+        <div className="text-center mb-8 px-4 md:px-8">
           <div
             className="inline-block mb-4 px-4 py-2"
             style={{
-              background: 'var(--color-background-light)',
               border: '2px solid var(--color-secondary)',
               boxShadow: '4px 4px 0 var(--color-secondary)',
             }}
           >
             <span
-              className="text-xs font-bold tracking-[0.3em] uppercase"
-              style={{ fontFamily: 'var(--font-stack-heading)', color: '#ffffff' }}
+              className="text-xs tracking-[0.3em] uppercase"
+              style={{ fontFamily: 'var(--font-stack-heading)', color: 'var(--color-secondary)' }}
             >
               Testimonials
             </span>
           </div>
           <h2
-            className="tracking-tight font-bold"
+            className="tracking-tight"
             style={{
-              fontSize: 'clamp(1.8rem, 5vw, 3rem)',
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
             }}
@@ -102,11 +98,8 @@ export function Testimonials() {
           </h2>
         </div>
 
-        {/* Main Content Layout */}
-        <div className="max-w-[1400px] mx-auto w-full h-[70vw] sm:h-[560px] lg:h-[640px] flex gap-4 lg:gap-6 px-4 md:px-8">
-          
-          {/* --- LEFT COLUMN: GLOBE MAP --- */}
-          <div className="hidden lg:flex w-[380px] xl:w-[420px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0" style={{ border: '4px solid var(--color-secondary)', boxShadow: 'var(--shadow-geometric)' }}>
+        <div className="max-w-[1400px] mx-auto w-full h-[600px] lg:h-[650px] flex gap-6 px-4 md:px-8">
+          <div className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0" style={{ border: '4px solid var(--color-secondary)', boxShadow: 'var(--shadow-geometric)' }}>
             <div className="text-center z-10 mt-4">
               <p className="text-lg leading-tight" style={{ fontFamily: 'var(--font-stack-heading)' }}>
                 <span className="text-[var(--color-secondary)]">Trusted</span>
@@ -128,20 +121,20 @@ export function Testimonials() {
                   <path
                     d="M190.023 369.047V379.047L189.52 379.045..."
                     stroke="currentColor"
-                    strokeOpacity="0.3"
+                    strokeOpacity="0.2"
                   />
                   <circle
                     cx="190"
                     cy="190"
                     r="189"
                     stroke="white"
-                    strokeWidth="1.5"
+                    strokeWidth="1"
                     strokeDasharray="2 10"
-                    opacity="0.3"
+                    opacity="0.2"
                   />
                 </svg>
 
-                {/* Animated Progress Circle mapped to scroll */}
+                {/* Animated Progress Circle */}
                 <svg
                   viewBox="0 0 380 380"
                   className="absolute inset-0 w-full h-full -rotate-90"
@@ -150,7 +143,7 @@ export function Testimonials() {
                     cx="190"
                     cy="190"
                     r="184.5"
-                    stroke="rgba(255,255,255,0.15)"
+                    stroke="rgba(232,226,255,0.12)"
                     strokeWidth="11"
                     fill="none"
                     style={{
@@ -194,7 +187,6 @@ export function Testimonials() {
 }
 
 function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
-  // Map the overall scroll progress to the current active testimonial index
   const testimonialIndex = useTransform(
     scrollProgress, 
     [0, 0.2, 0.4, 0.6, 0.8, 1], 
@@ -213,7 +205,7 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
   const active = TESTIMONIALS[currentIndex];
 
   return (
-    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/40">
+    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
       <motion.div
         className="relative w-full h-full"
         animate={{
@@ -229,7 +221,7 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
         <img
           src="https://cdn.prod.website-files.com/68a5787bba0829184628bd51/68b6b0d7f637ee0f1ff47780_BASE.avif"
           alt="World Map Base"
-          className="absolute top-0 left-0 w-full h-full object-cover opacity-60 grayscale"
+          className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
         />
       </motion.div>
     </div>
@@ -238,8 +230,8 @@ function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
 
 function TestimonialSlider({ scrollProgress }: { scrollProgress: any }) {
   return (
-    <div className="flex-1 min-w-0 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col justify-center" style={{ border: '2px solid rgba(255,255,255,0.25)', boxShadow: 'var(--shadow-geometric)' }}>
-      <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
+    <div className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col justify-center" style={{ border: '2px solid rgba(255,255,255,0.15)', boxShadow: 'var(--shadow-geometric)' }}>
+      <div className="relative w-full h-[400px] flex items-center justify-center perspective-[1000px]">
         {TESTIMONIALS.map((testimonial, i) => (
           <TestimonialCard
             key={testimonial.id}
@@ -265,66 +257,56 @@ function TestimonialCard({
   total: number;
   scrollProgress: any;
 }) {
-  // Calculate when this specific card should start and end its animation
   const start = index / total;
   const end = (index + 1) / total;
 
-  // Check if this is the final card in our list
-  const isLast = index === total - 1;
-
-  // Animation values mapped to scroll progress.
-  // We use `isLast` to prevent the final card from fading out or moving away.
   const opacity = useTransform(
     scrollProgress,
     [start, start + 0.05, end - 0.05, end],
-    [0, 1, 1, isLast ? 1 : 0]
+    [0, 1, 1, 0]
   );
   const y = useTransform(
     scrollProgress,
     [start, start + 0.1, end - 0.1, end],
-    [60, 0, 0, isLast ? 0 : -60]
+    [60, 0, 0, -60]
   );
   const rotateX = useTransform(
     scrollProgress,
     [start, start + 0.1, end - 0.1, end],
-    [-45, 0, 0, isLast ? 0 : 45]
+    [-45, 0, 0, 45]
   );
   const scale = useTransform(
     scrollProgress,
     [start, start + 0.1, end - 0.1, end],
-    [0.9, 1, 1, isLast ? 1 : 0.9]
+    [0.9, 1, 1, 0.9]
   );
 
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[92%] sm:w-[85%] bg-[var(--color-primary)] text-white p-6 sm:p-8 md:p-10"
+      className="absolute w-[85%] md:w-[80%] bg-[var(--color-primary)] text-white p-8 md:p-12"
       data-geometric-card
     >
-      {/* Strengthened border contrast for mobile */}
       <div
-        className="absolute inset-0 pointer-events-none border-[3px] sm:border-[4px] border-white/40"
-        style={{ boxShadow: 'var(--shadow-geometric)' }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ border: '4px solid rgba(255,255,255,0.2)', boxShadow: 'var(--shadow-geometric)' }}
       />
-      <div className="relative flex flex-col gap-6 sm:gap-7">
+      <div className="relative flex flex-col gap-8">
         <h3
-          className="leading-[1.25] tracking-tight text-white/95 font-medium"
-          style={{
-            fontFamily: "var(--font-stack-heading)",
-            fontSize: "clamp(1.1rem, 3.5vw, 2.1rem)",
-          }}
+          className="text-2xl md:text-4xl leading-[1.1] tracking-tight"
+          style={{ fontFamily: "var(--font-stack-heading)" }}
         >
           "{testimonial.quote}"
         </h3>
-        <div className="flex items-center gap-4 sm:gap-5">
+        <div className="flex items-center gap-4">
           <motion.div
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white/60 flex-shrink-0 bg-black/20"
+            className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/30"
             style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
               boxShadow: [
                 "0 0 0 0 rgba(164, 108, 252, 0)",
-                "0 0 20px 6px rgba(164, 108, 252, 0.7)", // Brighter pulse for dark screens
+                "0 0 20px 4px rgba(164, 108, 252, 0.4)",
                 "0 0 0 0 rgba(164, 108, 252, 0)",
               ],
             }}
@@ -336,20 +318,15 @@ function TestimonialCard({
               className="w-full h-full object-cover"
             />
           </motion.div>
-          <div className="min-w-0">
+          <div>
             <div
-              className="leading-none mb-2 text-white font-bold truncate"
-              style={{
-                fontFamily: "var(--font-stack-body)",
-                fontStyle: "italic",
-                fontSize: "clamp(1.1rem, 3vw, 1.75rem)",
-              }}
+              className="text-3xl leading-none mb-1 text-[#FBFBFC]"
+              style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic" }}
             >
               {testimonial.name}
             </div>
-            {/* Dark text on light accent background ensures perfect contrast */}
             <div
-              className="inline-block bg-[var(--color-secondary)] px-2.5 py-1 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold tracking-widest text-[#050505]"
+              className="inline-block bg-[var(--color-secondary)] px-3 py-1 text-xs tracking-widest text-[var(--color-background-light)]"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {testimonial.role}

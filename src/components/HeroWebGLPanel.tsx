@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
-import * as THREE from 'three';
-import { brandLogos } from '../lib/brandLogos';
-import { ScrollReveal } from './ScrollReveal';
-import { VideoOverlay } from './VideoOverlay';
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { brandLogos } from "../lib/brandLogos";
 
 const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -20,13 +17,17 @@ const N = ALL_URLS.length;
 
 const BOUNDS_X = 13;
 const BOUNDS_Y = 9;
+
 const CURSOR_SPHERE_R = 4.0;
 const CURSOR_SMOOTH = 8.0;
 const CURSOR_FIELD_R = 14.0;
+
 const SPRING_HOME = 0.08;
 const FRICTION = 0.97;
+
 const MAX_SPEED = 55.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
+
 const JELLY_SPRING = 22.0;
 const JELLY_DAMPING = 5.0;
 
@@ -126,36 +127,7 @@ const SHELL_COLORS = [
   new THREE.Color(0xccddff), new THREE.Color(0xffeebb),
 ];
 
-function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
-  const isPrimary = variant === 'primary';
-  const [hovered, setHovered] = React.useState(false);
-
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="inline-block px-8 py-4 border-2 cursor-pointer uppercase"
-      style={{
-        fontFamily: 'var(--font-stack-heading)',
-        fontSize: '0.75rem',
-        letterSpacing: '0.15em',
-        background: isPrimary ? '#fbfbfc' : 'transparent',
-        color: isPrimary ? '#291e56' : '#fbfbfc',
-        borderColor: '#fbfbfc',
-        boxShadow: hovered
-          ? `6px 6px 0 #a46cfc`
-          : `4px 4px 0 rgba(164,108,252,0.7)`,
-        transform: hovered ? 'translate(-2px, -2px)' : 'translate(0, 0)',
-        transition: 'box-shadow 0.18s ease, transform 0.18s ease',
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function HeroCanvas() {
+export function HeroWebGLPanel() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -192,7 +164,10 @@ function HeroCanvas() {
         uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
       },
     });
-    const displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
+    const displacementQuad = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      displacementMaterial
+    );
     displacementScene.add(displacementQuad);
 
     const mainGroup = new THREE.Group();
@@ -423,6 +398,7 @@ function HeroCanvas() {
       const sphereSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
 
       for (let s = 0; s < SUB; s++) {
+
         for (let i = 0; i < N; i++) {
           const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * 0.06;
           const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * 0.05;
@@ -506,6 +482,7 @@ function HeroCanvas() {
             const ddy = py[i] - sphereY;
             const distSq = ddx * ddx + ddy * ddy;
             const dist = Math.sqrt(distSq);
+
             const contactDist = CURSOR_SPHERE_R + radii[i];
 
             if (dist < contactDist && dist > 0.001) {
@@ -516,6 +493,7 @@ function HeroCanvas() {
               py[i] += ny * overlap;
 
               const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
+
               if (relVn < 0) {
                 const restitution = 0.75;
                 const impulseMag = -(1 + restitution) * relVn;
@@ -593,6 +571,7 @@ function HeroCanvas() {
         );
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
+
         const targetRotVelX = baseRotX[i] + vy[i] * 0.15;
         const targetRotVelY = baseRotY[i] - vx[i] * 0.15;
         const rLerp = 1 - Math.exp(-6 * dt);
@@ -670,124 +649,4 @@ function HeroCanvas() {
   }, []);
 
   return <div ref={containerRef} className="w-full h-full" />;
-}
-
-export function Hero() {
-  const [videoOpen, setVideoOpen] = useState(false);
-
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }
-  };
-
-  return (
-    <section
-      id="hero"
-      className="relative min-h-screen overflow-hidden"
-      style={{ background: '#000' }}
-    >
-      <div className="absolute inset-0 overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(135deg, #020408 0%, #060210 40%, #020408 100%)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse at 65% 50%, rgba(30,60,120,0.25) 0%, transparent 65%)',
-          }}
-        />
-      </div>
-
-      <div
-        className="relative z-10 px-6 md:px-12"
-        style={{
-          paddingTop: 'var(--space-8x)',
-          paddingBottom: 'var(--space-8x)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[60vh]">
-            <header>
-              <motion.h1
-                {...fadeInUp}
-                transition={{ ...fadeInUp.transition, delay: 0.05 }}
-                style={{
-                  fontSize: 'clamp(2.8rem, 7vw, 5rem)',
-                  lineHeight: 1.08,
-                  letterSpacing: '-0.03em',
-                  fontFamily: 'var(--font-stack-heading)',
-                  color: '#ffffff',
-                  marginBottom: 'var(--space-6x)',
-                  textShadow: '0 2px 20px rgba(0,0,0,0.5)',
-                }}
-              >
-                From{' '}
-                <span style={{ WebkitTextStroke: '2px #ffffff', color: 'transparent' }}>B2B</span>{' '}
-                to{' '}
-                <span style={{ WebkitTextStroke: '2px #ffffff', color: 'transparent' }}>H2H</span>
-                <br />
-                Build a Brand People
-                <br />
-                Want to Talk To
-              </motion.h1>
-
-              <motion.p
-                {...fadeInUp}
-                transition={{ ...fadeInUp.transition, delay: 0.2 }}
-                className="text-xl md:text-2xl"
-                style={{
-                  color: 'rgba(255,255,255,0.85)',
-                  lineHeight: 1.6,
-                  maxWidth: '36rem',
-                  marginBottom: 'var(--space-6x)',
-                  textShadow: '0 1px 10px rgba(0,0,0,0.4)',
-                }}
-              >
-                People don't only want to connect with brands anymore;
-                they connect with the people behind them.
-              </motion.p>
-
-              <motion.div
-                {...fadeInUp}
-                transition={{ ...fadeInUp.transition, delay: 0.35 }}
-                className="flex flex-wrap gap-4"
-              >
-                <HeroButton variant="primary" onClick={() => setVideoOpen(true)}>
-                  Hear Our Story
-                </HeroButton>
-                <HeroButton variant="outline" onClick={() => setVideoOpen(true)}>
-                  Our Journey
-                </HeroButton>
-              </motion.div>
-            </header>
-
-            <ScrollReveal mode="blur" delay={0.2} className="w-full">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 0.4 }}
-              >
-                <div
-                  className="relative mx-auto w-full h-[340px] sm:h-[480px] md:h-[700px] lg:h-[820px] overflow-hidden"
-                  style={{
-                    border: "3px solid var(--color-text-dark)",
-                    boxShadow: "-10px 10px 0 var(--color-surface-dark)",
-                    background: "#000",
-                  }}
-                >
-                  <HeroCanvas />
-                </div>
-              </motion.div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </div>
-
-      <VideoOverlay isOpen={videoOpen} onClose={() => setVideoOpen(false)} />
-    </section>
-  );
 }

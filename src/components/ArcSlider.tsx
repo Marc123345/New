@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
-import { motion, AnimatePresence } from "motion/react";
 import {
   Globe,
   Users,
   Target,
   TrendingUp,
   Sparkles,
-  X,
 } from "lucide-react";
+import { ServiceCardOverlay } from "./ServiceCardOverlay";
 
 const SERVICES = [
   {
@@ -20,14 +19,8 @@ const SERVICES = [
       "Strategic company page management that builds brand authority and engages your professional community.",
     icon: Globe,
     color: "#7B2FF2",
-    bgColor: "#5A05E6",
-    image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    details: [
-      "Company page strategy & setup",
-      "Content calendar & posting cadence",
-      "Community management & engagement",
-      "Analytics & performance reporting",
-    ],
+    bgColor: "#7B2FF2",
+    details: [],
   },
   {
     id: 2,
@@ -38,14 +31,8 @@ const SERVICES = [
       "Elevate your executives into thought leaders with strategic personal branding and content.",
     icon: Users,
     color: "#9B59F5",
-    bgColor: "#6F11F5",
-    image: "https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    details: [
-      "Personal brand audit & strategy",
-      "Executive profile optimisation",
-      "Ghostwritten thought-leadership posts",
-      "Audience growth & engagement tactics",
-    ],
+    bgColor: "#9B59F5",
+    details: [],
   },
   {
     id: 3,
@@ -56,14 +43,8 @@ const SERVICES = [
       "Turn your team into brand ambassadors with structured employee advocacy programs.",
     icon: TrendingUp,
     color: "#B181FC",
-    bgColor: "#8338EC",
-    image: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    details: [
-      "Advocacy programme design & rollout",
-      "Ready-to-share content library",
-      "Team training & onboarding",
-      "Participation tracking & reporting",
-    ],
+    bgColor: "#B181FC",
+    details: [],
   },
   {
     id: 4,
@@ -74,8 +55,7 @@ const SERVICES = [
       "Your website is often your first impression. We make sure it's the right one. Beautiful, high-converting websites with SEO built in from day one.",
     icon: Globe,
     color: "#6610E6",
-    bgColor: "#4A00D8",
-    image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    bgColor: "#6610E6",
     details: [
       "Strategic design & copywriting",
       "Responsive build (mobile-first)",
@@ -93,7 +73,6 @@ const SERVICES = [
     icon: Target,
     color: "#e8e2ff",
     bgColor: "#1a1535",
-    image: "https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Paid strategy & audience targeting",
       "Ad copy and creative production",
@@ -110,8 +89,7 @@ const SERVICES = [
       "When it comes to storytelling, words matter! We craft clear, engaging, and on-brand content that connects.",
     icon: Sparkles,
     color: "#C9A3FF",
-    bgColor: "#3A0CA3",
-    image: "https://images.pexels.com/photos/3182781/pexels-photo-3182781.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    bgColor: "#C9A3FF",
     details: [
       "Social captions and campaigns",
       "Long-form blog and thought leadership",
@@ -121,256 +99,6 @@ const SERVICES = [
   },
 ];
 
-type Service = typeof SERVICES[number];
-
-interface OverlayProps {
-  service: Service | null;
-  onClose: () => void;
-}
-
-function ServiceOverlay({ service, onClose }: OverlayProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [showHint, setShowHint] = useState(false);
-  const touchRef = useRef({ startY: 0, atTop: false });
-  const onCloseRef = useRef(onClose);
-  useEffect(() => { onCloseRef.current = onClose; });
-
-  useEffect(() => {
-    if (!service) return;
-    setScrollProgress(0);
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-    const el = scrollRef.current;
-    const isScrollable = el ? el.scrollHeight > el.clientHeight : false;
-    setShowHint(isScrollable);
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
-    };
-    const prevOverflow = document.body.style.overflow;
-    document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [service]);
-
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const p = el.scrollTop / (el.scrollHeight - el.clientHeight);
-    setScrollProgress(p);
-    if (p > 0) setShowHint(false);
-  }, []);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchRef.current.startY = e.touches[0].clientY;
-    touchRef.current.atTop = (scrollRef.current?.scrollTop ?? 0) <= 0;
-  }, []);
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!touchRef.current.atTop) return;
-    const delta = e.changedTouches[0].clientY - touchRef.current.startY;
-    if (delta > 100) onCloseRef.current();
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {service && (
-        <motion.div
-          key="service-overlay-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8"
-          style={{ background: "rgba(4,4,8,0.75)", backdropFilter: "blur(12px)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="service-card-title"
-        >
-          <motion.div
-            key="service-overlay-panel"
-            initial={{ opacity: 0, y: 24, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.97 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full overflow-hidden"
-            style={{
-              maxWidth: "680px",
-              maxHeight: "85vh",
-              background: "rgba(10,8,20,0.98)",
-              border: `1px solid ${service.color}44`,
-              boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${service.color}22`,
-            }}
-          >
-            <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(255,255,255,0.06)" }}>
-              <motion.div
-                className="h-full"
-                style={{ width: `${scrollProgress * 100}%`, background: `linear-gradient(to right, ${service.bgColor}, ${service.color})` }}
-              />
-            </div>
-
-            <motion.button
-              onClick={onClose}
-              aria-label="Close overlay"
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
-              style={{
-                border: "1px solid rgba(255,255,255,0.15)",
-                background: "rgba(255,255,255,0.07)",
-                color: "rgba(255,255,255,0.7)",
-                borderRadius: 2,
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
-            >
-              <X size={16} strokeWidth={2} />
-            </motion.button>
-
-            <div
-              ref={scrollRef}
-              className="overflow-y-auto overscroll-contain"
-              style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
-              onScroll={handleScroll}
-            >
-              <div className="px-6 sm:px-8 pt-10 pb-8 space-y-6">
-              {service.image && (
-                <motion.div
-                  key={`img-${service.id}`}
-                  initial={{ opacity: 0, scale: 1.03 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="relative w-full overflow-hidden"
-                  style={{
-                    height: 'clamp(160px, 28vw, 220px)',
-                    border: `2px solid ${service.color}55`,
-                    boxShadow: `6px 6px 0 ${service.color}44`,
-                  }}
-                >
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: `linear-gradient(to top, rgba(4,4,8,0.95) 0%, transparent 55%, ${service.bgColor}55 100%)` }}
-                  />
-                  <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs" style={{ color: service.color }}>
-                    <span className="h-px w-8 inline-block" style={{ backgroundColor: service.color }} />
-                    {service.category}
-                  </div>
-                </motion.div>
-              )}
-
-              <div>
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.08, duration: 0.4 }}
-                  className="block text-[10px] uppercase tracking-[0.35em] mb-5"
-                  style={{ color: service.color, fontFamily: "var(--font-stack-heading)" }}
-                >
-                  <span className="inline-block w-4 h-[1px] mr-2 align-middle" style={{ background: service.color }} />
-                  {service.category} &mdash; Service {String(service.id).padStart(2, "0")}
-                </motion.span>
-
-                <motion.h2
-                  id="service-card-title"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="font-bold leading-[1.05] tracking-[-0.03em]"
-                  style={{ fontSize: "clamp(2.2rem, 7vw, 4rem)", color: "#fff", fontFamily: "var(--font-stack-heading)" }}
-                >
-                  {service.title}
-                </motion.h2>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.16 }}
-                className="h-px w-full"
-                style={{ background: `linear-gradient(to right, ${service.color}44, transparent)` }}
-              />
-
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.45 }}
-                className="leading-[1.8] text-base sm:text-lg"
-                style={{ color: "rgba(255,255,255,0.7)", fontFamily: "var(--font-stack-body)" }}
-              >
-                {service.description}
-              </motion.p>
-
-              {service.details.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28, duration: 0.45 }}
-                >
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-[10px] uppercase tracking-[0.35em]" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-stack-heading)" }}>
-                      What We Deliver
-                    </span>
-                    <span className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
-                  </div>
-                  <ul className="grid sm:grid-cols-2 gap-2">
-                    {service.details.map((detail, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.32 + i * 0.05, duration: 0.35 }}
-                        className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed"
-                        style={{
-                          background: "rgba(255,255,255,0.03)",
-                          border: "1px solid rgba(255,255,255,0.06)",
-                          color: "rgba(255,255,255,0.72)",
-                          fontFamily: "var(--font-stack-body)",
-                        }}
-                      >
-                        <span className="mt-[3px] flex-shrink-0" style={{ color: service.color }}>&#8594;</span>
-                        {detail}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-            </div>
-            </div>
-
-            {showHint && scrollProgress === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-none"
-              >
-                <motion.div animate={{ y: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ color: "rgba(255,255,255,0.35)" }}>
-                    <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </motion.div>
-                <span className="text-[10px] tracking-[0.15em] uppercase" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-stack-heading)" }}>Scroll</span>
-              </motion.div>
-            )}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
 export function ArcSlider() {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -378,16 +106,11 @@ export function ArcSlider() {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [overlayService, setOverlayService] = useState<Service | null>(null);
+  const [overlayService, setOverlayService] = useState<typeof SERVICES[number] | null>(null);
   const activeIndexRef = useRef(0);
   const dragRef = useRef({ startX: 0, hasMoved: false, isDragging: false });
 
   const positionCards = useCallback((index: number, animate: boolean) => {
-    const isMobile = window.innerWidth < 768;
-    const spreadStep1 = isMobile ? 240 : 360;
-    const spreadStep2 = isMobile ? 420 : 580;
-    const spreadStep3 = isMobile ? 540 : 760;
-
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
       if (!card) return;
@@ -400,7 +123,7 @@ export function ArcSlider() {
       let translateZ: number;
       let scale: number;
       let opacity: number;
-      let targetZIndex: number;
+      let zIndex: number;
 
       if (absOffset === 0) {
         translateX = 0;
@@ -408,28 +131,28 @@ export function ArcSlider() {
         translateZ = 0;
         scale = 1;
         opacity = 1;
-        targetZIndex = 10;
+        zIndex = 10;
       } else if (absOffset === 1) {
-        translateX = offset * spreadStep1;
+        translateX = offset * 340;
         rotateY = offset < 0 ? 30 : -30;
         translateZ = -120;
         scale = 0.82;
         opacity = 0.6;
-        targetZIndex = 5;
+        zIndex = 5;
       } else if (absOffset === 2) {
-        translateX = offset * spreadStep2;
+        translateX = offset * 540;
         rotateY = offset < 0 ? 45 : -45;
         translateZ = -240;
         scale = 0.65;
         opacity = 0.25;
-        targetZIndex = 2;
+        zIndex = 2;
       } else {
-        translateX = offset * spreadStep3;
+        translateX = offset * 700;
         rotateY = offset < 0 ? 55 : -55;
         translateZ = -350;
         scale = 0.5;
         opacity = 0;
-        targetZIndex = 1;
+        zIndex = 1;
       }
 
       const shadow = absOffset === 0
@@ -437,16 +160,16 @@ export function ArcSlider() {
         : "none";
 
       if (animate) {
-        gsap.set(card, { zIndex: targetZIndex });
         gsap.to(card, {
           x: translateX,
           rotateY: rotateY,
           z: translateZ,
           scale: scale,
           opacity: opacity,
+          zIndex: zIndex,
           boxShadow: shadow,
           duration: 0.7,
-          ease: "power3.out",
+          ease: "power2.out",
           overwrite: true,
         });
       } else {
@@ -456,7 +179,7 @@ export function ArcSlider() {
           z: translateZ,
           scale: scale,
           opacity: opacity,
-          zIndex: targetZIndex,
+          zIndex: zIndex,
           boxShadow: shadow,
         });
       }
@@ -477,9 +200,6 @@ export function ArcSlider() {
 
   useEffect(() => {
     positionCards(0, false);
-    const handleResize = () => positionCards(activeIndexRef.current, false);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, [positionCards]);
 
   useEffect(() => {
@@ -538,36 +258,35 @@ export function ArcSlider() {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (overlayService) return;
       if (e.key === "ArrowLeft") navigateTo(activeIndexRef.current - 1);
       if (e.key === "ArrowRight") navigateTo(activeIndexRef.current + 1);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [navigateTo, overlayService]);
+  }, [navigateTo]);
 
   return (
     <>
       <div
         className="relative w-full py-16 md:py-24 overflow-hidden"
-        style={{ background: "var(--color-background-light, #f8f9fa)" }}
+        style={{ background: "var(--color-background-light)" }}
       >
         <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
           <span
-            className="text-xs font-semibold tracking-[0.3em] mb-4 block uppercase"
+            className="text-xs tracking-[0.3em] mb-5 block uppercase"
             style={{
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-secondary, #9B59F5)",
+              color: "var(--color-secondary)",
             }}
           >
             Our Capabilities
           </span>
           <h2
-            className="tracking-tight font-bold"
+            className="tracking-tight"
             style={{
               fontSize: "clamp(2.5rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-text-dark, #111)",
+              color: "var(--color-text-dark)",
             }}
           >
             Services
@@ -577,7 +296,10 @@ export function ArcSlider() {
         <div
           ref={tabBarRef}
           className="relative z-30 flex gap-2 justify-start md:justify-center px-6 mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
           role="tablist"
         >
           {SERVICES.map((service, i) => (
@@ -587,25 +309,24 @@ export function ArcSlider() {
               role="tab"
               aria-selected={i === activeIndex}
               onClick={() => navigateTo(i)}
-              className="flex-shrink-0 transition-all duration-300 font-semibold"
+              className="flex-shrink-0 transition-all duration-300"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                fontSize: "0.75rem",
-                letterSpacing: "0.1em",
+                fontSize: "0.7rem",
+                letterSpacing: "0.15em",
                 textTransform: "uppercase",
-                padding: "10px 24px",
+                padding: "10px 20px",
                 whiteSpace: "nowrap",
-                border: "2px solid var(--color-secondary, #9B59F5)",
-                borderRadius: "0",
+                border: "2px solid var(--color-secondary)",
                 background: i === activeIndex
-                  ? "var(--color-secondary, #9B59F5)"
+                  ? "var(--color-secondary)"
                   : "transparent",
                 color: i === activeIndex
-                  ? "var(--color-background-light, #fff)"
-                  : "var(--color-text-dark, #111)",
+                  ? "var(--color-background-light)"
+                  : "var(--color-text-dark)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
-                  ? "0 4px 14px rgba(155, 89, 245, 0.4)"
+                  ? "var(--shadow-button)"
                   : "none",
               }}
             >
@@ -618,7 +339,7 @@ export function ArcSlider() {
           ref={containerRef}
           className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            height: "clamp(440px, 60vw, 560px)",
+            height: "clamp(440px, 60vw, 620px)",
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
             touchAction: "pan-y",
@@ -639,98 +360,107 @@ export function ArcSlider() {
                   ref={(el) => (cardsRef.current[i] = el)}
                   className="absolute will-change-transform"
                   style={{
-                    width: "clamp(280px, 28vw, 380px)",
+                    width: "clamp(280px, 28vw, 420px)",
                     aspectRatio: "3 / 4",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 sm:p-8 transition-colors duration-500"
+                    className="relative h-full w-full overflow-hidden flex flex-col p-5 sm:p-7"
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",
-                      borderRadius: "0",
                     }}
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start mb-auto">
                       <div>
                         <span
-                          className="text-[10px] tracking-[0.3em] opacity-60 font-semibold block"
+                          className="text-[10px] tracking-[0.3em] opacity-50 block mb-1"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             color: "#fff",
-                            marginBottom: "4px",
                           }}
                         >
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.15em] opacity-40 font-medium uppercase"
+                          className="text-[10px] tracking-[0.2em] opacity-35"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             color: "#fff",
                           }}
                         >
-                          {service.category}
+                          {service.category.toUpperCase()}
                         </span>
                       </div>
                       <div
-                        className="w-10 h-10 flex items-center justify-center opacity-20"
+                        className="w-10 h-10 flex items-center justify-center opacity-15"
                         style={{ color: "#fff" }}
                       >
-                        <IconComponent size={32} strokeWidth={1.5} />
+                        <IconComponent size={28} strokeWidth={1.5} />
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-6">
+                    <div className="mt-auto">
                       <h3
-                        className="tracking-tight leading-[1] font-bold"
+                        className="tracking-tight leading-[0.95] mb-2"
                         style={{
-                          fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
+                          fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
-                          margin: 0,
                         }}
                       >
                         {service.fullTitle}
                       </h3>
 
-                      <div className="mt-2">
-                        <button
-                          onClick={(e) => {
-                            if (dragRef.current.hasMoved) return;
-                            if (i !== activeIndex) { navigateTo(i); return; }
-                            e.stopPropagation();
-                            setOverlayService(service);
-                          }}
-                          className="group inline-flex items-center gap-3 transition-all duration-300"
-                          style={{
-                            fontFamily: "var(--font-stack-heading)",
-                            fontSize: "0.75rem",
-                            letterSpacing: "0.15em",
-                            textTransform: "uppercase",
-                            color: "#fff",
-                            background: "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.25)",
-                            borderRadius: "0",
-                            padding: "12px 24px",
-                            cursor: "pointer",
-                            pointerEvents: "auto",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                          }}
+                      <p
+                        className="mb-5 line-clamp-2"
+                        style={{
+                          fontSize: "0.8rem",
+                          lineHeight: 1.5,
+                          fontFamily: "var(--font-stack-body)",
+                          color: "rgba(255,255,255,0.55)",
+                          margin: 0,
+                          marginBottom: "20px",
+                        }}
+                      >
+                        {service.description}
+                      </p>
+
+                      <button
+                        onClick={(e) => {
+                          if (dragRef.current.hasMoved) return;
+                          e.stopPropagation();
+                          setOverlayService(service);
+                        }}
+                        className="group inline-flex items-center gap-2 transition-all duration-200"
+                        style={{
+                          fontFamily: "var(--font-stack-heading)",
+                          fontSize: "0.7rem",
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                          color: "#fff",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.25)",
+                          padding: "10px 24px",
+                          cursor: "pointer",
+                          pointerEvents: "auto",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.18)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                        }}
+                      >
+                        Discover
+                        <span
+                          className="transition-transform duration-200 group-hover:translate-x-1 inline-block"
                         >
-                          Discover
-                          <span className="transition-transform duration-300 group-hover:translate-x-1.5 inline-block">
-                            &#8594;
-                          </span>
-                        </button>
-                      </div>
+                          &#8594;
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -749,10 +479,9 @@ export function ArcSlider() {
               style={{
                 width: i === activeIndex ? 32 : 8,
                 height: 4,
-                borderRadius: "0",
                 background: i === activeIndex
-                  ? "var(--color-secondary, #9B59F5)"
-                  : "rgba(155, 89, 245, 0.2)",
+                  ? "var(--color-secondary)"
+                  : "rgba(164,108,252,0.2)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
@@ -762,7 +491,7 @@ export function ArcSlider() {
         </div>
       </div>
 
-      <ServiceOverlay
+      <ServiceCardOverlay
         service={overlayService}
         onClose={() => setOverlayService(null)}
       />

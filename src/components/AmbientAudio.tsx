@@ -1,59 +1,131 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-const FADE_DURATION = 1.5;
-const MASTER_VOLUME = 0.18;
+const FADE_DURATION = 2.5;
+const MASTER_VOLUME = 0.22;
 
-function createAmbientNodes(ctx: AudioContext, master: GainNode) {
-  const nodes: { stop: () => void }[] = [];
+type StoppableNode = { stop: () => void };
 
-  const pad = (freq: number, detune: number, vol: number) => {
+function createCinematicNodes(ctx: AudioContext, master: GainNode) {
+  const nodes: StoppableNode[] = [];
+  const t = ctx.currentTime;
+
+  const addNode = (node: StoppableNode) => { nodes.push(node); };
+
+  const drone = (freq: number, vol: number, type: OscillatorType = 'sine') => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
-    osc.type = 'sine';
+    osc.type = type;
     osc.frequency.value = freq;
-    osc.detune.value = detune;
     filter.type = 'lowpass';
-    filter.frequency.value = 800;
-    filter.Q.value = 0.5;
+    filter.frequency.value = 300;
+    filter.Q.value = 0.7;
     gain.gain.value = vol;
     osc.connect(filter).connect(gain).connect(master);
     osc.start();
-    nodes.push({ stop: () => { osc.stop(); osc.disconnect(); gain.disconnect(); filter.disconnect(); } });
-    return osc;
+    addNode({ stop: () => { osc.stop(); osc.disconnect(); gain.disconnect(); filter.disconnect(); } });
+    return { osc, gain, filter };
   };
 
-  pad(55, 0, 0.25);
-  pad(82.41, 5, 0.18);
-  pad(110, -3, 0.15);
-  pad(164.81, 8, 0.08);
-  pad(220, -5, 0.05);
+  drone(32.7, 0.35);
+  drone(65.41, 0.22);
+  drone(49.0, 0.18, 'triangle');
 
-  const lfo = ctx.createOscillator();
-  const lfoGain = ctx.createGain();
-  lfo.type = 'sine';
-  lfo.frequency.value = 0.08;
-  lfoGain.gain.value = 0.03;
-  lfo.connect(lfoGain).connect(master.gain);
-  lfo.start();
-  nodes.push({ stop: () => { lfo.stop(); lfo.disconnect(); lfoGain.disconnect(); } });
+  const fifth = drone(98.0, 0.0);
+  fifth.gain.gain.setValueAtTime(0, t);
+  fifth.gain.gain.linearRampToValueAtTime(0.12, t + 8);
+  fifth.gain.gain.linearRampToValueAtTime(0, t + 16);
+  fifth.gain.gain.linearRampToValueAtTime(0.12, t + 24);
+  fifth.gain.gain.linearRampToValueAtTime(0, t + 32);
 
-  const noiseLen = ctx.sampleRate * 2;
-  const noiseBuffer = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
-  const noiseData = noiseBuffer.getChannelData(0);
-  for (let i = 0; i < noiseLen; i++) noiseData[i] = (Math.random() * 2 - 1) * 0.015;
-  const noiseSrc = ctx.createBufferSource();
-  const noiseFilter = ctx.createBiquadFilter();
-  const noiseGain = ctx.createGain();
-  noiseSrc.buffer = noiseBuffer;
-  noiseSrc.loop = true;
-  noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.value = 400;
-  noiseFilter.Q.value = 0.3;
-  noiseGain.gain.value = 0.6;
-  noiseSrc.connect(noiseFilter).connect(noiseGain).connect(master);
-  noiseSrc.start();
-  nodes.push({ stop: () => { noiseSrc.stop(); noiseSrc.disconnect(); noiseFilter.disconnect(); noiseGain.disconnect(); } });
+  const shimmer = (freq: number, vol: number, rate: number) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    const tremOsc = ctx.createOscillator();
+    const tremGain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    filter.type = 'lowpass';
+    filter.frequency.value = 1200;
+    filter.Q.value = 1.5;
+    gain.gain.value = vol;
+    tremOsc.type = 'sine';
+    tremOsc.frequency.value = rate;
+    tremGain.gain.value = vol * 0.5;
+    tremOsc.connect(tremGain).connect(gain.gain);
+    tremOsc.start();
+    osc.connect(filter).connect(gain).connect(master);
+    osc.start();
+    addNode({ stop: () => { osc.stop(); tremOsc.stop(); osc.disconnect(); tremOsc.disconnect(); gain.disconnect(); tremGain.disconnect(); filter.disconnect(); } });
+  };
+
+  shimmer(523.25, 0.025, 0.15);
+  shimmer(659.25, 0.018, 0.12);
+  shimmer(783.99, 0.012, 0.09);
+
+  const breathLfo = ctx.createOscillator();
+  const breathGain = ctx.createGain();
+  breathLfo.type = 'sine';
+  breathLfo.frequency.value = 0.04;
+  breathGain.gain.value = 0.06;
+  breathLfo.connect(breathGain).connect(master.gain);
+  breathLfo.start();
+  addNode({ stop: () => { breathLfo.stop(); breathLfo.disconnect(); breathGain.disconnect(); } });
+
+  const reverbLen = ctx.sampleRate * 4;
+  const reverbBuf = ctx.createBuffer(2, reverbLen, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = reverbBuf.getChannelData(ch);
+    for (let i = 0; i < reverbLen; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.5);
+    }
+  }
+  const convolver = ctx.createConvolver();
+  convolver.buffer = reverbBuf;
+  const reverbSend = ctx.createGain();
+  reverbSend.gain.value = 0.35;
+  master.connect(reverbSend).connect(convolver).connect(ctx.destination);
+  addNode({ stop: () => { reverbSend.disconnect(); convolver.disconnect(); } });
+
+  const airLen = ctx.sampleRate * 3;
+  const airBuf = ctx.createBuffer(2, airLen, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = airBuf.getChannelData(ch);
+    for (let i = 0; i < airLen; i++) data[i] = (Math.random() * 2 - 1) * 0.008;
+  }
+  const airSrc = ctx.createBufferSource();
+  const airFilter = ctx.createBiquadFilter();
+  const airGain = ctx.createGain();
+  airSrc.buffer = airBuf;
+  airSrc.loop = true;
+  airFilter.type = 'highpass';
+  airFilter.frequency.value = 2000;
+  airFilter.Q.value = 0.3;
+  airGain.gain.value = 0.4;
+  airSrc.connect(airFilter).connect(airGain).connect(master);
+  airSrc.start();
+  addNode({ stop: () => { airSrc.stop(); airSrc.disconnect(); airFilter.disconnect(); airGain.disconnect(); } });
+
+  const subPulseLen = ctx.sampleRate * 6;
+  const subPulseBuf = ctx.createBuffer(1, subPulseLen, ctx.sampleRate);
+  const subData = subPulseBuf.getChannelData(0);
+  for (let i = 0; i < subPulseLen; i++) {
+    const phase = (i / subPulseLen) * Math.PI * 2;
+    subData[i] = Math.sin(25 * Math.PI * 2 * i / ctx.sampleRate) * Math.sin(phase) * 0.15;
+  }
+  const subSrc = ctx.createBufferSource();
+  const subGain = ctx.createGain();
+  const subFilter = ctx.createBiquadFilter();
+  subSrc.buffer = subPulseBuf;
+  subSrc.loop = true;
+  subFilter.type = 'lowpass';
+  subFilter.frequency.value = 60;
+  subFilter.Q.value = 0.5;
+  subGain.gain.value = 0.5;
+  subSrc.connect(subFilter).connect(subGain).connect(master);
+  subSrc.start();
+  addNode({ stop: () => { subSrc.stop(); subSrc.disconnect(); subFilter.disconnect(); subGain.disconnect(); } });
 
   return nodes;
 }
@@ -75,7 +147,7 @@ export function AmbientAudio() {
     master.gain.linearRampToValueAtTime(MASTER_VOLUME, ctx.currentTime + FADE_DURATION);
     ctxRef.current = ctx;
     masterRef.current = master;
-    nodesRef.current = createAmbientNodes(ctx, master);
+    nodesRef.current = createCinematicNodes(ctx, master);
     setPlaying(true);
   }, []);
 

@@ -305,33 +305,8 @@ function GlobeMap({
                 zIndex: 10,
               }}
             >
-              {isActive && (
-                <motion.div
-                  className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border"
-                  style={{ borderColor: "var(--color-secondary)" }}
-                  initial={{ width: 8, height: 8, opacity: 0.9 }}
-                  animate={{ width: 28, height: 28, opacity: 0 }}
-                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
-                />
-              )}
-              <motion.div
-                className="rounded-full"
-                animate={
-                  isActive
-                    ? {
-                        width: 10,
-                        height: 10,
-                        background: "var(--color-secondary)",
-                        boxShadow: "0 0 10px 4px rgba(164,108,252,0.8), 0 0 20px 8px rgba(164,108,252,0.4)",
-                      }
-                    : {
-                        width: 6,
-                        height: 6,
-                        background: "rgba(255,255,255,0.65)",
-                        boxShadow: "0 0 4px 1px rgba(255,255,255,0.3)",
-                      }
-                }
-                transition={{ duration: 0.4, ease: "easeOut" }}
+              <div
+                className={`globe-dot${isActive ? ' globe-dot--active' : ''}`}
               />
             </div>
           );

@@ -93,7 +93,7 @@ function AppContent() {
             paddingBottom: 'var(--space-8x)',
           }}
         >
-          <div className="max-w-8xl mx-auto">
+          <div className="w-full mx-auto">
             <HeroTitle>
               <ScrollReveal mode="blur" delay={0.2} className="w-full">
                 <div

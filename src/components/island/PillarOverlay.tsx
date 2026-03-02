@@ -66,7 +66,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
           transition={{ duration: 0.3 }}
           onClick={onClose}
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-12 pointer-events-auto"
-          style={{ background: 'rgba(14,8,32,0.95)' }}
+          style={{ background: '#0e0820' }}
         >
           <motion.div
             initial={{ scale: 0.95, y: 20, opacity: 0 }}

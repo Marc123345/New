@@ -185,7 +185,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8"
-          style={{ background: "rgba(4,4,8,0.95)" }}
+          style={{ background: "#040408" }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -221,17 +221,9 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
-              style={{
-                border: "1px solid rgba(255,255,255,0.15)",
-                background: "#1a1728",
-                color: "rgba(255,255,255,0.7)",
-                borderRadius: 2,
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#2a2540"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#1a1728"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+              className="absolute top-3 right-3 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
             >
-              <X size={16} strokeWidth={2} />
+              <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
             </motion.button>
 
             <div

@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
+import { useOverlay } from '../../hooks/useOverlay';
+
+const ALL_SERVICES = PILLARS;
 
 const PILLAR_ACCENTS = [
-  { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.14)', border: 'rgba(147,51,234,0.3)', dot: '#c084fc' },
-  { from: '#4a1d96', to: '#7c3aed', light: 'rgba(74,29,150,0.14)', border: 'rgba(124,58,237,0.3)', dot: '#a78bfa' },
-  { from: '#2e1065', to: '#5b21b6', light: 'rgba(46,16,101,0.14)', border: 'rgba(91,33,182,0.3)', dot: '#8b5cf6' },
+  { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.12)', border: 'rgba(147,51,234,0.28)', dot: '#c084fc', rgb: '192,132,252' },
+  { from: '#4a1d96', to: '#7c3aed', light: 'rgba(74,29,150,0.12)', border: 'rgba(124,58,237,0.28)', dot: '#a78bfa', rgb: '167,139,250' },
+  { from: '#2e1065', to: '#5b21b6', light: 'rgba(46,16,101,0.12)', border: 'rgba(91,33,182,0.28)', dot: '#8b5cf6', rgb: '139,92,246' },
 ];
 
 interface PillarOverlayProps {
@@ -17,283 +20,411 @@ interface PillarOverlayProps {
 }
 
 export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverlayProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
+  useOverlay(pillarIndex !== null, onClose);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const activeIndexRef = useRef<number | null>(null);
-  if (pillarIndex !== null) {
-    activeIndexRef.current = pillarIndex;
-  }
+  // Keep last non-null index so content doesn't vanish during exit animation
+  const lastIndexRef = useRef<number>(0);
+  const displayIndex = pillarIndex !== null ? pillarIndex : lastIndexRef.current;
+  if (pillarIndex !== null) lastIndexRef.current = pillarIndex;
 
-  const displayIndex = pillarIndex !== null ? pillarIndex : activeIndexRef.current;
-  const displayService = displayIndex !== null ? PILLARS[displayIndex] : null;
-  const accent = displayIndex !== null ? PILLAR_ACCENTS[displayIndex] : PILLAR_ACCENTS[0];
+  const activeService = ALL_SERVICES[displayIndex];
+  const accent = PILLAR_ACCENTS[displayIndex] ?? PILLAR_ACCENTS[0];
+  const hasPrev = displayIndex > 0;
+  const hasNext = displayIndex < ALL_SERVICES.length - 1;
 
+  // Keyboard navigation
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (pillarIndex === null) return;
+    const timer = setTimeout(() => modalRef.current?.focus(), 80);
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key === 'ArrowLeft' && hasPrev) { e.preventDefault(); onNavigate(displayIndex - 1); }
+      if (e.key === 'ArrowRight' && hasNext) { e.preventDefault(); onNavigate(displayIndex + 1); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => { clearTimeout(timer); window.removeEventListener('keydown', handleKeyDown); };
+  }, [pillarIndex, displayIndex, hasPrev, hasNext, onClose, onNavigate]);
+
+  // Scroll to top on pillar change
   useEffect(() => {
-    if (pillarIndex !== null) {
-      document.body.style.overflow = 'hidden';
+    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pillarIndex]);
 
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onClose();
-        if (e.key === 'ArrowRight' && displayIndex !== null && displayIndex < PILLARS.length - 1) onNavigate(displayIndex + 1);
-        if (e.key === 'ArrowLeft' && displayIndex !== null && displayIndex > 0) onNavigate(displayIndex - 1);
-      };
-      window.addEventListener('keydown', handleKeyDown);
-
-      return () => {
-        document.body.style.overflow = 'unset';
-        window.removeEventListener('keydown', handleKeyDown);
-      };
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-  }, [pillarIndex, onClose, displayIndex, onNavigate]);
-
-  if (!mounted) return null;
+  const isOpen = pillarIndex !== null && !!activeService;
 
   return createPortal(
     <AnimatePresence>
-      {pillarIndex !== null && displayService && (
-        <motion.div
-          key="pillar-overlay-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-12"
-          style={{ background: '#0e0820' }}
-        >
-          <div className="absolute inset-0" onClick={onClose} />
-
+      {isOpen && (
+        <>
+          {/* Backdrop */}
           <motion.div
-            initial={{ scale: 0.95, y: 20, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.95, y: 20, opacity: 0 }}
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative flex flex-col w-full max-w-4xl bg-[#0e0820] rounded-2xl shadow-2xl overflow-hidden"
-            style={{
-              maxHeight: 'calc(100vh - 2rem)',
-              border: `2px solid ${accent.border}`,
-              boxShadow: `0 25px 50px -12px rgba(0,0,0,0.5), 0 0 30px ${accent.light}`,
-            }}
+            onClick={onClose}
+            className="fixed inset-0 z-[100]"
+            style={{ background: 'rgba(2,2,6,0.88)', backdropFilter: 'blur(18px)' }}
+          />
+
+          {/* Dialog */}
+          <motion.div
+            key="dialog-wrapper"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[101] flex items-end sm:items-center justify-center sm:p-6"
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pillar-title"
           >
-            <div
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-64 blur-[100px] rounded-full opacity-30 pointer-events-none transition-colors duration-700"
-              style={{ backgroundColor: accent.dot }}
-            />
-
-            <div className="flex-shrink-0 flex justify-end p-3 relative z-20">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
-                aria-label="Close overlay"
+            <AnimatePresence mode="wait">
+              <motion.div
+                ref={modalRef}
+                key={`pillar-${displayIndex}`}
+                tabIndex={-1}
+                // Mobile: slides up from bottom. Desktop: scales in from center.
+                initial={{ opacity: 0, y: 40, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full focus:outline-none flex flex-col"
+                style={{
+                  maxWidth: 740,
+                  // Full height on mobile (sheet), capped on desktop
+                  maxHeight: 'min(92vh, 92dvh)',
+                  height: 'auto',
+                  // Rounded corners only on top for mobile sheet feel
+                  borderRadius: '16px 16px 0 0',
+                  background: 'linear-gradient(158deg, #0c0b13 0%, #100e1a 100%)',
+                  border: `1px solid ${accent.border}`,
+                  boxShadow: `
+                    0 0 0 1px rgba(255,255,255,0.04),
+                    0 40px 100px -20px rgba(0,0,0,0.9),
+                    0 0 80px -30px rgba(${accent.rgb},0.2)
+                  `,
+                  // Full rounded on desktop
+                  '@media (min-width: 640px)': { borderRadius: 16 },
+                }}
               >
-                <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-              </button>
-            </div>
+                {/* Accent top bar */}
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                  className="h-[3px] w-full origin-left flex-shrink-0"
+                  style={{
+                    background: `linear-gradient(90deg, ${accent.from}, ${accent.to}, transparent)`,
+                    borderRadius: '16px 16px 0 0',
+                  }}
+                />
 
-            <div
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 pb-10 scrollbar-hide"
-            >
-              <div className="max-w-3xl mx-auto space-y-12">
-                {displayService?.image && (
-                  <motion.div
-                    key={`image-${displayIndex}`}
-                    initial={{ opacity: 0, scale: 1.03 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="relative w-full overflow-hidden rounded-xl"
+                {/* Header */}
+                <div
+                  className="relative flex-shrink-0 px-5 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-7"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                >
+                  {/* Ghost number */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute right-5 sm:right-7 top-3 select-none pointer-events-none font-black leading-none"
                     style={{
-                      height: 'clamp(200px, 30vw, 320px)',
-                      border: `2px solid ${accent.border}`,
-                      boxShadow: `6px 6px 0 ${accent.dot}55`,
+                      fontSize: 'clamp(4rem, 10vw, 7rem)',
+                      color: 'rgba(255,255,255,0.03)',
+                      fontFamily: 'var(--font-stack-heading)',
+                      lineHeight: 1,
                     }}
                   >
-                    <img
-                      src={displayService.image}
-                      alt={displayService.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <div
-                      className="absolute inset-0"
-                      style={{ background: `linear-gradient(to top, #0e0820 0%, transparent 50%, ${accent.from}88 100%)` }}
-                    />
-                    <div className="absolute bottom-4 left-5">
-                      <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm font-semibold" style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-                        <span className="h-px w-8" style={{ backgroundColor: accent.dot }} />
-                        {displayService.subtitle}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                    {String(displayIndex + 1).padStart(2, '0')}
+                  </div>
 
-                <motion.div
-                  key={`header-${displayIndex}`}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="space-y-4 pt-2"
-                >
-                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none">
-                    {displayService?.title}
-                  </h2>
-                  <p className="text-lg sm:text-xl text-white/70 leading-relaxed max-w-2xl">
-                    {displayService?.description}
-                  </p>
-                </motion.div>
+                  {/* Close button — larger tap target on mobile */}
+                  <motion.button
+                    onClick={onClose}
+                    aria-label="Close"
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 340, damping: 22 }}
+                    className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
+                    style={{
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'rgba(255,255,255,0.04)',
+                      color: 'rgba(255,255,255,0.5)',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; e.currentTarget.style.color = '#fff'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+                  >
+                    <X size={15} strokeWidth={2} />
+                  </motion.button>
 
-                <motion.div
-                  key={`stats-${displayIndex}`}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                  className="grid grid-cols-3 gap-3 sm:gap-6"
-                >
-                  {displayService?.stats?.map((s: { value: string; label: string }, i: number) => (
-                    <div
-                      key={i}
-                      className="p-4 sm:p-6 bg-[#0c0618] text-center relative overflow-hidden group transition-all duration-300 rounded-lg"
-                      style={{
-                        border: `1px solid ${accent.border}`,
-                        boxShadow: `4px 4px 0 ${accent.dot}44`,
-                      }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `6px 6px 0 ${accent.dot}66`; (e.currentTarget as HTMLDivElement).style.transform = `translate(-2px, -2px)`; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = `4px 4px 0 ${accent.dot}44`; (e.currentTarget as HTMLDivElement).style.transform = `translate(0, 0)`; }}
+                  {/* Subtitle + counter */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1, duration: 0.4 }}
+                    className="flex items-center gap-3 mb-4"
+                    style={{ paddingLeft: '48px' }}
+                  >
+                    <span
+                      className="inline-flex items-center gap-2 text-[9px] sm:text-[10px] uppercase tracking-[0.35em]"
+                      style={{ color: accent.dot, fontFamily: 'var(--font-stack-heading)' }}
                     >
-                      <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
-                      />
-                      <div className="relative z-10 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: accent.dot }}>{s.value}</div>
-                      <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mt-2">{s.label}</div>
-                    </div>
-                  ))}
-                </motion.div>
+                      <span className="inline-block w-4 h-px" style={{ background: accent.dot }} />
+                      {activeService.subtitle}
+                    </span>
+                    <span
+                      className="text-[9px] tracking-[0.08em]"
+                      style={{ color: 'rgba(255,255,255,0.15)', fontFamily: 'var(--font-stack-heading)' }}
+                    >
+                      {displayIndex + 1} / {ALL_SERVICES.length}
+                    </span>
+                  </motion.div>
 
-                <motion.div
-                  key={`deliv-${displayIndex}`}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                  className="space-y-6"
+                  {/* Icon + Title */}
+                  <div className="flex items-start gap-4">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.55 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.18, type: 'spring', stiffness: 300, damping: 20 }}
+                      className="flex-shrink-0 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center"
+                      style={{ border: `1px solid ${accent.border}`, background: accent.light, color: accent.dot }}
+                    >
+                      {activeService.icon}
+                    </motion.div>
+
+                    <motion.h3
+                      id="pillar-title"
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.48, ease: [0.22, 1, 0.36, 1] }}
+                      className="font-bold leading-[1.08] tracking-[-0.025em] pt-0.5"
+                      style={{
+                        fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                        color: '#fff',
+                        fontFamily: 'var(--font-stack-heading)',
+                      }}
+                    >
+                      {activeService.title}
+                    </motion.h3>
+                  </div>
+                </div>
+
+                {/* Scrollable body */}
+                <div
+                  ref={contentRef}
+                  className="flex-1 overflow-y-auto min-h-0"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: `${accent.border} transparent`,
+                  }}
                 >
-                  <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold">What We Deliver</h4>
-                  <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
-                    {displayService?.whatWeDo?.map((item: string, i: number) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-4 p-4 bg-[#140f24] border rounded-lg transition-all duration-200"
+                  <div className="px-5 sm:px-8 py-6 sm:py-7 space-y-7 sm:space-y-8">
+
+                    {/* Description */}
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.26, duration: 0.45 }}
+                      className="leading-[1.78] text-sm sm:text-base"
+                      style={{ color: 'rgba(255,255,255,0.52)', fontFamily: 'var(--font-stack-body)' }}
+                    >
+                      {activeService.description}
+                    </motion.p>
+
+                    {/* Stats */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.32, duration: 0.45 }}
+                      className="grid grid-cols-3 gap-px overflow-hidden"
+                      style={{ border: `1px solid ${accent.border}`, background: accent.border }}
+                    >
+                      {activeService.stats.map((stat: { value: string; label: string }, i: number) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.38 + i * 0.065, type: 'spring', stiffness: 320, damping: 22 }}
+                          className="flex flex-col items-center justify-center py-4 sm:py-5 px-3 text-center"
+                          style={{ background: '#0c0b13' }}
+                        >
+                          <div
+                            className="font-extrabold leading-none tracking-[-0.03em] mb-1.5"
+                            style={{
+                              fontSize: 'clamp(1.25rem, 3.2vw, 1.75rem)',
+                              color: accent.dot,
+                              fontFamily: 'var(--font-stack-heading)',
+                            }}
+                          >
+                            {stat.value}
+                          </div>
+                          <div
+                            className="text-[10px] sm:text-[11px] leading-[1.35] tracking-[0.025em]"
+                            style={{ color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-stack-body)' }}
+                          >
+                            {stat.label}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+
+                    {/* What We Deliver */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.46, duration: 0.45 }}
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <span
+                          className="text-[9px] sm:text-[10px] uppercase tracking-[0.35em]"
+                          style={{ color: 'rgba(255,255,255,0.24)', fontFamily: 'var(--font-stack-heading)' }}
+                        >
+                          What We Deliver
+                        </span>
+                        <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />
+                      </div>
+
+                      <ul className="grid sm:grid-cols-2 gap-2">
+                        {(activeService.whatWeDo as string[]).map((item: string, i: number) => (
+                          <motion.li
+                            key={i}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5 + i * 0.04, duration: 0.36 }}
+                            className="flex items-start gap-3 py-2.5 px-3"
+                            style={{
+                              background: 'rgba(255,255,255,0.022)',
+                              border: '1px solid rgba(255,255,255,0.045)',
+                            }}
+                          >
+                            <span className="mt-[2px] flex-shrink-0" style={{ color: accent.dot }}>
+                              <Check size={12} strokeWidth={2.5} />
+                            </span>
+                            <span
+                              className="text-xs sm:text-[0.875rem] leading-snug"
+                              style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'var(--font-stack-body)' }}
+                            >
+                              {item}
+                            </span>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    </motion.div>
+
+                    {/* Closing note */}
+                    {activeService.closingNote && (
+                      <motion.blockquote
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.68, duration: 0.45 }}
+                        className="relative pl-5 text-[0.875rem] leading-[1.78] italic"
                         style={{
-                          borderColor: accent.border,
+                          color: 'rgba(255,255,255,0.38)',
+                          fontFamily: 'var(--font-stack-body)',
+                          borderLeft: `2px solid ${accent.dot}`,
                         }}
                       >
-                        <div
-                          className="flex-shrink-0 w-6 h-6 flex items-center justify-center border rounded-md"
-                          style={{ borderColor: accent.dot, color: accent.dot, background: 'rgba(0,0,0,0.2)' }}
-                        >
-                          <Check size={12} strokeWidth={3} />
-                        </div>
-                        <span className="text-sm sm:text-base text-white/90">{item}</span>
-                      </div>
-                    ))}
+                        {activeService.closingNote}
+                      </motion.blockquote>
+                    )}
+
+                    {/* Bottom padding so last item clears the sticky footer */}
+                    <div className="h-2" />
                   </div>
+                </div>
+
+                {/* Footer navigation */}
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.55, duration: 0.38 }}
+                  className="flex-shrink-0 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-5"
+                  style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.28)' }}
+                >
+                  {/* Prev */}
+                  <button
+                    onClick={() => hasPrev && onNavigate(displayIndex - 1)}
+                    disabled={!hasPrev}
+                    aria-label="Previous pillar"
+                    className="inline-flex items-center gap-2 transition-all duration-200 px-3 sm:px-4 py-2.5 min-w-[44px] min-h-[44px]"
+                    style={{
+                      fontFamily: 'var(--font-stack-heading)',
+                      fontSize: 10,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: hasPrev ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.1)',
+                      cursor: hasPrev ? 'pointer' : 'default',
+                      border: hasPrev ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
+                      background: 'none',
+                    }}
+                    onMouseEnter={e => { if (hasPrev) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
+                    onMouseLeave={e => { if (hasPrev) { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'none'; } }}
+                  >
+                    <ArrowLeft size={12} />
+                    <span className="hidden sm:inline">Prev</span>
+                  </button>
+
+                  {/* Dot pagination */}
+                  <nav className="flex items-center gap-2" aria-label="Pillar pagination">
+                    {ALL_SERVICES.map((svc, i) => (
+                      <button
+                        key={i}
+                        onClick={() => onNavigate(i)}
+                        aria-label={`Go to ${svc.title}`}
+                        aria-current={i === displayIndex ? 'step' : undefined}
+                        className="transition-all duration-300 relative"
+                        style={{
+                          width: i === displayIndex ? 26 : 7,
+                          height: 7,
+                          background: i === displayIndex ? accent.dot : 'rgba(255,255,255,0.1)',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          borderRadius: 0,
+                          // Larger touch target via pseudo-element workaround
+                          minWidth: 7,
+                          minHeight: 44,
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      />
+                    ))}
+                  </nav>
+
+                  {/* Next */}
+                  <button
+                    onClick={() => hasNext && onNavigate(displayIndex + 1)}
+                    disabled={!hasNext}
+                    aria-label="Next pillar"
+                    className="inline-flex items-center gap-2 transition-all duration-200 px-3 sm:px-4 py-2.5 min-w-[44px] min-h-[44px]"
+                    style={{
+                      fontFamily: 'var(--font-stack-heading)',
+                      fontSize: 10,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: hasNext ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.1)',
+                      cursor: hasNext ? 'pointer' : 'default',
+                      border: hasNext ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
+                      background: 'none',
+                    }}
+                    onMouseEnter={e => { if (hasNext) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
+                    onMouseLeave={e => { if (hasNext) { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'none'; } }}
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ArrowRight size={12} />
+                  </button>
                 </motion.div>
 
-                {displayService?.closingNote && (
-                  <motion.div
-                    key={`close-${displayIndex}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="p-6 bg-[#140f24] text-center rounded-lg"
-                    style={{ border: `1px solid ${accent.border}` }}
-                  >
-                    <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
-                  </motion.div>
-                )}
-              </div>
-            </div>
-
-            <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-[#0a0618] flex justify-between items-center">
-              <button
-                type="button"
-                disabled={displayIndex === 0}
-                onClick={() => displayIndex !== null && onNavigate(displayIndex - 1)}
-                className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase rounded-md"
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: '0.7rem',
-                  letterSpacing: '0.15em',
-                  border: '1px solid #fbfbfc',
-                  color: '#fbfbfc',
-                  background: 'transparent',
-                  transition: 'background 0.2s ease, color 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (displayIndex === 0) return;
-                  e.currentTarget.style.background = '#fbfbfc';
-                  e.currentTarget.style.color = '#0e0820';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#fbfbfc';
-                }}
-              >
-                <ArrowLeft size={16} /> <span className="hidden sm:inline">Prev</span>
-              </button>
-
-              <div className="flex gap-3">
-                {PILLARS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => onNavigate(i)}
-                    className="group relative flex items-center justify-center h-8"
-                    aria-label={`Go to pillar ${i + 1}`}
-                  >
-                    <div
-                      className={`h-1.5 transition-all duration-500 rounded-full ${i === displayIndex ? 'w-10' : 'w-2 bg-white/20 group-hover:bg-white/40'}`}
-                      style={{ backgroundColor: i === displayIndex ? accent.dot : undefined }}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                disabled={displayIndex === PILLARS.length - 1}
-                onClick={() => displayIndex !== null && onNavigate(displayIndex + 1)}
-                className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase rounded-md"
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: '0.7rem',
-                  letterSpacing: '0.15em',
-                  border: '1px solid #fbfbfc',
-                  color: '#fbfbfc',
-                  background: 'transparent',
-                  transition: 'background 0.2s ease, color 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (displayIndex === PILLARS.length - 1) return;
-                  e.currentTarget.style.background = '#fbfbfc';
-                  e.currentTarget.style.color = '#0e0820';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#fbfbfc';
-                }}
-              >
-                <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
-              </button>
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>,
     document.body

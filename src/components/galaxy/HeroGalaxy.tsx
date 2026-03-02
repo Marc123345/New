@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Building2, Users, Megaphone, Globe, Target, FileText } from 'lucide-react';
+import { Megaphone, Globe, Target, FileText } from 'lucide-react';
 import { CentralHub } from './CentralHub';
 import { OrbitRing } from './OrbitRing';
 import { PlanetNode } from './PlanetNode';
@@ -9,9 +9,7 @@ const INNER_RADIUS = 140;
 const OUTER_RADIUS = 230;
 
 const INNER_PLANETS = [
-  { icon: <Building2 size={20} />, label: 'Company Pages', accent: '#a46cfc', startAngle: 0 },
-  { icon: <Users size={20} />, label: 'Leadership Branding', accent: '#8b5cf6', startAngle: 120 },
-  { icon: <Megaphone size={20} />, label: 'Advocacy Program', accent: '#c084fc', startAngle: 240 },
+  { icon: <Megaphone size={20} />, label: 'Advocacy Program', accent: '#c084fc', startAngle: 0 },
 ];
 
 const OUTER_PLANETS = [
@@ -99,7 +97,7 @@ export function HeroGalaxy() {
         {[...INNER_PLANETS, ...OUTER_PLANETS].map((planet, i) => (
           <button
             key={planet.label}
-            onClick={() => (i < 3 ? handleInnerClick(i) : handleOuterClick(i - 3))}
+            onClick={() => (i < INNER_PLANETS.length ? handleInnerClick(i) : handleOuterClick(i - INNER_PLANETS.length))}
             className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 transition-all duration-200 cursor-pointer"
             style={{
               background: 'rgba(41,30,86,0.2)',

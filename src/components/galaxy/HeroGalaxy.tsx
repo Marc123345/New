@@ -93,29 +93,6 @@ export function HeroGalaxy() {
         ))}
       </div>
 
-      <div className="flex md:hidden overflow-x-auto gap-3 pb-2 -mx-2 px-2" style={{ scrollbarWidth: 'none' }}>
-        {[...INNER_PLANETS, ...OUTER_PLANETS].map((planet, i) => (
-          <button
-            key={planet.label}
-            onClick={() => (i < INNER_PLANETS.length ? handleInnerClick(i) : handleOuterClick(i - INNER_PLANETS.length))}
-            className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 transition-all duration-200 cursor-pointer"
-            style={{
-              background: 'rgba(41,30,86,0.2)',
-              border: `1px solid ${planet.accent}35`,
-              borderRadius: 6,
-              color: 'rgba(255,255,255,0.8)',
-              fontSize: 12,
-              fontFamily: 'var(--font-stack-heading)',
-              letterSpacing: '0.04em',
-              minHeight: 44,
-            }}
-          >
-            <span style={{ color: planet.accent }}>{planet.icon}</span>
-            <span className="whitespace-nowrap">{planet.label}</span>
-          </button>
-        ))}
-      </div>
-
       <PillarOverlay
         pillarIndex={pillarIndex}
         onClose={handleClosePillar}

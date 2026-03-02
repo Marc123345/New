@@ -169,7 +169,7 @@ export function EcosystemServices() {
   return (
     <section
       id="ecosystem"
-      className="relative w-full min-h-screen flex flex-col items-center justify-start overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-28"
       style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -221,7 +221,7 @@ export function EcosystemServices() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/50" />
       </div>
 
-      <div className="relative z-10 w-full text-center pointer-events-none select-none pt-16 sm:pt-24">
+      <div className="relative z-10 w-full text-center pointer-events-none select-none">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -246,7 +246,7 @@ export function EcosystemServices() {
           </div>
 
           <h1
-            className="leading-[0.9] tracking-tighter uppercase mb-2"
+            className="leading-[0.9] tracking-tighter uppercase mb-10 sm:mb-14"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
@@ -269,8 +269,7 @@ export function EcosystemServices() {
       </div>
 
       <div
-        className="relative z-20 w-full flex-1 flex items-center justify-center"
-        style={{ minHeight: '70vh' }}
+        className="relative z-20 w-full flex items-center justify-center"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >

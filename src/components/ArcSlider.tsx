@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -174,7 +175,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
     if (delta > 100) onCloseRef.current();
   }, []);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {service && (
         <motion.div
@@ -183,7 +184,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8"
           style={{ background: "rgba(4,4,8,0.95)" }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
@@ -235,7 +236,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
 
             <div
               ref={scrollRef}
-              className="overflow-y-auto overscroll-contain"
+              className="relative z-10 overflow-y-auto overscroll-contain"
               style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
               onScroll={handleScroll}
             >
@@ -367,7 +368,8 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 

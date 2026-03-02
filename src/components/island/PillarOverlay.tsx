@@ -64,16 +64,16 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={onClose}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-12 pointer-events-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-12"
           style={{ background: '#0e0820' }}
         >
+          <div className="absolute inset-0" onClick={onClose} />
+
           <motion.div
             initial={{ scale: 0.95, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 20, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            onClick={(e) => e.stopPropagation()}
             className="relative flex flex-col w-full max-w-4xl bg-[#0e0820] rounded-2xl shadow-2xl overflow-hidden"
             style={{
               maxHeight: 'calc(100vh - 2rem)',
@@ -86,18 +86,20 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
               style={{ backgroundColor: accent.dot }}
             />
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute top-4 right-4 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
-              aria-label="Close overlay"
-            >
-              <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-            </button>
+            <div className="flex-shrink-0 flex justify-end p-3 relative z-20">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
+                aria-label="Close overlay"
+              >
+                <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+              </button>
+            </div>
 
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 pt-14 pb-10 scrollbar-hide relative z-10"
+              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 pb-10 scrollbar-hide"
             >
               <div className="max-w-3xl mx-auto space-y-12">
                 {displayService?.image && (

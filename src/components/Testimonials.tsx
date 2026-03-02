@@ -90,8 +90,8 @@ export function Testimonials() {
   }, [scrollYProgress]);
 
   return (
-    <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
-      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
+    <div ref={containerRef} className="relative h-[250vh]" style={{ background: "var(--color-background-light)" }}>
+      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/10">
 
         <div className="text-center mb-8 px-4 md:px-8">
           <div
@@ -113,7 +113,7 @@ export function Testimonials() {
             style={{
               fontSize: "clamp(2rem, 4vw, 3rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "#ffffff",
+              color: "var(--color-text-dark)",
             }}
           >
             Trusted Across Africa
@@ -125,7 +125,7 @@ export function Testimonials() {
           <div
             className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
             style={{
-              border: "4px solid var(--color-secondary)",
+              border: "4px solid var(--color-text-dark)",
               boxShadow: "var(--shadow-geometric)",
             }}
           >
@@ -203,9 +203,10 @@ export function Testimonials() {
 
           {/* RIGHT: Testimonial Cards */}
           <div
-            className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col"
+            className="flex-1 relative overflow-hidden flex flex-col"
             style={{
-              border: "2px solid rgba(255,255,255,0.15)",
+              background: "var(--color-background-light)",
+              border: "2px solid var(--color-text-dark)",
               boxShadow: "var(--shadow-geometric)",
             }}
           >
@@ -222,7 +223,7 @@ export function Testimonials() {
             </div>
 
             {/* Contact list strip at bottom */}
-            <div className="shrink-0 border-t border-white/10 px-6 py-3">
+            <div className="shrink-0 border-t border-black/10 px-6 py-3">
               <div className="flex flex-wrap gap-2">
                 {CONTACTS.map((contact, i) => (
                   <div
@@ -231,8 +232,8 @@ export function Testimonials() {
                     style={{
                       border: i === activeIndex
                         ? "1px solid var(--color-secondary)"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent",
+                        : "1px solid rgba(0,0,0,0.12)",
+                      background: i === activeIndex ? "rgba(164,108,252,0.08)" : "transparent",
                     }}
                   >
                     <img
@@ -248,7 +249,7 @@ export function Testimonials() {
                       className="text-[10px] tracking-widest uppercase"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
-                        color: i === activeIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
+                        color: i === activeIndex ? "var(--color-text-dark)" : "rgba(35,35,35,0.4)",
                       }}
                     >
                       {contact.name.split(" ")[0]} · {contact.country}
@@ -354,27 +355,28 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[85%] md:w-[80%] bg-[var(--color-primary)] text-white p-8 md:p-10"
+      className="absolute w-[85%] md:w-[80%] p-8 md:p-10"
       data-geometric-card
     >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          border: "4px solid rgba(255,255,255,0.2)",
+          background: "var(--color-background-light)",
+          border: "4px solid var(--color-text-dark)",
           boxShadow: "var(--shadow-geometric)",
         }}
       />
       <div className="relative flex flex-col gap-6">
         <h3
           className="text-xl md:text-3xl leading-[1.1] tracking-tight"
-          style={{ fontFamily: "var(--font-stack-heading)" }}
+          style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-text-dark)" }}
         >
           "{contact.quote}"
         </h3>
         <div className="flex items-center gap-4">
           <motion.div
-            className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/30"
-            style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
+            className="w-14 h-14 rounded-full overflow-hidden border-2"
+            style={{ borderColor: "var(--color-text-dark)", boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
               boxShadow: [
@@ -393,16 +395,17 @@ function TestimonialCard({
           </motion.div>
           <div>
             <div
-              className="text-2xl leading-none mb-1 text-[#FBFBFC]"
+              className="text-2xl leading-none mb-1"
               style={{
                 fontFamily: "var(--font-stack-body)",
                 fontStyle: "italic",
+                color: "var(--color-text-dark)",
               }}
             >
               {contact.name}
             </div>
             <div
-              className="inline-block bg-[var(--color-secondary)] px-3 py-1 text-xs tracking-widest text-[var(--color-background-light)]"
+              className="inline-block bg-[var(--color-primary)] px-3 py-1 text-xs tracking-widest text-white"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {contact.role} · {contact.company}

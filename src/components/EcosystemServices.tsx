@@ -63,9 +63,10 @@ const OrbitNode = ({ item, index, total, onSelect, activeLabel, onToggleLabel }:
             className="text-xs uppercase tracking-[0.2em] whitespace-nowrap px-3 py-1"
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              color: '#ffffff',
-              background: 'rgba(41,30,86,0.95)',
-              border: '1px solid var(--color-secondary)',
+              color: 'var(--color-background-light)',
+              background: 'var(--color-primary)',
+              border: '1px solid var(--color-text-dark)',
+              boxShadow: '3px 3px 0 var(--color-text-dark)',
             }}
           >
             {item.subtitle}
@@ -89,21 +90,22 @@ export function EcosystemServices() {
     <section
       id="ecosystem"
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-32"
-      style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
+      style={{ background: 'var(--color-background-light)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-40"
-          style={{ filter: 'brightness(0.7) contrast(1.05)' }}
-        >
-          <source src={VIDEO_URL} type="video/mp4" />
-        </video>
-        <SpacePlanets3D preset="ecosystem" style={{ opacity: 0.75 }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/50" />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(164,108,252,0.06) 0%, transparent 55%), radial-gradient(circle at 70% 70%, rgba(96,165,250,0.05) 0%, transparent 50%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(35,35,35,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(35,35,35,0.04) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
       </div>
 
       <div className="relative z-10 container mx-auto px-6 text-center pointer-events-none select-none">
@@ -135,9 +137,8 @@ export function EcosystemServices() {
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
-              textShadow: '0 20px 40px rgba(41,30,86,0.6)',
               color: 'transparent',
-              WebkitTextStroke: '1.5px #ffffff',
+              WebkitTextStroke: '1.5px var(--color-text-dark)',
             }}
           >
             Three Pillars. <br />
@@ -155,8 +156,8 @@ export function EcosystemServices() {
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
-              color: 'var(--color-secondary)',
-              opacity: 0.08,
+              color: 'var(--color-text-dark)',
+              opacity: 0.04,
             }}
           >
             Connection

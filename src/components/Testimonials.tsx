@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 
 const TESTIMONIALS = [
   {
@@ -123,8 +123,6 @@ export function Testimonials() {
     offset: ["start start", "end end"],
   });
 
-  const [activeContactId, setActiveContactId] = useState<string | null>(null);
-
   return (
     <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
@@ -221,8 +219,6 @@ export function Testimonials() {
 
               <GlobeMap
                 scrollProgress={scrollYProgress}
-                activeContactId={activeContactId}
-                onContactHover={setActiveContactId}
               />
             </div>
 
@@ -259,14 +255,6 @@ export function Testimonials() {
               ))}
             </div>
 
-            {/* Divider */}
-            <div className="w-full h-px bg-white/10 shrink-0" />
-
-            {/* Bottom half: Contact Directory */}
-            <ContactDirectory
-              activeContactId={activeContactId}
-              onContactHover={setActiveContactId}
-            />
           </div>
         </div>
       </div>
@@ -274,15 +262,7 @@ export function Testimonials() {
   );
 }
 
-function GlobeMap({
-  scrollProgress,
-  activeContactId,
-  onContactHover,
-}: {
-  scrollProgress: any;
-  activeContactId: string | null;
-  onContactHover: (id: string | null) => void;
-}) {
+function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
   const testimonialIndex = useTransform(
     scrollProgress,
     [0, 0.2, 0.4, 0.6, 0.8, 1],
@@ -299,10 +279,6 @@ function GlobeMap({
   }, [testimonialIndex]);
 
   const active = TESTIMONIALS[currentIndex];
-
-  const activeContact = activeContactId
-    ? CONTACTS.find((c) => c.id === activeContactId)
-    : null;
 
   return (
     <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
@@ -324,219 +300,27 @@ function GlobeMap({
           className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
         />
 
-        {/* Country dots */}
-        {CONTACTS.map((contact) => {
-          const isActive =
-            activeContactId === contact.id ||
-            (activeContact && activeContact.countryCode === contact.countryCode);
-
-          const uniqueDots = CONTACTS.filter(
-            (c, idx, arr) =>
-              arr.findIndex((x) => x.countryCode === c.countryCode) === idx
-          );
-          if (
-            uniqueDots.findIndex((c) => c.id === contact.id) === -1
-          ) {
-            return null;
-          }
-
-          return (
-            <motion.button
-              key={contact.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-              style={{
-                left: `${contact.dotPosition.x}%`,
-                top: `${contact.dotPosition.y}%`,
-                zIndex: 10,
-              }}
-              onHoverStart={() => {
-                const match = CONTACTS.find(
-                  (c) => c.countryCode === contact.countryCode
-                );
-                if (match) onContactHover(match.id);
-              }}
-              onHoverEnd={() => onContactHover(null)}
-            >
-              <motion.div
-                className="relative flex items-center justify-center"
-                animate={isActive ? "active" : "idle"}
-              >
-                <motion.div
-                  className="rounded-full"
-                  variants={{
-                    idle: {
-                      width: 8,
-                      height: 8,
-                      backgroundColor: "rgba(255,255,255,0.7)",
-                      boxShadow: "0 0 0px 0px rgba(255,255,255,0)",
-                    },
-                    active: {
-                      width: 12,
-                      height: 12,
-                      backgroundColor: "var(--color-secondary)",
-                      boxShadow:
-                        "0 0 12px 4px rgba(164,108,252,0.6), 0 0 24px 8px rgba(164,108,252,0.2)",
-                    },
-                  }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                />
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      className="absolute rounded-full border border-[var(--color-secondary)]"
-                      initial={{ width: 12, height: 12, opacity: 0.8 }}
-                      animate={{ width: 32, height: 32, opacity: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                    />
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </motion.button>
-          );
-        })}
+        {CONTACTS.filter(
+          (c, idx, arr) =>
+            arr.findIndex((x) => x.countryCode === c.countryCode) === idx
+        ).map((contact) => (
+          <div
+            key={contact.id}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{
+              left: `${contact.dotPosition.x}%`,
+              top: `${contact.dotPosition.y}%`,
+              zIndex: 10,
+            }}
+          >
+            <div className="w-2 h-2 rounded-full bg-white/70" />
+          </div>
+        ))}
       </motion.div>
     </div>
   );
 }
 
-function ContactDirectory({
-  activeContactId,
-  onContactHover,
-}: {
-  activeContactId: string | null;
-  onContactHover: (id: string | null) => void;
-}) {
-  return (
-    <div className="shrink-0 overflow-y-auto" style={{ maxHeight: "240px" }}>
-      <div className="px-6 py-3 border-b border-white/10 sticky top-0 bg-[var(--color-surface-dark)] z-10">
-        <span
-          className="text-xs tracking-[0.25em] uppercase text-white/40"
-          style={{ fontFamily: "var(--font-stack-heading)" }}
-        >
-          Regional Contacts
-        </span>
-      </div>
-      <div className="flex flex-col divide-y divide-white/5">
-        {CONTACTS.map((contact) => {
-          const isActive = activeContactId === contact.id;
-          return (
-            <motion.div
-              key={contact.id}
-              className="relative flex items-center gap-4 px-6 py-3 cursor-pointer overflow-hidden"
-              onHoverStart={() => onContactHover(contact.id)}
-              onHoverEnd={() => onContactHover(null)}
-              animate={isActive ? "active" : "idle"}
-            >
-              {/* Active left bar */}
-              <motion.div
-                className="absolute left-0 top-0 bottom-0 w-[3px]"
-                style={{ backgroundColor: "var(--color-secondary)" }}
-                variants={{
-                  idle: { scaleY: 0, originY: 0.5 },
-                  active: { scaleY: 1, originY: 0.5 },
-                }}
-                transition={{ duration: 0.2 }}
-              />
-
-              {/* Background fill */}
-              <motion.div
-                className="absolute inset-0"
-                style={{ backgroundColor: "var(--color-primary)" }}
-                variants={{
-                  idle: { opacity: 0 },
-                  active: { opacity: 0.4 },
-                }}
-                transition={{ duration: 0.2 }}
-              />
-
-              {/* Country badge */}
-              <div className="relative shrink-0 flex items-center justify-center w-10 h-10" style={{ border: "1px solid rgba(255,255,255,0.15)" }}>
-                <motion.span
-                  className="text-xs font-bold tracking-widest"
-                  style={{ fontFamily: "var(--font-stack-heading)" }}
-                  variants={{
-                    idle: { color: "rgba(255,255,255,0.4)" },
-                    active: { color: "var(--color-secondary)" },
-                  }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {contact.countryCode}
-                </motion.span>
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      className="absolute inset-0"
-                      style={{ border: "1px solid var(--color-secondary)" }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Info */}
-              <div className="relative flex-1 min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span
-                    className="text-white text-sm font-medium truncate"
-                    style={{ fontFamily: "var(--font-stack-heading)" }}
-                  >
-                    {contact.name}
-                  </span>
-                  <span
-                    className="text-xs tracking-widest uppercase shrink-0"
-                    style={{
-                      fontFamily: "var(--font-stack-heading)",
-                      color: "var(--color-secondary)",
-                    }}
-                  >
-                    {contact.role}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span
-                    className="text-xs text-white/40 truncate"
-                    style={{ fontFamily: "var(--font-stack-body)" }}
-                  >
-                    {contact.company}
-                  </span>
-                  <span className="text-white/20 text-xs">·</span>
-                  <span
-                    className="text-xs text-white/50 shrink-0"
-                    style={{ fontFamily: "var(--font-stack-body)" }}
-                  >
-                    {contact.country}
-                  </span>
-                </div>
-              </div>
-
-              {/* Glow dot indicator */}
-              <div className="relative shrink-0">
-                <motion.div
-                  className="w-2 h-2 rounded-full"
-                  variants={{
-                    idle: {
-                      backgroundColor: "rgba(255,255,255,0.15)",
-                      boxShadow: "none",
-                    },
-                    active: {
-                      backgroundColor: "var(--color-secondary)",
-                      boxShadow: "0 0 8px 2px rgba(164,108,252,0.5)",
-                    },
-                  }}
-                  transition={{ duration: 0.2 }}
-                />
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 function TestimonialCard({
   testimonial,

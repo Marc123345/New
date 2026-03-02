@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
 import './globe.css';
-import './index.css';
 
 interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;

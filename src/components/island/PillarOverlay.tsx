@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
@@ -45,7 +46,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
   const hasPrev = pillarIndex !== null && pillarIndex > 0;
   const hasNext = pillarIndex !== null && pillarIndex < ALL_SERVICES.length - 1;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {pillarIndex !== null && activeService && (
         <>
@@ -56,8 +57,8 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             onClick={onClose}
-            className="fixed inset-0 z-[150]"
-            style={{ background: 'rgba(4,4,8,0.82)', backdropFilter: 'blur(20px)' }}
+            className="fixed inset-0 z-[200]"
+            style={{ background: 'rgba(4,4,8,0.96)' }}
           />
 
           <motion.div
@@ -65,7 +66,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
+            className="fixed inset-0 z-[201] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -392,6 +393,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

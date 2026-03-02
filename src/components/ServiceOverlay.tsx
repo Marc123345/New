@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { SECONDARY_SERVICES } from '../constants/ecosystem';
@@ -12,7 +13,7 @@ interface ServiceOverlayProps {
 export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOverlayProps) {
   useOverlay(serviceIndex !== null, onClose);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {serviceIndex !== null && (
         <>
@@ -23,11 +24,8 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="fixed inset-0 z-[150]"
-            style={{
-              backgroundColor: 'rgba(5,5,5,0.95)',
-              backdropFilter: 'blur(28px)'
-            }}
+            className="fixed inset-0 z-[200]"
+            style={{ backgroundColor: 'rgba(5,5,5,0.97)' }}
           />
 
           <motion.div
@@ -35,7 +33,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
+            className="fixed inset-0 z-[201] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
             onClick={onClose}
           >
             <AnimatePresence mode="wait">
@@ -196,6 +194,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { PILLARS } from '../constants/ecosystem'; // Adjusted path if needed based on your folder structure
+import { PILLARS } from '../../constants/ecosystem';
 
 const PILLAR_ACCENTS = [
   { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.14)', border: 'rgba(147,51,234,0.3)', dot: '#c084fc' },

@@ -1,6 +1,9 @@
-import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { motion, useScroll, useTransform, useMotionValueEvent, MotionValue } from 'framer-motion';
-import Globe from 'globe.gl';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import * as THREE from 'three';
+import ThreeGlobe from 'three-globe';
 
 const AFRICA_CITY_POINTS = [
   { lat: 30.04,  lng: 31.24,  pop: 21000 },
@@ -36,13 +39,11 @@ const AFRICA_CITY_POINTS = [
   { lat: 18.07,  lng: -15.97, pop: 4000  },
   { lat: 6.36,   lng: 2.42,   pop: 4000  },
   { lat: -13.96, lng: 33.79,  pop: 3500  },
-  { lat: -9.44,  lng: 147.18, pop: 1000  },
   { lat: 11.86,  lng: 15.35,  pop: 3000  },
   { lat: -22.90, lng: 43.16,  pop: 3000  },
   { lat: 4.85,   lng: 31.60,  pop: 3000  },
   { lat: -6.17,  lng: 35.74,  pop: 2500  },
   { lat: 1.74,   lng: 10.44,  pop: 2500  },
-  { lat: 19.12,  lng: -72.34, pop: 2000  },
 ];
 
 const sortedByPop = [...AFRICA_CITY_POINTS].sort((a, b) => b.pop - a.pop);
@@ -58,8 +59,7 @@ function getPointColor(progress: number): string {
     const t = progress / 0.75;
     const r = Math.round(140 + (192 - 140) * t);
     const g = Math.round(60 + (132 - 60) * t);
-    const b = 252;
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}fc`;
   } else {
     const t = (progress - 0.75) / 0.25;
     const r = Math.round(192 + (240 - 192) * t);
@@ -68,19 +68,85 @@ function getPointColor(progress: number): string {
   }
 }
 
-function getPointAltitude(progress: number): number {
-  return 0.01 + progress * 0.07;
+function getAtmosphereColor(progress: number): string {
+  if (progress > 0.75) {
+    const t = (progress - 0.75) / 0.25;
+    return `rgba(192, 108, 255, ${0.25 + t * 0.75})`;
+  }
+  const t = progress / 0.75;
+  return `rgba(${Math.round(60 + t * 80)}, ${Math.round(40 + t * 40)}, ${Math.round(120 + t * 60)}, ${0.08 + t * 0.18})`;
 }
 
-function getPointRadius(progress: number): number {
-  return 0.22 + progress * 0.7;
+interface GlobeSceneProps {
+  progress: number;
+}
+
+function GlobeScene({ progress }: GlobeSceneProps) {
+  const globeRef = useRef<ThreeGlobe | null>(null);
+  const { scene, camera } = useThree();
+
+  useEffect(() => {
+    const globe = new ThreeGlobe()
+      .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
+      .pointLat('lat')
+      .pointLng('lng')
+      .pointColor(() => getPointColor(0))
+      .pointAltitude(0.01)
+      .pointRadius(0.22)
+      .pointsMerge(true)
+      .atmosphereColor('rgba(60,40,120,0.08)')
+      .atmosphereAltitude(0.08)
+      .showGraticules(false);
+
+    globe.pointsData(getVisiblePoints(0));
+    scene.add(globe);
+    globeRef.current = globe;
+
+    const ambientLight = new THREE.AmbientLight(0xcccccc, Math.PI);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.6 * Math.PI);
+    dirLight.position.set(1, 1, 1);
+    scene.add(ambientLight, dirLight);
+
+    camera.position.set(0, 0, 300);
+
+    return () => {
+      scene.remove(globe);
+      scene.remove(ambientLight);
+      scene.remove(dirLight);
+    };
+  }, [scene, camera]);
+
+  useEffect(() => {
+    if (!globeRef.current) return;
+    const g = globeRef.current;
+
+    g.pointsData(getVisiblePoints(progress))
+      .pointColor(() => getPointColor(progress))
+      .pointAltitude(0.01 + progress * 0.07)
+      .pointRadius(0.22 + progress * 0.7)
+      .pointsMerge(true)
+      .atmosphereColor(getAtmosphereColor(progress))
+      .atmosphereAltitude(progress > 0.75
+        ? 0.12 + ((progress - 0.75) / 0.25) * 0.28
+        : 0.08 + (progress / 0.75) * 0.06
+      );
+  }, [progress]);
+
+  useFrame((_, delta) => {
+    if (globeRef.current) {
+      globeRef.current.rotation.y += delta * 0.05;
+      globeRef.current.tick?.();
+    }
+  });
+
+  return null;
 }
 
 const eras = [
   {
-    subtitle: 'AFRICA AT NIGHT (Present)',
-    title: 'VIEW OF AFRICA AT NIGHT (Current)',
-    body: 'Current urban footprints illuminated by purple light.',
+    subtitle: 'AFRICA AT NIGHT',
+    title: 'View of Africa at Night',
+    body: 'Current urban footprints illuminated — where light marks life, commerce, and connection.',
     rangeStart: 0,
     rangeEnd: 0.25,
   },
@@ -93,15 +159,15 @@ const eras = [
   },
   {
     subtitle: 'THE AI ERA',
-    title: 'The AI Era (c. 2020s-Present)',
+    title: 'The AI Era (c. 2020s–Present)',
     body: 'Artificial intelligence transforms industries and connectivity. New nodes light up as automation reshapes how Africa connects.',
     rangeStart: 0.5,
     rangeEnd: 0.75,
   },
   {
-    subtitle: 'THE H2H DIFFERENCE: FULL ILLUMINATION',
-    title: 'The H2H Difference',
-    body: 'When Human Collaboration meets the Digital & AI Foundations. A United, Illuminated Continent. Purple Represents Progress, Unity, and Connection.',
+    subtitle: 'THE H2H DIFFERENCE',
+    title: 'Full Illumination',
+    body: 'When Human Collaboration meets Digital & AI foundations — a united, illuminated continent. This is H2H.',
     rangeStart: 0.75,
     rangeEnd: 1,
   },
@@ -110,11 +176,13 @@ const eras = [
 function EraText({
   subtitle, title, body, rangeStart, rangeEnd, scrollYProgress,
 }: {
-  subtitle: string; title: string; body: string;
-  rangeStart: number; rangeEnd: number;
+  subtitle: string;
+  title: string;
+  body: string;
+  rangeStart: number;
+  rangeEnd: number;
   scrollYProgress: MotionValue<number>;
 }) {
-  const mid = rangeStart + (rangeEnd - rangeStart) * 0.5;
   const fadeIn = rangeStart + (rangeEnd - rangeStart) * 0.15;
   const fadeOut = rangeEnd - (rangeEnd - rangeStart) * 0.15;
 
@@ -150,9 +218,7 @@ function EraText({
 
 export function HeroStory() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const globeContainerRef = useRef<HTMLDivElement>(null);
-  const globeInstance = useRef<ReturnType<typeof Globe> | null>(null);
-  const lastProgress = useRef(0);
+  const [progress, setProgress] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -175,83 +241,9 @@ export function HeroStory() {
     })),
   []);
 
-  const updateGlobe = useCallback((progress: number) => {
-    if (!globeInstance.current) return;
-    const g = globeInstance.current as any;
-
-    g.pointsData(getVisiblePoints(progress))
-      .pointColor(() => getPointColor(progress))
-      .pointAltitude(getPointAltitude(progress))
-      .pointRadius(getPointRadius(progress))
-      .pointsMerge(true);
-
-    if (progress > 0.75) {
-      const t = (progress - 0.75) / 0.25;
-      g.atmosphereColor(`rgba(192, 108, 255, ${0.25 + t * 0.75})`)
-        .atmosphereAltitude(0.12 + t * 0.28);
-    } else {
-      const t = progress / 0.75;
-      g.atmosphereColor(`rgba(${Math.round(60 + t * 80)}, ${Math.round(40 + t * 40)}, ${Math.round(120 + t * 60)}, ${0.08 + t * 0.18})`)
-        .atmosphereAltitude(0.08 + t * 0.06);
-    }
-  }, []);
-
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    if (Math.abs(latest - lastProgress.current) > 0.004) {
-      lastProgress.current = latest;
-      updateGlobe(latest);
-    }
+    setProgress(latest);
   });
-
-  useEffect(() => {
-    const container = globeContainerRef.current;
-    if (!container) return;
-
-    const g = Globe()(container) as any;
-
-    g.globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
-      .pointLat('lat')
-      .pointLng('lng')
-      .pointColor(() => getPointColor(0))
-      .pointAltitude(0.01)
-      .pointRadius(0.22)
-      .pointsMerge(true)
-      .atmosphereColor('rgba(60,40,120,0.08)')
-      .atmosphereAltitude(0.08)
-      .backgroundColor('rgba(0,0,0,0)')
-      .showGraticules(false)
-      .width(container.clientWidth)
-      .height(container.clientHeight);
-
-    g.pointsData(getVisiblePoints(0));
-
-    const controls = g.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.55;
-    controls.enableZoom = false;
-    controls.enablePan = false;
-    controls.rotateSpeed = 0;
-
-    g.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
-
-    globeInstance.current = g;
-
-    const handleResize = () => {
-      if (container && globeInstance.current) {
-        (globeInstance.current as any)
-          .width(container.clientWidth)
-          .height(container.clientHeight);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (globeInstance.current) {
-        try { (globeInstance.current as any)._destructor(); } catch {}
-      }
-    };
-  }, []);
 
   return (
     <section ref={sectionRef} className="relative" style={{ height: '500vh' }}>
@@ -295,11 +287,19 @@ export function HeroStory() {
 
           <div className="hidden md:flex w-1/2 items-center justify-center relative">
             <div className="relative w-full h-full">
-              <div
-                ref={globeContainerRef}
-                className="w-full h-full"
-                style={{ cursor: 'default' }}
-              />
+              <Canvas
+                camera={{ position: [0, 0, 300], fov: 50, near: 0.1, far: 10000 }}
+                style={{ background: 'transparent' }}
+                gl={{ alpha: true, antialias: true }}
+              >
+                <GlobeScene progress={progress} />
+                <OrbitControls
+                  enableZoom={false}
+                  enablePan={false}
+                  enableRotate={false}
+                  autoRotate={false}
+                />
+              </Canvas>
 
               <motion.div
                 className="absolute pointer-events-none"
@@ -321,22 +321,6 @@ export function HeroStory() {
         </div>
 
         <div className="absolute bottom-8 left-10 md:left-16 lg:left-24 z-20 flex flex-col gap-2">
-          <div className="flex gap-3 mb-1">
-            {eras.map((era, i) => {
-              const phaseOpacity = useTransform(
-                scrollYProgress,
-                [era.rangeStart, era.rangeStart + 0.05, era.rangeEnd - 0.05, era.rangeEnd],
-                [0.2, 1, 1, 0.2]
-              );
-              return (
-                <motion.div
-                  key={i}
-                  className="h-px w-10"
-                  style={{ background: 'rgba(168,85,247,0.55)', opacity: phaseOpacity }}
-                />
-              );
-            })}
-          </div>
           <div className="w-52 h-px relative" style={{ background: 'rgba(88,28,135,0.25)' }}>
             <motion.div
               className="absolute inset-y-0 left-0 h-px"

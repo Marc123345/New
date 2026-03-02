@@ -621,7 +621,7 @@ export function ArcSlider() {
     <>
       <div
         className="relative w-full py-16 md:py-24 overflow-hidden"
-        style={{ background: "var(--color-background-light, #f8f9fa)" }}
+        style={{ background: "#0d0a1a" }}
       >
         <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
           <span
@@ -638,7 +638,7 @@ export function ArcSlider() {
             style={{
               fontSize: "clamp(2.5rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-text-dark, #111)",
+              color: "#ffffff",
             }}
           >
             Services
@@ -666,14 +666,14 @@ export function ArcSlider() {
                 textTransform: "uppercase",
                 padding: "10px 24px",
                 whiteSpace: "nowrap",
-                border: "2px solid var(--color-secondary, #9B59F5)",
+                border: "2px solid rgba(155, 89, 245, 0.5)",
                 borderRadius: "0",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
                 color: i === activeIndex
-                  ? "var(--color-background-light, #fff)"
-                  : "var(--color-text-dark, #111)",
+                  ? "#ffffff"
+                  : "rgba(255,255,255,0.75)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
                   ? "0 4px 14px rgba(155, 89, 245, 0.4)"
@@ -719,9 +719,9 @@ export function ArcSlider() {
                   <div
                     className="relative h-full w-full overflow-hidden flex flex-col justify-between p-8 sm:p-10 transition-colors duration-500"
                     style={{
-                      backgroundColor: "var(--color-background-light)",
-                      border: `2px solid var(--color-text-dark)`,
-                      boxShadow: "var(--shadow-geometric)",
+                      backgroundColor: service.bgColor,
+                      border: `2px solid ${service.color}`,
+                      boxShadow: `6px 6px 0 ${service.color}55`,
                       borderRadius: "0",
                     }}
                   >
@@ -745,8 +745,7 @@ export function ArcSlider() {
                           className="text-[10px] tracking-[0.15em] font-medium uppercase"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "var(--color-text-dark)",
-                            opacity: 0.45,
+                            color: "rgba(255,255,255,0.55)",
                           }}
                         >
                           {service.category}
@@ -766,7 +765,7 @@ export function ArcSlider() {
                         style={{
                           fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
                           fontFamily: "var(--font-stack-heading)",
-                          color: "var(--color-text-dark)",
+                          color: "#ffffff",
                           margin: 0,
                         }}
                       >
@@ -787,9 +786,9 @@ export function ArcSlider() {
                             fontSize: "0.75rem",
                             letterSpacing: "0.15em",
                             textTransform: "uppercase",
-                            color: "var(--color-text-dark)",
+                            color: "#ffffff",
                             background: "transparent",
-                            border: `1px solid var(--color-text-dark)`,
+                            border: `1px solid rgba(255,255,255,0.4)`,
                             borderRadius: "0",
                             padding: "12px 24px",
                             cursor: "pointer",
@@ -802,8 +801,8 @@ export function ArcSlider() {
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = "transparent";
-                            e.currentTarget.style.color = "var(--color-text-dark)";
-                            e.currentTarget.style.borderColor = "var(--color-text-dark)";
+                            e.currentTarget.style.color = "#ffffff";
+                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
                           }}
                         >
                           Discover

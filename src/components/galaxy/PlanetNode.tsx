@@ -11,7 +11,6 @@ interface PlanetNodeProps {
   orbitDuration: number;
   reverse?: boolean;
   paused?: boolean;
-  onHoverChange?: (isHovered: boolean) => void;
 }
 
 export function PlanetNode({
@@ -24,7 +23,6 @@ export function PlanetNode({
   orbitDuration,
   reverse = false,
   paused = false,
-  onHoverChange,
 }: PlanetNodeProps) {
   const [hovered, setHovered] = useState(false);
 
@@ -57,8 +55,8 @@ export function PlanetNode({
         >
           <button
             onClick={onClick}
-            onMouseEnter={() => { setHovered(true); onHoverChange?.(true); }}
-            onMouseLeave={() => { setHovered(false); onHoverChange?.(false); }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
             className="relative flex items-center justify-center rounded-full transition-transform duration-300 cursor-pointer"
             style={{
               width: 52,

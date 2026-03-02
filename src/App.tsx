@@ -100,9 +100,9 @@ function AppContent() {
               <div
                 className="hero-webgl-container relative mx-auto w-full overflow-hidden"
                 style={{
-                  background: "#040608",
+                  background: "#ffffff",
                   borderRadius: "2px",
-                  boxShadow: "0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.8), 0 0 120px rgba(0,0,0,0.5)",
+                  boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 40px 80px rgba(0,0,0,0.6), 0 0 120px rgba(0,0,0,0.3)",
                 }}
               >
                 <HeroWebGLPanel />
@@ -110,8 +110,8 @@ function AppContent() {
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background: `
-                      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.025) 0%, transparent 60%),
-                      linear-gradient(to bottom, transparent 70%, rgba(4,6,8,0.85) 100%)
+                      radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.02) 0%, transparent 60%),
+                      linear-gradient(to bottom, transparent 70%, rgba(255,255,255,0.85) 100%)
                     `,
                   }}
                 />

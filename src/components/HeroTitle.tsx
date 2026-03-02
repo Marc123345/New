@@ -124,9 +124,29 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
       />
 
       <style>{`
+        @keyframes waveFlow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
         .outline-text {
-          -webkit-text-stroke: 2px #ffffff;
+          -webkit-text-stroke: 2px rgba(255,255,255,0.25);
+          background: linear-gradient(
+            90deg,
+            #7c3aed 0%,
+            #a78bfa 15%,
+            #c4b5fd 25%,
+            #8b5cf6 40%,
+            #6d28d9 55%,
+            #a78bfa 70%,
+            #c4b5fd 80%,
+            #7c3aed 100%
+          );
+          background-size: 300% 100%;
+          -webkit-background-clip: text;
+          background-clip: text;
           color: transparent;
+          animation: waveFlow 4s ease-in-out infinite;
         }
       `}</style>
     </div>

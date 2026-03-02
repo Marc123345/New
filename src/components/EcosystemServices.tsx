@@ -87,8 +87,7 @@ export function EcosystemServices() {
 
   return (
     <section
-      id="ecosystem"
-      className="relative w-full min-h-screen flex flex-col items-center overflow-hidden pt-20 pb-10 sm:pt-24 sm:pb-16"
+      className="relative w-full min-h-screen flex flex-col items-center overflow-hidden py-16 sm:py-20"
       style={{ background: 'var(--color-background-light)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -107,7 +106,7 @@ export function EcosystemServices() {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 text-center pointer-events-none select-none mb-4">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 text-center pointer-events-none select-none mb-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -165,7 +164,7 @@ export function EcosystemServices() {
       </div>
 
       <div
-        className="relative z-20 w-full flex items-center justify-center"
+        className="relative z-20 w-full flex items-center justify-center px-4"
         style={{ minHeight: 560 }}
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}

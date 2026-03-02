@@ -120,7 +120,7 @@ function AppContent() {
 
       <HeroStory />
 
-      <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
+      <div id="ecosystem" className="relative" style={{ zIndex: 2, margin: 0, padding: 0 }}>
         <EcosystemServices />
       </div>
 

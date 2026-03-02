@@ -223,12 +223,6 @@ export function Testimonials() {
 
             {/* Contact list strip at bottom */}
             <div className="shrink-0 border-t border-white/10 px-6 py-3">
-              <p
-                className="text-[10px] tracking-[0.25em] uppercase text-white/30 mb-2"
-                style={{ fontFamily: "var(--font-stack-heading)" }}
-              >
-                Key People
-              </p>
               <div className="flex flex-wrap gap-2">
                 {CONTACTS.map((contact, i) => (
                   <div
@@ -241,12 +235,14 @@ export function Testimonials() {
                       background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent",
                     }}
                   >
-                    <div
-                      className="w-1.5 h-1.5 rounded-full transition-all duration-200"
-                      style={{
-                        background: i === activeIndex ? "var(--color-secondary)" : "rgba(255,255,255,0.2)",
-                        boxShadow: i === activeIndex ? "0 0 6px rgba(164,108,252,0.8)" : "none",
-                      }}
+                    <img
+                      src={`https://flagcdn.com/20x15/${contact.countryCode.toLowerCase()}.png`}
+                      srcSet={`https://flagcdn.com/40x30/${contact.countryCode.toLowerCase()}.png 2x`}
+                      width={20}
+                      height={15}
+                      alt={contact.country}
+                      className="rounded-[2px] shrink-0"
+                      style={{ opacity: i === activeIndex ? 1 : 0.45 }}
                     />
                     <span
                       className="text-[10px] tracking-widest uppercase"

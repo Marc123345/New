@@ -126,27 +126,30 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
       <style>{`
         @keyframes waveFlow {
           0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        @keyframes glowPulse {
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.3)); }
+          50% { filter: drop-shadow(0 0 18px rgba(139,92,246,0.6)) drop-shadow(0 0 40px rgba(124,58,237,0.2)); }
         }
         .outline-text {
-          -webkit-text-stroke: 2px rgba(255,255,255,0.25);
+          position: relative;
+          -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
           background: linear-gradient(
-            90deg,
-            #7c3aed 0%,
-            #a78bfa 15%,
-            #c4b5fd 25%,
-            #8b5cf6 40%,
-            #6d28d9 55%,
-            #a78bfa 70%,
-            #c4b5fd 80%,
-            #7c3aed 100%
+            110deg,
+            rgba(139,92,246,0.6) 0%,
+            #a78bfa 20%,
+            #e0d4ff 35%,
+            #c4b5fd 50%,
+            #8b5cf6 65%,
+            #a78bfa 80%,
+            rgba(139,92,246,0.6) 100%
           );
-          background-size: 300% 100%;
+          background-size: 200% 100%;
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
-          animation: waveFlow 4s ease-in-out infinite;
+          animation: waveFlow 6s linear infinite, glowPulse 3s ease-in-out infinite;
         }
       `}</style>
     </div>

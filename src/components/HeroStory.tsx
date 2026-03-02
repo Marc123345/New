@@ -1,4 +1,6 @@
-import React, { useRef, useMemo } from 'react';
+'use client'; // Required if you are using Next.js App Router
+
+import React, { useRef, useMemo, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Sphere, useTexture, Float } from '@react-three/drei';
@@ -210,7 +212,10 @@ export function AboutStory() {
         {/* Right Column: 3D Canvas */}
         <div className="absolute inset-0 md:relative md:w-1/2 h-full z-0 pointer-events-none">
           <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-            <Globe scrollYProgress={scrollYProgress} />
+            {/* The Suspense Boundary catches the component while the texture loads */}
+            <Suspense fallback={null}>
+              <Globe scrollYProgress={scrollYProgress} />
+            </Suspense>
             
             {/* Post Processing for the Neon glow */}
             <EffectComposer>

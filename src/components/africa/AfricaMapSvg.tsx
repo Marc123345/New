@@ -9,38 +9,70 @@ interface AfricaMapSvgProps {
 
 export function AfricaMapSvg({ activeCountry, onDotHover, onDotClick }: AfricaMapSvgProps) {
   return (
-    <svg
-      viewBox="0 0 420 420"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-    >
-      <defs>
-        <radialGradient id="dot-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--color-secondary)" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity="0" />
-        </radialGradient>
-        <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      <AfricaOutline />
-
-      {COUNTRY_DOTS.map((dot) => (
-        <CountryDotMarker
-          key={dot.code}
-          dot={dot}
-          isActive={activeCountry === dot.code}
-          onHover={onDotHover}
-          onClick={onDotClick}
+    <div className="relative w-full h-full">
+      <div className="absolute inset-0 rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
+        <img
+          src="https://cdn.prod.website-files.com/68a5787bba0829184628bd51/68b6b0d7f637ee0f1ff47780_BASE.avif"
+          alt="Africa Map"
+          className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
+          style={{ transform: "scale(2.2) translate(-8%, 5%)" }}
         />
-      ))}
-    </svg>
+      </div>
+
+      <svg
+        viewBox="0 0 340 340"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="absolute inset-0 w-full h-full"
+        style={{ zIndex: 2 }}
+      >
+        <defs>
+          <radialGradient id="dot-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--color-secondary)" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity="0" />
+          </radialGradient>
+          <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {COUNTRY_DOTS.map((dot) => (
+          <CountryDotMarker
+            key={dot.code}
+            dot={dot}
+            isActive={activeCountry === dot.code}
+            onHover={onDotHover}
+            onClick={onDotClick}
+          />
+        ))}
+
+        {COUNTRY_DOTS.map((dot, i) =>
+          COUNTRY_DOTS.slice(i + 1).map((dot2) => {
+            const dist = Math.hypot(dot.cx - dot2.cx, dot.cy - dot2.cy);
+            if (dist > 120) return null;
+            const bothActive = activeCountry === dot.code || activeCountry === dot2.code;
+            return (
+              <line
+                key={`${dot.code}-${dot2.code}`}
+                x1={dot.cx}
+                y1={dot.cy}
+                x2={dot2.cx}
+                y2={dot2.cy}
+                stroke="var(--color-secondary)"
+                strokeWidth={bothActive ? 1.2 : 0.4}
+                strokeOpacity={bothActive ? 0.5 : 0.1}
+                strokeDasharray={bothActive ? "0" : "2 4"}
+                style={{ transition: "all 0.4s ease" }}
+              />
+            );
+          })
+        )}
+      </svg>
+    </div>
   );
 }
 
@@ -93,30 +125,53 @@ function CountryDotMarker({
         cx={dot.cx}
         cy={dot.cy}
         r={isActive ? 6 : 4}
-        fill={isActive ? "var(--color-secondary)" : "rgba(164, 108, 252, 0.5)"}
+        fill={isActive ? "var(--color-secondary)" : "rgba(164, 108, 252, 0.6)"}
         filter={isActive ? "url(#glow-filter)" : undefined}
         animate={{
           r: isActive ? 6 : 4,
-          fill: isActive ? "var(--color-secondary)" : "rgba(164, 108, 252, 0.5)",
+          fill: isActive ? "var(--color-secondary)" : "rgba(164, 108, 252, 0.6)",
         }}
         transition={{ duration: 0.25 }}
       />
 
+      <circle
+        cx={dot.cx}
+        cy={dot.cy}
+        r={2}
+        fill="#fff"
+        opacity={isActive ? 1 : 0.7}
+        style={{ transition: "opacity 0.3s ease" }}
+      />
+
       {isActive && (
-        <motion.text
-          x={dot.cx}
-          y={dot.cy - 16}
-          textAnchor="middle"
-          fill="var(--color-text-dark)"
-          fontSize="10"
-          fontFamily="var(--font-stack-heading)"
-          letterSpacing="0.1em"
-          initial={{ opacity: 0, y: dot.cy - 10 }}
-          animate={{ opacity: 1, y: dot.cy - 22 }}
-          transition={{ duration: 0.3 }}
+        <motion.g
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
         >
-          {dot.name.toUpperCase()}
-        </motion.text>
+          <rect
+            x={dot.cx - dot.name.length * 3.2 - 6}
+            y={dot.cy - 30}
+            width={dot.name.length * 6.4 + 12}
+            height={16}
+            rx={2}
+            fill="rgba(14, 11, 31, 0.85)"
+            stroke="var(--color-secondary)"
+            strokeWidth={0.5}
+            strokeOpacity={0.5}
+          />
+          <text
+            x={dot.cx}
+            y={dot.cy - 19}
+            textAnchor="middle"
+            fill="var(--color-secondary)"
+            fontSize="9"
+            fontFamily="var(--font-stack-heading)"
+            letterSpacing="0.12em"
+          >
+            {dot.name.toUpperCase()}
+          </text>
+        </motion.g>
       )}
 
       <circle
@@ -126,52 +181,5 @@ function CountryDotMarker({
         fill="transparent"
       />
     </g>
-  );
-}
-
-function AfricaOutline() {
-  return (
-    <path
-      d="
-        M 170 60
-        C 175 55, 195 50, 215 52
-        C 235 54, 260 58, 280 65
-        C 295 70, 305 78, 310 88
-        C 315 98, 318 108, 315 120
-        L 320 115
-        C 325 108, 332 105, 335 110
-        C 338 115, 335 125, 330 135
-        C 325 145, 318 152, 315 160
-        C 312 168, 312 178, 315 188
-        C 318 198, 322 208, 325 218
-        C 328 228, 328 238, 325 248
-        C 322 258, 318 265, 312 275
-        C 308 285, 302 295, 295 305
-        C 288 315, 278 325, 268 332
-        C 258 339, 250 348, 245 355
-        C 240 362, 230 365, 220 360
-        C 215 358, 218 350, 225 342
-        C 230 336, 238 330, 240 322
-        C 242 314, 238 308, 232 302
-        C 226 296, 218 292, 212 285
-        C 206 278, 198 270, 192 260
-        C 186 250, 180 242, 175 232
-        C 170 222, 168 212, 165 202
-        C 162 192, 158 182, 152 175
-        C 146 168, 138 165, 130 168
-        C 125 170, 118 172, 112 170
-        C 106 168, 100 162, 105 155
-        C 108 150, 115 148, 118 142
-        C 120 136, 118 128, 120 122
-        C 122 116, 125 110, 130 105
-        C 135 100, 140 92, 145 85
-        C 150 78, 158 70, 165 64
-        Z
-      "
-      fill="rgba(164, 108, 252, 0.06)"
-      stroke="rgba(164, 108, 252, 0.2)"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-    />
   );
 }

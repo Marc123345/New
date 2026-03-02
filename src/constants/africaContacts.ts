@@ -100,12 +100,12 @@ export const AFRICA_CONTACTS: AfricaContact[] = [
 ];
 
 export const COUNTRY_DOTS: CountryDot[] = [
-  { code: "MA", name: "Morocco", cx: 170, cy: 82 },
-  { code: "EG", name: "Egypt", cx: 285, cy: 100 },
-  { code: "SN", name: "Senegal", cx: 120, cy: 165 },
-  { code: "NG", name: "Nigeria", cx: 195, cy: 192 },
-  { code: "GH", name: "Ghana", cx: 175, cy: 192 },
-  { code: "KE", name: "Kenya", cx: 310, cy: 220 },
-  { code: "TZ", name: "Tanzania", cx: 300, cy: 248 },
-  { code: "ZA", name: "South Africa", cx: 255, cy: 345 },
+  { code: "MA", name: "Morocco", cx: 135, cy: 75 },
+  { code: "EG", name: "Egypt", cx: 225, cy: 90 },
+  { code: "SN", name: "Senegal", cx: 95, cy: 152 },
+  { code: "GH", name: "Ghana", cx: 140, cy: 170 },
+  { code: "NG", name: "Nigeria", cx: 165, cy: 165 },
+  { code: "KE", name: "Kenya", cx: 250, cy: 195 },
+  { code: "TZ", name: "Tanzania", cx: 240, cy: 220 },
+  { code: "ZA", name: "South Africa", cx: 205, cy: 300 },
 ];

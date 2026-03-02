@@ -130,16 +130,18 @@ export function HeroWebGLPanel() {
     const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 36);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setClearColor(0x000000, 0);
+    renderer.setClearColor(0x040608, 1);
+    renderer.domElement.style.display = "block";
     container.appendChild(renderer.domElement);
 
     const renderTarget = new THREE.WebGLRenderTarget(
       container.clientWidth * Math.min(window.devicePixelRatio, 2),
-      container.clientHeight * Math.min(window.devicePixelRatio, 2)
+      container.clientHeight * Math.min(window.devicePixelRatio, 2),
+      { format: THREE.RGBAFormat }
     );
 
     const displacementScene = new THREE.Scene();
@@ -598,8 +600,12 @@ export function HeroWebGLPanel() {
         displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
 
       renderer.setRenderTarget(renderTarget);
+      renderer.setClearColor(0x040608, 1);
+      renderer.clear();
       renderer.render(scene, camera);
       renderer.setRenderTarget(null);
+      renderer.setClearColor(0x040608, 1);
+      renderer.clear();
       renderer.render(displacementScene, displacementCamera);
     };
     animId = requestAnimationFrame(animate);

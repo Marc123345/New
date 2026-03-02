@@ -10,7 +10,7 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HeroWebGL } from "./components/HeroWebGL";
+import { Starfield } from "./components/galaxy/Starfield";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 
 const AboutStory = lazy(() =>
@@ -75,7 +75,9 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#000' }}
       >
-        <HeroWebGL />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #020408 0%, #060210 40%, #020408 100%)' }}>
+          <Starfield />
+        </div>
 
         <div
           className="relative z-10 px-6 md:px-12"

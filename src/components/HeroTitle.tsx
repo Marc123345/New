@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { VideoOverlay } from './VideoOverlay';
+import { HeroGalaxy } from './galaxy/HeroGalaxy';
 
 function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
   const isPrimary = variant === 'primary';
@@ -41,58 +42,71 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[60vh]">
-      <header>
-        <motion.h1
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.05 }}
-          style={{
-            fontSize: 'clamp(2.8rem, 7vw, 5rem)',
-            lineHeight: 1.08,
-            letterSpacing: '-0.03em',
-            fontFamily: 'var(--font-stack-heading)',
-            color: '#ffffff',
-            marginBottom: 'var(--space-6x)',
-            textShadow: '0 2px 20px rgba(0,0,0,0.5)',
-          }}
-        >
-          From <span className="outline-text">B2B</span>{' '}
-          to <span className="outline-text">H2H</span>
-          <br />
-          Build a Brand People
-          <br />
-          Want to Talk To
-        </motion.h1>
+    <div className="flex flex-col gap-8 lg:gap-12">
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <header>
+          <motion.h1
+            {...fadeInUp}
+            transition={{ ...fadeInUp.transition, delay: 0.05 }}
+            style={{
+              fontSize: 'clamp(2.8rem, 7vw, 5rem)',
+              lineHeight: 1.08,
+              letterSpacing: '-0.03em',
+              fontFamily: 'var(--font-stack-heading)',
+              color: '#ffffff',
+              marginBottom: 'var(--space-6x)',
+              textShadow: '0 2px 20px rgba(0,0,0,0.5)',
+            }}
+          >
+            From <span className="outline-text">B2B</span>{' '}
+            to <span className="outline-text">H2H</span>
+            <br />
+            Build a Brand People
+            <br />
+            Want to Talk To
+          </motion.h1>
 
-        <motion.p
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.2 }}
-          className="text-xl md:text-2xl"
-          style={{
-            color: 'rgba(255,255,255,0.85)',
-            lineHeight: 1.6,
-            maxWidth: '36rem',
-            marginBottom: 'var(--space-6x)',
-            textShadow: '0 1px 10px rgba(0,0,0,0.4)',
-          }}
-        >
-          People don't only want to connect with brands anymore;
-          they connect with the people behind them.
-        </motion.p>
+          <motion.p
+            {...fadeInUp}
+            transition={{ ...fadeInUp.transition, delay: 0.2 }}
+            className="text-xl md:text-2xl"
+            style={{
+              color: 'rgba(255,255,255,0.85)',
+              lineHeight: 1.6,
+              maxWidth: '36rem',
+              marginBottom: 'var(--space-6x)',
+              textShadow: '0 1px 10px rgba(0,0,0,0.4)',
+            }}
+          >
+            People don't only want to connect with brands anymore;
+            they connect with the people behind them.
+          </motion.p>
+
+          <motion.div
+            {...fadeInUp}
+            transition={{ ...fadeInUp.transition, delay: 0.35 }}
+            className="flex flex-wrap gap-4"
+          >
+            <HeroButton variant="primary" onClick={() => {
+              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Book a Call
+            </HeroButton>
+            <HeroButton variant="outline" onClick={() => setVideoOpen(true)}>
+              Hear Our Story
+            </HeroButton>
+          </motion.div>
+        </header>
 
         <motion.div
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.35 }}
-          className="flex flex-wrap gap-4"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="flex justify-center"
         >
-          <HeroButton variant="primary" onClick={() => setVideoOpen(true)}>
-            Hear Our Story
-          </HeroButton>
-          <HeroButton variant="outline" onClick={() => setVideoOpen(true)}>
-            Our Journey
-          </HeroButton>
+          <HeroGalaxy />
         </motion.div>
-      </header>
+      </div>
 
       {children && (
         <motion.div
@@ -109,7 +123,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
         onClose={() => setVideoOpen(false)}
       />
 
-      <style jsx>{`
+      <style>{`
         .outline-text {
           -webkit-text-stroke: 2px #ffffff;
           color: transparent;

@@ -65,7 +65,6 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
         .heatmapPointWeight('pop')
         .heatmapBandwidth(0.9)
         .heatmapColorSaturation(2.8)
-        .heatmapColorFn(heatmapColorFn)
         .heatmapsData([worldPopulationData])
         .arcsData([])
         .arcColor('color')

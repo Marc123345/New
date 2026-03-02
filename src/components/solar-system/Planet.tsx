@@ -13,14 +13,16 @@ interface PlanetProps {
   onSelect: (name: string) => void
 }
 
+const BASE = "https://cdn.jsdelivr.net/npm/three-globe/example/img"
 const TEXTURE_URLS: Record<string, string> = {
-  Mercury: "https://ik.imagekit.io/qcvroy8xpd/mercury.jpg",
-  Venus: "https://ik.imagekit.io/qcvroy8xpd/venus.jpg",
-  Earth: "https://ik.imagekit.io/qcvroy8xpd/earth.jpg",
-  Mars: "https://ik.imagekit.io/qcvroy8xpd/mars.jpg",
-  Jupiter: "https://ik.imagekit.io/qcvroy8xpd/jupiter.jpg",
-  Uranus: "https://ik.imagekit.io/qcvroy8xpd/uranus.jpg",
-  Neptune: "https://ik.imagekit.io/qcvroy8xpd/neptune.jpg",
+  Mercury: `${BASE}/earth-night.jpg`,
+  Venus: `${BASE}/earth-day.jpg`,
+  Earth: `${BASE}/earth-day.jpg`,
+  Mars: `${BASE}/earth-night.jpg`,
+  Jupiter: `${BASE}/earth-day.jpg`,
+  Uranus: `${BASE}/earth-water.png`,
+  Neptune: `${BASE}/earth-night.jpg`,
+  Saturn: `${BASE}/earth-day.jpg`,
 }
 
 const Planet = ({ name, radius, distance, speed, elapsed, isPaused, onSelect }: PlanetProps) => {

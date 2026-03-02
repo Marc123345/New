@@ -11,7 +11,6 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { AmbientAudio } from "./components/AmbientAudio";
 import { SolarSystem } from "./components/solar-system";
 
 const AboutStory = lazy(() =>
@@ -68,7 +67,6 @@ function AppContent() {
   return (
     <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
-      <AmbientAudio />
       <Navigation />
       <ScrollProgress />
 

@@ -44,58 +44,24 @@ const CAPABILITIES = [
   { tag: 'Analytics', desc: 'Data-driven insights & optimization' },
 ];
 
-function HologramFrame({ children }: { children: React.ReactNode }) {
+function GeometricFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="hologram-container" style={{ position: 'relative' }}>
-      <div
-        style={{
-          position: 'absolute',
-          inset: -2,
-          borderRadius: 8,
-          padding: 2,
-          background: 'linear-gradient(135deg, #a46cfc 0%, #b181fc 40%, #a46cfc 70%, #b181fc 100%)',
-          backgroundSize: '300% 300%',
-          animation: 'hologramBorder 4s ease infinite',
-          zIndex: 0,
-        }}
-      >
-        <div style={{
-          width: '100%',
-          height: '100%',
-          borderRadius: 6,
-          background: 'rgba(14,11,31,0.95)',
-        }} />
-      </div>
-
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          borderRadius: 6,
-          overflow: 'hidden',
-          boxShadow: '0 0 40px rgba(164,108,252,0.15), 0 0 80px rgba(164,108,252,0.06)',
-        }}
-      >
-        <div
-          className="pointer-events-none"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 10,
-            background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(164,108,252,0.03) 2px, rgba(164,108,252,0.03) 4px)',
-          }}
-        />
-        <div
-          className="pointer-events-none"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 11,
-            background: 'linear-gradient(180deg, rgba(164,108,252,0.08) 0%, transparent 15%, transparent 85%, rgba(164,108,252,0.06) 100%)',
-          }}
-        />
-        {children}
-      </div>
+    <div
+      className="transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 overflow-hidden"
+      style={{
+        position: 'relative',
+        border: '2px solid var(--color-surface-dark)',
+        background: 'var(--color-background-light)',
+        boxShadow: 'var(--shadow-geometric)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-geometric)';
+      }}
+    >
+      {children}
     </div>
   );
 }
@@ -164,19 +130,7 @@ export function AboutStory() {
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
-      <style>{`
-        @keyframes hologramBorder {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        @keyframes scanlineSweep {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-      `}</style>
-
-      <div
+<div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
@@ -239,7 +193,7 @@ export function AboutStory() {
           viewport={{ once: true, margin: '-60px' }}
         >
           <motion.div className="lg:col-span-5" variants={fadeUpItem}>
-            <HologramFrame>
+            <GeometricFrame>
               <div style={{ position: 'relative' }}>
                 <video
                   autoPlay
@@ -261,21 +215,8 @@ export function AboutStory() {
                     `,
                   }}
                 />
-                <div
-                  className="pointer-events-none"
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    height: '200%',
-                    top: 0,
-                    background: 'linear-gradient(180deg, transparent 0%, rgba(164,108,252,0.04) 50%, transparent 100%)',
-                    animation: 'scanlineSweep 6s linear infinite',
-                    zIndex: 12,
-                  }}
-                />
               </div>
-            </HologramFrame>
+            </GeometricFrame>
           </motion.div>
 
           <motion.div
@@ -372,14 +313,16 @@ export function AboutStory() {
                 variants={scaleInItem}
                 onHoverStart={() => setActiveCapability(i)}
                 onHoverEnd={() => setActiveCapability(null)}
-                className="relative px-4 py-4 cursor-default"
+                className="relative px-4 py-4 cursor-default transition-all duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5"
                 style={{
-                  border: `1px solid ${activeCapability === i ? 'rgba(164,108,252,0.25)' : 'rgba(164,108,252,0.08)'}`,
+                  border: '2px solid var(--color-surface-dark)',
                   background: activeCapability === i
                     ? 'rgba(164,108,252,0.08)'
-                    : 'rgba(164,108,252,0.02)',
-                  borderRadius: 6,
-                  transition: 'background 0.3s ease, border-color 0.3s ease',
+                    : 'var(--color-background-light)',
+                  boxShadow: activeCapability === i
+                    ? 'var(--shadow-geometric-hover)'
+                    : '6px 6px 0 var(--color-secondary)',
+                  transition: 'background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
                 }}
               >
                 <span
@@ -410,16 +353,6 @@ export function AboutStory() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-                <motion.div
-                  className="absolute bottom-0 left-2 right-2 h-px"
-                  style={{
-                    background: 'var(--color-secondary)',
-                    transformOrigin: 'left',
-                    scaleX: activeCapability === i ? 1 : 0,
-                    opacity: activeCapability === i ? 0.4 : 0,
-                    transition: 'transform 0.4s ease, opacity 0.4s ease',
-                  }}
-                />
               </motion.div>
             ))}
           </motion.div>

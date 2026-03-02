@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { H2HLogo } from "./H2HLogo";
 
@@ -57,7 +57,7 @@ export function Navigation() {
     };
   }, [isOpen]);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setIsOpen(false);
     if (href.startsWith("/")) {
@@ -68,7 +68,7 @@ export function Navigation() {
       const el = document.getElementById(href.substring(1));
       if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: "smooth" });
     }, 550);
-  };
+  }, [navigate]);
 
   return (
     <>

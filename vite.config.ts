@@ -52,6 +52,15 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-three': ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing'],
+            'vendor-motion': ['framer-motion', 'motion'],
+          },
+        },
+      },
     },
     server: {
       port: 3000,

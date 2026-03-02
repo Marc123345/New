@@ -343,18 +343,20 @@ export function HeroWebGLPanel() {
     container.addEventListener("touchmove", handleTouchMove, { passive: true });
     container.addEventListener("mouseleave", handleMouseLeave);
 
-    let hidden = false;
-    const handleVisibility = () => { hidden = document.hidden; };
-    document.addEventListener("visibilitychange", handleVisibility);
+    let hidden = document.hidden;
+    let animId: number;
+    let animating = false;
 
     let tiltX = 0, tiltY = 0;
     let time = 0;
     const clock = new THREE.Clock();
-    let animId: number;
 
     const animate = () => {
+      if (hidden) {
+        animating = false;
+        return; // handleVisibility will restart
+      }
       animId = requestAnimationFrame(animate);
-      if (hidden) return;
 
       const rawDelta = clock.getDelta();
       const dt = Math.min(rawDelta, 0.05);
@@ -602,6 +604,18 @@ export function HeroWebGLPanel() {
       renderer.setRenderTarget(null);
       renderer.render(displacementScene, displacementCamera);
     };
+
+    const handleVisibility = () => {
+      hidden = document.hidden;
+      if (!hidden && !animating) {
+        animating = true;
+        clock.getDelta(); // discard accumulated delta while hidden
+        animId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    animating = true;
     animId = requestAnimationFrame(animate);
 
     const handleResize = () => {

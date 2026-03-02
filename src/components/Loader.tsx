@@ -8,21 +8,21 @@ interface LoaderProps {
 const DURATION = 3200;
 const REVEAL_DURATION = 1000;
 
+const STATUS_STAGES = [
+  { at: 0, text: 'Initializing' },
+  { at: 20, text: 'Loading Assets' },
+  { at: 45, text: 'Building Scene' },
+  { at: 70, text: 'Rendering World' },
+  { at: 90, text: 'Almost Ready' },
+  { at: 99, text: 'Launching' },
+];
+
 export function Loader({ onComplete }: LoaderProps) {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<'loading' | 'reveal' | 'done'>('loading');
   const [statusText, setStatusText] = useState('Initializing');
   const [glitchActive, setGlitchActive] = useState(false);
   const progressRef = useRef(0);
-
-  const STATUS_STAGES = [
-    { at: 0, text: 'Initializing' },
-    { at: 20, text: 'Loading Assets' },
-    { at: 45, text: 'Building Scene' },
-    { at: 70, text: 'Rendering World' },
-    { at: 90, text: 'Almost Ready' },
-    { at: 99, text: 'Launching' },
-  ];
 
   const triggerGlitch = useCallback(() => {
     setGlitchActive(true);
@@ -76,30 +76,6 @@ export function Loader({ onComplete }: LoaderProps) {
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
       style={{ background: '#0a0614' }}
     >
-      <style>{`
-        @keyframes iphone-float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 0.85; transform: scale(1.08); }
-        }
-        @keyframes screen-scanline {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(400%); }
-        }
-        .iphone-float {
-          animation: iphone-float 3.2s ease-in-out infinite;
-        }
-        .glow-pulse {
-          animation: glow-pulse 2.4s ease-in-out infinite;
-        }
-        .screen-scanline {
-          animation: screen-scanline 2.2s linear infinite;
-        }
-      `}</style>
-
       {/* Background video */}
       <video
         autoPlay

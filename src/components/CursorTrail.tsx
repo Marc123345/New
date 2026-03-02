@@ -182,8 +182,10 @@ export function CursorTrail() {
     };
 
     let rafId: number;
+    let isHidden = document.hidden;
 
     const tick = () => {
+      if (isHidden) return; // don't reschedule; onVisibilityChange will restart
       rafId = requestAnimationFrame(tick);
       if (!hasEntered) return;
 
@@ -207,15 +209,22 @@ export function CursorTrail() {
       prevMouse.copy(mouse);
     };
 
+    const onVisibilityChange = () => {
+      isHidden = document.hidden;
+      if (!isHidden) rafId = requestAnimationFrame(tick);
+    };
+
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseleave", onMouseLeave);
     window.addEventListener("resize", onResize);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     rafId = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       cancelAnimationFrame(rafId);
       renderer.dispose();
       rtA.dispose();

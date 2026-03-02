@@ -29,6 +29,11 @@ const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
 );
 
+const SECTION_PADDING: React.CSSProperties = {
+  paddingTop: 'var(--space-8x)',
+  paddingBottom: 'var(--space-8x)',
+};
+
 interface SectionProps {
   id: string;
   className?: string;
@@ -49,10 +54,7 @@ const Section = ({
   <section
     id={id}
     className={className}
-    style={noPadding ? {} : {
-      paddingTop: 'var(--space-8x)',
-      paddingBottom: 'var(--space-8x)'
-    }}
+    style={noPadding ? undefined : SECTION_PADDING}
   >
     <LazySection>
       <ScrollReveal mode={revealMode} delay={delay}>

@@ -354,35 +354,6 @@ export function AboutStory() {
                 transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
               />
 
-              <motion.a
-                href="#contact"
-                className="inline-flex items-center gap-3 group cursor-pointer"
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-text-dark)',
-                  textDecoration: 'none',
-                  padding: '14px 32px',
-                  border: '1px solid rgba(164,108,252,0.3)',
-                  borderRadius: 4,
-                  background: 'rgba(164,108,252,0.06)',
-                  transition: 'all 0.3s ease',
-                }}
-                whileHover={{
-                  background: 'rgba(164,108,252,0.14)',
-                  borderColor: 'rgba(164,108,252,0.5)',
-                  y: -2,
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Why We Exist
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </motion.a>
             </motion.div>
           </motion.div>
         </motion.div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { motion, AnimatePresence } from "motion/react";
@@ -97,8 +97,8 @@ const SERVICES = [
     description:
       "Video is the most powerful storytelling medium in today's digital ecosystem. We conceptualize, produce, and edit high-impact videos tailored for social media, advertising, and brand storytelling. From short-form reels to polished brand videos and promotional content, we create visually compelling narratives that captivate audiences and drive measurable results.",
     icon: Video,
-    color: "#e8e2ff",
-    bgColor: "#1a1535",
+    color: "#7B2FF2",
+    bgColor: "#5A05E6",
     image: "https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Short-form reels & social content",
@@ -261,8 +261,8 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8"
-          style={{ background: "#040408" }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8 backdrop-blur-sm"
+          style={{ background: "rgba(255, 255, 255, 0.85)" }} // Changed to translucent white
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -280,12 +280,13 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
             style={{
               maxWidth: "680px",
               maxHeight: "85vh",
-              background: "#0a0814",
+              background: "#ffffff", // Changed to white
               border: `1px solid ${service.color}44`,
-              boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${service.color}22`,
+              boxShadow: `0 32px 80px rgba(0,0,0,0.1), 0 0 0 1px ${service.color}22`, // Softened shadow
+              borderRadius: "16px", // Added a subtle radius for modern look
             }}
           >
-            <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(255,255,255,0.06)" }}>
+            <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ background: "rgba(0,0,0,0.06)" }}>
               <motion.div
                 className="h-full"
                 style={{ width: `${scrollProgress * 100}%`, background: `linear-gradient(to right, ${service.bgColor}, ${service.color})` }}
@@ -298,7 +299,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute top-3 right-3 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
+              className="absolute top-3 right-3 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-black/10 bg-gray-50 hover:bg-gray-100 transition-all text-gray-800 cursor-pointer active:scale-95 group" // Adapted colors for light mode
             >
               <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
             </motion.button>
@@ -316,11 +317,11 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                   initial={{ opacity: 0, scale: 1.03 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="relative w-full overflow-hidden"
+                  className="relative w-full overflow-hidden rounded-lg" // Added rounding
                   style={{
                     height: 'clamp(160px, 28vw, 220px)',
-                    border: `2px solid ${service.color}55`,
-                    boxShadow: `6px 6px 0 ${service.color}44`,
+                    border: `1px solid ${service.color}33`,
+                    boxShadow: `4px 4px 0 ${service.color}22`,
                   }}
                 >
                   <img
@@ -331,9 +332,9 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                   />
                   <div
                     className="absolute inset-0"
-                    style={{ background: `linear-gradient(to top, rgba(4,4,8,0.95) 0%, transparent 55%, ${service.bgColor}55 100%)` }}
+                    style={{ background: `linear-gradient(to top, rgba(255,255,255,0.95) 0%, transparent 55%, ${service.bgColor}22 100%)` }} // Changed to white gradient
                   />
-                  <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs" style={{ color: service.color }}>
+                  <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs font-semibold" style={{ color: service.color }}>
                     <span className="h-px w-8 inline-block" style={{ backgroundColor: service.color }} />
                     {service.category}
                   </div>
@@ -345,7 +346,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.08, duration: 0.4 }}
-                  className="block text-[10px] uppercase tracking-[0.35em] mb-5"
+                  className="block text-[10px] uppercase tracking-[0.35em] mb-5 font-bold"
                   style={{ color: service.color, fontFamily: "var(--font-stack-heading)" }}
                 >
                   <span className="inline-block w-4 h-[1px] mr-2 align-middle" style={{ background: service.color }} />
@@ -358,7 +359,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className="font-bold leading-[1.05] tracking-[-0.03em]"
-                  style={{ fontSize: "clamp(2.2rem, 7vw, 4rem)", color: "#fff", fontFamily: "var(--font-stack-heading)" }}
+                  style={{ fontSize: "clamp(2.2rem, 7vw, 4rem)", color: "#111827", fontFamily: "var(--font-stack-heading)" }} // Changed to dark text
                 >
                   {service.title}
                 </motion.h2>
@@ -377,7 +378,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.45 }}
                 className="leading-[1.8] text-base sm:text-lg"
-                style={{ color: "rgba(255,255,255,0.7)", fontFamily: "var(--font-stack-body)" }}
+                style={{ color: "#4B5563", fontFamily: "var(--font-stack-body)" }} // Changed to medium gray
               >
                 {service.description}
               </motion.p>
@@ -389,10 +390,10 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                   transition={{ delay: 0.28, duration: 0.45 }}
                 >
                   <div className="flex items-center gap-3 mb-5">
-                    <span className="text-[10px] uppercase tracking-[0.35em]" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-stack-heading)" }}>
+                    <span className="text-[10px] uppercase tracking-[0.35em] font-bold" style={{ color: "#9CA3AF", fontFamily: "var(--font-stack-heading)" }}>
                       What We Deliver
                     </span>
-                    <span className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+                    <span className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.07)" }} />
                   </div>
                   <ul className="grid sm:grid-cols-2 gap-2">
                     {service.details.map((detail, i) => (
@@ -401,11 +402,11 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.32 + i * 0.05, duration: 0.35 }}
-                        className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed"
+                        className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed rounded-md"
                         style={{
-                          background: "#110f1e",
-                          border: "1px solid rgba(255,255,255,0.06)",
-                          color: "rgba(255,255,255,0.72)",
+                          background: "#F9FAFB", // Light gray background
+                          border: "1px solid rgba(0,0,0,0.05)",
+                          color: "#374151", // Dark gray text
                           fontFamily: "var(--font-stack-body)",
                         }}
                       >
@@ -427,11 +428,11 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                 className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-none"
               >
                 <motion.div animate={{ y: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ color: "rgba(0,0,0,0.4)" }}>
                     <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </motion.div>
-                <span className="text-[10px] tracking-[0.15em] uppercase" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-stack-heading)" }}>Scroll</span>
+                <span className="text-[10px] tracking-[0.15em] uppercase font-bold" style={{ color: "rgba(0,0,0,0.4)", fontFamily: "var(--font-stack-heading)" }}>Scroll</span>
               </motion.div>
             )}
           </motion.div>
@@ -503,8 +504,9 @@ export function ArcSlider() {
         targetZIndex = 1;
       }
 
+      // Softened the shadow for a light theme
       const shadow = absOffset === 0
-        ? "10px 10px 0 rgba(164,108,252,0.6)"
+        ? "10px 10px 0 rgba(155, 89, 245, 0.2)"
         : "none";
 
       if (animate) {
@@ -621,7 +623,7 @@ export function ArcSlider() {
     <>
       <div
         className="relative w-full py-16 md:py-24 overflow-hidden"
-        style={{ background: "#0d0a1a" }}
+        style={{ background: "#ffffff" }} // Main canvas is now white
       >
         <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
           <span
@@ -638,7 +640,7 @@ export function ArcSlider() {
             style={{
               fontSize: "clamp(2.5rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "#ffffff",
+              color: "#111827", // Heading changed to dark gray
             }}
           >
             Services
@@ -658,7 +660,7 @@ export function ArcSlider() {
               role="tab"
               aria-selected={i === activeIndex}
               onClick={() => navigateTo(i)}
-              className="flex-shrink-0 transition-all duration-300 font-semibold"
+              className="flex-shrink-0 transition-all duration-300 font-bold"
               style={{
                 fontFamily: "var(--font-stack-heading)",
                 fontSize: "0.75rem",
@@ -666,17 +668,17 @@ export function ArcSlider() {
                 textTransform: "uppercase",
                 padding: "10px 24px",
                 whiteSpace: "nowrap",
-                border: "2px solid rgba(155, 89, 245, 0.5)",
-                borderRadius: "0",
+                border: "2px solid rgba(155, 89, 245, 0.3)", // Lighter border
+                borderRadius: "999px", // Rounded pills look better on light mode
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
                 color: i === activeIndex
                   ? "#ffffff"
-                  : "rgba(255,255,255,0.75)",
+                  : "#4B5563", // Dark gray inactive text
                 cursor: "pointer",
                 boxShadow: i === activeIndex
-                  ? "0 4px 14px rgba(155, 89, 245, 0.4)"
+                  ? "0 4px 14px rgba(155, 89, 245, 0.25)"
                   : "none",
               }}
             >
@@ -717,22 +719,21 @@ export function ArcSlider() {
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-8 sm:p-10 transition-colors duration-500"
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-8 sm:p-10 transition-colors duration-500 rounded-xl"
                     style={{
-                      backgroundColor: service.bgColor,
-                      border: `2px solid ${service.color}`,
-                      boxShadow: `6px 6px 0 ${service.color}55`,
-                      borderRadius: "0",
+                      backgroundColor: "#ffffff", // Cards are now white
+                      border: `1px solid ${service.color}44`, // Softened borders
+                      boxShadow: `4px 4px 0 ${service.color}33`,
                     }}
                   >
                     <div
-                      className="absolute top-0 left-0 right-0 h-1"
+                      className="absolute top-0 left-0 right-0 h-[6px]"
                       style={{ background: service.color }}
                     />
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start mt-2">
                       <div>
                         <span
-                          className="text-[10px] tracking-[0.3em] font-semibold block"
+                          className="text-[10px] tracking-[0.3em] font-bold block"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             color: service.color,
@@ -742,10 +743,10 @@ export function ArcSlider() {
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.15em] font-medium uppercase"
+                          className="text-[10px] tracking-[0.15em] font-bold uppercase"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "rgba(255,255,255,0.55)",
+                            color: "#9CA3AF", // Light text for category
                           }}
                         >
                           {service.category}
@@ -753,19 +754,19 @@ export function ArcSlider() {
                       </div>
                       <div
                         className="w-10 h-10 flex items-center justify-center"
-                        style={{ color: service.color, opacity: 0.6 }}
+                        style={{ color: service.color, opacity: 0.9 }}
                       >
-                        <IconComponent size={32} strokeWidth={1.5} />
+                        <IconComponent size={32} strokeWidth={2} />
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-6">
                       <h3
-                        className="tracking-tight leading-[1] font-bold"
+                        className="tracking-tight leading-[1.1] font-bold"
                         style={{
                           fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
                           fontFamily: "var(--font-stack-heading)",
-                          color: "#ffffff",
+                          color: "#111827", // Dark card text
                           margin: 0,
                         }}
                       >
@@ -780,16 +781,16 @@ export function ArcSlider() {
                             e.stopPropagation();
                             setOverlayService(service);
                           }}
-                          className="group inline-flex items-center gap-3 transition-all duration-300"
+                          className="group inline-flex items-center gap-3 transition-all duration-300 font-bold"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             fontSize: "0.75rem",
                             letterSpacing: "0.15em",
                             textTransform: "uppercase",
-                            color: "#ffffff",
+                            color: "#111827", // Dark button text
                             background: "transparent",
-                            border: `1px solid rgba(255,255,255,0.4)`,
-                            borderRadius: "0",
+                            border: `1px solid rgba(0,0,0,0.15)`, // Light border
+                            borderRadius: "99px",
                             padding: "12px 24px",
                             cursor: "pointer",
                             pointerEvents: "auto",
@@ -801,8 +802,8 @@ export function ArcSlider() {
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = "transparent";
-                            e.currentTarget.style.color = "#ffffff";
-                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+                            e.currentTarget.style.color = "#111827";
+                            e.currentTarget.style.borderColor = "rgba(0,0,0,0.15)";
                           }}
                         >
                           Discover
@@ -829,7 +830,7 @@ export function ArcSlider() {
               style={{
                 width: i === activeIndex ? 32 : 8,
                 height: 4,
-                borderRadius: "0",
+                borderRadius: "99px",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "rgba(155, 89, 245, 0.2)",

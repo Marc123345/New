@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Play } from 'lucide-react';
 
@@ -423,7 +424,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }:
     setPlaying(false);
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -817,6 +818,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }:
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

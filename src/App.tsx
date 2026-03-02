@@ -75,7 +75,7 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#000' }}
+        style={{ background: '#f8f8f6' }}
       >
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <SolarSystem />

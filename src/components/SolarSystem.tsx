@@ -14,7 +14,7 @@ export function SolarSystem() {
 
         .solar-system-ol li {
           aspect-ratio: 1 / 1;
-          border: 1px dashed rgba(255,255,255,0.15);
+          border: 1px dashed rgba(0,0,0,0.12);
           border-radius: 50%;
           display: grid;
           grid-area: 1 / 1;
@@ -28,7 +28,7 @@ export function SolarSystem() {
           aspect-ratio: 1 / 1;
           background: var(--b, hsl(0, 0%, 50%));
           border-radius: 50%;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
           content: '';
           display: block;
           offset-path: content-box;

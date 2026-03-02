@@ -77,7 +77,6 @@ export function Testimonials() {
   });
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsubscribe = scrollYProgress.on("change", (latest) => {
@@ -90,24 +89,13 @@ export function Testimonials() {
     return unsubscribe;
   }, [scrollYProgress]);
 
-  // Auto-scroll the mobile tabs to keep the active one in view
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const activeElement = scrollContainerRef.current.children[activeIndex] as HTMLElement;
-      if (activeElement) {
-        activeElement.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-      }
-    }
-  }, [activeIndex]);
-
   return (
     <div ref={containerRef} className="relative h-[250vh]" style={{ background: "#ffffff" }}>
-      {/* Changed to 100dvh for better mobile browser support */}
-      <div className="sticky top-0 h-[100dvh] flex flex-col justify-center overflow-hidden border-t border-black/10">
+      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/10">
 
-        <div className="text-center mb-4 md:mb-8 px-4 md:px-8 mt-10 md:mt-0">
+        <div className="text-center mb-8 px-4 md:px-8">
           <div
-            className="inline-block mb-2 md:mb-4 px-4 py-2"
+            className="inline-block mb-4 px-4 py-2"
             style={{
               border: "2px solid var(--color-secondary)",
               boxShadow: "4px 4px 0 var(--color-secondary)",
@@ -132,8 +120,7 @@ export function Testimonials() {
           </h2>
         </div>
 
-        {/* Adjusted height to fit mobile screens better */}
-        <div className="max-w-[1400px] mx-auto w-full h-[55vh] min-h-[450px] lg:h-[650px] flex gap-6 px-4 md:px-8">
+        <div className="max-w-[1400px] mx-auto w-full h-[600px] lg:h-[650px] flex gap-6 px-4 md:px-8">
           {/* LEFT: Globe Panel */}
           <div
             className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
@@ -235,17 +222,13 @@ export function Testimonials() {
               ))}
             </div>
 
-            {/* Contact list strip at bottom - Made horizontally scrollable for mobile */}
-            <div className="shrink-0 border-t border-black/10 px-4 sm:px-6 py-3 bg-[#ffffff]">
-              <div 
-                ref={scrollContainerRef}
-                className="flex overflow-x-auto hide-scrollbar gap-2 pb-1"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              >
+            {/* Contact list strip at bottom */}
+            <div className="shrink-0 border-t border-black/10 px-6 py-3">
+              <div className="flex flex-wrap gap-2">
                 {CONTACTS.map((contact, i) => (
                   <div
                     key={contact.id}
-                    className="flex items-center gap-2 px-3 py-1.5 transition-all duration-200 shrink-0"
+                    className="flex items-center gap-2 px-3 py-1.5 transition-all duration-200"
                     style={{
                       border: i === activeIndex
                         ? "1px solid var(--color-secondary)"
@@ -372,27 +355,27 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[90%] md:w-[85%] lg:w-[80%] p-5 sm:p-8 md:p-10" // Adjusted padding for mobile
+      className="absolute w-[85%] md:w-[80%] p-8 md:p-10"
       data-geometric-card
     >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "#ffffff",
+          background: "var(--color-background-light)",
           border: "4px solid var(--color-text-dark)",
           boxShadow: "var(--shadow-geometric)",
         }}
       />
-      <div className="relative flex flex-col gap-4 sm:gap-6">
+      <div className="relative flex flex-col gap-6">
         <h3
-          className="text-base sm:text-xl md:text-2xl lg:text-3xl leading-[1.3] sm:leading-[1.1] tracking-tight" // Fluid typography for mobile
+          className="text-xl md:text-3xl leading-[1.1] tracking-tight"
           style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-text-dark)" }}
         >
           "{contact.quote}"
         </h3>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-2 sm:mt-0">
+        <div className="flex items-center gap-4">
           <motion.div
-            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 shrink-0"
+            className="w-14 h-14 rounded-full overflow-hidden border-2"
             style={{ borderColor: "var(--color-text-dark)", boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
@@ -412,7 +395,7 @@ function TestimonialCard({
           </motion.div>
           <div>
             <div
-              className="text-lg sm:text-2xl leading-none mb-1 sm:mb-2"
+              className="text-2xl leading-none mb-1"
               style={{
                 fontFamily: "var(--font-stack-body)",
                 fontStyle: "italic",
@@ -422,7 +405,7 @@ function TestimonialCard({
               {contact.name}
             </div>
             <div
-              className="inline-block bg-[var(--color-primary)] px-2 sm:px-3 py-1 text-[10px] sm:text-xs tracking-widest text-white whitespace-nowrap"
+              className="inline-block bg-[var(--color-primary)] px-3 py-1 text-xs tracking-widest text-white"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {contact.role} · {contact.company}

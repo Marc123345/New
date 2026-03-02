@@ -220,7 +220,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
+              className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
               style={{
                 border: "1px solid rgba(255,255,255,0.15)",
                 background: "#1a1728",
@@ -239,7 +239,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
               onScroll={handleScroll}
             >
-              <div className="px-6 sm:px-8 pt-10 pb-8 space-y-6">
+              <div className="px-6 sm:px-8 pt-14 pb-8 space-y-6">
               {service.image && (
                 <motion.div
                   key={`img-${service.id}`}

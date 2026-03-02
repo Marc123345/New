@@ -97,7 +97,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
 
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 py-10 scrollbar-hide relative z-10"
+              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 pt-14 pb-10 scrollbar-hide relative z-10"
             >
               <div className="max-w-3xl mx-auto space-y-12">
                 {displayService?.image && (

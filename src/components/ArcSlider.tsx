@@ -719,36 +719,42 @@ export function ArcSlider() {
                   <div
                     className="relative h-full w-full overflow-hidden flex flex-col justify-between p-8 sm:p-10 transition-colors duration-500"
                     style={{
-                      backgroundColor: service.bgColor,
-                      border: "2px solid rgba(255,255,255,0.12)",
+                      backgroundColor: "var(--color-background-light)",
+                      border: `2px solid var(--color-text-dark)`,
+                      boxShadow: "var(--shadow-geometric)",
                       borderRadius: "0",
                     }}
                   >
+                    <div
+                      className="absolute top-0 left-0 right-0 h-1"
+                      style={{ background: service.color }}
+                    />
                     <div className="flex justify-between items-start">
                       <div>
                         <span
-                          className="text-[10px] tracking-[0.3em] opacity-60 font-semibold block"
+                          className="text-[10px] tracking-[0.3em] font-semibold block"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "#fff",
+                            color: service.color,
                             marginBottom: "4px",
                           }}
                         >
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.15em] opacity-40 font-medium uppercase"
+                          className="text-[10px] tracking-[0.15em] font-medium uppercase"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "#fff",
+                            color: "var(--color-text-dark)",
+                            opacity: 0.45,
                           }}
                         >
                           {service.category}
                         </span>
                       </div>
                       <div
-                        className="w-10 h-10 flex items-center justify-center opacity-20"
-                        style={{ color: "#fff" }}
+                        className="w-10 h-10 flex items-center justify-center"
+                        style={{ color: service.color, opacity: 0.6 }}
                       >
                         <IconComponent size={32} strokeWidth={1.5} />
                       </div>
@@ -760,7 +766,7 @@ export function ArcSlider() {
                         style={{
                           fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
                           fontFamily: "var(--font-stack-heading)",
-                          color: "#fff",
+                          color: "var(--color-text-dark)",
                           margin: 0,
                         }}
                       >
@@ -781,19 +787,23 @@ export function ArcSlider() {
                             fontSize: "0.75rem",
                             letterSpacing: "0.15em",
                             textTransform: "uppercase",
-                            color: "#fff",
-                            background: "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.25)",
+                            color: "var(--color-text-dark)",
+                            background: "transparent",
+                            border: `1px solid var(--color-text-dark)`,
                             borderRadius: "0",
                             padding: "12px 24px",
                             cursor: "pointer",
                             pointerEvents: "auto",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
+                            e.currentTarget.style.background = service.color;
+                            e.currentTarget.style.color = "#fff";
+                            e.currentTarget.style.borderColor = service.color;
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.color = "var(--color-text-dark)";
+                            e.currentTarget.style.borderColor = "var(--color-text-dark)";
                           }}
                         >
                           Discover

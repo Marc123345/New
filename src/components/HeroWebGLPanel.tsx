@@ -55,18 +55,16 @@ varying vec2 vUv;
 varying float vFresnel;
 void main() {
   vec4 tex = texture2D(uMap, vUv);
-  vec3 L = normalize(vec3(0.4, 0.7, 1.0));
-  float diff = max(dot(vNormal, L), 0.0) * 0.5;
+  vec3 L = normalize(vec3(0.3, 0.6, 1.0));
+  float diff = max(dot(vNormal, L), 0.0) * 0.35;
   vec3 H = normalize(L + vViewDir);
-  float spec = pow(max(dot(vNormal, H), 0.0), 64.0) * (0.4 + uHover * 0.4);
-  vec3 ambient = tex.rgb * 0.82;
+  float spec = pow(max(dot(vNormal, H), 0.0), 90.0) * (0.5 + uHover * 0.5);
+  vec3 ambient = tex.rgb * 0.62;
   vec3 lit = tex.rgb * diff;
-  vec3 rimColor = vec3(0.15, 0.18, 0.25) * vFresnel * (0.35 + uHover * 0.25);
-  vec3 final = ambient + lit + vec3(spec * 0.5) - rimColor;
-  final = max(final, vec3(0.0));
-  float fog = mix(1.0, 0.7, uDepth);
-  vec3 fogged = mix(final * fog, vec3(1.0), uDepth * 0.3);
-  gl_FragColor = vec4(fogged, 1.0);
+  vec3 glassRim = vec3(1.0) * vFresnel * (0.18 + uHover * 0.22);
+  vec3 final = ambient + lit + vec3(spec * 0.7) + glassRim;
+  float fog = mix(1.0, 0.55, uDepth);
+  gl_FragColor = vec4(final * fog, 1.0);
 }`;
 
 const SHELL_VERT = `
@@ -84,9 +82,9 @@ uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 void main() {
-  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
-  float shadow = fr * (0.18 + uHover * 0.22);
-  gl_FragColor = vec4(vec3(0.12, 0.14, 0.2), shadow * 0.35);
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.5);
+  float glow = fr * (0.12 + uHover * 0.25);
+  gl_FragColor = vec4(vec3(0.85, 0.90, 1.0) * glow, glow * 0.45);
 }`;
 
 const DISPLACEMENT_VERT = `
@@ -303,7 +301,7 @@ export function HeroWebGLPanel() {
         transparent: true,
         side: THREE.BackSide,
         depthWrite: false,
-        blending: THREE.NormalBlending,
+        blending: THREE.AdditiveBlending,
       });
       shellMaterials.push(shellMat);
       inner.add(new THREE.Mesh(shellGeo, shellMat));

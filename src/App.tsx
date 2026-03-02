@@ -98,23 +98,18 @@ function AppContent() {
           <div className="max-w-8xl mx-auto">
             <HeroTitle>
               <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden"
+                className="hero-webgl-container relative mx-auto w-full overflow-hidden bg-[var(--color-background-light)] border-2 border-[var(--color-surface-dark)] transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
                 style={{
-                  background: "#ffffff",
-                  borderRadius: "2px",
-                  boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 40px 80px rgba(0,0,0,0.6), 0 0 120px rgba(0,0,0,0.3)",
+                  boxShadow: 'var(--shadow-geometric)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--shadow-geometric)';
                 }}
               >
                 <HeroWebGLPanel />
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: `
-                      radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.02) 0%, transparent 60%),
-                      linear-gradient(to bottom, transparent 70%, rgba(255,255,255,0.85) 100%)
-                    `,
-                  }}
-                />
               </div>
             </HeroTitle>
           </div>

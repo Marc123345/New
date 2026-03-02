@@ -5,9 +5,18 @@ import {
   useTransform,
   Variants,
 } from 'motion/react';
-import { SpacePlanets3D } from './space/SpacePlanets3D';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const PLANET_IMAGES = [
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/jupiter.jpg', size: 220, top: '5%', left: '70%', duration: 18, delay: 0 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/saturn.jpg', size: 160, top: '62%', left: '80%', duration: 24, delay: 3 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/neptune.jpg', size: 130, top: '10%', left: '-3%', duration: 20, delay: 1 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/venus.jpg', size: 100, top: '75%', left: '2%', duration: 22, delay: 5 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/mars.jpg', size: 80, top: '42%', left: '87%', duration: 16, delay: 2 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/uranus.jpg', size: 110, top: '84%', left: '44%', duration: 28, delay: 4 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/mercury.jpg', size: 65, top: '4%', left: '38%', duration: 14, delay: 6 },
+];
 
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
@@ -120,30 +129,60 @@ export function AboutStory() {
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
-      <SpacePlanets3D preset="about" style={{ opacity: 0.6 }} />
-
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.18) 0%, transparent 55%),
-            radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.2) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, rgba(10, 5, 30, 0.4) 0%, transparent 70%)
-          `,
-          zIndex: 1,
-        }}
-      />
-
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            linear-gradient(180deg, #06030f 0%, transparent 12%),
-            linear-gradient(0deg, #06030f 0%, transparent 12%)
-          `,
-          zIndex: 2,
-        }}
-      />
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {PLANET_IMAGES.map((planet, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full overflow-hidden"
+            style={{
+              width: planet.size,
+              height: planet.size,
+              top: planet.top,
+              left: planet.left,
+              opacity: 0.5,
+              filter: 'blur(0.5px)',
+            }}
+            animate={{ y: [0, -18, 0], rotate: [0, 360] }}
+            transition={{
+              y: { duration: planet.duration, repeat: Infinity, ease: 'easeInOut', delay: planet.delay },
+              rotate: { duration: planet.duration * 3, repeat: Infinity, ease: 'linear', delay: planet.delay },
+            }}
+          >
+            <img
+              src={planet.src}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ borderRadius: '50%' }}
+            />
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08) 0%, transparent 60%)',
+                boxShadow: 'inset -4px -4px 16px rgba(0,0,0,0.6)',
+              }}
+            />
+          </motion.div>
+        ))}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.18) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.2) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(10, 5, 30, 0.4) 0%, transparent 70%)
+            `,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(180deg, #06030f 0%, transparent 12%),
+              linear-gradient(0deg, #06030f 0%, transparent 12%)
+            `,
+          }}
+        />
+      </div>
 
       <motion.div
         className="relative w-full mx-auto flex flex-col items-center"

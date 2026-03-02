@@ -2,9 +2,18 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, SERVICES } from '../constants/ecosystem';
-import { SpacePlanets3D } from './space/SpacePlanets3D';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
+
+const PLANET_IMAGES = [
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/jupiter.jpg', size: 260, top: '5%', left: '68%', duration: 18, delay: 0 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/saturn.jpg', size: 180, top: '60%', left: '78%', duration: 24, delay: 3 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/neptune.jpg', size: 140, top: '15%', left: '-4%', duration: 20, delay: 1 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/venus.jpg', size: 110, top: '72%', left: '3%', duration: 22, delay: 5 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/mars.jpg', size: 90, top: '40%', left: '85%', duration: 16, delay: 2 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/uranus.jpg', size: 120, top: '82%', left: '45%', duration: 28, delay: 4 },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/mercury.jpg', size: 70, top: '5%', left: '40%', duration: 14, delay: 6 },
+];
 
 interface OrbitNodeProps {
   item: typeof PILLARS[number];
@@ -102,7 +111,41 @@ export function EcosystemServices() {
         >
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
-        <SpacePlanets3D preset="ecosystem" style={{ opacity: 0.75 }} />
+
+        {PLANET_IMAGES.map((planet, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full overflow-hidden"
+            style={{
+              width: planet.size,
+              height: planet.size,
+              top: planet.top,
+              left: planet.left,
+              opacity: 0.55,
+              filter: 'blur(0.5px)',
+            }}
+            animate={{ y: [0, -18, 0], rotate: [0, 360] }}
+            transition={{
+              y: { duration: planet.duration, repeat: Infinity, ease: 'easeInOut', delay: planet.delay },
+              rotate: { duration: planet.duration * 3, repeat: Infinity, ease: 'linear', delay: planet.delay },
+            }}
+          >
+            <img
+              src={planet.src}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{ borderRadius: '50%' }}
+            />
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08) 0%, transparent 60%)',
+                boxShadow: 'inset -4px -4px 16px rgba(0,0,0,0.6)',
+              }}
+            />
+          </motion.div>
+        ))}
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/50" />
       </div>
 

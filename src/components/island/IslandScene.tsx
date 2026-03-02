@@ -13,6 +13,19 @@ const PILLAR_COLORS_HEX = ['#A46CFC', '#B181FC', '#A46CFC'];
 const TRANSITION_MICRO = '0.3s ease';
 const TRANSITION_MACRO = '0.5s ease';
 
+const PILLAR_PLANETS = [
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/jupiter.jpg', label: 'Company Pages' },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/saturn.jpg', label: 'Leadership Branding' },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/neptune.jpg', label: 'Advocacy Program' },
+];
+
+const BACKGROUND_PLANETS = [
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/venus.jpg', size: 90, top: '8%', left: '2%' },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/mercury.jpg', size: 60, top: '65%', left: '88%' },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/mars.jpg', size: 75, top: '70%', left: '5%' },
+  { src: 'https://ik.imagekit.io/qcvroy8xpd/uranus.jpg', size: 100, top: '6%', left: '80%' },
+];
+
 interface IslandSceneProps {
   onPillarSelect: (index: number) => void;
 }
@@ -60,17 +73,105 @@ export function IslandScene({ onPillarSelect }: IslandSceneProps) {
       <div className="relative" aria-hidden="true">
         <div
           className="relative w-full overflow-hidden"
-          style={{ height: 'clamp(200px, 44vw, 540px)' }}
+          style={{
+            height: 'clamp(200px, 44vw, 540px)',
+            background: 'linear-gradient(135deg, #0a0612 0%, #0e0820 40%, #120a2a 70%, #0a0612 100%)',
+          }}
         >
-          <img
-            src="https://ik.imagekit.io/qcvroy8xpd/Rectangle%20(1).png"
-            alt="Three Pillars"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {BACKGROUND_PLANETS.map((p, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full overflow-hidden pointer-events-none"
+              style={{
+                width: p.size,
+                height: p.size,
+                top: p.top,
+                left: p.left,
+                opacity: 0.3,
+              }}
+              animate={{ y: [0, -10, 0], rotate: [0, 360] }}
+              transition={{
+                y: { duration: 12 + i * 3, repeat: Infinity, ease: 'easeInOut', delay: i * 1.5 },
+                rotate: { duration: 40 + i * 8, repeat: Infinity, ease: 'linear', delay: i * 1.5 },
+              }}
+            >
+              <img src={p.src} alt="" className="w-full h-full object-cover" style={{ borderRadius: '50%' }} />
+            </motion.div>
+          ))}
+
+          <div className="absolute inset-0 flex items-center justify-center gap-8 md:gap-16 px-6">
+            {PILLAR_PLANETS.map((planet, i) => {
+              const isActive = activePillar === i || cardHovered === i;
+              return (
+                <motion.button
+                  key={i}
+                  onClick={() => onPillarSelect(i)}
+                  onMouseEnter={() => handleCardEnter(i)}
+                  onMouseLeave={handleCardLeave}
+                  className="relative flex flex-col items-center gap-3 cursor-pointer border-none bg-transparent focus:outline-none"
+                  whileHover={{ scale: 1.06 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <motion.div
+                    className="relative rounded-full overflow-hidden"
+                    style={{
+                      width: 'clamp(80px, 14vw, 160px)',
+                      height: 'clamp(80px, 14vw, 160px)',
+                      boxShadow: isActive
+                        ? `0 0 40px ${PILLAR_COLORS_HEX[i]}60, 0 0 80px ${PILLAR_COLORS_HEX[i]}20`
+                        : '0 4px 24px rgba(0,0,0,0.5)',
+                      transition: 'box-shadow 0.4s ease',
+                    }}
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 40 + i * 10, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <img
+                      src={planet.src}
+                      alt={planet.label}
+                      className="w-full h-full object-cover"
+                      style={{ borderRadius: '50%' }}
+                    />
+                    <div
+                      className="absolute inset-0 rounded-full transition-opacity duration-300"
+                      style={{
+                        background: isActive
+                          ? `radial-gradient(circle at 35% 35%, rgba(255,255,255,0.12) 0%, ${PILLAR_COLORS_HEX[i]}10 60%, transparent 100%)`
+                          : 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.06) 0%, transparent 60%)',
+                        boxShadow: 'inset -3px -3px 12px rgba(0,0,0,0.7)',
+                      }}
+                    />
+                    {isActive && (
+                      <motion.div
+                        className="absolute inset-0 rounded-full"
+                        style={{ border: `2px solid ${PILLAR_COLORS_HEX[i]}80` }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </motion.div>
+
+                  <span
+                    className="text-center transition-all duration-300"
+                    style={{
+                      fontFamily: 'var(--font-stack-heading)',
+                      fontSize: 'clamp(0.6rem, 1.5vw, 0.75rem)',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase' as const,
+                      color: isActive ? PILLAR_COLORS_HEX[i] : 'rgba(255,255,255,0.35)',
+                    }}
+                  >
+                    {`0${i + 1}`}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </div>
+
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(251,251,252,0.15) 0%, rgba(251,251,252,0.05) 50%, rgba(251,251,252,0.6) 100%)',
+              background: 'linear-gradient(to bottom, rgba(10,6,18,0.2) 0%, rgba(10,6,18,0.05) 50%, rgba(10,6,18,0.4) 100%)',
             }}
           />
         </div>

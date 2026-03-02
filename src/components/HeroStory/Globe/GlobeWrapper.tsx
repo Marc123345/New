@@ -32,7 +32,7 @@ const buildArcs = (progress: number) => {
     startLng: cities[i].lng,
     endLat: cities[(i + 3) % cities.length].lat,
     endLng: cities[(i + 3) % cities.length].lng,
-    color: ['rgba(168,85,247,0.6)', 'rgba(192,132,252,0.3)'],
+    color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
   }));
 };
 
@@ -70,7 +70,7 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
         .arcDashLength(0.4)
         .arcDashGap(0.2)
         .arcDashAnimateTime(1500)
-        .arcStroke(0.4);
+        .arcStroke(1.2);
 
       globe.controls().autoRotate = true;
       globe.controls().autoRotateSpeed = 0.4;

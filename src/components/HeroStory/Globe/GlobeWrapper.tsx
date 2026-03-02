@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
 import './globe.css';
@@ -8,57 +8,64 @@ interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;
 }
 
+const heatmapColorFn = (t: number) => {
+  const colors = [
+    [0, 0, 0, 0],
+    [0.1, 0, 0.3, 0.3],
+    [0.3, 0, 0.6, 0.5],
+    [0.5, 0.1, 0.8, 0.7],
+    [0.75, 0.3, 1, 0.85],
+    [1, 0.5, 1, 1],
+  ];
+  const idx = Math.floor(t * (colors.length - 1));
+  const nextIdx = Math.min(idx + 1, colors.length - 1);
+  const blend = t * (colors.length - 1) - idx;
+  const color = colors[idx].map((c, i) => c + (colors[nextIdx][i] - c) * blend);
+  return `rgba(${Math.round(color[0] * 255)}, ${Math.round(color[1] * 255)}, ${Math.round(color[2] * 255)}, ${color[3]})`;
+};
+
+const buildArcs = (progress: number) => {
+  if (progress < 0.3) return [];
+  const threshold = Math.floor(((progress - 0.3) / 0.7) * 30);
+  const cities = worldPopulationData.slice(0, 30);
+  return Array.from({ length: Math.min(threshold, cities.length - 1) }, (_, i) => ({
+    startLat: cities[i].lat,
+    startLng: cities[i].lng,
+    endLat: cities[(i + 3) % cities.length].lat,
+    endLng: cities[(i + 3) % cities.length].lng,
+    color: ['rgba(168,85,247,0.6)', 'rgba(192,132,252,0.3)'],
+  }));
+};
+
 export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
-  const animFrameRef = useRef<number>(0);
-  const progressRef = useRef(0);
-
-  const buildArcs = useCallback((progress: number) => {
-    if (progress < 0.3) return [];
-    const threshold = Math.floor((progress - 0.3) / 0.7 * 30);
-    const arcs = [];
-    const cities = worldPopulationData.slice(0, 30);
-    for (let i = 0; i < Math.min(threshold, cities.length - 1); i++) {
-      arcs.push({
-        startLat: cities[i].lat,
-        startLng: cities[i].lng,
-        endLat: cities[(i + 3) % cities.length].lat,
-        endLng: cities[(i + 3) % cities.length].lng,
-        color: ['rgba(168,85,247,0.6)', 'rgba(192,132,252,0.3)'],
-      });
-    }
-    return arcs;
-  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
-
-    let globe: any;
 
     const init = async () => {
       const GlobeModule = await import('globe.gl');
       const Globe = GlobeModule.default;
 
-      globe = Globe({ animateIn: false })(containerRef.current!);
+      const globe = Globe({ animateIn: false })(containerRef.current!);
       globeRef.current = globe;
 
       globe
-        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
-        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
-        .atmosphereColor('rgba(100,50,200,0.4)')
+        .atmosphereColor('rgba(120,60,220,0.5)')
         .atmosphereAltitude(0.15)
         .width(containerRef.current!.clientWidth || 800)
         .height(containerRef.current!.clientHeight || 800)
-        .pointsData(worldPopulationData)
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor(() => 'rgba(192,132,252,0.85)')
-        .pointAltitude(d => (d as any).pop / 40000000 * 0.06)
-        .pointRadius(d => Math.sqrt((d as any).pop) / 3200)
-        .pointsMerge(false)
+        .heatmapPointLat('lat')
+        .heatmapPointLng('lng')
+        .heatmapPointWeight('pop')
+        .heatmapBandwidth(0.9)
+        .heatmapColorSaturation(2.8)
+        .heatmapColorFn(heatmapColorFn)
+        .heatmapsData([worldPopulationData])
         .arcsData([])
         .arcColor('color')
         .arcDashLength(0.4)
@@ -89,32 +96,22 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animFrameRef.current);
       if (globeRef.current) {
         globeRef.current._destructor?.();
         globeRef.current = null;
       }
     };
-  }, [buildArcs]);
+  }, []);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
-    progressRef.current = progress;
     if (!globeRef.current) return;
-
     const globe = globeRef.current;
 
-    const altitude = 2.2 - progress * 0.6;
-    globe.pointOfView({ lat: 5, lng: 20, altitude: Math.max(1.4, altitude) }, 300);
-
-    const arcs = buildArcs(progress);
-    globe.arcsData(arcs);
-
-    const atmoIntensity = 0.15 + progress * 0.25;
-    globe.atmosphereAltitude(atmoIntensity);
-
-    const speed = 0.4 + progress * 0.8;
+    globe.pointOfView({ lat: 5, lng: 20, altitude: Math.max(1.4, 2.2 - progress * 0.6) }, 300);
+    globe.arcsData(buildArcs(progress));
+    globe.atmosphereAltitude(0.15 + progress * 0.25);
     if (globe.controls()) {
-      globe.controls().autoRotateSpeed = speed;
+      globe.controls().autoRotateSpeed = 0.4 + progress * 0.8;
     }
   });
 

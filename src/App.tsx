@@ -13,6 +13,7 @@ import { CursorTrail } from "./components/CursorTrail";
 import { Starfield } from "./components/galaxy/Starfield";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { AmbientAudio } from "./components/AmbientAudio";
+import { SpacePlanets3D } from "./components/space/SpacePlanets3D";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -86,6 +87,7 @@ function AppContent() {
           `
         }}>
           <Starfield />
+          <SpacePlanets3D preset="hero" />
         </div>
 
         <div

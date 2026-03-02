@@ -6,6 +6,7 @@ import {
   Variants,
   AnimatePresence,
 } from 'motion/react';
+import { SpacePlanets3D } from './space/SpacePlanets3D';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -126,24 +127,38 @@ export function AboutStory() {
       id="about"
       className="relative w-full overflow-hidden flex flex-col items-center justify-center"
       style={{
-        background: 'var(--color-primary)',
+        background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
-<div
+      <SpacePlanets3D preset="about" style={{ opacity: 0.6 }} />
+
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
-            linear-gradient(180deg, var(--color-primary) 0%, transparent 12%),
-            linear-gradient(0deg, var(--color-primary) 0%, transparent 12%)
+            radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.18) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.2) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(10, 5, 30, 0.4) 0%, transparent 70%)
           `,
           zIndex: 1,
         }}
       />
 
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            linear-gradient(180deg, #06030f 0%, transparent 12%),
+            linear-gradient(0deg, #06030f 0%, transparent 12%)
+          `,
+          zIndex: 2,
+        }}
+      />
+
       <motion.div
-        className="relative z-10 w-full mx-auto flex flex-col items-center"
-        style={{ y: contentParallax, maxWidth: '1300px' }}
+        className="relative w-full mx-auto flex flex-col items-center"
+        style={{ y: contentParallax, maxWidth: '1300px', zIndex: 10 }}
       >
         <div className="flex flex-col items-center text-center mb-16 md:mb-24">
           <SectionBadge label="About Us" />

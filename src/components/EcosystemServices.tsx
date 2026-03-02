@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, SERVICES } from '../constants/ecosystem';
+import { SpacePlanets3D } from './space/SpacePlanets3D';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
 
@@ -101,6 +102,7 @@ export function EcosystemServices() {
         >
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
+        <SpacePlanets3D preset="ecosystem" style={{ opacity: 0.75 }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/50" />
       </div>
 

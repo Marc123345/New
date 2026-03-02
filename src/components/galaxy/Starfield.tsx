@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-const STAR_COUNT = 600;
-const SHOOTING_STAR_INTERVAL = 3000;
+const STAR_COUNT = 800;
+const SHOOTING_STAR_INTERVAL = 2500;
 
 const STAR_COLORS = [
   '255, 255, 255',
@@ -10,15 +10,21 @@ const STAR_COLORS = [
   '255, 240, 220',
   '180, 210, 255',
   '255, 230, 200',
+  '160, 190, 255',
+  '240, 248, 255',
 ];
 
 const NEBULAE = [
-  { x: 0.15, y: 0.3, r: 0.45, color: '20, 40, 80', opacity: 0.08 },
-  { x: 0.7, y: 0.2, r: 0.4, color: '15, 30, 70', opacity: 0.07 },
-  { x: 0.5, y: 0.65, r: 0.5, color: '10, 25, 60', opacity: 0.06 },
-  { x: 0.85, y: 0.7, r: 0.3, color: '30, 50, 90', opacity: 0.05 },
-  { x: 0.3, y: 0.85, r: 0.35, color: '20, 35, 75', opacity: 0.04 },
-  { x: 0.55, y: 0.15, r: 0.25, color: '40, 60, 100', opacity: 0.06 },
+  { x: 0.12, y: 0.25, r: 0.55, color: '18, 40, 90', opacity: 0.10 },
+  { x: 0.65, y: 0.15, r: 0.45, color: '12, 30, 75', opacity: 0.09 },
+  { x: 0.45, y: 0.6, r: 0.6, color: '8, 22, 55', opacity: 0.08 },
+  { x: 0.85, y: 0.65, r: 0.4, color: '25, 45, 85', opacity: 0.07 },
+  { x: 0.25, y: 0.8, r: 0.4, color: '15, 32, 70', opacity: 0.06 },
+  { x: 0.55, y: 0.1, r: 0.3, color: '35, 55, 100', opacity: 0.07 },
+  { x: 0.9, y: 0.35, r: 0.35, color: '10, 28, 65', opacity: 0.06 },
+  { x: 0.05, y: 0.5, r: 0.5, color: '20, 38, 80', opacity: 0.05 },
+  { x: 0.4, y: 0.35, r: 0.25, color: '30, 50, 95', opacity: 0.04 },
+  { x: 0.75, y: 0.85, r: 0.35, color: '14, 26, 60', opacity: 0.05 },
 ];
 
 interface Star {
@@ -45,16 +51,21 @@ interface ShootingStar {
 function createStars(w: number, h: number): Star[] {
   const stars: Star[] = [];
   for (let i = 0; i < STAR_COUNT; i++) {
-    const isBright = Math.random() < 0.08;
+    const roll = Math.random();
+    const isBright = roll < 0.06;
+    const isMedium = roll < 0.2;
+    const nearCenter = Math.random() < 0.3;
+    const cx = nearCenter ? w * (0.3 + Math.random() * 0.4) : Math.random() * w;
+    const cy = nearCenter ? h * (0.2 + Math.random() * 0.6) : Math.random() * h;
     stars.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      size: isBright ? 1.2 + Math.random() * 1.8 : 0.3 + Math.random() * 1.2,
-      baseAlpha: isBright ? 0.6 + Math.random() * 0.4 : 0.1 + Math.random() * 0.5,
-      twinkleSpeed: 0.2 + Math.random() * 1.5,
+      x: cx + (Math.random() - 0.5) * w * 0.15,
+      y: cy + (Math.random() - 0.5) * h * 0.15,
+      size: isBright ? 1.4 + Math.random() * 2.0 : isMedium ? 0.7 + Math.random() * 1.0 : 0.2 + Math.random() * 0.8,
+      baseAlpha: isBright ? 0.7 + Math.random() * 0.3 : isMedium ? 0.3 + Math.random() * 0.4 : 0.08 + Math.random() * 0.35,
+      twinkleSpeed: 0.15 + Math.random() * 1.8,
       twinkleOffset: Math.random() * Math.PI * 2,
       color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
-      glow: isBright,
+      glow: isBright || (isMedium && Math.random() < 0.3),
     });
   }
   return stars;

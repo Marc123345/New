@@ -75,7 +75,17 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#000' }}
       >
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 20%, #0a1628 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, #0c1a2e 0%, transparent 45%), radial-gradient(ellipse at 50% 50%, #060d1a 0%, #020408 100%)' }}>
+        <div className="absolute inset-0" style={{
+          background: `
+            radial-gradient(ellipse at 20% 15%, rgba(15, 25, 60, 0.7) 0%, transparent 45%),
+            radial-gradient(ellipse at 75% 20%, rgba(10, 35, 70, 0.5) 0%, transparent 40%),
+            radial-gradient(ellipse at 85% 75%, rgba(20, 30, 65, 0.6) 0%, transparent 50%),
+            radial-gradient(ellipse at 40% 80%, rgba(8, 20, 55, 0.5) 0%, transparent 45%),
+            radial-gradient(ellipse at 55% 45%, rgba(5, 12, 35, 0.8) 0%, transparent 60%),
+            radial-gradient(ellipse at 10% 60%, rgba(12, 22, 50, 0.4) 0%, transparent 35%),
+            radial-gradient(ellipse at 50% 50%, #030810 0%, #010204 100%)
+          `
+        }}>
           <Starfield />
         </div>
 

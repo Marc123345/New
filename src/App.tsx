@@ -12,6 +12,7 @@ import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { Starfield } from "./components/galaxy/Starfield";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
+import { AmbientAudio } from "./components/AmbientAudio";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -67,6 +68,7 @@ function AppContent() {
   return (
     <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
+      <AmbientAudio />
       <Navigation />
       <ScrollProgress />
 

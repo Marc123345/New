@@ -10,10 +10,9 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { Starfield } from "./components/galaxy/Starfield";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { AmbientAudio } from "./components/AmbientAudio";
-import { SpacePlanets3D } from "./components/space/SpacePlanets3D";
+import { SolarSystem } from "./components/SolarSystem";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -76,18 +75,10 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#040608' }}
+        style={{ background: '#000' }}
       >
-        <div className="absolute inset-0" style={{
-          background: `
-            radial-gradient(ellipse at 15% 20%, rgba(8, 18, 40, 0.6) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 15%, rgba(6, 16, 36, 0.4) 0%, transparent 45%),
-            radial-gradient(ellipse at 90% 80%, rgba(10, 20, 44, 0.5) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, #040608 0%, #020304 100%)
-          `
-        }}>
-          <Starfield />
-          <SpacePlanets3D preset="hero" />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <SolarSystem />
         </div>
 
         <div

@@ -56,7 +56,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                 <div
                   style={{
                     height: 3,
-                    background: 'linear-gradient(to right, var(--color-primary), var(--color-secondary))',
+                    background: 'linear-gradient(to right, #0369a1, #0ea5e9)',
                   }}
                 />
 
@@ -108,7 +108,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                         style={{
                           fontSize: 11,
                           letterSpacing: '0.3em',
-                          color: 'var(--color-primary)',
+                          color: '#0ea5e9',
                           opacity: 0.8,
                           textTransform: 'uppercase',
                           marginBottom: 12,
@@ -177,7 +177,7 @@ export function ServiceOverlay({ serviceIndex, onClose, onNavigate }: ServiceOve
                               fontSize: 12,
                               letterSpacing: '0.04em',
                               border: '1px solid var(--color-surface-dark)',
-                              backgroundColor: 'rgba(124,4,252,0.05)',
+                              backgroundColor: 'rgba(14,165,233,0.05)',
                               color: 'var(--color-text-dark)',
                               fontFamily: 'var(--font-stack-body)',
                             }}

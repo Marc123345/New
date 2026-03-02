@@ -1,6 +1,7 @@
 import { useFrame, useLoader } from "@react-three/fiber"
 import { useRef } from "react"
 import * as THREE from "three"
+import { TextureLoader } from "three"
 
 interface SaturnGroupProps {
   onSelect: (name: string) => void
@@ -38,7 +39,5 @@ const SaturnGroup = ({ onSelect, elapsed, isPaused }: SaturnGroupProps) => {
     </group>
   )
 }
-
-const { TextureLoader } = THREE
 
 export default SaturnGroup

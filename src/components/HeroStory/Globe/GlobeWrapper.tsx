@@ -8,6 +8,8 @@ interface GlobeWrapperProps {
 }
 
 const heatmapColorFn = (t: number) => {
+  if (t == null || isNaN(t)) return 'rgba(0,0,0,0)';
+  const safeT = Math.max(0, Math.min(1, t));
   const colors = [
     [0, 0, 0, 0],
     [0.1, 0, 0.3, 0.3],
@@ -16,9 +18,9 @@ const heatmapColorFn = (t: number) => {
     [0.75, 0.3, 1, 0.85],
     [1, 0.5, 1, 1],
   ];
-  const idx = Math.floor(t * (colors.length - 1));
+  const idx = Math.floor(safeT * (colors.length - 1));
   const nextIdx = Math.min(idx + 1, colors.length - 1);
-  const blend = t * (colors.length - 1) - idx;
+  const blend = safeT * (colors.length - 1) - idx;
   const color = colors[idx].map((c, i) => c + (colors[nextIdx][i] - c) * blend);
   return `rgba(${Math.round(color[0] * 255)}, ${Math.round(color[1] * 255)}, ${Math.round(color[2] * 255)}, ${color[3]})`;
 };

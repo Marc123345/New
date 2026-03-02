@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
-import { PILLARS, SERVICES } from '../constants/ecosystem';
+import { PILLARS } from '../constants/ecosystem';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
 const LAPTOP_URL = 'https://ik.imagekit.io/qcvroy8xpd/download.png';
@@ -16,61 +16,50 @@ const PLANET_IMAGES = [
   { src: 'https://ik.imagekit.io/qcvroy8xpd/mercury.jpg', size: 70, top: '5%', left: '40%', duration: 14, delay: 6 },
 ];
 
+const ORBIT_RADIUS = 220;
+const ORBIT_DURATION = 18000;
+
 interface OrbitNodeProps {
   item: typeof PILLARS[number];
   index: number;
   total: number;
-  onSelect: (serviceIndex: number) => void;
-  activeLabel: number | null;
-  onToggleLabel: (index: number) => void;
+  onSelect: (index: number) => void;
+  orbitAngle: number;
 }
 
-const OrbitNode = ({ item, index, total, onSelect, activeLabel, onToggleLabel }: OrbitNodeProps) => {
-  const angle = (index / total) * 2 * Math.PI;
-  const radius = 300;
-  const x = Math.cos(angle) * radius;
-  const y = Math.sin(angle) * radius;
-
-  const serviceIndex = SERVICES.indexOf(item);
-  const showLabel = activeLabel === index;
+const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps) => {
+  const baseAngle = (index / total) * 2 * Math.PI;
+  const angle = baseAngle + orbitAngle;
+  const x = Math.cos(angle) * ORBIT_RADIUS;
+  const y = Math.sin(angle) * ORBIT_RADIUS;
 
   return (
-    <motion.div
-      className="absolute top-1/2 left-1/2 z-30 pointer-events-auto"
-      style={{ x, y }}
+    <div
+      className="absolute z-30"
+      style={{
+        left: '50%',
+        top: '50%',
+        transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+      }}
     >
-      <motion.button
-        onClick={() => onSelect(serviceIndex)}
-        onPointerDown={(e) => {
-          if (e.pointerType === 'touch') {
-            e.stopPropagation();
-            onToggleLabel(index);
-          }
-        }}
-        animate={{ rotate: -360 }}
-        transition={{ duration: 100, ease: 'linear', repeat: Infinity }}
-        className="group relative flex items-center justify-center p-4 focus:outline-none"
+      <button
+        type="button"
+        onClick={() => onSelect(index)}
+        className="group relative flex items-center justify-center p-3 focus:outline-none cursor-pointer"
       >
         <div
-          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 group-hover:scale-110"
           style={{
             background: 'linear-gradient(135deg, var(--color-primary), rgba(164,108,252,0.4))',
             border: '2px solid var(--color-secondary)',
             boxShadow: '0 0 24px rgba(164,108,252,0.35), inset 0 0 12px rgba(164,108,252,0.15)',
           }}
         >
-          <div className="transition-colors" style={{ color: '#ffffff' }}>
-            {item.icon}
-          </div>
+          <div style={{ color: '#ffffff' }}>{item.icon}</div>
         </div>
-
-        <div
-          className={`absolute left-full ml-3 top-1/2 -translate-y-1/2 transition-opacity duration-500 pointer-events-none z-50 ${
-            showLabel ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-          }`}
-        >
+        <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap">
           <span
-            className="text-xs uppercase tracking-[0.2em] whitespace-nowrap px-3 py-1"
+            className="text-xs uppercase tracking-[0.2em] px-3 py-1"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
@@ -81,10 +70,37 @@ const OrbitNode = ({ item, index, total, onSelect, activeLabel, onToggleLabel }:
             {item.subtitle}
           </span>
         </div>
-      </motion.button>
-    </motion.div>
+      </button>
+    </div>
   );
 };
+
+function useOrbitAngle(paused: boolean) {
+  const angleRef = useRef(0);
+  const lastTimeRef = useRef<number | null>(null);
+  const [angle, setAngle] = useState(0);
+  const rafRef = useRef<number>(0);
+
+  useEffect(() => {
+    const step = (now: number) => {
+      if (!paused) {
+        if (lastTimeRef.current !== null) {
+          const delta = now - lastTimeRef.current;
+          angleRef.current += (delta / ORBIT_DURATION) * 2 * Math.PI;
+          setAngle(angleRef.current);
+        }
+        lastTimeRef.current = now;
+      } else {
+        lastTimeRef.current = null;
+      }
+      rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [paused]);
+
+  return angle;
+}
 
 function LaptopCenter() {
   const mouseX = useMotionValue(0);
@@ -157,14 +173,12 @@ function LaptopCenter() {
   );
 }
 
+const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
+
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
-  const [activeLabel, setActiveLabel] = useState<number | null>(null);
-
-  const handleToggleLabel = (index: number) => {
-    setActiveLabel(prev => prev === index ? null : index);
-  };
+  const orbitAngle = useOrbitAngle(isHoveringOrbit);
 
   return (
     <section
@@ -269,40 +283,32 @@ export function EcosystemServices() {
       </div>
 
       <div
-        className="relative z-20 w-full flex items-center justify-center"
+        className="relative z-20 flex items-center justify-center"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
+        style={{ width: ORBIT_DIAMETER + 120, height: ORBIT_DIAMETER + 120 }}
       >
-        <div className="relative w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
-
+        <div
+          className="relative flex items-center justify-center"
+          style={{ width: ORBIT_DIAMETER + 120, height: ORBIT_DIAMETER + 120 }}
+        >
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {[1, 0.65].map((scale, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  width: `${scale * 100}%`,
-                  height: `${scale * 100}%`,
-                  border: '1px solid rgba(164,108,252,0.15)',
-                  boxShadow: i === 0 ? '0 0 40px rgba(164,108,252,0.06)' : 'none',
-                }}
-              />
-            ))}
+            <div
+              className="absolute rounded-full"
+              style={{
+                width: ORBIT_DIAMETER,
+                height: ORBIT_DIAMETER,
+                border: '1px solid rgba(164,108,252,0.2)',
+                boxShadow: '0 0 40px rgba(164,108,252,0.06)',
+              }}
+            />
           </div>
 
-          <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-auto">
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
             <LaptopCenter />
           </div>
 
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: isHoveringOrbit ? 0 : 120,
-              ease: 'linear',
-              repeat: Infinity,
-            }}
-          >
+          <div className="absolute inset-0 z-30">
             {PILLARS.map((pillar, i) => (
               <OrbitNode
                 key={i}
@@ -310,11 +316,10 @@ export function EcosystemServices() {
                 index={i}
                 total={PILLARS.length}
                 onSelect={setSelectedService}
-                activeLabel={activeLabel}
-                onToggleLabel={handleToggleLabel}
+                orbitAngle={orbitAngle}
               />
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 

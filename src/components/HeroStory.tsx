@@ -165,6 +165,10 @@ const StoryText = ({
 };
 
 // --- Main Layout Component ---
+export function HeroStory() {
+  return <AboutStory />;
+}
+
 export function AboutStory() {
   const containerRef = useRef<HTMLDivElement>(null);
   

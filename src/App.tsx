@@ -24,7 +24,7 @@ const ArcSlider = lazy(() =>
   import("./components/ArcSlider").then((m) => ({ default: m.ArcSlider })),
 );
 const Testimonials = lazy(() =>
-  import("./components/Testimonials").then((m) => ({ default: m.Testimonials })),
+  import("./components/Testimonials").then((m) => ({ default: m.RegionalPresence })),
 );
 const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),

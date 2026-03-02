@@ -1,10 +1,9 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import {
   motion,
   useScroll,
   useTransform,
   Variants,
-  AnimatePresence,
 } from 'motion/react';
 import { SpacePlanets3D } from './space/SpacePlanets3D';
 
@@ -36,14 +35,6 @@ const scaleInItem: Variants = {
   },
 };
 
-const CAPABILITIES = [
-  { tag: 'Company Pages', desc: 'Strategic company page management that builds brand authority and engages your professional community.' },
-  { tag: 'Leadership Branding', desc: 'Elevate your executives into thought leaders with strategic personal branding and content.' },
-  { tag: 'Advocacy Program', desc: 'Turn your team into brand ambassadors with structured employee advocacy programs.' },
-  { tag: 'Website Design + SEO', desc: 'Beautiful, high-converting websites with SEO built in from day one.' },
-  { tag: 'Paid Campaigns', desc: 'Amplify your message and drive real business outcomes with targeted paid campaigns.' },
-  { tag: 'Content Writing', desc: 'Clear, engaging, and on-brand content that connects and converts.' },
-];
 
 function GeometricFrame({ children }: { children: React.ReactNode }) {
   return (
@@ -112,8 +103,6 @@ function SectionBadge({ label }: { label: string }) {
 
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeCapability, setActiveCapability] = useState<number | null>(null);
-
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
@@ -363,64 +352,6 @@ export function AboutStory() {
           </motion.div>
         </motion.div>
 
-        <div className="w-full mt-16 md:mt-24">
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-          >
-            {CAPABILITIES.map((cap, i) => (
-              <motion.div
-                key={cap.tag}
-                variants={scaleInItem}
-                onHoverStart={() => setActiveCapability(i)}
-                onHoverEnd={() => setActiveCapability(null)}
-                className="relative px-4 py-4 cursor-default transition-all duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5"
-                style={{
-                  border: '2px solid var(--color-surface-dark)',
-                  background: activeCapability === i
-                    ? 'rgba(164,108,252,0.08)'
-                    : 'var(--color-background-light)',
-                  boxShadow: activeCapability === i
-                    ? 'var(--shadow-geometric-hover)'
-                    : '6px 6px 0 var(--color-secondary)',
-                  transition: 'background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
-                }}
-              >
-                <span
-                  className="block text-[0.7rem] font-semibold uppercase tracking-[0.15em]"
-                  style={{
-                    fontFamily: 'var(--font-stack-heading)',
-                    color: activeCapability === i ? 'var(--color-text-dark)' : 'rgba(232,226,255,0.5)',
-                    transition: 'color 0.3s ease',
-                  }}
-                >
-                  {cap.tag}
-                </span>
-                <AnimatePresence>
-                  {activeCapability === i && (
-                    <motion.span
-                      className="block mt-1.5 text-[0.65rem]"
-                      style={{
-                        color: 'rgba(232,226,255,0.4)',
-                        fontFamily: 'var(--font-stack-body)',
-                        lineHeight: 1.4,
-                      }}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      {cap.desc}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
       </motion.div>
     </section>
   );

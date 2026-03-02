@@ -1,133 +1,76 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
-
-const TESTIMONIALS = [
-  {
-    id: "1",
-    name: "Amara Okafor",
-    role: "CEO, TechVentures Nigeria",
-    quote:
-      "H2H Digital didn't just build a platform; they built a digital ecosystem that understands the heartbeat of Lagos markets. Their expertise in African fintech is unmatched.",
-    avatar:
-      "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=400&h=400&fit=crop",
-    mapCode: "NG",
-    mapView: { x: "-15%", y: "8%", scale: 2.5 },
-  },
-  {
-    id: "2",
-    name: "Kwame Mensah",
-    role: "Founder, GhanaFintech",
-    quote:
-      "The level of creativity exceeded our expectations. Our transaction volume tripled within three months. H2H brought world-class execution to West Africa.",
-    avatar:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
-    mapCode: "GH",
-    mapView: { x: "-18%", y: "10%", scale: 2.8 },
-  },
-  {
-    id: "3",
-    name: "Zainab Hassan",
-    role: "Director, EduTech Kenya",
-    quote:
-      "A game-changer for education. They delivered a world-class learning platform that truly resonates with our students and scales across East Africa beautifully.",
-    avatar:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
-    mapCode: "KE",
-    mapView: { x: "-42%", y: "12%", scale: 2.6 },
-  },
-  {
-    id: "4",
-    name: "Thabo Nkosi",
-    role: "MD, SA Digital Solutions",
-    quote:
-      "From the first pixel to the final line of code, the execution was flawless. H2H is the partner you dream of—combining global standards with African insight.",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-    mapCode: "ZA",
-    mapView: { x: "-28%", y: "-32%", scale: 2.3 },
-  },
-  {
-    id: "5",
-    name: "Fatima Diallo",
-    role: "Co-Founder, Senegal Commerce",
-    quote:
-      "Their expertise in e-commerce and digital payments helped us scale rapidly across francophone Africa. The results speak for themselves.",
-    avatar:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
-    mapCode: "SN",
-    mapView: { x: "-20%", y: "5%", scale: 2.4 },
-  },
-];
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 const CONTACTS = [
   {
     id: "c1",
-    name: "Shannon Varani",
-    company: "Varani Group",
-    country: "South Africa",
-    countryCode: "ZA",
-    role: "Founder & CEO",
-    dotPosition: { x: 52, y: 76 },
-  },
-  {
-    id: "c2",
     name: "Amara Okafor",
     company: "TechVentures Nigeria",
     country: "Nigeria",
-    countryCode: "NG",
+    city: "Lagos",
     role: "CEO",
-    dotPosition: { x: 44, y: 46 },
+    countryCode: "NG",
+    dot: { x: 44.5, y: 45.5 },
   },
   {
-    id: "c3",
+    id: "c2",
     name: "Kwame Mensah",
     company: "GhanaFintech",
     country: "Ghana",
-    countryCode: "GH",
+    city: "Accra",
     role: "Founder",
-    dotPosition: { x: 38, y: 49 },
+    countryCode: "GH",
+    dot: { x: 38.5, y: 48.5 },
+  },
+  {
+    id: "c3",
+    name: "Fatima Diallo",
+    company: "Senegal Commerce",
+    country: "Senegal",
+    city: "Dakar",
+    role: "Co-Founder",
+    countryCode: "SN",
+    dot: { x: 32, y: 42 },
   },
   {
     id: "c4",
     name: "Zainab Hassan",
     company: "EduTech Kenya",
     country: "Kenya",
-    countryCode: "KE",
+    city: "Nairobi",
     role: "Director",
-    dotPosition: { x: 62, y: 55 },
+    countryCode: "KE",
+    dot: { x: 63, y: 55 },
   },
   {
     id: "c5",
-    name: "Fatima Diallo",
-    company: "Senegal Commerce",
-    country: "Senegal",
-    countryCode: "SN",
-    role: "Co-Founder",
-    dotPosition: { x: 32, y: 42 },
+    name: "Shannon Varani",
+    company: "Varani Group",
+    country: "South Africa",
+    city: "Cape Town",
+    role: "Founder & CEO",
+    countryCode: "ZA",
+    dot: { x: 52, y: 77 },
   },
   {
     id: "c6",
     name: "Thabo Nkosi",
     company: "SA Digital Solutions",
     country: "South Africa",
-    countryCode: "ZA",
+    city: "Johannesburg",
     role: "Managing Director",
-    dotPosition: { x: 52, y: 76 },
+    countryCode: "ZA",
+    dot: { x: 54, y: 74 },
   },
 ];
 
 export function Testimonials() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   return (
-    <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
-      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10">
-
-        <div className="text-center mb-8 px-4 md:px-8">
+    <section className="relative bg-[var(--color-surface-dark)] border-t border-white/10 py-20 px-4 md:px-8">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="text-center mb-12">
           <div
             className="inline-block mb-4 px-4 py-2"
             style={{
@@ -137,285 +80,358 @@ export function Testimonials() {
           >
             <span
               className="text-xs tracking-[0.3em] uppercase"
-              style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}
+              style={{
+                fontFamily: "var(--font-stack-heading)",
+                color: "var(--color-secondary)",
+              }}
             >
-              Testimonials
+              Trusted Across Africa
             </span>
           </div>
           <h2
-            className="tracking-tight"
+            className="tracking-tight text-white"
             style={{
               fontSize: "clamp(2rem, 4vw, 3rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "#ffffff",
             }}
           >
-            Trusted Across Africa
+            Our Partners on the Ground
           </h2>
         </div>
 
-        <div className="max-w-[1400px] mx-auto w-full h-[600px] lg:h-[650px] flex gap-6 px-4 md:px-8">
-          {/* LEFT COLUMN */}
-          <div
-            className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
-            style={{
-              border: "4px solid var(--color-secondary)",
-              boxShadow: "var(--shadow-geometric)",
-            }}
-          >
-            <div className="text-center z-10 mt-4">
-              <p
-                className="text-lg leading-tight"
-                style={{ fontFamily: "var(--font-stack-heading)" }}
-              >
-                <span className="text-[var(--color-secondary)]">Trusted</span>
-                <br />
-                Across Africa
-              </p>
-            </div>
-
-            <div className="relative w-[340px] h-[340px] flex-shrink-0 flex items-center justify-center">
-              <div className="absolute inset-0 w-full h-full">
-                <svg
-                  viewBox="0 0 380 380"
-                  fill="none"
-                  className="w-full h-full animate-[spin_60s_linear_infinite]"
-                >
-                  <circle
-                    cx="190"
-                    cy="190"
-                    r="189"
-                    stroke="white"
-                    strokeWidth="1"
-                    strokeDasharray="2 10"
-                    opacity="0.2"
-                  />
-                </svg>
-
-                <svg
-                  viewBox="0 0 380 380"
-                  className="absolute inset-0 w-full h-full -rotate-90"
-                >
-                  <motion.circle
-                    cx="190"
-                    cy="190"
-                    r="184.5"
-                    stroke="rgba(232,226,255,0.12)"
-                    strokeWidth="11"
-                    fill="none"
-                    style={{ pathLength: scrollYProgress }}
-                  />
-                  <motion.circle
-                    cx="190"
-                    cy="190"
-                    r="184.5"
-                    stroke="var(--color-secondary)"
-                    strokeWidth="3"
-                    fill="none"
-                    style={{ pathLength: scrollYProgress }}
-                  />
-                </svg>
-              </div>
-
-              <GlobeMap
-                scrollProgress={scrollYProgress}
-              />
-            </div>
-
-            <div className="z-10 relative text-center mb-4">
-              <p
-                className="text-[var(--color-secondary)] text-3xl leading-[0.8] tracking-wide -rotate-2"
-                style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic" }}
-              >
-                H2H's Global
-                <br />
-                Community
-              </p>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN */}
-          <div
-            className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col"
-            style={{
-              border: "2px solid rgba(255,255,255,0.15)",
-              boxShadow: "var(--shadow-geometric)",
-            }}
-          >
-            {/* Top half: Testimonial Slider */}
-            <div className="relative w-full flex-1 flex items-center justify-center perspective-[1000px]" style={{ minHeight: 0 }}>
-              {TESTIMONIALS.map((testimonial, i) => (
-                <TestimonialCard
-                  key={testimonial.id}
-                  testimonial={testimonial}
-                  index={i}
-                  total={TESTIMONIALS.length}
-                  scrollProgress={scrollYProgress}
-                />
-              ))}
-            </div>
-
-          </div>
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+          <AfricaMapPanel activeId={activeId} onHover={setActiveId} />
+          <ContactsPanel activeId={activeId} onHover={setActiveId} />
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-function GlobeMap({ scrollProgress }: { scrollProgress: any }) {
-  const testimonialIndex = useTransform(
-    scrollProgress,
-    [0, 0.2, 0.4, 0.6, 0.8, 1],
-    [0, 0, 1, 2, 3, 4]
-  );
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const unsubscribe = testimonialIndex.on("change", (latest) => {
-      setCurrentIndex(Math.floor(latest));
-    });
-    return unsubscribe;
-  }, [testimonialIndex]);
-
-  const active = TESTIMONIALS[currentIndex];
-
-  return (
-    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
-      <motion.div
-        className="relative w-full h-full"
-        animate={{
-          x: active.mapView.x,
-          y: active.mapView.y,
-          scale: active.mapView.scale,
-        }}
-        transition={{
-          duration: 1.2,
-          ease: [0.625, 0.05, 0, 1],
-        }}
-      >
-        <img
-          src="https://cdn.prod.website-files.com/68a5787bba0829184628bd51/68b6b0d7f637ee0f1ff47780_BASE.avif"
-          alt="World Map Base"
-          className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
-        />
-
-        {CONTACTS.filter(
-          (c, idx, arr) =>
-            arr.findIndex((x) => x.countryCode === c.countryCode) === idx
-        ).map((contact) => (
-          <div
-            key={contact.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{
-              left: `${contact.dotPosition.x}%`,
-              top: `${contact.dotPosition.y}%`,
-              zIndex: 10,
-            }}
-          >
-            <div className="w-2 h-2 rounded-full bg-white/70" />
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-
-
-function TestimonialCard({
-  testimonial,
-  index,
-  total,
-  scrollProgress,
+function AfricaMapPanel({
+  activeId,
+  onHover,
 }: {
-  testimonial: (typeof TESTIMONIALS)[number];
-  index: number;
-  total: number;
-  scrollProgress: any;
+  activeId: string | null;
+  onHover: (id: string | null) => void;
 }) {
-  const start = index / total;
-  const end = (index + 1) / total;
-
-  const opacity = useTransform(
-    scrollProgress,
-    [start, start + 0.05, end - 0.05, end],
-    [0, 1, 1, 0]
-  );
-  const y = useTransform(
-    scrollProgress,
-    [start, start + 0.1, end - 0.1, end],
-    [60, 0, 0, -60]
-  );
-  const rotateX = useTransform(
-    scrollProgress,
-    [start, start + 0.1, end - 0.1, end],
-    [-45, 0, 0, 45]
-  );
-  const scale = useTransform(
-    scrollProgress,
-    [start, start + 0.1, end - 0.1, end],
-    [0.9, 1, 1, 0.9]
-  );
-
   return (
-    <motion.div
-      style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[85%] md:w-[80%] bg-[var(--color-primary)] text-white p-8 md:p-10"
-      data-geometric-card
+    <div
+      className="lg:w-[420px] shrink-0 flex flex-col items-center justify-between py-10 px-8 relative"
+      style={{
+        background: "var(--color-primary)",
+        border: "4px solid var(--color-secondary)",
+        boxShadow: "var(--shadow-geometric)",
+      }}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          border: "4px solid rgba(255,255,255,0.2)",
-          boxShadow: "var(--shadow-geometric)",
-        }}
-      />
-      <div className="relative flex flex-col gap-6">
-        <h3
-          className="text-xl md:text-3xl leading-[1.1] tracking-tight"
+      <div className="text-center z-10">
+        <p
+          className="text-lg leading-tight"
           style={{ fontFamily: "var(--font-stack-heading)" }}
         >
-          "{testimonial.quote}"
-        </h3>
-        <div className="flex items-center gap-4">
-          <motion.div
-            className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/30"
-            style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
-            animate={{
-              scale: [1, 1.08, 1],
-              boxShadow: [
-                "0 0 0 0 rgba(164, 108, 252, 0)",
-                "0 0 20px 4px rgba(164, 108, 252, 0.4)",
-                "0 0 0 0 rgba(164, 108, 252, 0)",
-              ],
-            }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <img
-              src={testimonial.avatar}
-              alt={testimonial.name}
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-          <div>
-            <div
-              className="text-2xl leading-none mb-1 text-[#FBFBFC]"
-              style={{
-                fontFamily: "var(--font-stack-body)",
-                fontStyle: "italic",
-              }}
-            >
-              {testimonial.name}
-            </div>
-            <div
-              className="inline-block bg-[var(--color-secondary)] px-3 py-1 text-xs tracking-widest text-[var(--color-background-light)]"
-              style={{ fontFamily: "var(--font-stack-heading)" }}
-            >
-              {testimonial.role}
-            </div>
-          </div>
-        </div>
+          <span style={{ color: "var(--color-secondary)" }}>Trusted</span>
+          <br />
+          <span className="text-white">Across Africa</span>
+        </p>
       </div>
-    </motion.div>
+
+      <div className="relative w-full flex items-center justify-center mt-6">
+        <AfricaSVG activeId={activeId} onHover={onHover} />
+      </div>
+
+      <div className="z-10 text-center mt-6">
+        <p
+          className="text-xs tracking-[0.2em] uppercase text-white/40"
+          style={{ fontFamily: "var(--font-stack-heading)" }}
+        >
+          {CONTACTS.length} Partners · 5 Countries
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AfricaSVG({
+  activeId,
+  onHover,
+}: {
+  activeId: string | null;
+  onHover: (id: string | null) => void;
+}) {
+  return (
+    <svg
+      viewBox="0 0 200 220"
+      fill="none"
+      className="w-full max-w-[300px]"
+      style={{ filter: "drop-shadow(0 0 24px rgba(164,108,252,0.15))" }}
+    >
+      <path
+        d="
+          M 72 8
+          L 85 8
+          L 96 12
+          L 108 10
+          L 118 14
+          L 124 20
+          L 128 28
+          L 134 32
+          L 138 40
+          L 138 50
+          L 142 56
+          L 148 60
+          L 152 68
+          L 150 76
+          L 146 82
+          L 148 90
+          L 145 98
+          L 148 106
+          L 152 116
+          L 152 126
+          L 148 134
+          L 142 142
+          L 136 152
+          L 128 164
+          L 118 174
+          L 110 180
+          L 102 186
+          L 96 190
+          L 90 194
+          L 86 196
+          L 84 192
+          L 80 188
+          L 76 180
+          L 72 172
+          L 66 164
+          L 60 154
+          L 54 144
+          L 48 134
+          L 44 124
+          L 42 114
+          L 40 104
+          L 40 94
+          L 42 84
+          L 40 74
+          L 38 64
+          L 36 54
+          L 36 44
+          L 38 36
+          L 42 28
+          L 48 20
+          L 56 14
+          L 64 10
+          Z
+        "
+        fill="rgba(255,255,255,0.04)"
+        stroke="rgba(255,255,255,0.25)"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="
+          M 54 130
+          L 46 126
+          L 38 118
+          L 32 110
+          L 28 102
+          L 26 94
+          L 28 86
+          L 32 80
+          L 36 76
+          L 36 70
+          L 38 64
+        "
+        stroke="rgba(255,255,255,0.08)"
+        strokeWidth="1"
+        fill="none"
+      />
+
+      {CONTACTS.map((contact) => {
+        const isActive = activeId === contact.id;
+        const x = (contact.dot.x / 100) * 200;
+        const y = (contact.dot.y / 100) * 220;
+
+        return (
+          <g
+            key={contact.id}
+            style={{ cursor: "pointer" }}
+            onMouseEnter={() => onHover(contact.id)}
+            onMouseLeave={() => onHover(null)}
+          >
+            {isActive && (
+              <motion.circle
+                cx={x}
+                cy={y}
+                r={12}
+                fill="none"
+                stroke="var(--color-secondary)"
+                strokeWidth="1"
+                initial={{ r: 6, opacity: 0.8 }}
+                animate={{ r: 16, opacity: 0 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "easeOut" }}
+              />
+            )}
+            <motion.circle
+              cx={x}
+              cy={y}
+              animate={
+                isActive
+                  ? {
+                      r: 6,
+                      fill: "var(--color-secondary)" as any,
+                      filter:
+                        "drop-shadow(0 0 8px rgba(164,108,252,0.9)) drop-shadow(0 0 16px rgba(164,108,252,0.5))",
+                    }
+                  : {
+                      r: 4,
+                      fill: "rgba(255,255,255,0.7)" as any,
+                      filter: "none",
+                    }
+              }
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function ContactsPanel({
+  activeId,
+  onHover,
+}: {
+  activeId: string | null;
+  onHover: (id: string | null) => void;
+}) {
+  return (
+    <div
+      className="flex-1 flex flex-col overflow-hidden"
+      style={{
+        border: "2px solid rgba(255,255,255,0.15)",
+        boxShadow: "var(--shadow-geometric)",
+        background: "var(--color-surface-dark)",
+      }}
+    >
+      <div
+        className="px-6 py-4 border-b border-white/10 shrink-0"
+        style={{ background: "rgba(255,255,255,0.03)" }}
+      >
+        <span
+          className="text-xs tracking-[0.25em] uppercase text-white/40"
+          style={{ fontFamily: "var(--font-stack-heading)" }}
+        >
+          Key People
+        </span>
+      </div>
+
+      <div className="flex flex-col divide-y divide-white/5 overflow-y-auto">
+        {CONTACTS.map((contact) => {
+          const isActive = activeId === contact.id;
+          return (
+            <motion.div
+              key={contact.id}
+              className="relative flex items-center gap-4 px-6 py-4 cursor-pointer overflow-hidden"
+              onHoverStart={() => onHover(contact.id)}
+              onHoverEnd={() => onHover(null)}
+              onTouchStart={() => onHover(contact.id)}
+              onTouchEnd={() => onHover(null)}
+            >
+              <motion.div
+                className="absolute left-0 top-0 bottom-0 w-[3px]"
+                style={{ background: "var(--color-secondary)" }}
+                animate={{ scaleY: isActive ? 1 : 0 }}
+                initial={{ scaleY: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              />
+
+              <motion.div
+                className="absolute inset-0"
+                style={{ background: "var(--color-primary)" }}
+                animate={{ opacity: isActive ? 0.35 : 0 }}
+                transition={{ duration: 0.2 }}
+              />
+
+              <div
+                className="relative shrink-0 flex items-center justify-center w-10 h-10"
+                style={{ border: "1px solid rgba(255,255,255,0.15)" }}
+              >
+                <motion.span
+                  className="text-xs font-bold tracking-widest"
+                  style={{ fontFamily: "var(--font-stack-heading)" }}
+                  animate={{ color: isActive ? "var(--color-secondary)" : "rgba(255,255,255,0.4)" }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {contact.countryCode}
+                </motion.span>
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{ border: "1px solid var(--color-secondary)" }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="relative flex-1 min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span
+                    className="text-white text-sm font-semibold"
+                    style={{ fontFamily: "var(--font-stack-heading)" }}
+                  >
+                    {contact.name}
+                  </span>
+                  <span
+                    className="text-[10px] tracking-widest uppercase shrink-0"
+                    style={{
+                      fontFamily: "var(--font-stack-heading)",
+                      color: "var(--color-secondary)",
+                    }}
+                  >
+                    {contact.role}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                  <span
+                    className="text-xs text-white/40"
+                    style={{ fontFamily: "var(--font-stack-body)" }}
+                  >
+                    {contact.company}
+                  </span>
+                  <span className="text-white/20 text-xs">·</span>
+                  <span
+                    className="text-xs text-white/50 shrink-0"
+                    style={{ fontFamily: "var(--font-stack-body)" }}
+                  >
+                    {contact.city ? `${contact.city}, ` : ""}{contact.country}
+                  </span>
+                </div>
+              </div>
+
+              <motion.div
+                className="relative shrink-0 w-2 h-2 rounded-full"
+                animate={
+                  isActive
+                    ? {
+                        backgroundColor: "var(--color-secondary)",
+                        boxShadow: "0 0 8px 3px rgba(164,108,252,0.6)",
+                      }
+                    : {
+                        backgroundColor: "rgba(255,255,255,0.15)",
+                        boxShadow: "none",
+                      }
+                }
+                transition={{ duration: 0.2 }}
+              />
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

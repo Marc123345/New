@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
 import './globe.css';
@@ -23,15 +23,14 @@ const heatmapColorFn = (t: number) => {
   return `rgba(${Math.round(color[0] * 255)}, ${Math.round(color[1] * 255)}, ${Math.round(color[2] * 255)}, ${color[3]})`;
 };
 
-const buildArcs = (progress: number) => {
-  if (progress < 0.3) return [];
-  const threshold = Math.floor(((progress - 0.3) / 0.7) * 30);
-  const cities = worldPopulationData.slice(0, 30);
-  return Array.from({ length: Math.min(threshold, cities.length - 1) }, (_, i) => ({
-    startLat: cities[i].lat,
-    startLng: cities[i].lng,
-    endLat: cities[(i + 3) % cities.length].lat,
-    endLng: cities[(i + 3) % cities.length].lng,
+const CITIES = worldPopulationData.slice(0, 30);
+
+const buildArcs = (threshold: number) => {
+  return Array.from({ length: Math.min(threshold, CITIES.length - 1) }, (_, i) => ({
+    startLat: CITIES[i].lat,
+    startLng: CITIES[i].lng,
+    endLat: CITIES[(i + 3) % CITIES.length].lat,
+    endLng: CITIES[(i + 3) % CITIES.length].lng,
     color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
   }));
 };
@@ -39,14 +38,42 @@ const buildArcs = (progress: number) => {
 export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
+  const lastThresholdRef = useRef<number>(-1);
+  const rafRef = useRef<number | null>(null);
+  const pendingProgressRef = useRef<number | null>(null);
+
+  const applyProgress = useCallback((progress: number) => {
+    const globe = globeRef.current;
+    if (!globe) return;
+
+    globe.pointOfView({ lat: 5, lng: 20, altitude: Math.max(1.4, 2.2 - progress * 0.6) }, 300);
+    globe.atmosphereAltitude(0.15 + progress * 0.25);
+    if (globe.controls()) {
+      globe.controls().autoRotateSpeed = 0.4 + progress * 0.8;
+    }
+
+    if (progress >= 0.3) {
+      const threshold = Math.floor(((progress - 0.3) / 0.7) * 30);
+      if (threshold !== lastThresholdRef.current) {
+        lastThresholdRef.current = threshold;
+        globe.arcsData(buildArcs(threshold));
+      }
+    } else if (lastThresholdRef.current !== 0) {
+      lastThresholdRef.current = 0;
+      globe.arcsData([]);
+    }
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    let cancelled = false;
+
     const init = async () => {
       const GlobeModule = await import('globe.gl');
-      const Globe = GlobeModule.default;
+      if (cancelled) return;
 
+      const Globe = GlobeModule.default;
       const globe = Globe({ animateIn: false })(containerRef.current!);
       globeRef.current = globe;
 
@@ -79,22 +106,41 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
       globe.controls().enableRotate = false;
 
       globe.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!globeRef.current) return;
+          if (entry.isIntersecting) {
+            globeRef.current.resumeAnimation?.();
+          } else {
+            globeRef.current.pauseAnimation?.();
+          }
+        },
+        { threshold: 0.05 }
+      );
+      if (containerRef.current) observer.observe(containerRef.current);
+
+      const handleResize = () => {
+        if (globeRef.current && containerRef.current) {
+          globeRef.current
+            .width(containerRef.current.clientWidth)
+            .height(containerRef.current.clientHeight);
+        }
+      };
+      window.addEventListener('resize', handleResize);
+
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('resize', handleResize);
+      };
     };
 
-    init();
-
-    const handleResize = () => {
-      if (globeRef.current && containerRef.current) {
-        globeRef.current
-          .width(containerRef.current.clientWidth)
-          .height(containerRef.current.clientHeight);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
+    const cleanup = init();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      cancelled = true;
+      cleanup.then((fn) => fn?.());
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       if (globeRef.current) {
         globeRef.current._destructor?.();
         globeRef.current = null;
@@ -103,15 +149,15 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
   }, []);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
-    if (!globeRef.current) return;
-    const globe = globeRef.current;
-
-    globe.pointOfView({ lat: 5, lng: 20, altitude: Math.max(1.4, 2.2 - progress * 0.6) }, 300);
-    globe.arcsData(buildArcs(progress));
-    globe.atmosphereAltitude(0.15 + progress * 0.25);
-    if (globe.controls()) {
-      globe.controls().autoRotateSpeed = 0.4 + progress * 0.8;
-    }
+    pendingProgressRef.current = progress;
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      if (pendingProgressRef.current !== null) {
+        applyProgress(pendingProgressRef.current);
+        pendingProgressRef.current = null;
+      }
+    });
   });
 
   return (

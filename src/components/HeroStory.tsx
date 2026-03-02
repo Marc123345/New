@@ -7,25 +7,25 @@ const phases = [
     subtitle: 'The World Is Connected',
     title: 'But connection\nis not enough.',
     description: 'Billions of people online. Infinite content. Yet most brands still struggle to be heard — let alone felt.',
-    range: [0, 0.1, 0.22, 0.28] as [number, number, number, number],
+    range: [0, 0.05, 0.18, 0.25] as [number, number, number, number],
   },
   {
     subtitle: 'The Digital Era',
     title: 'Brands went\ndigital. Fast.',
     description: 'Social media, paid ads, automation. The tools multiplied. But somewhere along the way, the human voice got lost.',
-    range: [0.22, 0.32, 0.45, 0.52] as [number, number, number, number],
+    range: [0.25, 0.32, 0.45, 0.5] as [number, number, number, number],
   },
   {
     subtitle: 'The AI Era',
     title: 'More content.\nLess connection.',
     description: "AI accelerated everything — except authenticity. People don't want more noise. They want brands that speak like humans.",
-    range: [0.48, 0.56, 0.68, 0.76] as [number, number, number, number],
+    range: [0.5, 0.57, 0.7, 0.75] as [number, number, number, number],
   },
   {
     subtitle: 'The H2H Difference',
     title: 'Human to\nHuman.',
     description: 'We help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.',
-    range: [0.72, 0.8, 1, 1] as [number, number, number, number],
+    range: [0.75, 0.82, 0.96, 1] as [number, number, number, number],
   },
 ];
 

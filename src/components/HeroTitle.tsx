@@ -132,21 +132,21 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
           100% { background-position: 200% 50%; }
         }
         @keyframes glowPulse {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(180,130,40,0.2)); }
-          50% { filter: drop-shadow(0 0 14px rgba(180,130,40,0.4)); }
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(160,120,220,0.25)); }
+          50% { filter: drop-shadow(0 0 16px rgba(160,120,220,0.45)); }
         }
         .outline-text {
           position: relative;
-          -webkit-text-stroke: 1.5px rgba(0,0,0,0.06);
+          -webkit-text-stroke: 0px;
           background: linear-gradient(
             110deg,
-            #b07d20 0%,
-            #d4a843 20%,
-            #f0c96a 35%,
-            #d4a843 50%,
-            #9a6c18 65%,
-            #d4a843 80%,
-            #b07d20 100%
+            #9b72cf 0%,
+            #c4a0e8 20%,
+            #dcc6f5 35%,
+            #c4a0e8 50%,
+            #8b5db8 65%,
+            #c4a0e8 80%,
+            #9b72cf 100%
           );
           background-size: 200% 100%;
           -webkit-background-clip: text;

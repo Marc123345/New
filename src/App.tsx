@@ -77,10 +77,6 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#f8f8f6' }}
       >
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <SolarSystem />
-        </div>
-
         <div
           className="relative z-10 px-4 md:px-8 lg:px-12"
           style={{

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { motion, AnimatePresence } from "motion/react";
@@ -206,7 +206,6 @@ interface OverlayProps {
   onClose: () => void;
 }
 
-// Keeping your exact original ServiceOverlay design
 function ServiceOverlay({ service, onClose }: OverlayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -622,7 +621,7 @@ export function ArcSlider() {
     <>
       <div
         className="relative w-full py-16 md:py-24 overflow-hidden"
-        style={{ background: "#ffffff" }} // CHANGED: Only the canvas background is white
+        style={{ background: "var(--color-background-light, #f8f9fa)" }}
       >
         <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
           <span
@@ -639,7 +638,7 @@ export function ArcSlider() {
             style={{
               fontSize: "clamp(2.5rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "#111827", // CHANGED: Title updated to dark text for white canvas
+              color: "var(--color-text-dark, #111)",
             }}
           >
             Services
@@ -667,14 +666,14 @@ export function ArcSlider() {
                 textTransform: "uppercase",
                 padding: "10px 24px",
                 whiteSpace: "nowrap",
-                border: "2px solid rgba(155, 89, 245, 0.5)",
+                border: "2px solid var(--color-secondary, #9B59F5)",
                 borderRadius: "0",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
                 color: i === activeIndex
-                  ? "#ffffff"
-                  : "rgba(0,0,0,0.6)", // CHANGED: Inactive tabs updated to dark gray for visibility
+                  ? "var(--color-background-light, #fff)"
+                  : "var(--color-text-dark, #111)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
                   ? "0 4px 14px rgba(155, 89, 245, 0.4)"
@@ -717,45 +716,39 @@ export function ArcSlider() {
                     backfaceVisibility: "hidden",
                   }}
                 >
-                  {/* Cards remain completely unchanged to preserve your geometric dark-purple design */}
                   <div
                     className="relative h-full w-full overflow-hidden flex flex-col justify-between p-8 sm:p-10 transition-colors duration-500"
                     style={{
                       backgroundColor: service.bgColor,
-                      border: `2px solid ${service.color}`,
-                      boxShadow: `6px 6px 0 ${service.color}55`,
+                      border: "2px solid rgba(255,255,255,0.12)",
                       borderRadius: "0",
                     }}
                   >
-                    <div
-                      className="absolute top-0 left-0 right-0 h-1"
-                      style={{ background: service.color }}
-                    />
                     <div className="flex justify-between items-start">
                       <div>
                         <span
-                          className="text-[10px] tracking-[0.3em] font-semibold block"
+                          className="text-[10px] tracking-[0.3em] opacity-60 font-semibold block"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: service.color,
+                            color: "#fff",
                             marginBottom: "4px",
                           }}
                         >
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.15em] font-medium uppercase"
+                          className="text-[10px] tracking-[0.15em] opacity-40 font-medium uppercase"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "rgba(255,255,255,0.55)",
+                            color: "#fff",
                           }}
                         >
                           {service.category}
                         </span>
                       </div>
                       <div
-                        className="w-10 h-10 flex items-center justify-center"
-                        style={{ color: service.color, opacity: 0.6 }}
+                        className="w-10 h-10 flex items-center justify-center opacity-20"
+                        style={{ color: "#fff" }}
                       >
                         <IconComponent size={32} strokeWidth={1.5} />
                       </div>
@@ -767,7 +760,7 @@ export function ArcSlider() {
                         style={{
                           fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
                           fontFamily: "var(--font-stack-heading)",
-                          color: "#ffffff",
+                          color: "#fff",
                           margin: 0,
                         }}
                       >
@@ -788,23 +781,19 @@ export function ArcSlider() {
                             fontSize: "0.75rem",
                             letterSpacing: "0.15em",
                             textTransform: "uppercase",
-                            color: "#ffffff",
-                            background: "transparent",
-                            border: `1px solid rgba(255,255,255,0.4)`,
+                            color: "#fff",
+                            background: "rgba(255,255,255,0.08)",
+                            border: "1px solid rgba(255,255,255,0.25)",
                             borderRadius: "0",
                             padding: "12px 24px",
                             cursor: "pointer",
                             pointerEvents: "auto",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = service.color;
-                            e.currentTarget.style.color = "#fff";
-                            e.currentTarget.style.borderColor = service.color;
+                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "transparent";
-                            e.currentTarget.style.color = "#ffffff";
-                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
                           }}
                         >
                           Discover
@@ -834,7 +823,7 @@ export function ArcSlider() {
                 borderRadius: "0",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
-                  : "rgba(155, 89, 245, 0.3)", // Slightly darker for better contrast on white
+                  : "rgba(155, 89, 245, 0.2)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,

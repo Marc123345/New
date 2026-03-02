@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, SERVICES } from '../constants/ecosystem';
+import { SpacePlanets3D } from './space/SpacePlanets3D';
 
-const MACBOOK_MOCKUP = 'https://ik.imagekit.io/qcvroy8xpd/macbook-mockup-front-view_1332-60629.avif';
+const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
 
 interface OrbitNodeProps {
   item: typeof PILLARS[number];
@@ -62,10 +63,9 @@ const OrbitNode = ({ item, index, total, onSelect, activeLabel, onToggleLabel }:
             className="text-xs uppercase tracking-[0.2em] whitespace-nowrap px-3 py-1"
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              color: 'var(--color-background-light)',
-              background: 'var(--color-primary)',
-              border: '1px solid var(--color-text-dark)',
-              boxShadow: '3px 3px 0 var(--color-text-dark)',
+              color: '#ffffff',
+              background: 'rgba(41,30,86,0.95)',
+              border: '1px solid var(--color-secondary)',
             }}
           >
             {item.subtitle}
@@ -87,33 +87,33 @@ export function EcosystemServices() {
 
   return (
     <section
-      className="relative w-full min-h-screen flex flex-col items-center overflow-hidden py-16 sm:py-20"
-      style={{ background: 'var(--color-background-light)' }}
+      id="ecosystem"
+      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-32"
+      style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(164,108,252,0.06) 0%, transparent 55%), radial-gradient(circle at 70% 70%, rgba(96,165,250,0.05) 0%, transparent 50%)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(35,35,35,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(35,35,35,0.04) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-40"
+          style={{ filter: 'brightness(0.7) contrast(1.05)' }}
+        >
+          <source src={VIDEO_URL} type="video/mp4" />
+        </video>
+        <SpacePlanets3D preset="ecosystem" style={{ opacity: 0.75 }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/50" />
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 text-center pointer-events-none select-none mb-6">
+      <div className="relative z-10 container mx-auto px-6 text-center pointer-events-none select-none">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
           <div
-            className="inline-block mb-6 px-4 py-2"
+            className="inline-block mb-8 px-4 py-2"
             style={{
               border: '2px solid var(--color-secondary)',
               boxShadow: '4px 4px 0 var(--color-secondary)',
@@ -131,12 +131,13 @@ export function EcosystemServices() {
           </div>
 
           <h1
-            className="leading-[0.9] tracking-tighter uppercase mb-2"
+            className="leading-[0.9] tracking-tighter uppercase mb-4"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
+              textShadow: '0 20px 40px rgba(41,30,86,0.6)',
               color: 'transparent',
-              WebkitTextStroke: '1.5px var(--color-text-dark)',
+              WebkitTextStroke: '1.5px #ffffff',
             }}
           >
             Three Pillars. <br />
@@ -154,8 +155,8 @@ export function EcosystemServices() {
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
-              color: 'var(--color-text-dark)',
-              opacity: 0.04,
+              color: 'var(--color-secondary)',
+              opacity: 0.08,
             }}
           >
             Connection
@@ -164,20 +165,20 @@ export function EcosystemServices() {
       </div>
 
       <div
-        className="relative z-20 w-full flex items-center justify-center px-4"
-        style={{ minHeight: 560 }}
+        className="absolute inset-0 z-20 overflow-visible pointer-events-none flex items-center justify-center"
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >
-        <div className="relative w-[500px] h-[500px] sm:w-[620px] sm:h-[620px] md:w-[820px] md:h-[820px] flex items-center justify-center">
+        <div className="relative w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
           <motion.div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            className="absolute inset-0 flex items-center justify-center"
             animate={{ rotate: 360 }}
             transition={{
               duration: isHoveringOrbit ? 0 : 120,
               ease: 'linear',
               repeat: Infinity,
             }}
+            style={{ animationPlayState: isHoveringOrbit ? 'paused' : 'running' }}
           >
             {PILLARS.map((pillar, i) => (
               <OrbitNode
@@ -190,23 +191,6 @@ export function EcosystemServices() {
                 onToggleLabel={handleToggleLabel}
               />
             ))}
-          </motion.div>
-
-          <motion.div
-            className="relative z-10 pointer-events-none"
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1.4, ease: 'easeOut', delay: 0.3 }}
-            style={{ width: '70%', maxWidth: 520 }}
-          >
-            <img
-              src={MACBOOK_MOCKUP}
-              alt="Website preview"
-              className="w-full h-auto object-contain"
-              style={{
-                filter: 'drop-shadow(0 24px 60px rgba(164,108,252,0.18)) drop-shadow(0 8px 24px rgba(0,0,0,0.12))',
-              }}
-            />
           </motion.div>
         </div>
       </div>

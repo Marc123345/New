@@ -105,15 +105,15 @@ export function Navigation() {
               className="hidden sm:block text-[10px] uppercase tracking-[0.3em] font-medium transition-colors duration-500"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                color: "var(--color-text-dark)",
+                color: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)",
               }}
             >
               Menu
             </span>
             <div className="flex flex-col gap-[5px] w-6">
-              <span className="block h-[1.5px] w-full transition-colors duration-500" style={{ backgroundColor: "var(--color-text-dark)" }} />
-              <span className="block h-[1.5px] w-3/4 transition-colors duration-500" style={{ backgroundColor: "var(--color-text-dark)" }} />
-              <span className="block h-[1.5px] w-1/2 transition-colors duration-500" style={{ backgroundColor: "var(--color-text-dark)" }} />
+              <span className="block h-[1.5px] w-full transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
+              <span className="block h-[1.5px] w-3/4 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
+              <span className="block h-[1.5px] w-1/2 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
             </div>
           </button>
         </div>

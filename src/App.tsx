@@ -10,9 +10,10 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
+import { Starfield } from "./components/galaxy/Starfield";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { AmbientAudio } from "./components/AmbientAudio";
-import { SolarSystem } from "./components/SolarSystem";
+import { SpacePlanets3D } from "./components/space/SpacePlanets3D";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -75,8 +76,20 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#f8f8f6' }}
+        style={{ background: '#040608' }}
       >
+        <div className="absolute inset-0" style={{
+          background: `
+            radial-gradient(ellipse at 15% 20%, rgba(8, 18, 40, 0.6) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 15%, rgba(6, 16, 36, 0.4) 0%, transparent 45%),
+            radial-gradient(ellipse at 90% 80%, rgba(10, 20, 44, 0.5) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, #040608 0%, #020304 100%)
+          `
+        }}>
+          <Starfield />
+          <SpacePlanets3D preset="hero" />
+        </div>
+
         <div
           className="relative z-10 px-4 md:px-8 lg:px-12"
           style={{
@@ -87,9 +100,15 @@ function AppContent() {
           <div className="max-w-8xl mx-auto">
             <HeroTitle>
               <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
+                className="hero-webgl-container relative mx-auto w-full overflow-hidden bg-[var(--color-background-light)] border-2 border-[var(--color-surface-dark)] transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
                 style={{
-                  background: 'transparent',
+                  boxShadow: 'var(--shadow-geometric)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--shadow-geometric)';
                 }}
               >
                 <HeroWebGLPanel />
@@ -101,7 +120,7 @@ function AppContent() {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
             className="text-xs tracking-[0.25em] uppercase"
-            style={{ color: 'rgba(0,0,0,0.45)', fontFamily: 'var(--font-stack-heading)', letterSpacing: '0.2em' }}
+            style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-stack-heading)', letterSpacing: '0.2em' }}
           >
             scroll to explore
           </span>
@@ -111,7 +130,7 @@ function AppContent() {
             stroke="currentColor"
             strokeWidth={1.5}
             viewBox="0 0 24 24"
-            style={{ color: 'rgba(0,0,0,0.35)' }}
+            style={{ color: 'rgba(255,255,255,0.25)' }}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
@@ -120,7 +139,7 @@ function AppContent() {
 
       <HeroStory />
 
-      <div id="ecosystem" className="relative" style={{ zIndex: 2, margin: 0, padding: 0 }}>
+      <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
         <EcosystemServices />
       </div>
 

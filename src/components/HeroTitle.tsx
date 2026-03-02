@@ -17,12 +17,12 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
         fontFamily: 'var(--font-stack-heading)',
         fontSize: '0.75rem',
         letterSpacing: '0.15em',
-        background: isPrimary ? '#1a1a2e' : 'transparent',
-        color: isPrimary ? '#ffffff' : '#1a1a2e',
-        borderColor: '#1a1a2e',
+        background: isPrimary ? '#fbfbfc' : 'transparent',
+        color: isPrimary ? '#291e56' : '#fbfbfc',
+        borderColor: '#fbfbfc',
         boxShadow: hovered
-          ? `6px 6px 0 rgba(0,0,0,0.25)`
-          : `4px 4px 0 rgba(0,0,0,0.12)`,
+          ? `6px 6px 0 #a46cfc`
+          : `4px 4px 0 rgba(164,108,252,0.7)`,
         transform: hovered ? 'translate(-2px, -2px)' : 'translate(0, 0)',
         transition: 'box-shadow 0.18s ease, transform 0.18s ease',
       }}
@@ -54,8 +54,9 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
               lineHeight: 1.08,
               letterSpacing: '-0.03em',
               fontFamily: 'var(--font-stack-heading)',
-              color: '#0f0f1a',
+              color: '#ffffff',
               marginBottom: 'var(--space-6x)',
+              textShadow: '0 2px 20px rgba(0,0,0,0.5)',
             }}
           >
             From <span className="outline-text">B2B</span>{' '}
@@ -71,10 +72,11 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
             transition={{ ...fadeInUp.transition, delay: 0.2 }}
             className="text-xl md:text-2xl"
             style={{
-              color: 'rgba(15,15,26,0.65)',
+              color: 'rgba(255,255,255,0.85)',
               lineHeight: 1.6,
               maxWidth: '36rem',
               marginBottom: 'var(--space-6x)',
+              textShadow: '0 1px 10px rgba(0,0,0,0.4)',
             }}
           >
             People don't only want to connect with brands anymore;
@@ -132,21 +134,21 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
           100% { background-position: 200% 50%; }
         }
         @keyframes glowPulse {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(160,120,220,0.25)); }
-          50% { filter: drop-shadow(0 0 16px rgba(160,120,220,0.45)); }
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.3)); }
+          50% { filter: drop-shadow(0 0 18px rgba(139,92,246,0.6)) drop-shadow(0 0 40px rgba(124,58,237,0.2)); }
         }
         .outline-text {
           position: relative;
-          -webkit-text-stroke: 0px;
+          -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
           background: linear-gradient(
             110deg,
-            #9b72cf 0%,
-            #c4a0e8 20%,
-            #dcc6f5 35%,
-            #c4a0e8 50%,
-            #8b5db8 65%,
-            #c4a0e8 80%,
-            #9b72cf 100%
+            rgba(139,92,246,0.6) 0%,
+            #a78bfa 20%,
+            #e0d4ff 35%,
+            #c4b5fd 50%,
+            #8b5cf6 65%,
+            #a78bfa 80%,
+            rgba(139,92,246,0.6) 100%
           );
           background-size: 200% 100%;
           -webkit-background-clip: text;

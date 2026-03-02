@@ -242,24 +242,6 @@ export function EcosystemServices() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
-          <div
-            className="inline-block mb-6 px-4 py-2"
-            style={{
-              border: '2px solid var(--color-secondary)',
-              boxShadow: '4px 4px 0 var(--color-secondary)',
-            }}
-          >
-            <span
-              className="text-xs uppercase tracking-[0.3em]"
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                color: 'var(--color-secondary)',
-              }}
-            >
-              The Framework
-            </span>
-          </div>
-
           <h1
             className="leading-tight sm:leading-[0.9] tracking-tighter uppercase mb-12 sm:mb-16"
             style={{

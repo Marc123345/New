@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, SERVICES } from '../constants/ecosystem';
-import { SpacePlanets3D } from './space/SpacePlanets3D';
 
-const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
+const MACBOOK_MOCKUP = 'https://ik.imagekit.io/qcvroy8xpd/macbook-mockup-front-view_1332-60629.avif';
 
 interface OrbitNodeProps {
   item: typeof PILLARS[number];
@@ -89,7 +88,7 @@ export function EcosystemServices() {
   return (
     <section
       id="ecosystem"
-      className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-32"
+      className="relative w-full min-h-screen flex flex-col items-center overflow-hidden pt-20 pb-10 sm:pt-24 sm:pb-16"
       style={{ background: 'var(--color-background-light)' }}
     >
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -108,14 +107,14 @@ export function EcosystemServices() {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 text-center pointer-events-none select-none">
+      <div className="relative z-10 container mx-auto px-6 text-center pointer-events-none select-none mb-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
           <div
-            className="inline-block mb-8 px-4 py-2"
+            className="inline-block mb-6 px-4 py-2"
             style={{
               border: '2px solid var(--color-secondary)',
               boxShadow: '4px 4px 0 var(--color-secondary)',
@@ -133,7 +132,7 @@ export function EcosystemServices() {
           </div>
 
           <h1
-            className="leading-[0.9] tracking-tighter uppercase mb-4"
+            className="leading-[0.9] tracking-tighter uppercase mb-2"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2.5rem, 10vw, 9rem)',
@@ -166,20 +165,20 @@ export function EcosystemServices() {
       </div>
 
       <div
-        className="absolute inset-0 z-20 overflow-visible pointer-events-none flex items-center justify-center"
+        className="relative z-20 w-full flex items-center justify-center"
+        style={{ minHeight: 560 }}
         onMouseEnter={() => setIsHoveringOrbit(true)}
         onMouseLeave={() => setIsHoveringOrbit(false)}
       >
-        <div className="relative w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] md:w-[900px] md:h-[900px] flex items-center justify-center">
+        <div className="relative w-[500px] h-[500px] sm:w-[620px] sm:h-[620px] md:w-[820px] md:h-[820px] flex items-center justify-center">
           <motion.div
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
             animate={{ rotate: 360 }}
             transition={{
               duration: isHoveringOrbit ? 0 : 120,
               ease: 'linear',
               repeat: Infinity,
             }}
-            style={{ animationPlayState: isHoveringOrbit ? 'paused' : 'running' }}
           >
             {PILLARS.map((pillar, i) => (
               <OrbitNode
@@ -192,6 +191,23 @@ export function EcosystemServices() {
                 onToggleLabel={handleToggleLabel}
               />
             ))}
+          </motion.div>
+
+          <motion.div
+            className="relative z-10 pointer-events-none"
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 1.4, ease: 'easeOut', delay: 0.3 }}
+            style={{ width: '70%', maxWidth: 520 }}
+          >
+            <img
+              src={MACBOOK_MOCKUP}
+              alt="Website preview"
+              className="w-full h-auto object-contain"
+              style={{
+                filter: 'drop-shadow(0 24px 60px rgba(164,108,252,0.18)) drop-shadow(0 8px 24px rgba(0,0,0,0.12))',
+              }}
+            />
           </motion.div>
         </div>
       </div>

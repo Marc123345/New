@@ -45,9 +45,7 @@ function FloatingParticles() {
       });
     }
 
-    let frame = 0;
     const draw = () => {
-      frame++;
       ctx.clearRect(0, 0, w(), h());
 
       for (const p of particles) {
@@ -62,13 +60,13 @@ function FloatingParticles() {
         const a = p.alpha * (0.5 + 0.5 * Math.sin(p.pulse));
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 255, 240, ${a})`;
+        ctx.fillStyle = `rgba(164, 108, 252, ${a})`;
         ctx.fill();
 
         if (p.size > 1) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 255, 240, ${a * 0.1})`;
+          ctx.fillStyle = `rgba(164, 108, 252, ${a * 0.1})`;
           ctx.fill();
         }
       }
@@ -82,7 +80,7 @@ function FloatingParticles() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(0, 255, 240, ${0.06 * (1 - dist / 80)})`;
+            ctx.strokeStyle = `rgba(164, 108, 252, ${0.06 * (1 - dist / 80)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -113,7 +111,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
       <svg style={{ position: 'absolute', top: 12, left: 12, width: 40, height: 40, opacity: 0.4 }}>
         <motion.path
           d="M0,10 L10,0 L30,0 L40,10"
-          stroke="rgba(0,255,240,0.5)"
+          stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0 }}
@@ -122,7 +120,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
         />
         <motion.path
           d="M0,30 L10,40 L30,40 L40,30"
-          stroke="rgba(0,255,240,0.3)"
+          stroke="rgba(164,108,252,0.3)"
           strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0 }}
@@ -134,7 +132,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
       <svg style={{ position: 'absolute', top: 12, right: 12, width: 40, height: 40, opacity: 0.4 }}>
         <motion.path
           d="M40,10 L30,0 L10,0 L0,10"
-          stroke="rgba(0,255,240,0.5)"
+          stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0 }}
@@ -143,7 +141,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
         />
         <motion.path
           d="M40,30 L30,40 L10,40 L0,30"
-          stroke="rgba(0,255,240,0.3)"
+          stroke="rgba(164,108,252,0.3)"
           strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0 }}
@@ -155,7 +153,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
       <svg style={{ position: 'absolute', bottom: 12, left: 12, width: 40, height: 40, opacity: 0.4 }}>
         <motion.path
           d="M0,30 L10,40 L30,40 L40,30"
-          stroke="rgba(0,255,240,0.5)"
+          stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0 }}
@@ -167,7 +165,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
       <svg style={{ position: 'absolute', bottom: 12, right: 12, width: 40, height: 40, opacity: 0.4 }}>
         <motion.path
           d="M40,30 L30,40 L10,40 L0,30"
-          stroke="rgba(0,255,240,0.5)"
+          stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
           initial={{ pathLength: 0 }}
@@ -192,11 +190,11 @@ function HoloHUD({ playing }: { playing: boolean }) {
             transition={{ delay: 0.6 }}
           >
             <motion.div
-              style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(0,255,240,0.8)' }}
+              style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(164,108,252,0.8)' }}
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 1.2, repeat: Infinity }}
             />
-            <span style={{ color: 'rgba(0,255,240,0.5)', fontSize: '0.55rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+            <span style={{ color: 'rgba(164,108,252,0.6)', fontSize: '0.55rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
               Live
             </span>
           </motion.div>
@@ -206,7 +204,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
               position: 'absolute',
               top: 14,
               left: 60,
-              color: 'rgba(0,255,240,0.35)',
+              color: 'rgba(164,108,252,0.4)',
               fontSize: '0.5rem',
               letterSpacing: '0.12em',
               fontFamily: 'monospace',
@@ -324,18 +322,18 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
         mouseRef.current.x * vw, mouseRef.current.y * vh, 0,
         mouseRef.current.x * vw, mouseRef.current.y * vh, vw * 0.5
       );
-      grad.addColorStop(0, 'rgba(0, 255, 240, 0.06)');
-      grad.addColorStop(0.4, 'rgba(0, 200, 220, 0.02)');
+      grad.addColorStop(0, 'rgba(164, 108, 252, 0.06)');
+      grad.addColorStop(0.4, 'rgba(140, 90, 220, 0.02)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, vw, vh);
       ctx.restore();
 
       const edgeGrad = ctx.createLinearGradient(0, 0, 0, vh);
-      edgeGrad.addColorStop(0, 'rgba(0, 255, 240, 0.08)');
-      edgeGrad.addColorStop(0.15, 'rgba(0, 255, 240, 0)');
-      edgeGrad.addColorStop(0.85, 'rgba(0, 255, 240, 0)');
-      edgeGrad.addColorStop(1, 'rgba(0, 255, 240, 0.06)');
+      edgeGrad.addColorStop(0, 'rgba(164, 108, 252, 0.08)');
+      edgeGrad.addColorStop(0.15, 'rgba(164, 108, 252, 0)');
+      edgeGrad.addColorStop(0.85, 'rgba(164, 108, 252, 0)');
+      edgeGrad.addColorStop(1, 'rgba(164, 108, 252, 0.06)');
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       ctx.fillStyle = edgeGrad;
@@ -347,7 +345,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
       const intensity = 0.03 + 0.02 * Math.sin(t * 0.05);
       for (let y = 0; y < vh; y += 2) {
         const lineAlpha = y % 4 === 0 ? intensity * 1.5 : intensity;
-        ctx.fillStyle = `rgba(0, 255, 255, ${lineAlpha})`;
+        ctx.fillStyle = `rgba(164, 108, 252, ${lineAlpha})`;
         ctx.fillRect(0, y, vw, 1);
       }
       ctx.restore();
@@ -359,11 +357,11 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
       ctx.globalCompositeOperation = 'screen';
       const drawScan = (sy: number, w: number, a: number) => {
         const sg = ctx.createLinearGradient(0, sy - w, 0, sy + w);
-        sg.addColorStop(0, 'rgba(0, 255, 255, 0)');
-        sg.addColorStop(0.3, `rgba(0, 255, 240, ${a * 0.4})`);
-        sg.addColorStop(0.5, `rgba(0, 255, 240, ${a})`);
-        sg.addColorStop(0.7, `rgba(0, 255, 240, ${a * 0.4})`);
-        sg.addColorStop(1, 'rgba(0, 255, 255, 0)');
+        sg.addColorStop(0, 'rgba(164, 108, 252, 0)');
+        sg.addColorStop(0.3, `rgba(177, 129, 252, ${a * 0.4})`);
+        sg.addColorStop(0.5, `rgba(164, 108, 252, ${a})`);
+        sg.addColorStop(0.7, `rgba(177, 129, 252, ${a * 0.4})`);
+        sg.addColorStop(1, 'rgba(164, 108, 252, 0)');
         ctx.fillStyle = sg;
         ctx.fillRect(0, sy - w, vw, w * 2);
       };
@@ -390,14 +388,14 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
       if (Math.random() > 0.985) {
         ctx.save();
         ctx.globalAlpha = 0.04 + Math.random() * 0.06;
-        ctx.fillStyle = '#0ff';
+        ctx.fillStyle = '#a46cfc';
         ctx.fillRect(0, 0, vw, vh);
         ctx.restore();
       }
 
       const vigGrad = ctx.createRadialGradient(vw / 2, vh / 2, vw * 0.25, vw / 2, vh / 2, vw * 0.7);
       vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      vigGrad.addColorStop(1, 'rgba(0,5,5,0.4)');
+      vigGrad.addColorStop(1, 'rgba(5,2,10,0.4)');
       ctx.save();
       ctx.fillStyle = vigGrad;
       ctx.fillRect(0, 0, vw, vh);
@@ -436,7 +434,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
             transition={{ duration: 0.5 }}
             onClick={onClose}
             className="fixed inset-0"
-            style={{ zIndex: 150, background: 'rgba(0,2,4,0.97)', backdropFilter: 'blur(30px)' }}
+            style={{ zIndex: 150, background: 'rgba(4,0,10,0.97)', backdropFilter: 'blur(30px)' }}
           >
             <FloatingParticles />
           </motion.div>
@@ -465,18 +463,18 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                   right: 0,
                   width: 40,
                   height: 40,
-                  background: 'rgba(0, 255, 240, 0.04)',
-                  border: '1px solid rgba(0, 255, 240, 0.2)',
+                  background: 'rgba(164, 108, 252, 0.04)',
+                  border: '1px solid rgba(164, 108, 252, 0.2)',
                   borderRadius: 2,
-                  color: 'rgba(0, 255, 240, 0.7)',
+                  color: 'rgba(164, 108, 252, 0.7)',
                   cursor: 'pointer',
                   zIndex: 10,
                 }}
                 whileHover={{
-                  background: 'rgba(0, 255, 240, 0.1)',
-                  borderColor: 'rgba(0, 255, 240, 0.5)',
-                  color: 'rgba(0, 255, 240, 1)',
-                  boxShadow: '0 0 20px rgba(0, 255, 240, 0.15)',
+                  background: 'rgba(164, 108, 252, 0.1)',
+                  borderColor: 'rgba(164, 108, 252, 0.5)',
+                  color: 'rgba(164, 108, 252, 1)',
+                  boxShadow: '0 0 20px rgba(164, 108, 252, 0.15)',
                 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -487,9 +485,9 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                 style={{ position: 'relative' }}
                 animate={playing ? {
                   boxShadow: [
-                    '0 0 40px rgba(0, 255, 240, 0.08), 0 0 80px rgba(0, 200, 220, 0.04)',
-                    '0 0 60px rgba(0, 255, 240, 0.12), 0 0 120px rgba(0, 200, 220, 0.06)',
-                    '0 0 40px rgba(0, 255, 240, 0.08), 0 0 80px rgba(0, 200, 220, 0.04)',
+                    '0 0 40px rgba(164, 108, 252, 0.08), 0 0 80px rgba(140, 90, 220, 0.04)',
+                    '0 0 60px rgba(164, 108, 252, 0.12), 0 0 120px rgba(140, 90, 220, 0.06)',
+                    '0 0 40px rgba(164, 108, 252, 0.08), 0 0 80px rgba(140, 90, 220, 0.04)',
                   ],
                 } : {}}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -506,15 +504,15 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                   animate={{
                     opacity: 1,
                     borderColor: playing
-                      ? ['rgba(0, 255, 240, 0.25)', 'rgba(0, 255, 240, 0.4)', 'rgba(0, 255, 240, 0.25)']
-                      : 'rgba(0, 255, 240, 0.15)',
+                      ? ['rgba(164, 108, 252, 0.25)', 'rgba(164, 108, 252, 0.4)', 'rgba(164, 108, 252, 0.25)']
+                      : 'rgba(164, 108, 252, 0.15)',
                     boxShadow: playing
                       ? [
-                          '0 0 20px rgba(0, 255, 240, 0.06), inset 0 0 20px rgba(0, 255, 240, 0.02)',
-                          '0 0 40px rgba(0, 255, 240, 0.1), inset 0 0 30px rgba(0, 255, 240, 0.04)',
-                          '0 0 20px rgba(0, 255, 240, 0.06), inset 0 0 20px rgba(0, 255, 240, 0.02)',
+                          '0 0 20px rgba(164, 108, 252, 0.06), inset 0 0 20px rgba(164, 108, 252, 0.02)',
+                          '0 0 40px rgba(164, 108, 252, 0.1), inset 0 0 30px rgba(164, 108, 252, 0.04)',
+                          '0 0 20px rgba(164, 108, 252, 0.06), inset 0 0 20px rgba(164, 108, 252, 0.02)',
                         ]
-                      : '0 0 20px rgba(0, 255, 240, 0.06)',
+                      : '0 0 20px rgba(164, 108, 252, 0.06)',
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
@@ -525,9 +523,9 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                     width: '100%',
                     aspectRatio: '16/9',
                     overflow: 'hidden',
-                    background: '#010808',
+                    background: '#080410',
                     borderRadius: 4,
-                    border: '1px solid rgba(0, 255, 240, 0.15)',
+                    border: '1px solid rgba(164, 108, 252, 0.15)',
                   }}
                 >
                   <video
@@ -567,12 +565,12 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.6 }}
                       className="absolute inset-0 flex flex-col items-center justify-center gap-6"
-                      style={{ background: 'radial-gradient(ellipse at center, rgba(0, 255, 240, 0.03) 0%, transparent 60%)' }}
+                      style={{ background: 'radial-gradient(ellipse at center, rgba(164, 108, 252, 0.03) 0%, transparent 60%)' }}
                     >
                       {bootPhase < 3 && (
                         <motion.div
                           style={{
-                            color: 'rgba(0, 255, 240, 0.4)',
+                            color: 'rgba(164, 108, 252, 0.5)',
                             fontSize: '0.55rem',
                             letterSpacing: '0.2em',
                             fontFamily: 'monospace',
@@ -608,7 +606,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                                 position: 'absolute',
                                 inset: 0,
                                 borderRadius: '50%',
-                                border: '1.5px solid rgba(0, 255, 240, 0.25)',
+                                border: '1.5px solid rgba(164, 108, 252, 0.25)',
                               }}
                               animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
                               transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -619,7 +617,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                                 position: 'absolute',
                                 inset: -8,
                                 borderRadius: '50%',
-                                border: '1px solid rgba(0, 255, 240, 0.1)',
+                                border: '1px solid rgba(164, 108, 252, 0.1)',
                               }}
                               animate={{ rotate: 360 }}
                               transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
@@ -630,7 +628,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                                 position: 'absolute',
                                 inset: -18,
                                 borderRadius: '50%',
-                                border: '1px dashed rgba(0, 255, 240, 0.06)',
+                                border: '1px dashed rgba(164, 108, 252, 0.06)',
                               }}
                               animate={{ rotate: -360 }}
                               transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
@@ -641,7 +639,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                                 position: 'absolute',
                                 inset: -28,
                                 borderRadius: '50%',
-                                border: '0.5px solid rgba(0, 255, 240, 0.04)',
+                                border: '0.5px solid rgba(164, 108, 252, 0.04)',
                               }}
                               animate={{ rotate: 360 }}
                               transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
@@ -653,7 +651,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                                 cy="65"
                                 r="60"
                                 fill="none"
-                                stroke="rgba(0, 255, 240, 0.3)"
+                                stroke="rgba(164, 108, 252, 0.3)"
                                 strokeWidth="1"
                                 strokeDasharray="8 12"
                                 initial={{ rotate: 0 }}
@@ -668,18 +666,18 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                                 width: 60,
                                 height: 60,
                                 borderRadius: '50%',
-                                background: 'radial-gradient(circle, rgba(0, 255, 240, 0.08) 0%, transparent 70%)',
+                                background: 'radial-gradient(circle, rgba(164, 108, 252, 0.08) 0%, transparent 70%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                               }}
-                              animate={{ boxShadow: ['0 0 30px rgba(0,255,240,0.05)', '0 0 50px rgba(0,255,240,0.1)', '0 0 30px rgba(0,255,240,0.05)'] }}
+                              animate={{ boxShadow: ['0 0 30px rgba(164,108,252,0.05)', '0 0 50px rgba(164,108,252,0.1)', '0 0 30px rgba(164,108,252,0.05)'] }}
                               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                             >
                               <Play
                                 size={28}
-                                fill="rgba(0, 255, 240, 0.5)"
-                                stroke="rgba(0, 255, 240, 0.8)"
+                                fill="rgba(164, 108, 252, 0.5)"
+                                stroke="rgba(164, 108, 252, 0.8)"
                                 strokeWidth={1.5}
                                 style={{ marginLeft: 3 }}
                               />
@@ -691,7 +689,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
                             style={{
-                              color: 'rgba(0, 255, 240, 0.5)',
+                              color: 'rgba(164, 108, 252, 0.6)',
                               fontSize: '0.65rem',
                               letterSpacing: '0.3em',
                               textTransform: 'uppercase',
@@ -716,7 +714,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                         left: 0,
                         right: 0,
                         height: 70,
-                        background: 'linear-gradient(to top, rgba(0, 8, 8, 0.8), transparent)',
+                        background: 'linear-gradient(to top, rgba(8, 4, 16, 0.8), transparent)',
                         pointerEvents: 'none',
                         display: 'flex',
                         alignItems: 'flex-end',
@@ -725,7 +723,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                       }}
                     >
                       <span style={{
-                        color: 'rgba(0, 255, 240, 0.4)',
+                        color: 'rgba(164, 108, 252, 0.5)',
                         fontSize: '0.55rem',
                         letterSpacing: '0.18em',
                         textTransform: 'uppercase',
@@ -743,7 +741,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                             key={i}
                             style={{
                               width: 2,
-                              background: 'rgba(0, 255, 240, 0.5)',
+                              background: 'rgba(164, 108, 252, 0.5)',
                               borderRadius: 1,
                             }}
                             animate={{ height: [4, 8 + Math.random() * 8, 4] }}
@@ -762,7 +760,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                     left: '5%',
                     right: '5%',
                     height: 50,
-                    background: 'radial-gradient(ellipse at center, rgba(0, 255, 240, 0.1) 0%, transparent 70%)',
+                    background: 'radial-gradient(ellipse at center, rgba(164, 108, 252, 0.1) 0%, transparent 70%)',
                     filter: 'blur(12px)',
                     pointerEvents: 'none',
                   }}
@@ -777,7 +775,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                     left: -30,
                     width: 1,
                     height: 60,
-                    background: 'linear-gradient(to bottom, transparent, rgba(0,255,240,0.15), transparent)',
+                    background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.15), transparent)',
                     pointerEvents: 'none',
                   }}
                   animate={{ height: [40, 80, 40], opacity: [0.3, 0.6, 0.3] }}
@@ -790,7 +788,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                     right: -30,
                     width: 1,
                     height: 60,
-                    background: 'linear-gradient(to bottom, transparent, rgba(0,255,240,0.15), transparent)',
+                    background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.15), transparent)',
                     pointerEvents: 'none',
                   }}
                   animate={{ height: [40, 80, 40], opacity: [0.3, 0.6, 0.3] }}

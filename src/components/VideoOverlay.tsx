@@ -45,15 +45,15 @@ export function VideoOverlay({ isOpen, onClose }: VideoOverlayProps) {
             transition={{ duration: 0.35 }}
             onClick={onClose}
             className="fixed inset-0"
-            style={{ zIndex: 150, background: 'rgba(5,5,5,0.92)', backdropFilter: 'blur(20px)' }}
+            style={{ zIndex: 150, background: 'rgba(4,0,10,0.94)', backdropFilter: 'blur(24px)' }}
           />
 
           <motion.div
             key="player"
-            initial={{ opacity: 0, scale: 0.96, y: 24 }}
+            initial={{ opacity: 0, scale: 0.92, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: -12 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+            exit={{ opacity: 0, scale: 0.95, y: -12 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 28 }}
             className="fixed inset-0 flex items-center justify-center p-4 md:p-10"
             style={{ zIndex: 151, pointerEvents: 'none' }}
           >
@@ -65,42 +65,79 @@ export function VideoOverlay({ isOpen, onClose }: VideoOverlayProps) {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close button */}
-              <button
+              <motion.button
                 onClick={onClose}
                 aria-label="Close"
-                className="absolute flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+                className="absolute flex items-center justify-center"
                 style={{
                   top: -48,
                   right: 0,
                   width: 40,
                   height: 40,
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  background: 'rgba(164, 108, 252, 0.06)',
+                  border: '1px solid rgba(164, 108, 252, 0.25)',
                   borderRadius: 2,
-                  color: '#fff',
+                  color: 'rgba(164, 108, 252, 0.8)',
                   cursor: 'pointer',
                   zIndex: 10,
                 }}
+                whileHover={{
+                  background: 'rgba(164, 108, 252, 0.12)',
+                  borderColor: 'rgba(164, 108, 252, 0.5)',
+                  color: '#a46cfc',
+                  boxShadow: '0 0 20px rgba(164, 108, 252, 0.15)',
+                }}
+                whileTap={{ scale: 0.9 }}
               >
                 <X size={18} strokeWidth={2} />
-              </button>
+              </motion.button>
 
-              {/* Video */}
-              <div
-                className="relative w-full overflow-hidden"
-                style={{ aspectRatio: '16/9', background: '#000' }}
+              <motion.div
+                style={{ position: 'relative' }}
+                animate={{
+                  boxShadow: [
+                    '0 0 30px rgba(164, 108, 252, 0.06), 0 0 60px rgba(140, 90, 220, 0.03)',
+                    '0 0 50px rgba(164, 108, 252, 0.1), 0 0 100px rgba(140, 90, 220, 0.05)',
+                    '0 0 30px rgba(164, 108, 252, 0.06), 0 0 60px rgba(140, 90, 220, 0.03)',
+                  ],
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <video
-                  ref={videoRef}
-                  src={VIDEO_URL}
-                  autoPlay
-                  controls
-                  playsInline
-                  className="absolute inset-0 w-full h-full"
-                  style={{ display: 'block', objectFit: 'cover' }}
+                <div
+                  className="relative w-full overflow-hidden"
+                  style={{
+                    aspectRatio: '16/9',
+                    background: '#080410',
+                    borderRadius: 4,
+                    border: '1px solid rgba(164, 108, 252, 0.2)',
+                  }}
+                >
+                  <video
+                    ref={videoRef}
+                    src={VIDEO_URL}
+                    autoPlay
+                    controls
+                    playsInline
+                    className="absolute inset-0 w-full h-full"
+                    style={{ display: 'block', objectFit: 'cover' }}
+                  />
+                </div>
+
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    bottom: -2,
+                    left: '8%',
+                    right: '8%',
+                    height: 40,
+                    background: 'radial-gradient(ellipse at center, rgba(164, 108, 252, 0.08) 0%, transparent 70%)',
+                    filter: 'blur(10px)',
+                    pointerEvents: 'none',
+                  }}
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </>

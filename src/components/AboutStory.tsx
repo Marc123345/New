@@ -1,14 +1,11 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
-  useMotionValue,
   Variants,
   AnimatePresence,
 } from 'motion/react';
-import { SignalGridPanel } from './SignalGridPanel';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -38,88 +35,68 @@ const scaleInItem: Variants = {
   },
 };
 
-function useMagnetic(strength = 0.2) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 150, damping: 15 });
-  const springY = useSpring(y, { stiffness: 150, damping: 15 });
+const CAPABILITIES = [
+  { tag: 'Strategy', desc: 'Brand positioning & market analysis' },
+  { tag: 'Creative', desc: 'Visual storytelling & content creation' },
+  { tag: 'Growth', desc: 'Performance marketing & scaling' },
+  { tag: 'Social', desc: 'Community management & engagement' },
+  { tag: 'Content', desc: 'Editorial planning & production' },
+  { tag: 'Analytics', desc: 'Data-driven insights & optimization' },
+];
 
-  const handleMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
-      y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
-    },
-    [x, y, strength],
-  );
-
-  const handleLeave = useCallback(() => {
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
-
-  return { ref, springX, springY, handleMove, handleLeave };
-}
-
-function GlassCard({
-  children,
-  className = '',
-  cardStyle = {},
-  noHoverLift = false,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  cardStyle?: React.CSSProperties;
-  noHoverLift?: boolean;
-}) {
-  const mag = useMagnetic(0.06);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    mag.handleMove(e);
-    if (!mag.ref.current) return;
-    const rect = mag.ref.current.getBoundingClientRect();
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
+function HologramFrame({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div variants={fadeUpItem} className={`relative h-full w-full ${className}`}>
-      <motion.div
-        ref={mag.ref}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => { mag.handleLeave(); setIsHovering(false); }}
-        style={{ x: mag.springX, y: mag.springY }}
-        className="relative h-full w-full"
+    <div className="hologram-container" style={{ position: 'relative' }}>
+      <div
+        style={{
+          position: 'absolute',
+          inset: -2,
+          borderRadius: 8,
+          padding: 2,
+          background: 'linear-gradient(135deg, #a46cfc 0%, #b181fc 40%, #a46cfc 70%, #b181fc 100%)',
+          backgroundSize: '300% 300%',
+          animation: 'hologramBorder 4s ease infinite',
+          zIndex: 0,
+        }}
       >
-        <motion.div
-          whileHover={noHoverLift ? {} : {
-            y: -4,
-            transition: { type: 'spring', stiffness: 400, damping: 25 },
-          }}
-          className="relative h-full w-full overflow-hidden"
+        <div style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: 6,
+          background: 'rgba(14,11,31,0.95)',
+        }} />
+      </div>
+
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          borderRadius: 6,
+          overflow: 'hidden',
+          boxShadow: '0 0 40px rgba(164,108,252,0.15), 0 0 80px rgba(164,108,252,0.06)',
+        }}
+      >
+        <div
+          className="pointer-events-none"
           style={{
-            border: '1px solid rgba(164,108,252,0.1)',
-            borderRadius: 6,
-            ...cardStyle,
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(164,108,252,0.03) 2px, rgba(164,108,252,0.03) 4px)',
           }}
-        >
-          <motion.div
-            className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-500"
-            style={{
-              opacity: isHovering ? 1 : 0,
-              background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(164,108,252,0.06), transparent 40%)`,
-            }}
-          />
-          <div className="relative z-10 h-full w-full flex flex-col">
-            {children}
-          </div>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+        />
+        <div
+          className="pointer-events-none"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 11,
+            background: 'linear-gradient(180deg, rgba(164,108,252,0.08) 0%, transparent 15%, transparent 85%, rgba(164,108,252,0.06) 100%)',
+          }}
+        />
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -166,62 +143,6 @@ function SectionBadge({ label }: { label: string }) {
   );
 }
 
-function FloatingOrb({ delay, size, x, y }: { delay: number; size: number; x: string; y: string }) {
-  return (
-    <motion.div
-      className="absolute rounded-full pointer-events-none"
-      style={{
-        width: size,
-        height: size,
-        left: x,
-        top: y,
-        background: 'radial-gradient(circle, rgba(164,108,252,0.06) 0%, transparent 70%)',
-        filter: 'blur(60px)',
-      }}
-      animate={{
-        y: [0, -40, 0],
-        x: [0, 20, 0],
-        scale: [1, 1.15, 1],
-        opacity: [0.2, 0.5, 0.2],
-      }}
-      transition={{
-        duration: 10 + delay * 2,
-        repeat: Infinity,
-        ease: 'easeInOut',
-        delay,
-      }}
-    />
-  );
-}
-
-function CellLabel({ text }: { text: string }) {
-  return (
-    <span
-      className="inline-block w-full"
-      style={{
-        fontSize: '0.55rem',
-        fontWeight: 700,
-        letterSpacing: '0.25em',
-        textTransform: 'uppercase',
-        color: 'rgba(164,108,252,0.6)',
-        fontFamily: 'var(--font-stack-heading)',
-        marginBottom: '0.75rem',
-      }}
-    >
-      {text}
-    </span>
-  );
-}
-
-const CAPABILITIES = [
-  { tag: 'Strategy', desc: 'Brand positioning & market analysis' },
-  { tag: 'Creative', desc: 'Visual storytelling & content creation' },
-  { tag: 'Growth', desc: 'Performance marketing & scaling' },
-  { tag: 'Social', desc: 'Community management & engagement' },
-  { tag: 'Content', desc: 'Editorial planning & production' },
-  { tag: 'Analytics', desc: 'Data-driven insights & optimization' },
-];
-
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeCapability, setActiveCapability] = useState<number | null>(null);
@@ -232,8 +153,6 @@ export function AboutStory() {
   });
 
   const contentParallax = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
-  const videoParallax = useTransform(scrollYProgress, [0, 1], ['5%', '-5%']);
-  const networkFloat = useTransform(scrollYProgress, [0.2, 0.8], [10, -10]);
 
   return (
     <section
@@ -245,9 +164,17 @@ export function AboutStory() {
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
-      <FloatingOrb delay={0} size={500} x="5%" y="10%" />
-      <FloatingOrb delay={3} size={350} x="75%" y="55%" />
-      <FloatingOrb delay={1.5} size={280} x="50%" y="80%" />
+      <style>{`
+        @keyframes hologramBorder {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes scanlineSweep {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+      `}</style>
 
       <div
         className="absolute inset-0 pointer-events-none"
@@ -302,232 +229,230 @@ export function AboutStory() {
               Connection
             </motion.span>
           </h2>
-
-          <motion.p
-            className="max-w-xl mt-8"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.25, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-body)',
-              fontSize: 'clamp(1rem, 1.6vw, 1.1rem)',
-              lineHeight: 1.75,
-              color: 'rgba(232,226,255,0.45)',
-            }}
-          >
-            We believe the most impactful brands are the ones that know how to
-            connect, not just communicate. People want personality -- brands that
-            speak like humans and offer something meaningful.
-          </motion.p>
         </div>
 
         <motion.div
-          className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4"
+          className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-60px' }}
         >
-          <div className="lg:col-span-7 h-full">
-            <GlassCard
-              cardStyle={{
-                padding: 0,
-                background: 'rgba(14,11,31,0.8)',
-                minHeight: '480px',
-                overflow: 'hidden',
-              }}
-              noHoverLift
-            >
-              <motion.div className="relative w-full h-full" style={{ y: videoParallax }}>
+          <motion.div className="lg:col-span-5" variants={fadeUpItem}>
+            <HologramFrame>
+              <div style={{ position: 'relative' }}>
                 <video
                   autoPlay
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover"
-                  style={{ minHeight: '520px' }}
+                  className="w-full object-cover"
+                  style={{ aspectRatio: '4 / 5', display: 'block' }}
                   src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4"
                 />
                 <div
-                  className="absolute inset-0"
+                  className="pointer-events-none"
                   style={{
+                    position: 'absolute',
+                    inset: 0,
                     background: `
-                      linear-gradient(180deg, rgba(14,11,31,0.4) 0%, transparent 30%),
-                      linear-gradient(180deg, transparent 50%, rgba(14,11,31,0.9) 100%)
+                      linear-gradient(180deg, rgba(14,11,31,0.3) 0%, transparent 25%),
+                      linear-gradient(180deg, transparent 70%, rgba(14,11,31,0.7) 100%)
                     `,
                   }}
                 />
-                <motion.div
-                  className="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-7 md:px-7 md:pb-7 md:pt-9"
-                  initial={{ opacity: 0, y: 25 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.9, delay: 0.4 }}
-                >
-                  <CellLabel text="Our Story" />
-                  <p
-                    className="font-semibold max-w-sm"
-                    style={{
-                      color: 'var(--color-text-dark)',
-                      fontFamily: 'var(--font-stack-body)',
-                      fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                      lineHeight: 1.45,
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    A social-first agency built to help brands grow by making their
-                    digital presence feel more human.
-                  </p>
-                  <motion.div
-                    className="mt-5 h-px"
-                    style={{ background: 'rgba(164,108,252,0.25)', transformOrigin: 'left' }}
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.2, delay: 0.7, ease: EASE_OUT_EXPO }}
-                  />
-                </motion.div>
-              </motion.div>
-            </GlassCard>
-          </div>
+                <div
+                  className="pointer-events-none"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    height: '200%',
+                    top: 0,
+                    background: 'linear-gradient(180deg, transparent 0%, rgba(164,108,252,0.04) 50%, transparent 100%)',
+                    animation: 'scanlineSweep 6s linear infinite',
+                    zIndex: 12,
+                  }}
+                />
+              </div>
+            </HologramFrame>
+          </motion.div>
 
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            <motion.div className="flex-1" style={{ y: networkFloat }}>
-              <GlassCard
-                cardStyle={{
-                  padding: 0,
-                  background: 'rgba(14,11,31,0.6)',
-                  minHeight: '300px',
-                  display: 'flex',
-                  alignItems: 'stretch',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                }}
-                noHoverLift
-              >
-                <div className="relative w-full h-full" style={{ minHeight: '300px' }}>
-                  <SignalGridPanel />
-                  <div
-                    className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5"
-                    style={{
-                      background: 'rgba(14,11,31,0.7)',
-                      border: '1px solid rgba(164,108,252,0.12)',
-                      backdropFilter: 'blur(10px)',
-                      borderRadius: 4,
-                    }}
-                  >
-                    <span
-                      className="text-[0.55rem] uppercase"
-                      style={{
-                        color: 'rgba(232,226,255,0.5)',
-                        letterSpacing: '0.15em',
-                        fontFamily: 'var(--font-stack-heading)',
-                      }}
-                    >
-                      Live Network
-                    </span>
-                    <motion.span
-                      className="inline-block rounded-full"
-                      style={{ width: 5, height: 5, background: '#4ade80' }}
-                      animate={{ opacity: [1, 0.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </div>
-                </div>
-              </GlassCard>
-            </motion.div>
-
-            <GlassCard
-              cardStyle={{
-                background: 'var(--color-text-dark)',
-                padding: 'clamp(1.5rem, 3vw, 2rem)',
-                justifyContent: 'center',
-              }}
+          <motion.div
+            className="lg:col-span-7 flex flex-col justify-center"
+            variants={fadeUpItem}
+          >
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
             >
-              <p
-                className="font-bold"
+              <span
+                className="inline-block mb-6"
                 style={{
-                  color: 'var(--color-primary)',
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1rem, 1.6vw, 1.15rem)',
-                  lineHeight: 1.45,
-                  letterSpacing: '-0.02em',
+                  fontSize: '0.55rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(164,108,252,0.6)',
+                  fontFamily: 'var(--font-stack-heading)',
                 }}
               >
-                We combine insight with efficiency to build brand ecosystems
+                Our Story
+              </span>
+
+              <p
+                style={{
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
+                  lineHeight: 1.75,
+                  color: 'rgba(232,226,255,0.55)',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                We started with a simple belief: the most impactful brands don't just
+                broadcast -- they connect. In a world saturated with noise, people
+                gravitate toward brands that feel human, speak with personality, and
+                offer something genuinely meaningful.
+              </p>
+
+              <p
+                style={{
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
+                  lineHeight: 1.75,
+                  color: 'rgba(232,226,255,0.55)',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                That's why we built a social-first agency grounded in insight and
+                efficiency -- helping brands grow by making every digital touchpoint
+                feel real and every interaction count.
+              </p>
+
+              <p
+                className="font-semibold"
+                style={{
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
+                  lineHeight: 1.75,
+                  color: 'var(--color-text-dark)',
+                  marginBottom: '2.5rem',
+                }}
+              >
+                We combine strategy, creative, and data to build brand ecosystems
                 that work -- across every platform and stage of growth.
               </p>
-            </GlassCard>
-          </div>
 
-          <div className="lg:col-span-12 mt-6">
-            <motion.div
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-40px' }}
-            >
-              {CAPABILITIES.map((cap, i) => (
-                <motion.div
-                  key={cap.tag}
-                  variants={scaleInItem}
-                  onHoverStart={() => setActiveCapability(i)}
-                  onHoverEnd={() => setActiveCapability(null)}
-                  className="relative px-4 py-4 cursor-default"
+              <motion.div
+                className="h-px mb-8"
+                style={{ background: 'rgba(164,108,252,0.2)', transformOrigin: 'left' }}
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
+              />
+
+              <motion.a
+                href="#contact"
+                className="inline-flex items-center gap-3 group cursor-pointer"
+                style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-text-dark)',
+                  textDecoration: 'none',
+                  padding: '14px 32px',
+                  border: '1px solid rgba(164,108,252,0.3)',
+                  borderRadius: 4,
+                  background: 'rgba(164,108,252,0.06)',
+                  transition: 'all 0.3s ease',
+                }}
+                whileHover={{
+                  background: 'rgba(164,108,252,0.14)',
+                  borderColor: 'rgba(164,108,252,0.5)',
+                  y: -2,
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Why We Exist
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </motion.a>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
+        <div className="w-full mt-16 md:mt-24">
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-40px' }}
+          >
+            {CAPABILITIES.map((cap, i) => (
+              <motion.div
+                key={cap.tag}
+                variants={scaleInItem}
+                onHoverStart={() => setActiveCapability(i)}
+                onHoverEnd={() => setActiveCapability(null)}
+                className="relative px-4 py-4 cursor-default"
+                style={{
+                  border: `1px solid ${activeCapability === i ? 'rgba(164,108,252,0.25)' : 'rgba(164,108,252,0.08)'}`,
+                  background: activeCapability === i
+                    ? 'rgba(164,108,252,0.08)'
+                    : 'rgba(164,108,252,0.02)',
+                  borderRadius: 6,
+                  transition: 'background 0.3s ease, border-color 0.3s ease',
+                }}
+              >
+                <span
+                  className="block text-[0.7rem] font-semibold uppercase tracking-[0.15em]"
                   style={{
-                    border: `1px solid ${activeCapability === i ? 'rgba(164,108,252,0.25)' : 'rgba(164,108,252,0.08)'}`,
-                    background: activeCapability === i
-                      ? 'rgba(164,108,252,0.08)'
-                      : 'rgba(164,108,252,0.02)',
-                    borderRadius: 6,
-                    transition: 'background 0.3s ease, border-color 0.3s ease',
+                    fontFamily: 'var(--font-stack-heading)',
+                    color: activeCapability === i ? 'var(--color-text-dark)' : 'rgba(232,226,255,0.5)',
+                    transition: 'color 0.3s ease',
                   }}
                 >
-                  <span
-                    className="block text-[0.7rem] font-semibold uppercase tracking-[0.15em]"
-                    style={{
-                      fontFamily: 'var(--font-stack-heading)',
-                      color: activeCapability === i ? 'var(--color-text-dark)' : 'rgba(232,226,255,0.5)',
-                      transition: 'color 0.3s ease',
-                    }}
-                  >
-                    {cap.tag}
-                  </span>
-                  <AnimatePresence>
-                    {activeCapability === i && (
-                      <motion.span
-                        className="block mt-1.5 text-[0.65rem]"
-                        style={{
-                          color: 'rgba(232,226,255,0.4)',
-                          fontFamily: 'var(--font-stack-body)',
-                          lineHeight: 1.4,
-                        }}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        {cap.desc}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                  <motion.div
-                    className="absolute bottom-0 left-2 right-2 h-px"
-                    style={{
-                      background: 'var(--color-secondary)',
-                      transformOrigin: 'left',
-                      scaleX: activeCapability === i ? 1 : 0,
-                      opacity: activeCapability === i ? 0.4 : 0,
-                      transition: 'transform 0.4s ease, opacity 0.4s ease',
-                    }}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </motion.div>
+                  {cap.tag}
+                </span>
+                <AnimatePresence>
+                  {activeCapability === i && (
+                    <motion.span
+                      className="block mt-1.5 text-[0.65rem]"
+                      style={{
+                        color: 'rgba(232,226,255,0.4)',
+                        fontFamily: 'var(--font-stack-body)',
+                        lineHeight: 1.4,
+                      }}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      {cap.desc}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                <motion.div
+                  className="absolute bottom-0 left-2 right-2 h-px"
+                  style={{
+                    background: 'var(--color-secondary)',
+                    transformOrigin: 'left',
+                    scaleX: activeCapability === i ? 1 : 0,
+                    opacity: activeCapability === i ? 0.4 : 0,
+                    transition: 'transform 0.4s ease, opacity 0.4s ease',
+                  }}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </motion.div>
     </section>
   );

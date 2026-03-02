@@ -1,8 +1,8 @@
 interface OrbitRingProps {
   radius: number;
   strokeColor?: string;
-  dashArray?: string;
-  duration?: number;
+  dashPattern?: string;
+  rotationDuration?: number;
   reverse?: boolean;
   paused?: boolean;
 }
@@ -10,8 +10,8 @@ interface OrbitRingProps {
 export function OrbitRing({
   radius,
   strokeColor = 'rgba(164,108,252,0.12)',
-  dashArray = '4 8',
-  duration = 90,
+  dashPattern = '4 8',
+  rotationDuration = 90,
   reverse = false,
   paused = false,
 }: OrbitRingProps) {
@@ -22,7 +22,7 @@ export function OrbitRing({
     <svg
       width={size}
       height={size}
-      className="absolute"
+      className="absolute hidden md:block"
       style={{
         top: '50%',
         left: '50%',
@@ -38,9 +38,9 @@ export function OrbitRing({
         fill="none"
         stroke={strokeColor}
         strokeWidth={1}
-        strokeDasharray={dashArray}
+        strokeDasharray={dashPattern}
         style={{
-          animation: paused ? 'none' : `orbitSpin ${duration}s linear infinite`,
+          animation: paused ? 'none' : `orbitSpin ${rotationDuration}s linear infinite`,
           animationDirection: reverse ? 'reverse' : 'normal',
           transformOrigin: `${center}px ${center}px`,
         }}

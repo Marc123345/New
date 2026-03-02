@@ -48,15 +48,15 @@ export function HeroGalaxy() {
         <OrbitRing
           radius={INNER_RADIUS}
           strokeColor="rgba(164,108,252,0.14)"
-          dashArray="4 8"
-          duration={90}
+          dashPattern="4 8"
+          rotationDuration={90}
           paused={hovering}
         />
         <OrbitRing
           radius={OUTER_RADIUS}
           strokeColor="rgba(164,108,252,0.08)"
-          dashArray="6 12"
-          duration={120}
+          dashPattern="6 12"
+          rotationDuration={120}
           reverse
           paused={hovering}
         />

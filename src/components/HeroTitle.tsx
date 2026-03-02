@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { VideoOverlay } from './VideoOverlay';
 import { HologramOverlay } from './HologramOverlay';
+import { PenEraseTransition } from './PenEraseTransition';
 import { HeroGalaxy } from './galaxy/HeroGalaxy';
 
 function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
@@ -60,7 +61,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
               textShadow: '0 2px 20px rgba(0,0,0,0.5)',
             }}
           >
-            From <span className="outline-text">B2B</span>{' '}
+            From <PenEraseTransition />{' '}
             to <span className="outline-text">H2H</span>
             <br />
             Build a Brand People

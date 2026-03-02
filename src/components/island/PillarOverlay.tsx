@@ -1,15 +1,13 @@
-import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
-import { useOverlay } from '../../hooks/useOverlay';
-
-const ALL_SERVICES = PILLARS;
 
 const PILLAR_ACCENTS = [
-  { from: '#6b21a8', to: '#9333ea', light: 'rgba(107,33,168,0.14)', border: 'rgba(147,51,234,0.3)', dot: '#c084fc' },
-  { from: '#4a1d96', to: '#7c3aed', light: 'rgba(74,29,150,0.14)', border: 'rgba(124,58,237,0.3)', dot: '#a78bfa' },
-  { from: '#2e1065', to: '#5b21b6', light: 'rgba(46,16,101,0.14)', border: 'rgba(91,33,182,0.3)', dot: '#8b5cf6' },
+  { from: '#291e56', to: '#4a2d8a', light: 'rgba(164,108,252,0.12)', border: 'rgba(164,108,252,0.35)', dot: '#a46cfc' },
+  { from: '#3d2670', to: '#7c4bc0', light: 'rgba(177,129,252,0.15)', border: 'rgba(177,129,252,0.45)', dot: '#c084fc' },
+  { from: '#4a2d8a', to: '#a46cfc', light: 'rgba(177,129,252,0.18)', border: 'rgba(177,129,252,0.5)', dot: '#b181fc' },
 ];
 
 interface PillarOverlayProps {
@@ -19,379 +17,292 @@ interface PillarOverlayProps {
 }
 
 export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverlayProps) {
-  useOverlay(pillarIndex !== null, onClose);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  const activeIndexRef = useRef<number | null>(null);
+  if (pillarIndex !== null) {
+    activeIndexRef.current = pillarIndex;
+  }
+
+  const displayIndex = pillarIndex !== null ? pillarIndex : activeIndexRef.current;
+  const displayService = displayIndex !== null ? PILLARS[displayIndex] : null;
+  const accent = displayIndex !== null ? PILLAR_ACCENTS[displayIndex] : PILLAR_ACCENTS[0];
 
   useEffect(() => {
-    if (pillarIndex === null) return;
-    const timer = setTimeout(() => modalRef.current?.focus(), 100);
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft' && pillarIndex > 0) { e.preventDefault(); onNavigate(pillarIndex - 1); }
-      if (e.key === 'ArrowRight' && pillarIndex < ALL_SERVICES.length - 1) { e.preventDefault(); onNavigate(pillarIndex + 1); }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => { clearTimeout(timer); window.removeEventListener('keydown', handleKeyDown); };
-  }, [pillarIndex, onClose, onNavigate]);
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (contentRef.current) contentRef.current.scrollTop = 0;
+    if (pillarIndex !== null) {
+      document.body.style.overflow = 'hidden';
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+        if (e.key === 'ArrowRight' && displayIndex !== null && displayIndex < PILLARS.length - 1) onNavigate(displayIndex + 1);
+        if (e.key === 'ArrowLeft' && displayIndex !== null && displayIndex > 0) onNavigate(displayIndex - 1);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [pillarIndex, onClose, displayIndex, onNavigate]);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [pillarIndex]);
 
-  const activeService = pillarIndex !== null ? ALL_SERVICES[pillarIndex] : null;
-  const accent = pillarIndex !== null ? PILLAR_ACCENTS[pillarIndex] : PILLAR_ACCENTS[0];
-  const hasPrev = pillarIndex !== null && pillarIndex > 0;
-  const hasNext = pillarIndex !== null && pillarIndex < ALL_SERVICES.length - 1;
+  if (!mounted) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      {pillarIndex !== null && activeService && (
-        <>
+      {pillarIndex !== null && displayService && (
+        <motion.div
+          key="pillar-overlay-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={onClose}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0e0820]/80 p-4 sm:p-6 md:p-12 pointer-events-auto"
+          style={{ backdropFilter: 'blur(8px)' }}
+        >
           <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            onClick={onClose}
-            className="fixed inset-0 z-[150]"
-            style={{ background: 'rgba(4,4,8,0.82)', backdropFilter: 'blur(20px)' }}
-          />
-
-          <motion.div
-            key="container"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[151] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-8"
-            onClick={onClose}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="service-title"
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: 20, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex flex-col w-full max-w-4xl bg-[#0e0820] shadow-2xl overflow-hidden"
+            style={{
+              maxHeight: 'calc(100vh - 2rem)',
+              border: `2px solid ${accent.border}`,
+              boxShadow: `0 25px 50px -12px rgba(0,0,0,0.5), 0 0 30px ${accent.light}`,
+              borderRadius: '1rem',
+            }}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                ref={modalRef}
-                key={pillarIndex}
-                tabIndex={-1}
-                initial={{ opacity: 0, y: 48, scale: 0.92 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -24, scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 280, damping: 28, mass: 0.85 }}
-                onClick={(e) => e.stopPropagation()}
-                className="relative w-full focus:outline-none flex flex-col"
-                style={{
-                  maxWidth: 760,
-                  maxHeight: '88dvh',
-                  borderRadius: '0',
-                  background: 'linear-gradient(145deg, #0d0d14 0%, #111118 100%)',
-                  border: `1px solid ${accent.border}`,
-                  boxShadow: `0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px -16px rgba(0,0,0,0.8), 0 0 60px -20px ${accent.from}55`,
-                }}
-              >
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                  className="h-[3px] w-full origin-left flex-shrink-0"
-                  style={{ background: `linear-gradient(to right, ${accent.from}, ${accent.to}, transparent)` }}
-                />
+            <div
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xl h-64 blur-[100px] rounded-full opacity-30 pointer-events-none transition-colors duration-700"
+              style={{ backgroundColor: accent.dot }}
+            />
 
-                <div
-                  className="relative flex-shrink-0 px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-7"
-                  style={{ borderBottom: `1px solid rgba(255,255,255,0.06)` }}
-                >
-                  <div
-                    className="absolute right-6 top-4 select-none pointer-events-none font-black leading-none hidden sm:block"
-                    aria-hidden="true"
-                    style={{
-                      fontSize: 'clamp(5rem, 12vw, 8rem)',
-                      color: 'rgba(255,255,255,0.03)',
-                      fontFamily: 'var(--font-stack-heading)',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {String(pillarIndex + 1).padStart(2, '0')}
-                  </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-4 right-4 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-black/40 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group backdrop-blur-md"
+              aria-label="Close overlay"
+            >
+              <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+            </button>
 
-                  <motion.button
-                    onClick={onClose}
-                    aria-label="Close overlay"
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.25, type: 'spring', stiffness: 320, damping: 22 }}
-                    className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
-                    style={{
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      background: 'rgba(255,255,255,0.05)',
-                      color: 'rgba(255,255,255,0.6)',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-                  >
-                    <X size={16} strokeWidth={2} />
-                  </motion.button>
-
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto min-h-0 px-6 sm:px-10 py-10 scrollbar-hide relative z-10"
+            >
+              <div className="max-w-3xl mx-auto space-y-12">
+                {displayService.image && (
                   <motion.div
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.12, duration: 0.45 }}
-                    className="flex items-center gap-3 mb-4 sm:mb-5"
+                    key={`image-${displayIndex}`}
+                    initial={{ opacity: 0, scale: 1.03 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="relative w-full overflow-hidden rounded-xl"
+                    style={{
+                      height: 'clamp(200px, 30vw, 320px)',
+                      border: `2px solid ${accent.border}`,
+                      boxShadow: `6px 6px 0 ${accent.dot}55`,
+                    }}
                   >
-                    <span
-                      className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.35em]"
-                      style={{ color: accent.dot, fontFamily: 'var(--font-stack-heading)' }}
-                    >
-                      <span
-                        className="inline-block w-4 h-[1px]"
-                        style={{ background: accent.dot }}
-                      />
-                      {activeService.subtitle}
-                    </span>
-                    <span
-                      className="text-[10px] tracking-[0.08em]"
-                      style={{ color: 'rgba(255,255,255,0.18)', fontFamily: 'var(--font-stack-heading)' }}
-                    >
-                      {pillarIndex + 1} / {ALL_SERVICES.length}
-                    </span>
-                  </motion.div>
-
-                  <div className="flex items-start gap-5">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.6 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.2, type: 'spring', stiffness: 280, damping: 20 }}
-                      className="flex-shrink-0 flex h-14 w-14 items-center justify-center"
-                      style={{
-                        border: `1px solid ${accent.border}`,
-                        background: accent.light,
-                        color: accent.dot,
-                      }}
-                    >
-                      {activeService.icon}
-                    </motion.div>
-
-                    <div className="flex-1 min-w-0">
-                      <motion.h3
-                        id="service-title"
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.22, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                        className="font-bold leading-[1.1] tracking-[-0.025em]"
-                        style={{
-                          fontSize: 'clamp(1.9rem, 4.5vw, 2.6rem)',
-                          color: '#fff',
-                          fontFamily: 'var(--font-stack-heading)',
-                        }}
-                      >
-                        {activeService.title}
-                      </motion.h3>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  ref={contentRef}
-                  className="flex-1 overflow-y-auto"
-                  style={{ scrollbarWidth: 'thin', scrollbarColor: `${accent.border} transparent` }}
-                >
-                  <div className="px-5 py-5 sm:px-8 sm:py-7 space-y-6 sm:space-y-8">
-
-                    <motion.p
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.28, duration: 0.5 }}
-                      className="leading-[1.75] text-base"
-                      style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'var(--font-stack-body)' }}
-                    >
-                      {activeService.description}
-                    </motion.p>
-
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.34, duration: 0.5 }}
-                      className="grid grid-cols-3 gap-px overflow-hidden"
-                      style={{ border: `1px solid ${accent.border}`, background: accent.border }}
-                    >
-                      {activeService.stats.map((stat: { value: string; label: string }, i: number) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4 + i * 0.07, type: 'spring', stiffness: 300, damping: 22 }}
-                          className="flex flex-col items-center justify-center py-4 px-2 sm:py-5 sm:px-4 text-center"
-                          style={{ background: '#0d0d14' }}
-                        >
-                          <div
-                            className="font-extrabold leading-none tracking-[-0.03em] mb-1.5"
-                            style={{
-                              fontSize: 'clamp(1.1rem, 4vw, 1.85rem)',
-                              color: accent.dot,
-                              fontFamily: 'var(--font-stack-heading)',
-                            }}
-                          >
-                            {stat.value}
-                          </div>
-                          <div
-                            className="text-[10px] sm:text-[11px] leading-[1.4] tracking-[0.03em]"
-                            style={{ color: 'rgba(255,255,255,0.32)', fontFamily: 'var(--font-stack-body)' }}
-                          >
-                            {stat.label}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.48, duration: 0.5 }}
-                    >
-                      <div
-                        className="flex items-center gap-3 mb-4"
-                      >
-                        <span
-                          className="text-[10px] uppercase tracking-[0.35em]"
-                          style={{ color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-stack-heading)' }}
-                        >
-                          What We Deliver
-                        </span>
-                        <span
-                          className="flex-1 h-px"
-                          style={{ background: 'rgba(255,255,255,0.06)' }}
-                        />
+                    <img
+                      src={displayService.image}
+                      alt={displayService.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: `linear-gradient(to top, #0e0820 0%, transparent 50%, ${accent.from}88 100%)` }}
+                    />
+                    <div className="absolute bottom-4 left-5">
+                      <div className="flex items-center gap-3 font-mono tracking-tighter uppercase text-sm font-semibold" style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+                        <span className="h-px w-8" style={{ backgroundColor: accent.dot }} />
+                        {displayService.subtitle}
                       </div>
-
-                      <ul className="grid sm:grid-cols-2 gap-2">
-                        {(activeService.whatWeDo as string[]).map((item: string, i: number) => (
-                          <motion.li
-                            key={i}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.52 + i * 0.045, duration: 0.38 }}
-                            className="flex items-start gap-3 py-2.5 px-3"
-                            style={{
-                              background: 'rgba(255,255,255,0.025)',
-                              border: '1px solid rgba(255,255,255,0.05)',
-                            }}
-                          >
-                            <span
-                              className="mt-[1px] flex-shrink-0"
-                              style={{ color: accent.dot }}
-                            >
-                              <Check size={13} strokeWidth={2.5} />
-                            </span>
-                            <span
-                              className="text-[0.875rem] leading-snug"
-                              style={{ color: 'rgba(255,255,255,0.62)', fontFamily: 'var(--font-stack-body)' }}
-                            >
-                              {item}
-                            </span>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    </motion.div>
-
-                    {activeService.closingNote && (
-                      <motion.blockquote
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.72, duration: 0.5 }}
-                        className="relative pl-5 text-[0.9rem] leading-[1.75] italic"
-                        style={{
-                          color: 'rgba(255,255,255,0.42)',
-                          fontFamily: 'var(--font-stack-body)',
-                          borderLeft: `2px solid ${accent.dot}`,
-                        }}
-                      >
-                        {activeService.closingNote}
-                      </motion.blockquote>
-                    )}
-
-                  </div>
-                </div>
+                    </div>
+                  </motion.div>
+                )}
 
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.4 }}
-                  className="flex-shrink-0 flex items-center justify-between px-3 py-3 sm:px-8 sm:py-5"
-                  style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.25)' }}
+                  key={`header-${displayIndex}`}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4 pt-2"
                 >
-                  <button
-                    onClick={() => hasPrev && onNavigate(pillarIndex - 1)}
-                    disabled={!hasPrev}
-                    aria-label="Previous pillar"
-                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-2.5 py-2 sm:px-4 sm:py-2.5"
-                    style={{
-                      fontFamily: 'var(--font-stack-heading)',
-                      fontSize: 11,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: hasPrev ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.12)',
-                      cursor: hasPrev ? 'pointer' : 'default',
-                      border: hasPrev ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
-                      background: 'none',
-                    }}
-                    onMouseEnter={e => { if (hasPrev) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
-                    onMouseLeave={e => { if (hasPrev) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'none'; } }}
-                  >
-                    <ArrowLeft size={13} />
-                    <span className="hidden sm:inline">Prev</span>
-                  </button>
-
-                  <nav className="flex items-center gap-2" aria-label="Pillar pagination">
-                    {ALL_SERVICES.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => onNavigate(i)}
-                        aria-label={`Go to ${ALL_SERVICES[i].title}`}
-                        aria-current={i === pillarIndex ? 'step' : undefined}
-                        className="transition-all duration-300"
-                        style={{
-                          width: i === pillarIndex ? 28 : 7,
-                          height: 7,
-                          background: i === pillarIndex ? accent.dot : 'rgba(255,255,255,0.1)',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: 0,
-                          borderRadius: 0,
-                        }}
-                      />
-                    ))}
-                  </nav>
-
-                  <button
-                    onClick={() => hasNext && onNavigate(pillarIndex + 1)}
-                    disabled={!hasNext}
-                    aria-label="Next pillar"
-                    className="group inline-flex items-center gap-1.5 sm:gap-2 transition-all duration-200 px-2.5 py-2 sm:px-4 sm:py-2.5"
-                    style={{
-                      fontFamily: 'var(--font-stack-heading)',
-                      fontSize: 11,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: hasNext ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.12)',
-                      cursor: hasNext ? 'pointer' : 'default',
-                      border: hasNext ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
-                      background: 'none',
-                    }}
-                    onMouseEnter={e => { if (hasNext) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
-                    onMouseLeave={e => { if (hasNext) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'none'; } }}
-                  >
-                    <span className="hidden sm:inline">Next</span>
-                    <ArrowRight size={13} />
-                  </button>
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none">
+                    {displayService.title}
+                  </h2>
+                  <p className="text-lg sm:text-xl text-white/70 leading-relaxed max-w-2xl">
+                    {displayService.description}
+                  </p>
                 </motion.div>
 
-              </motion.div>
-            </AnimatePresence>
+                <motion.div
+                  key={`stats-${displayIndex}`}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="grid grid-cols-3 gap-3 sm:gap-6"
+                >
+                  {displayService.stats.map((s, i) => (
+                    <div
+                      key={i}
+                      className="p-4 sm:p-6 bg-black/20 backdrop-blur-md text-center relative overflow-hidden group transition-all duration-300 rounded-lg"
+                      style={{
+                        border: `1px solid ${accent.border}`,
+                        boxShadow: `4px 4px 0 ${accent.dot}44`,
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLDivElement).style.boxShadow = `6px 6px 0 ${accent.dot}66`;
+                        (e.currentTarget as HTMLDivElement).style.transform = `translate(-2px, -2px)`;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLDivElement).style.boxShadow = `4px 4px 0 ${accent.dot}44`;
+                        (e.currentTarget as HTMLDivElement).style.transform = `translate(0, 0)`;
+                      }}
+                    >
+                      <div
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
+                      />
+                      <div className="relative z-10 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: accent.dot }}>{s.value}</div>
+                      <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mt-2">{s.label}</div>
+                    </div>
+                  ))}
+                </motion.div>
+
+                <motion.div
+                  key={`deliv-${displayIndex}`}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="space-y-6"
+                >
+                  <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold">What We Deliver</h4>
+                  <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
+                    {(displayService.whatWeDo as string[]).map((item: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 p-4 bg-white/5 border rounded-lg transition-all duration-200"
+                        style={{ borderColor: accent.border }}
+                      >
+                        <div
+                          className="flex-shrink-0 w-6 h-6 flex items-center justify-center border rounded-md"
+                          style={{ borderColor: accent.dot, color: accent.dot, background: 'rgba(0,0,0,0.2)' }}
+                        >
+                          <Check size={12} strokeWidth={3} />
+                        </div>
+                        <span className="text-sm sm:text-base text-white/90">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {displayService.closingNote && (
+                  <motion.div
+                    key={`close-${displayIndex}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="p-6 bg-white/5 text-center rounded-lg"
+                    style={{ border: `1px solid ${accent.border}` }}
+                  >
+                    <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+
+            <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-black/40 backdrop-blur-xl flex justify-between items-center">
+              <button
+                type="button"
+                disabled={displayIndex === 0}
+                onClick={() => displayIndex !== null && onNavigate(displayIndex - 1)}
+                className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase rounded-md"
+                style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.15em',
+                  border: '1px solid #fbfbfc',
+                  color: '#fbfbfc',
+                  background: 'transparent',
+                  transition: 'background 0.2s ease, color 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (displayIndex === 0) return;
+                  e.currentTarget.style.background = '#fbfbfc';
+                  e.currentTarget.style.color = '#0e0820';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#fbfbfc';
+                }}
+              >
+                <ArrowLeft size={16} /> <span className="hidden sm:inline">Prev</span>
+              </button>
+
+              <div className="flex gap-3">
+                {PILLARS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onNavigate(i)}
+                    className="group relative flex items-center justify-center h-8"
+                    aria-label={`Go to pillar ${i + 1}`}
+                  >
+                    <div
+                      className={`h-1.5 transition-all duration-500 rounded-full ${i === displayIndex ? 'w-10' : 'w-2 bg-white/20 group-hover:bg-white/40'}`}
+                      style={{ backgroundColor: i === displayIndex ? accent.dot : undefined }}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                disabled={displayIndex === PILLARS.length - 1}
+                onClick={() => displayIndex !== null && onNavigate(displayIndex + 1)}
+                className="flex items-center gap-2 disabled:opacity-20 min-h-[44px] min-w-[44px] px-4 cursor-pointer uppercase rounded-md"
+                style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.15em',
+                  border: '1px solid #fbfbfc',
+                  color: '#fbfbfc',
+                  background: 'transparent',
+                  transition: 'background 0.2s ease, color 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (displayIndex === PILLARS.length - 1) return;
+                  e.currentTarget.style.background = '#fbfbfc';
+                  e.currentTarget.style.color = '#0e0820';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#fbfbfc';
+                }}
+              >
+                <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
+              </button>
+            </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

@@ -8,6 +8,7 @@ const FOUNDER_VIDEO_URL =
 interface HologramOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  title?: string;
 }
 
 function FloatingParticles() {
@@ -221,7 +222,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
   );
 }
 
-export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
+export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }: HologramOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -810,7 +811,7 @@ export function HologramOverlay({ isOpen, onClose }: HologramOverlayProps) {
                   fontFamily: 'var(--font-stack-heading)',
                 }}
               >
-                Meet the Founder
+                {title}
               </motion.p>
             </div>
           </motion.div>

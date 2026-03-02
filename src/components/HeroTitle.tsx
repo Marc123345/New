@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { VideoOverlay } from './VideoOverlay';
 import { HologramOverlay } from './HologramOverlay';
 import { HeroGalaxy } from './galaxy/HeroGalaxy';
 
@@ -118,9 +117,10 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
         </motion.div>
       )}
 
-      <VideoOverlay
+      <HologramOverlay
         isOpen={videoOpen}
         onClose={() => setVideoOpen(false)}
+        title="Hear Our Story"
       />
 
       <HologramOverlay

@@ -184,7 +184,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8"
-          style={{ background: "rgba(4,4,8,0.75)", backdropFilter: "blur(12px)" }}
+          style={{ background: "rgba(4,4,8,0.95)" }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -202,7 +202,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
             style={{
               maxWidth: "680px",
               maxHeight: "85vh",
-              background: "rgba(10,8,20,0.98)",
+              background: "#0a0814",
               border: `1px solid ${service.color}44`,
               boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${service.color}22`,
             }}
@@ -223,12 +223,12 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center transition-all duration-200 hover:rotate-90"
               style={{
                 border: "1px solid rgba(255,255,255,0.15)",
-                background: "rgba(255,255,255,0.07)",
+                background: "#1a1728",
                 color: "rgba(255,255,255,0.7)",
                 borderRadius: 2,
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#2a2540"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#1a1728"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
             >
               <X size={16} strokeWidth={2} />
             </motion.button>
@@ -333,7 +333,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                         transition={{ delay: 0.32 + i * 0.05, duration: 0.35 }}
                         className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed"
                         style={{
-                          background: "rgba(255,255,255,0.03)",
+                          background: "#110f1e",
                           border: "1px solid rgba(255,255,255,0.06)",
                           color: "rgba(255,255,255,0.72)",
                           fontFamily: "var(--font-stack-body)",

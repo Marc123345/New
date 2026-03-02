@@ -60,12 +60,13 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
       {pillarIndex !== null && displayService && (
         <motion.div
           key="pillar-overlay-backdrop"
-          initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-          animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
-          exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onClose}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0e0820]/80 p-4 sm:p-6 md:p-12 pointer-events-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-12 pointer-events-auto"
+          style={{ background: 'rgba(14,8,32,0.95)' }}
         >
           <motion.div
             initial={{ scale: 0.95, y: 20, opacity: 0 }}
@@ -88,7 +89,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-4 right-4 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-black/40 hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95 group backdrop-blur-md"
+              className="absolute top-4 right-4 z-[10000] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
               aria-label="Close overlay"
             >
               <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -156,7 +157,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   {displayService?.stats?.map((s: { value: string; label: string }, i: number) => (
                     <div
                       key={i}
-                      className="p-4 sm:p-6 bg-black/20 backdrop-blur-md text-center relative overflow-hidden group transition-all duration-300 rounded-lg"
+                      className="p-4 sm:p-6 bg-[#0c0618] text-center relative overflow-hidden group transition-all duration-300 rounded-lg"
                       style={{
                         border: `1px solid ${accent.border}`,
                         boxShadow: `4px 4px 0 ${accent.dot}44`,
@@ -186,7 +187,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     {displayService?.whatWeDo?.map((item: string, i: number) => (
                       <div
                         key={i}
-                        className="flex items-center gap-4 p-4 bg-white/5 border rounded-lg transition-all duration-200"
+                        className="flex items-center gap-4 p-4 bg-[#140f24] border rounded-lg transition-all duration-200"
                         style={{
                           borderColor: accent.border,
                         }}
@@ -209,7 +210,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="p-6 bg-white/5 text-center rounded-lg"
+                    className="p-6 bg-[#140f24] text-center rounded-lg"
                     style={{ border: `1px solid ${accent.border}` }}
                   >
                     <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
@@ -218,7 +219,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
               </div>
             </div>
 
-            <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-black/40 backdrop-blur-xl flex justify-between items-center">
+            <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-[#0a0618] flex justify-between items-center">
               <button
                 type="button"
                 disabled={displayIndex === 0}

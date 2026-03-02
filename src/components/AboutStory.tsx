@@ -1,378 +1,350 @@
-import { useRef, useState } from 'react';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  Variants,
-  AnimatePresence,
-} from 'motion/react';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { SpacePlanets3D } from './space/SpacePlanets3D';
 
-const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-const staggerContainer: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+const ERAS = [
+  {
+    range: [0, 0.33] as [number, number],
+    label: 'The Digital Era',
+    heading: 'THE DIGITAL ERA',
+    subheading: 'c. 2010s',
+    eyebrow: 'VIEW OF AFRICA AT NIGHT (Current)',
+    body: 'Data networks connect fiber cable and satellite links. Current urban footprints illuminated by purple light.',
   },
-};
-
-const fadeUpItem: Variants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.9, ease: EASE_OUT_EXPO },
+  {
+    range: [0.33, 0.66] as [number, number],
+    label: 'The AI Era',
+    heading: 'THE AI ERA',
+    subheading: 'c. 2020s–Present',
+    eyebrow: null,
+    body: 'Artificial intelligence transforms industries and connectivity. Network nodes expanding across every border.',
   },
-};
-
-const scaleInItem: Variants = {
-  hidden: { opacity: 0, scale: 0.92 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.8, ease: EASE_OUT_EXPO },
+  {
+    range: [0.66, 1] as [number, number],
+    label: 'The H2H Difference',
+    heading: 'THE H2H DIFFERENCE',
+    subheading: 'Full Illumination',
+    eyebrow: null,
+    body: 'When Human Collaboration meets Digital & AI Foundations. A United, Illuminated Continent. Purple Represents Progress, Unity, and Connection.',
   },
-};
-
-const CAPABILITIES = [
-  { tag: 'Strategy', desc: 'Brand positioning & market analysis' },
-  { tag: 'Creative', desc: 'Visual storytelling & content creation' },
-  { tag: 'Growth', desc: 'Performance marketing & scaling' },
-  { tag: 'Social', desc: 'Community management & engagement' },
-  { tag: 'Content', desc: 'Editorial planning & production' },
-  { tag: 'Analytics', desc: 'Data-driven insights & optimization' },
 ];
 
-function GeometricFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 overflow-hidden"
-      style={{
-        position: 'relative',
-        border: '2px solid var(--color-surface-dark)',
-        background: 'var(--color-background-light)',
-        boxShadow: 'var(--shadow-geometric)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-geometric)';
-      }}
-    >
-      {children}
-    </div>
-  );
-}
+function EraText({
+  era,
+  scrollYProgress,
+  index,
+}: {
+  era: (typeof ERAS)[number];
+  scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress'];
+  index: number;
+}) {
+  const [start, end] = era.range;
+  const fadeInStart = index === 0 ? 0 : start - 0.06;
+  const fadeInEnd = index === 0 ? 0.08 : start + 0.08;
+  const fadeOutStart = index === ERAS.length - 1 ? 0.98 : end - 0.06;
+  const fadeOutEnd = index === ERAS.length - 1 ? 1 : end + 0.06;
 
-function SectionBadge({ label }: { label: string }) {
+  const opacity = useTransform(
+    scrollYProgress,
+    [fadeInStart, fadeInEnd, fadeOutStart, fadeOutEnd],
+    [0, 1, 1, 0]
+  );
+  const y = useTransform(
+    scrollYProgress,
+    [fadeInStart, fadeInEnd],
+    [32, 0]
+  );
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: -15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-      className="inline-block mb-10"
+      style={{ opacity, y, position: 'absolute', inset: 0, pointerEvents: 'none' }}
+      className="flex flex-col justify-center px-6 md:px-12 lg:px-16"
     >
-      <div
-        className="inline-flex items-center gap-2.5 px-4 py-1.5"
-        style={{
-          border: '1px solid rgba(164,108,252,0.15)',
-          borderRadius: '100px',
-          background: 'rgba(164,108,252,0.05)',
-        }}
-      >
-        <motion.span
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: '50%',
-            background: 'var(--color-secondary)',
-            display: 'inline-block',
-            boxShadow: '0 0 8px rgba(164,108,252,0.5)',
-          }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        />
+      <div className="max-w-sm">
         <span
-          className="text-[0.55rem] font-bold uppercase tracking-[0.3em]"
+          className="block mb-3 text-[0.55rem] font-bold uppercase tracking-[0.35em]"
+          style={{ color: 'rgba(164,108,252,0.7)', fontFamily: 'var(--font-stack-heading)' }}
+        >
+          {`0${index + 1} / 03 — ${era.label}`}
+        </span>
+
+        {era.eyebrow && (
+          <span
+            className="block mb-4 text-[0.6rem] font-semibold uppercase tracking-[0.25em]"
+            style={{ color: 'rgba(164,108,252,0.5)', fontFamily: 'var(--font-stack-heading)' }}
+          >
+            {era.eyebrow}
+          </span>
+        )}
+
+        <h2
+          className="uppercase mb-1"
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            color: 'var(--color-surface-dark)',
+            fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+            fontWeight: 800,
+            lineHeight: 1.05,
+            letterSpacing: '-0.03em',
+            color: 'var(--color-text-dark)',
           }}
         >
-          {label}
-        </span>
+          {era.heading}
+        </h2>
+
+        <p
+          className="mb-5 uppercase"
+          style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: 'clamp(0.75rem, 1.2vw, 0.9rem)',
+            letterSpacing: '0.2em',
+            color: 'rgba(164,108,252,0.8)',
+          }}
+        >
+          {era.subheading}
+        </p>
+
+        <div
+          className="mb-6 h-px"
+          style={{ background: 'linear-gradient(90deg, rgba(164,108,252,0.5) 0%, transparent 100%)' }}
+        />
+
+        <p
+          style={{
+            fontFamily: 'var(--font-stack-body)',
+            fontSize: 'clamp(0.85rem, 1.3vw, 1rem)',
+            lineHeight: 1.75,
+            color: 'rgba(232,226,255,0.55)',
+          }}
+        >
+          {era.body}
+        </p>
       </div>
     </motion.div>
   );
 }
 
 export function AboutStory() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [activeCapability, setActiveCapability] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start end', 'end start'],
+    offset: ['start start', 'end end'],
   });
 
-  const contentParallax = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
+  const glowOpacity = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [0.08, 0.35, 0.65, 1]);
+  const glowScale = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [0.55, 0.75, 1.0, 1.3]);
+  const outerGlowOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 0.2, 0.5]);
+  const globeScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
+  const progressScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section
+    <div
       ref={sectionRef}
       id="about"
-      className="relative w-full overflow-hidden flex flex-col items-center justify-center"
-      style={{
-        background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
-        padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
-      }}
+      style={{ height: '300vh', position: 'relative' }}
     >
-      <SpacePlanets3D preset="about" style={{ opacity: 0.6 }} />
-
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="sticky top-0 h-screen overflow-hidden"
         style={{
-          background: `
-            radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.18) 0%, transparent 55%),
-            radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.2) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, rgba(10, 5, 30, 0.4) 0%, transparent 70%)
-          `,
-          zIndex: 1,
+          background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
         }}
-      />
-
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            linear-gradient(180deg, #06030f 0%, transparent 12%),
-            linear-gradient(0deg, #06030f 0%, transparent 12%)
-          `,
-          zIndex: 2,
-        }}
-      />
-
-      <motion.div
-        className="relative w-full mx-auto flex flex-col items-center"
-        style={{ y: contentParallax, maxWidth: '1300px', zIndex: 10 }}
       >
-        <div className="flex flex-col items-center text-center mb-16 md:mb-24">
-          <SectionBadge label="About Us" />
+        <SpacePlanets3D preset="about" style={{ opacity: 0.4 }} />
 
-          <h2
-            style={{
-              fontSize: 'clamp(2.5rem, 6.5vw, 5.5rem)',
-              fontFamily: 'var(--font-stack-heading)',
-              color: 'var(--color-text-dark)',
-              lineHeight: 1.05,
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '-0.04em',
-              textAlign: 'center',
-              margin: 0,
-            }}
-          >
-            <motion.span
-              className="block"
-              initial={{ opacity: 0, y: 35 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-            >
-              From Brand Voice
-            </motion.span>
-            <motion.span
-              className="block mt-1"
-              initial={{ opacity: 0, y: 35 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, delay: 0.12, ease: EASE_OUT_EXPO }}
-            >
-              <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
-                To Human
-              </span>{' '}
-              Connection
-            </motion.span>
-          </h2>
-        </div>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse at 20% 30%, rgba(60,20,120,0.15) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 70%, rgba(20,10,60,0.18) 0%, transparent 50%)
+            `,
+            zIndex: 1,
+          }}
+        />
 
-        <motion.div
-          className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-        >
-          <motion.div className="lg:col-span-5" variants={fadeUpItem}>
-            <GeometricFrame>
-              <div style={{ position: 'relative' }}>
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full object-cover"
-                  style={{ aspectRatio: '4 / 5', display: 'block' }}
-                  src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4"
-                />
-                <div
-                  className="pointer-events-none"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: `
-                      linear-gradient(180deg, rgba(14,11,31,0.3) 0%, transparent 25%),
-                      linear-gradient(180deg, transparent 70%, rgba(14,11,31,0.7) 100%)
-                    `,
-                  }}
-                />
-              </div>
-            </GeometricFrame>
-          </motion.div>
+        <div className="relative h-full w-full flex items-center" style={{ zIndex: 10 }}>
 
           <motion.div
-            className="lg:col-span-7 flex flex-col justify-center"
-            variants={fadeUpItem}
+            className="absolute left-0 top-0 bottom-0 w-px"
+            style={{
+              background: 'rgba(164,108,252,0.15)',
+              transformOrigin: 'top',
+              zIndex: 20,
+            }}
+          />
+          <motion.div
+            className="absolute left-0 top-0 bottom-0 w-px"
+            style={{
+              background: 'rgba(164,108,252,0.7)',
+              transformOrigin: 'top',
+              scaleY: progressScaleY,
+              zIndex: 21,
+            }}
+          />
+
+          <div
+            className="absolute right-0 md:right-auto md:left-1/2 top-1/2 -translate-y-1/2 md:-translate-x-[10%]"
+            style={{ width: 'min(85vw, 700px)', aspectRatio: '1', zIndex: 5 }}
           >
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
+              className="relative w-full h-full"
+              style={{ scale: globeScale }}
             >
-              <span
-                className="inline-block mb-6"
-                style={{
-                  fontSize: '0.55rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.6)',
-                  fontFamily: 'var(--font-stack-heading)',
-                }}
-              >
-                Our Story
-              </span>
-
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                  lineHeight: 1.75,
-                  color: 'rgba(232,226,255,0.55)',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                We started with a simple belief: the most impactful brands don't just
-                broadcast -- they connect. In a world saturated with noise, people
-                gravitate toward brands that feel human, speak with personality, and
-                offer something genuinely meaningful.
-              </p>
-
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                  lineHeight: 1.75,
-                  color: 'rgba(232,226,255,0.55)',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                That's why we built a social-first agency grounded in insight and
-                efficiency -- helping brands grow by making every digital touchpoint
-                feel real and every interaction count.
-              </p>
-
-              <p
-                className="font-semibold"
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                  lineHeight: 1.75,
-                  color: 'var(--color-text-dark)',
-                  marginBottom: '2.5rem',
-                }}
-              >
-                We combine strategy, creative, and data to build brand ecosystems
-                that work -- across every platform and stage of growth.
-              </p>
-
-              <motion.div
-                className="h-px mb-8"
-                style={{ background: 'rgba(164,108,252,0.2)', transformOrigin: 'left' }}
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
+              <img
+                src="https://ik.imagekit.io/qcvroy8xpd/Planet.png"
+                alt="Globe showing Africa"
+                className="w-full h-full object-contain select-none"
+                draggable={false}
+                style={{ filter: 'brightness(0.75) contrast(1.1)' }}
               />
 
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
-        <div className="w-full mt-16 md:mt-24">
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-          >
-            {CAPABILITIES.map((cap, i) => (
               <motion.div
-                key={cap.tag}
-                variants={scaleInItem}
-                onHoverStart={() => setActiveCapability(i)}
-                onHoverEnd={() => setActiveCapability(null)}
-                className="relative px-4 py-4 cursor-default transition-all duration-300 hover:-translate-x-0.5 hover:-translate-y-0.5"
+                className="absolute pointer-events-none"
                 style={{
-                  border: '2px solid var(--color-surface-dark)',
-                  background: activeCapability === i
-                    ? 'rgba(164,108,252,0.08)'
-                    : 'var(--color-background-light)',
-                  boxShadow: activeCapability === i
-                    ? 'var(--shadow-geometric-hover)'
-                    : '6px 6px 0 var(--color-secondary)',
-                  transition: 'background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
+                  top: '20%',
+                  left: '30%',
+                  width: '55%',
+                  height: '60%',
+                  background: 'radial-gradient(circle, rgba(164,108,252,0.85) 0%, rgba(120,60,220,0.4) 35%, transparent 70%)',
+                  borderRadius: '50%',
+                  opacity: glowOpacity,
+                  scale: glowScale,
+                  filter: 'blur(4px)',
+                  mixBlendMode: 'screen',
+                }}
+              />
+
+              <motion.div
+                className="absolute pointer-events-none"
+                style={{
+                  top: '5%',
+                  left: '15%',
+                  width: '80%',
+                  height: '85%',
+                  background: 'radial-gradient(circle, rgba(164,108,252,0.2) 0%, transparent 65%)',
+                  borderRadius: '50%',
+                  opacity: outerGlowOpacity,
+                  filter: 'blur(20px)',
+                  mixBlendMode: 'screen',
+                }}
+              />
+            </motion.div>
+          </div>
+
+          <div
+            className="absolute inset-y-0 left-0 right-auto w-full md:w-1/2"
+            style={{ zIndex: 15 }}
+          >
+            <div className="absolute top-8 left-6 md:left-12 lg:left-16">
+              <div
+                className="inline-flex items-center gap-2.5 px-4 py-1.5"
+                style={{
+                  border: '1px solid rgba(164,108,252,0.2)',
+                  borderRadius: '100px',
+                  background: 'rgba(164,108,252,0.06)',
                 }}
               >
-                <span
-                  className="block text-[0.7rem] font-semibold uppercase tracking-[0.15em]"
+                <motion.span
                   style={{
-                    fontFamily: 'var(--font-stack-heading)',
-                    color: activeCapability === i ? 'var(--color-text-dark)' : 'rgba(232,226,255,0.5)',
-                    transition: 'color 0.3s ease',
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    background: 'var(--color-secondary)',
+                    display: 'inline-block',
+                    boxShadow: '0 0 8px rgba(164,108,252,0.6)',
                   }}
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <span
+                  className="text-[0.5rem] font-bold uppercase tracking-[0.3em]"
+                  style={{ fontFamily: 'var(--font-stack-heading)', color: 'rgba(232,226,255,0.6)' }}
                 >
-                  {cap.tag}
+                  About Us
                 </span>
-                <AnimatePresence>
-                  {activeCapability === i && (
-                    <motion.span
-                      className="block mt-1.5 text-[0.65rem]"
-                      style={{
-                        color: 'rgba(232,226,255,0.4)',
-                        fontFamily: 'var(--font-stack-body)',
-                        lineHeight: 1.4,
-                      }}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      {cap.desc}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </motion.div>
+              </div>
+            </div>
+
+            <div className="relative h-full" style={{ paddingTop: '5rem' }}>
+              {ERAS.map((era, i) => (
+                <EraText key={i} era={era} scrollYProgress={scrollYProgress} index={i} />
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="absolute bottom-8 right-6 md:right-12"
+            style={{ zIndex: 20 }}
+          >
+            <div className="flex items-center gap-4">
+              {ERAS.map((_, i) => (
+                <EraIndicator key={i} index={i} scrollYProgress={scrollYProgress} />
+              ))}
+            </div>
+          </div>
         </div>
-      </motion.div>
-    </section>
+
+        <div
+          className="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
+          style={{
+            background: 'linear-gradient(0deg, #06030f 0%, transparent 100%)',
+            zIndex: 12,
+          }}
+        />
+        <div
+          className="absolute inset-x-0 top-0 h-16 pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, #06030f 0%, transparent 100%)',
+            zIndex: 12,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function EraIndicator({
+  index,
+  scrollYProgress,
+}: {
+  index: number;
+  scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress'];
+}) {
+  const era = ERAS[index];
+  const [start, end] = era.range;
+  const center = (start + end) / 2;
+
+  const opacity = useTransform(
+    scrollYProgress,
+    [Math.max(0, start - 0.05), start + 0.08, end - 0.08, Math.min(1, end + 0.05)],
+    [0.3, 1, 1, 0.3]
+  );
+  const scale = useTransform(
+    scrollYProgress,
+    [Math.max(0, center - 0.15), center, Math.min(1, center + 0.15)],
+    [0.7, 1.3, 0.7]
+  );
+
+  return (
+    <motion.div
+      style={{ opacity, scale }}
+      className="flex flex-col items-center gap-1"
+    >
+      <motion.div
+        className="rounded-full"
+        style={{
+          width: 6,
+          height: 6,
+          background: 'rgba(164,108,252,0.9)',
+          boxShadow: '0 0 6px rgba(164,108,252,0.5)',
+        }}
+      />
+      <span
+        className="text-[0.45rem] uppercase tracking-widest"
+        style={{ color: 'rgba(164,108,252,0.6)', fontFamily: 'var(--font-stack-heading)' }}
+      >
+        {`0${index + 1}`}
+      </span>
+    </motion.div>
   );
 }

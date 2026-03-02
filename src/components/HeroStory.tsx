@@ -1,238 +1,357 @@
-'use client'; // Required if you are using Next.js App Router
-
 import React, { useRef, useMemo, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sphere, useTexture, Float } from '@react-three/drei';
+import { Sphere, useTexture, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
-// --- Types ---
-interface SceneProps {
+interface GlobeProps {
   scrollYProgress: MotionValue<number>;
 }
 
-// --- 3D Globe Component ---
-const Globe = ({ scrollYProgress }: SceneProps) => {
+const AfricaGlobe = ({ scrollYProgress }: GlobeProps) => {
   const planetTexture = useTexture('https://ik.imagekit.io/qcvroy8xpd/Planet.png');
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const lightRef = useRef<THREE.SpotLight>(null);
+  const fillLightRef = useRef<THREE.PointLight>(null);
+  const rimLightRef = useRef<THREE.PointLight>(null);
   const nodesRef = useRef<THREE.InstancedMesh>(null);
-
-  // Generate random node positions on the front-facing hemisphere (Africa side roughly)
-  const nodeCount = 30;
+  const linesRef = useRef<THREE.LineSegments>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  const nodeCount = 60;
   const nodePositions = useMemo(() => {
-    const pos = [];
-    for (let i = 0; i < nodeCount; i++) {
-      // Math to place points roughly on the front hemisphere
-      const phi = Math.acos(-1 + (2 * i) / nodeCount);
-      const theta = Math.sqrt(nodeCount * Math.PI) * phi;
-      const x = 2.05 * Math.cos(theta) * Math.sin(phi); // 2.05 is slightly larger than sphere radius 2
-      const y = 2.05 * Math.sin(theta) * Math.sin(phi);
-      const z = 2.05 * Math.cos(phi);
-      // Only keep nodes facing the camera (z > 0)
-      if (z > 0.5) pos.push(new THREE.Vector3(x, y, z));
+    const pos: THREE.Vector3[] = [];
+    const africaCenter = new THREE.Vector3(0.3, -0.2, 1).normalize();
+    for (let i = 0; i < nodeCount * 3; i++) {
+      const phi = Math.random() * Math.PI;
+      const theta = Math.random() * Math.PI * 2;
+      const x = 2.08 * Math.sin(phi) * Math.cos(theta);
+      const y = 2.08 * Math.sin(phi) * Math.sin(theta);
+      const z = 2.08 * Math.cos(phi);
+      const v = new THREE.Vector3(x, y, z).normalize();
+      const dot = v.dot(africaCenter);
+      if (dot > 0.2 && z > -0.5) {
+        pos.push(new THREE.Vector3(x, y, z));
+      }
+      if (pos.length >= nodeCount) break;
     }
     return pos;
   }, []);
 
-  useFrame(() => {
-    const progress = scrollYProgress.get(); // 0 to 1
-
-    // Phase 1 (0-0.33): Faint spotlight
-    // Phase 2 (0.33-0.66): Spotlight intensifies
-    // Phase 3 (0.66-1.0): Max illumination
-    
-    // Animate Spotlight Intensity
-    if (lightRef.current) {
-      const baseIntensity = 5;
-      const midIntensity = 20;
-      const maxIntensity = 100;
-      
-      let currentIntensity = baseIntensity;
-      if (progress > 0.33 && progress <= 0.66) {
-        // Interpolate between Phase 1 and 2
-        const localP = (progress - 0.33) / 0.33;
-        currentIntensity = THREE.MathUtils.lerp(baseIntensity, midIntensity, localP);
-      } else if (progress > 0.66) {
-        // Interpolate between Phase 2 and 3
-        const localP = (progress - 0.66) / 0.34;
-        currentIntensity = THREE.MathUtils.lerp(midIntensity, maxIntensity, localP);
+  const lineGeometry = useMemo(() => {
+    const positions: number[] = [];
+    for (let i = 0; i < nodePositions.length; i++) {
+      for (let j = i + 1; j < nodePositions.length; j++) {
+        const dist = nodePositions[i].distanceTo(nodePositions[j]);
+        if (dist < 1.2) {
+          positions.push(
+            nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
+            nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
+          );
+        }
       }
-      lightRef.current.intensity = currentIntensity;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    return geo;
+  }, [nodePositions]);
+
+  useFrame((state) => {
+    const progress = scrollYProgress.get();
+    const t = state.clock.getElapsedTime();
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = -0.4 + t * 0.03;
     }
 
-    // Animate Nodes (Opacity and Emissive intensity)
+    if (lightRef.current) {
+      const base = 4;
+      const mid1 = 25;
+      const mid2 = 60;
+      const max = 200;
+      let intensity = base;
+      if (progress < 0.25) {
+        intensity = base;
+      } else if (progress < 0.5) {
+        intensity = THREE.MathUtils.lerp(base, mid1, (progress - 0.25) / 0.25);
+      } else if (progress < 0.75) {
+        intensity = THREE.MathUtils.lerp(mid1, mid2, (progress - 0.5) / 0.25);
+      } else {
+        intensity = THREE.MathUtils.lerp(mid2, max, (progress - 0.75) / 0.25);
+      }
+      lightRef.current.intensity = intensity;
+    }
+
+    if (fillLightRef.current) {
+      fillLightRef.current.intensity = THREE.MathUtils.lerp(0, 15, Math.max(0, (progress - 0.75) / 0.25));
+      fillLightRef.current.color.setHex(0x9333ea);
+    }
+
+    if (rimLightRef.current) {
+      rimLightRef.current.intensity = THREE.MathUtils.lerp(2, 30, progress);
+    }
+
     if (nodesRef.current && nodesRef.current.material) {
       const mat = nodesRef.current.material as THREE.MeshStandardMaterial;
-      if (progress < 0.33) {
+      if (progress < 0.2) {
         mat.opacity = 0;
         mat.emissiveIntensity = 0;
-      } else if (progress >= 0.33 && progress < 0.66) {
-        const localP = (progress - 0.33) / 0.33;
-        mat.opacity = THREE.MathUtils.lerp(0, 1, localP);
-        mat.emissiveIntensity = THREE.MathUtils.lerp(0, 2, localP);
+      } else if (progress < 0.5) {
+        const p = (progress - 0.2) / 0.3;
+        mat.opacity = THREE.MathUtils.lerp(0, 0.7, p);
+        mat.emissiveIntensity = THREE.MathUtils.lerp(0, 3, p);
+      } else if (progress < 0.75) {
+        const p = (progress - 0.5) / 0.25;
+        mat.opacity = THREE.MathUtils.lerp(0.7, 1, p);
+        mat.emissiveIntensity = THREE.MathUtils.lerp(3, 7, p);
       } else {
-        const localP = (progress - 0.66) / 0.34;
+        const p = (progress - 0.75) / 0.25;
         mat.opacity = 1;
-        mat.emissiveIntensity = THREE.MathUtils.lerp(2, 8, localP); // Huge bloom trigger
+        mat.emissiveIntensity = THREE.MathUtils.lerp(7, 14, p);
+      }
+      mat.needsUpdate = true;
+
+      nodePositions.forEach((pos, i) => {
+        dummy.position.copy(pos);
+        const pulse = 1 + 0.05 * Math.sin(t * 2 + i * 0.5);
+        dummy.scale.setScalar(pulse);
+        dummy.updateMatrix();
+        nodesRef.current!.setMatrixAt(i, dummy.matrix);
+      });
+      nodesRef.current.instanceMatrix.needsUpdate = true;
+    }
+
+    if (linesRef.current && linesRef.current.material) {
+      const mat = linesRef.current.material as THREE.LineBasicMaterial;
+      if (progress < 0.25) {
+        mat.opacity = 0;
+      } else if (progress < 0.6) {
+        mat.opacity = THREE.MathUtils.lerp(0, 0.5, (progress - 0.25) / 0.35);
+      } else {
+        mat.opacity = THREE.MathUtils.lerp(0.5, 0.9, (progress - 0.6) / 0.4);
       }
     }
   });
 
   return (
-    <group rotation={[0.2, -0.5, 0]}> {/* Adjusted to put Africa in view */}
-      <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
-        {/* The Planet */}
-        <Sphere args={[2, 64, 64]}>
-          <meshStandardMaterial 
-            ref={materialRef}
-            map={planetTexture}
-            roughness={0.8}
-            metalness={0.2}
-          />
-        </Sphere>
+    <group ref={groupRef} rotation={[0.15, -0.4, 0]}>
+      <Sphere args={[2, 96, 96]}>
+        <meshStandardMaterial
+          map={planetTexture}
+          roughness={0.7}
+          metalness={0.25}
+        />
+      </Sphere>
 
-        {/* The Glowing Nodes (Instanced for performance) */}
-        <instancedMesh ref={nodesRef} args={[undefined, undefined, nodePositions.length]}>
-          <sphereGeometry args={[0.03, 16, 16]} />
-          <meshStandardMaterial 
-            color="#A46CFC" 
-            emissive="#A46CFC" 
-            transparent 
-            opacity={0}
-            emissiveIntensity={0}
-          />
-          {nodePositions.map((pos, i) => {
-            dummy.position.copy(pos);
-            dummy.updateMatrix();
-            nodesRef.current?.setMatrixAt(i, dummy.matrix);
-            return null;
-          })}
-        </instancedMesh>
-      </Float>
+      <instancedMesh ref={nodesRef} args={[undefined, undefined, nodePositions.length]}>
+        <sphereGeometry args={[0.028, 12, 12]} />
+        <meshStandardMaterial
+          color="#c084fc"
+          emissive="#a855f7"
+          transparent
+          opacity={0}
+          emissiveIntensity={0}
+          depthWrite={false}
+        />
+      </instancedMesh>
 
-      {/* Targetting Spotlight for Africa */}
-      <spotLight 
+      <lineSegments ref={linesRef} geometry={lineGeometry}>
+        <lineBasicMaterial color="#9333ea" transparent opacity={0} depthWrite={false} />
+      </lineSegments>
+
+      <spotLight
         ref={lightRef}
-        position={[5, 2, 5]} 
-        angle={0.5} 
-        penumbra={1} 
-        color="#A46CFC" 
+        position={[3, 1, 5]}
+        angle={0.6}
+        penumbra={0.8}
+        color="#b060ff"
+        distance={30}
+        intensity={4}
+        target-position={[0, 0, 0]}
+      />
+      <pointLight
+        ref={fillLightRef}
+        position={[0, -1, 4]}
+        color="#9333ea"
+        intensity={0}
         distance={20}
       />
-      <ambientLight intensity={0.1} />
+      <pointLight
+        ref={rimLightRef}
+        position={[-4, 0, -2]}
+        color="#7c3aed"
+        intensity={2}
+        distance={15}
+      />
+      <ambientLight intensity={0.06} color="#1a0030" />
     </group>
   );
 };
 
-// --- UI Overlay Component ---
-const StoryText = ({ 
-  title, 
-  subtitle, 
-  description, 
-  progressRange, 
-  scrollYProgress 
-}: { 
-  title: string, 
-  subtitle: string, 
-  description: string, 
-  progressRange: [number, number, number, number], 
-  scrollYProgress: MotionValue<number> 
+const phases = [
+  {
+    subtitle: 'AFRICA AT NIGHT (Present)',
+    title: 'VIEW OF AFRICA AT NIGHT (Current)',
+    description: 'Current urban footprints illuminated by purple light.',
+    range: [0, 0.1, 0.22, 0.28] as [number, number, number, number],
+  },
+  {
+    subtitle: 'THE DIGITAL ERA',
+    title: 'The Digital Era (c. 2010s)',
+    description: 'Data networks connect fiber cable and satellite links. Businesses started moving online, but real connection remained scarce.',
+    range: [0.22, 0.32, 0.45, 0.52] as [number, number, number, number],
+  },
+  {
+    subtitle: 'THE AI ERA',
+    title: 'The AI Era (c. 2020s-Present)',
+    description: 'Artificial intelligence transforms industries and connectivity. New nodes light up as automation takes over, but humanity gets lost in the noise.',
+    range: [0.48, 0.56, 0.68, 0.76] as [number, number, number, number],
+  },
+  {
+    subtitle: 'THE H2H DIFFERENCE: FULL ILLUMINATION',
+    title: 'The H2H Difference',
+    description: 'When Human Collaboration meets the Digital & AI Foundations. A United, Illuminated Continent. Purple Represents Progress, Unity, and Connection.',
+    range: [0.72, 0.8, 1, 1] as [number, number, number, number],
+  },
+];
+
+const PhaseText = ({
+  subtitle,
+  title,
+  description,
+  progressRange,
+  scrollYProgress,
+}: {
+  subtitle: string;
+  title: string;
+  description: string;
+  progressRange: [number, number, number, number];
+  scrollYProgress: MotionValue<number>;
 }) => {
-  // Fade in and out based on the specific scroll range
   const opacity = useTransform(scrollYProgress, progressRange, [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, progressRange, [40, 0, 0, -40]);
+  const y = useTransform(scrollYProgress, progressRange, [30, 0, 0, -30]);
 
   return (
-    <motion.div 
-      className="absolute inset-0 flex flex-col justify-center px-8 md:px-16"
+    <motion.div
+      className="absolute inset-0 flex flex-col justify-center"
       style={{ opacity, y, pointerEvents: 'none' }}
     >
-      <h3 className="text-purple-500 text-sm md:text-md uppercase tracking-widest mb-2 font-bold">
+      <p
+        className="text-xs uppercase tracking-[0.22em] font-semibold mb-3"
+        style={{ color: 'rgba(192,132,252,0.9)' }}
+      >
         {subtitle}
-      </h3>
-      <motion.div className="h-px w-16 bg-purple-500/50 mb-6" />
-      <h2 className="text-4xl md:text-6xl text-white uppercase font-black leading-tight mb-6" style={{ fontFamily: 'var(--font-stack-heading)' }}>
+      </p>
+      <h2
+        className="text-3xl md:text-4xl lg:text-5xl font-black leading-tight mb-5 text-white"
+        style={{
+          fontFamily: 'var(--font-stack-heading)',
+          textShadow: '0 0 40px rgba(168,85,247,0.5)',
+        }}
+      >
         {title}
       </h2>
-      <p className="text-gray-300 text-lg md:text-xl max-w-lg leading-relaxed">
+      <p className="text-base md:text-lg leading-relaxed max-w-xs" style={{ color: 'rgba(209,213,219,0.88)' }}>
         {description}
       </p>
     </motion.div>
   );
 };
 
-// --- Main Layout Component ---
 export function HeroStory() {
-  return <AboutStory />;
-}
-
-export function AboutStory() {
   const containerRef = useRef<HTMLDivElement>(null);
-  
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ['start start', 'end end'],
   });
 
-  return (
-    <div 
-      ref={containerRef} 
-      className="relative w-full"
-      style={{ 
-        height: '300vh', 
-        background: 'linear-gradient(160deg, #06030f 0%, #0e0820 50%, #030108 100%)' 
-      }}
-    >
-      <div className="sticky top-0 h-screen w-full flex flex-col md:flex-row overflow-hidden">
-        
-        {/* Left Column: UI overlay */}
-        <div className="relative w-full md:w-1/2 h-1/2 md:h-full z-10 flex items-center">
-          <StoryText 
-            subtitle="View of Africa at Night (Current)"
-            title="The Digital Era (c. 2010s)"
-            description="Data networks connect fiber cable and satellite links. Businesses started moving online, but real connection remained scarce."
-            progressRange={[0, 0.1, 0.25, 0.33]}
-            scrollYProgress={scrollYProgress}
-          />
-          <StoryText 
-            subtitle="The Next Evolution"
-            title="The AI Era (c. 2020s-Present)"
-            description="Artificial intelligence transforms industries and connectivity. New nodes light up as automation takes over, but humanity gets lost in the noise."
-            progressRange={[0.33, 0.4, 0.55, 0.66]}
-            scrollYProgress={scrollYProgress}
-          />
-          <StoryText 
-            subtitle="Full Illumination"
-            title="The H2H Difference"
-            description="When Human Collaboration meets Digital & AI Foundations. A United, Illuminated Continent. We bring the human energy back."
-            progressRange={[0.66, 0.75, 1, 1]}
-            scrollYProgress={scrollYProgress}
-          />
-        </div>
+  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
-        {/* Right Column: 3D Canvas */}
-        <div className="absolute inset-0 md:relative md:w-1/2 h-full z-0 pointer-events-none">
-          <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-            {/* The Suspense Boundary catches the component while the texture loads */}
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full"
+      style={{ height: '500vh' }}
+    >
+      <div
+        className="sticky top-0 h-screen w-full overflow-hidden"
+        style={{ background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)' }}
+      >
+        <div className="absolute inset-0">
+          <Canvas camera={{ position: [0, 0, 5], fov: 45 }} gl={{ antialias: true }}>
+            <Stars radius={120} depth={60} count={2500} factor={4} saturation={0} fade speed={0.4} />
             <Suspense fallback={null}>
-              <Globe scrollYProgress={scrollYProgress} />
+              <AfricaGlobe scrollYProgress={scrollYProgress} />
             </Suspense>
-            
-            {/* Post Processing for the Neon glow */}
             <EffectComposer>
-              <Bloom 
-                luminanceThreshold={0.2} 
-                mipmapBlur 
-                intensity={1.5} 
-              />
+              <Bloom luminanceThreshold={0.1} mipmapBlur intensity={2.2} levels={8} />
             </EffectComposer>
           </Canvas>
         </div>
 
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+        }} />
+
+        <div className="relative z-10 h-full flex items-center">
+          <div className="w-full max-w-7xl mx-auto px-8 md:px-14 lg:px-20">
+            <div className="w-full md:w-2/5 relative" style={{ minHeight: 240 }}>
+              {phases.map((phase, i) => (
+                <PhaseText
+                  key={i}
+                  subtitle={phase.subtitle}
+                  title={phase.title}
+                  description={phase.description}
+                  progressRange={phase.range}
+                  scrollYProgress={scrollYProgress}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-8 left-8 md:left-14 lg:left-20 right-8 z-20 flex flex-col gap-2">
+          <div className="w-64 h-px relative" style={{ background: 'rgba(168,85,247,0.2)' }}>
+            <motion.div
+              className="absolute inset-y-0 left-0"
+              style={{
+                width: progressBarWidth,
+                background: 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))',
+              }}
+            />
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2"
+              style={{
+                left: progressBarWidth,
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#c084fc',
+                boxShadow: '0 0 8px rgba(192,132,252,0.8)',
+                translateX: '-50%',
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
+              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.5)" strokeWidth="1" strokeLinecap="round"/>
+            </svg>
+            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(192,132,252,0.45)', fontFamily: 'var(--font-stack-heading)' }}>
+              scroll to explore
+            </span>
+          </div>
+        </div>
+
+        <div
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+          style={{ background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)' }}
+        />
       </div>
     </div>
   );
+}
+
+export function AboutStory() {
+  return <HeroStory />;
 }

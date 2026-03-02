@@ -198,6 +198,23 @@ export function AboutStory() {
               Connection
             </motion.span>
           </h2>
+
+          <motion.p
+            className="mt-8 max-w-2xl"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
+            style={{
+              fontFamily: 'var(--font-stack-body)',
+              fontSize: 'clamp(1rem, 1.4vw, 1.15rem)',
+              lineHeight: 1.8,
+              color: 'rgba(232,226,255,0.5)',
+              textAlign: 'center',
+            }}
+          >
+            At H2H we believe the most impactful brands are the ones that know how to connect, not just communicate.
+          </motion.p>
         </div>
 
         <motion.div
@@ -261,44 +278,25 @@ export function AboutStory() {
               <p
                 style={{
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                  lineHeight: 1.75,
+                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
+                  lineHeight: 1.8,
                   color: 'rgba(232,226,255,0.55)',
                   marginBottom: '1.5rem',
                 }}
               >
-                We started with a simple belief: the most impactful brands don't just
-                broadcast -- they connect. In a world saturated with noise, people
-                gravitate toward brands that feel human, speak with personality, and
-                offer something genuinely meaningful.
+                Perfect, polished campaigns are something that we take very seriously. But people want more than that. They want personality. They want to see and hear brands that speak like humans and offer something meaningful.
               </p>
 
               <p
                 style={{
                   fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                  lineHeight: 1.75,
+                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
+                  lineHeight: 1.8,
                   color: 'rgba(232,226,255,0.55)',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                That's why we built a social-first agency grounded in insight and
-                efficiency -- helping brands grow by making every digital touchpoint
-                feel real and every interaction count.
-              </p>
-
-              <p
-                className="font-semibold"
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.6vw, 1.2rem)',
-                  lineHeight: 1.75,
-                  color: 'var(--color-text-dark)',
                   marginBottom: '2.5rem',
                 }}
               >
-                We combine strategy, creative, and data to build brand ecosystems
-                that work -- across every platform and stage of growth.
+                H2H is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
               </p>
 
               <motion.div
@@ -309,6 +307,57 @@ export function AboutStory() {
                 viewport={{ once: true }}
                 transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
               />
+
+              <span
+                className="inline-block mb-5"
+                style={{
+                  fontSize: '0.55rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(164,108,252,0.6)',
+                  fontFamily: 'var(--font-stack-heading)',
+                }}
+              >
+                Why H2H?
+              </span>
+
+              <p
+                style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: 'clamp(1.1rem, 1.6vw, 1.25rem)',
+                  lineHeight: 1.6,
+                  color: 'var(--color-text-dark)',
+                  fontWeight: 700,
+                  marginBottom: '1.25rem',
+                }}
+              >
+                Because we embed ourselves in your world.
+              </p>
+
+              <p
+                style={{
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
+                  lineHeight: 1.8,
+                  color: 'rgba(232,226,255,0.55)',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                When you work with H2H, you don't get an agency. You get a partner — a flexible, responsive extension of your team. Like a living, breathing part of your organization, we adapt to your rhythm, align with your goals, and help you scale with clarity and purpose.
+              </p>
+
+              <p
+                style={{
+                  fontFamily: 'var(--font-stack-body)',
+                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
+                  lineHeight: 1.8,
+                  color: 'rgba(232,226,255,0.55)',
+                  marginBottom: '2.5rem',
+                }}
+              >
+                We're strategists, creatives, and storytellers who bring a mix of structure and soul. We combine insight with efficiency to help you build brand ecosystems that actually work — across every platform, every touchpoint, and every stage of growth.
+              </p>
 
             </motion.div>
           </motion.div>

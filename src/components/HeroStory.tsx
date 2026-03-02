@@ -4,27 +4,27 @@ import { GlobeWrapper } from './HeroStory/Globe/GlobeWrapper';
 
 const phases = [
   {
-    subtitle: 'AFRICA AT NIGHT (Present)',
-    title: 'VIEW OF AFRICA AT NIGHT (Current)',
-    description: 'Current urban footprints illuminated by purple light.',
+    subtitle: 'The World Is Connected',
+    title: 'But connection\nis not enough.',
+    description: 'Billions of people online. Infinite content. Yet most brands still struggle to be heard — let alone felt.',
     range: [0, 0.1, 0.22, 0.28] as [number, number, number, number],
   },
   {
-    subtitle: 'THE DIGITAL ERA',
-    title: 'The Digital Era (c. 2010s)',
-    description: 'Data networks connect fiber cable and satellite links. Businesses started moving online, but real connection remained scarce.',
+    subtitle: 'The Digital Era',
+    title: 'Brands went\ndigital. Fast.',
+    description: 'Social media, paid ads, automation. The tools multiplied. But somewhere along the way, the human voice got lost.',
     range: [0.22, 0.32, 0.45, 0.52] as [number, number, number, number],
   },
   {
-    subtitle: 'THE AI ERA',
-    title: 'The AI Era (c. 2020s-Present)',
-    description: 'Artificial intelligence transforms industries and connectivity. New nodes light up as automation takes over, but humanity gets lost in the noise.',
+    subtitle: 'The AI Era',
+    title: 'More content.\nLess connection.',
+    description: "AI accelerated everything — except authenticity. People don't want more noise. They want brands that speak like humans.",
     range: [0.48, 0.56, 0.68, 0.76] as [number, number, number, number],
   },
   {
-    subtitle: 'THE H2H DIFFERENCE: FULL ILLUMINATION',
-    title: 'The H2H Difference',
-    description: 'When Human Collaboration meets the Digital & AI Foundations. A United, Illuminated Continent. Purple Represents Progress, Unity, and Connection.',
+    subtitle: 'The H2H Difference',
+    title: 'Human to\nHuman.',
+    description: 'We help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.',
     range: [0.72, 0.8, 1, 1] as [number, number, number, number],
   },
 ];
@@ -61,6 +61,7 @@ const PhaseText = ({
         style={{
           fontFamily: 'var(--font-stack-heading)',
           textShadow: '0 0 40px rgba(168,85,247,0.5)',
+          whiteSpace: 'pre-line',
         }}
       >
         {title}

@@ -30,16 +30,28 @@ const CITIES = worldPopulationData.slice(0, 20);
 const buildArcs = (() => {
   const cache = new Map<number, object[]>();
   return (progress: number) => {
-    if (progress < 0.3) return [];
-    const threshold = Math.min(Math.floor(((progress - 0.3) / 0.7) * 15), CITIES.length - 1);
+    if (progress < 0.15) return [];
+    const threshold = Math.min(Math.floor(((progress - 0.15) / 0.85) * CITIES.length), CITIES.length - 1);
     if (cache.has(threshold)) return cache.get(threshold)!;
-    const arcs = Array.from({ length: threshold }, (_, i) => ({
-      startLat: CITIES[i].lat,
-      startLng: CITIES[i].lng,
-      endLat: CITIES[(i + 3) % CITIES.length].lat,
-      endLng: CITIES[(i + 3) % CITIES.length].lng,
-      color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
-    }));
+    const arcs: object[] = [];
+    for (let i = 0; i < threshold; i++) {
+      arcs.push({
+        startLat: CITIES[i].lat,
+        startLng: CITIES[i].lng,
+        endLat: CITIES[(i + 3) % CITIES.length].lat,
+        endLng: CITIES[(i + 3) % CITIES.length].lng,
+        color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
+      });
+      if (progress > 0.5 && i < threshold - 1) {
+        arcs.push({
+          startLat: CITIES[i].lat,
+          startLng: CITIES[i].lng,
+          endLat: CITIES[(i + 5) % CITIES.length].lat,
+          endLng: CITIES[(i + 5) % CITIES.length].lng,
+          color: ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'],
+        });
+      }
+    }
     cache.set(threshold, arcs);
     return arcs;
   };
@@ -126,17 +138,17 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
       if (p === null || !globeRef.current) return;
 
       const globe = globeRef.current;
-      const newAltitude = Math.max(1.4, 2.2 - p * 0.6);
+      const newAltitude = Math.max(1.2, 2.2 - p * 0.8);
 
       if (Math.abs(newAltitude - lastAltitudeRef.current) > 0.01) {
         lastAltitudeRef.current = newAltitude;
         globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 300);
-        globe.atmosphereAltitude(0.15 + p * 0.25);
+        globe.atmosphereAltitude(0.15 + p * 0.35);
         const controls = globe.controls();
-        if (controls) controls.autoRotateSpeed = 0.4 + p * 0.8;
+        if (controls) controls.autoRotateSpeed = 0.4 + p * 1.2;
       }
 
-      const newThreshold = p < 0.3 ? 0 : Math.min(Math.floor(((p - 0.3) / 0.7) * 15), CITIES.length - 1);
+      const newThreshold = p < 0.15 ? 0 : Math.min(Math.floor(((p - 0.15) / 0.85) * CITIES.length), CITIES.length - 1);
       if (newThreshold !== lastArcThresholdRef.current) {
         lastArcThresholdRef.current = newThreshold;
         globe.arcsData(buildArcs(p));

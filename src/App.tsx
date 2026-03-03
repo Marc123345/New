@@ -14,7 +14,7 @@ import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
-  import("./components/HeroStory").then((m) => ({ default: m.AboutStory })),
+  import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
 );
 const EcosystemServices = lazy(() =>
   import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),

@@ -11,7 +11,7 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { SolarSystem } from "./components/solar-system";
+import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -78,7 +78,7 @@ function AppContent() {
         style={{ background: '#040608' }}
       >
         <div className="absolute inset-0">
-          <SolarSystem />
+          <ShootingStars count={22} />
         </div>
 
         <div

@@ -35,38 +35,41 @@ const PhaseText = ({
   description,
   progressRange,
   scrollYProgress,
+  phaseIndex,
 }: {
   subtitle: string;
   title: string;
   description: string;
   progressRange: [number, number, number, number];
   scrollYProgress: MotionValue<number>;
+  phaseIndex: number;
 }) => {
   const opacity = useTransform(scrollYProgress, progressRange, [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, progressRange, [30, 0, 0, -30]);
+  const y = useTransform(scrollYProgress, progressRange, [40, 0, 0, -40]);
+  const scale = useTransform(scrollYProgress, progressRange, [0.95, 1, 1, 0.95]);
 
   return (
     <motion.div
       className="absolute inset-0 flex flex-col justify-center"
-      style={{ opacity, y, pointerEvents: 'none' }}
+      style={{ opacity, y, scale, pointerEvents: 'none' }}
     >
       <p
-        className="text-xs uppercase tracking-[0.22em] font-semibold mb-3"
-        style={{ color: 'rgba(192,132,252,0.9)' }}
+        className="text-sm uppercase tracking-[0.25em] font-bold mb-4"
+        style={{ color: 'rgba(192,132,252,0.95)' }}
       >
         {subtitle}
       </p>
       <h2
-        className="text-3xl md:text-4xl lg:text-5xl font-black leading-tight mb-5 text-white"
+        className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-white"
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          textShadow: '0 0 40px rgba(168,85,247,0.5)',
+          textShadow: `0 0 50px rgba(168,85,247,${0.4 + phaseIndex * 0.15})`,
           whiteSpace: 'pre-line',
         }}
       >
         {title}
       </h2>
-      <p className="text-base md:text-lg leading-relaxed max-w-xs" style={{ color: 'rgba(209,213,219,0.88)' }}>
+      <p className="text-base md:text-lg leading-relaxed max-w-sm" style={{ color: 'rgba(209,213,219,0.9)' }}>
         {description}
       </p>
     </motion.div>
@@ -100,7 +103,7 @@ export function HeroStory() {
 
         <div className="relative z-10 h-full flex items-center">
           <div className="w-full max-w-7xl mx-auto px-8 md:px-14 lg:px-20">
-            <div className="w-full md:w-2/5 relative" style={{ minHeight: 240 }}>
+            <div className="w-full md:w-1/2 relative" style={{ minHeight: 280 }}>
               {phases.map((phase, i) => (
                 <PhaseText
                   key={i}
@@ -109,6 +112,7 @@ export function HeroStory() {
                   description={phase.description}
                   progressRange={phase.range}
                   scrollYProgress={scrollYProgress}
+                  phaseIndex={i}
                 />
               ))}
             </div>

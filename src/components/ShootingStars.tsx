@@ -27,6 +27,18 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
     }));
   }, [count]);
 
+  const twinkleStars = useMemo(() => {
+    return Array.from({ length: 60 }, (_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: 1 + Math.random() * 1.5,
+      baseOpacity: 0.3 + Math.random() * 0.7,
+      duration: `${2 + Math.random() * 4}s`,
+      delay: `${Math.random() * 5}s`,
+    }));
+  }, []);
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <style>{`
@@ -91,18 +103,18 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
           animation: twinkle var(--twinkle-duration) var(--twinkle-delay) ease-in-out infinite;
         }
       `}</style>
-      {Array.from({ length: 60 }, (_, i) => (
+      {twinkleStars.map((star) => (
         <div
-          key={`twinkle-${i}`}
+          key={`twinkle-${star.id}`}
           className="twinkle-star"
           style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            width: 1 + Math.random() * 1.5,
-            height: 1 + Math.random() * 1.5,
-            '--base-opacity': 0.3 + Math.random() * 0.7,
-            '--twinkle-duration': `${2 + Math.random() * 4}s`,
-            '--twinkle-delay': `${Math.random() * 5}s`,
+            top: star.top,
+            left: star.left,
+            width: star.size,
+            height: star.size,
+            '--base-opacity': star.baseOpacity,
+            '--twinkle-duration': star.duration,
+            '--twinkle-delay': star.delay,
           } as React.CSSProperties}
         />
       ))}

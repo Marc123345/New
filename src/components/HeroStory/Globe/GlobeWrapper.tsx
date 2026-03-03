@@ -27,11 +27,18 @@ const heatmapColorFn = (t: number) => {
 
 const CITIES = worldPopulationData.slice(0, 20);
 
+const ARC_START = 0.15;
+
+function getArcThreshold(progress: number): number {
+  if (progress < ARC_START) return 0;
+  return Math.min(Math.floor(((progress - ARC_START) / (1 - ARC_START)) * CITIES.length), CITIES.length - 1);
+}
+
 const buildArcs = (() => {
   const cache = new Map<number, object[]>();
   return (progress: number) => {
-    if (progress < 0.15) return [];
-    const threshold = Math.min(Math.floor(((progress - 0.15) / 0.85) * CITIES.length), CITIES.length - 1);
+    const threshold = getArcThreshold(progress);
+    if (threshold === 0) return [];
     if (cache.has(threshold)) return cache.get(threshold)!;
     const arcs: object[] = [];
     for (let i = 0; i < threshold; i++) {
@@ -148,7 +155,7 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
         if (controls) controls.autoRotateSpeed = 0.4 + p * 1.2;
       }
 
-      const newThreshold = p < 0.15 ? 0 : Math.min(Math.floor(((p - 0.15) / 0.85) * CITIES.length), CITIES.length - 1);
+      const newThreshold = getArcThreshold(p);
       if (newThreshold !== lastArcThresholdRef.current) {
         lastArcThresholdRef.current = newThreshold;
         globe.arcsData(buildArcs(p));

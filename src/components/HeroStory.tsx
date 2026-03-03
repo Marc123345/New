@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
-import { GlobeWrapper } from './HeroStory/Globe/GlobeWrapper';
+import { HeroScene } from './HeroStory/HeroScene';
 
 const phases = [
   {
@@ -55,7 +55,7 @@ const PhaseText = ({
     >
       <p
         className="text-sm uppercase tracking-[0.25em] font-bold mb-4"
-        style={{ color: 'rgba(192,132,252,0.95)' }}
+        style={{ color: 'rgba(100,180,240,0.95)', fontFamily: 'var(--font-stack-heading)' }}
       >
         {subtitle}
       </p>
@@ -63,13 +63,13 @@ const PhaseText = ({
         className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-white"
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          textShadow: `0 0 50px rgba(168,85,247,${0.4 + phaseIndex * 0.15})`,
+          textShadow: `0 0 50px rgba(74,144,217,${0.4 + phaseIndex * 0.15})`,
           whiteSpace: 'pre-line',
         }}
       >
         {title}
       </h2>
-      <p className="text-base md:text-lg leading-relaxed max-w-sm" style={{ color: 'rgba(209,213,219,0.9)' }}>
+      <p className="text-base md:text-lg leading-relaxed max-w-sm" style={{ color: 'rgba(209,213,219,0.9)', fontFamily: 'var(--font-stack-body)' }}>
         {description}
       </p>
     </motion.div>
@@ -93,12 +93,12 @@ export function HeroStory() {
     >
       <div
         className="sticky top-0 h-screen w-full overflow-hidden"
-        style={{ background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)' }}
+        style={{ background: '#080c10' }}
       >
-        <GlobeWrapper scrollYProgress={scrollYProgress} />
+        <HeroScene scrollYProgress={scrollYProgress} />
 
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+          background: 'linear-gradient(to right, rgba(0,5,15,0.85) 0%, rgba(0,5,15,0.55) 40%, rgba(0,5,15,0.1) 70%, transparent 100%)',
         }} />
 
         <div className="relative z-10 h-full flex items-center">
@@ -120,12 +120,12 @@ export function HeroStory() {
         </div>
 
         <div className="absolute bottom-8 left-8 md:left-14 lg:left-20 right-8 z-20 flex flex-col gap-2">
-          <div className="w-64 h-px relative" style={{ background: 'rgba(168,85,247,0.2)' }}>
+          <div className="w-64 h-px relative" style={{ background: 'rgba(74,144,217,0.25)' }}>
             <motion.div
               className="absolute inset-y-0 left-0"
               style={{
                 width: progressBarWidth,
-                background: 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))',
+                background: 'linear-gradient(to right, rgba(74,144,217,0.9), rgba(100,180,240,0.5))',
               }}
             />
             <motion.div
@@ -135,17 +135,17 @@ export function HeroStory() {
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
-                background: '#c084fc',
-                boxShadow: '0 0 8px rgba(192,132,252,0.8)',
+                background: '#64b4f0',
+                boxShadow: '0 0 8px rgba(100,180,240,0.8)',
                 translateX: '-50%',
               }}
             />
           </div>
           <div className="flex items-center gap-2">
             <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
-              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.5)" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(100,180,240,0.5)" strokeWidth="1" strokeLinecap="round"/>
             </svg>
-            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(192,132,252,0.45)', fontFamily: 'var(--font-stack-heading)' }}>
+            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(100,180,240,0.45)', fontFamily: 'var(--font-stack-heading)' }}>
               scroll to explore
             </span>
           </div>
@@ -153,7 +153,7 @@ export function HeroStory() {
 
         <div
           className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={{ background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(to top, rgba(0,5,15,0.7) 0%, transparent 100%)' }}
         />
       </div>
     </div>

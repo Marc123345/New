@@ -91,7 +91,7 @@ export function Testimonials() {
 
   return (
     <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
-      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-10 md:py-0">
+      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
 
         <div className="text-center mb-6 md:mb-8 px-4 md:px-8">
           <div
@@ -121,7 +121,7 @@ export function Testimonials() {
         </div>
 
         {/* Adjusted Height for Mobile Responsiveness */}
-        <div className="max-w-[1400px] mx-auto w-full h-[70vh] min-h-[450px] md:min-h-[550px] md:h-[600px] lg:h-[650px] flex gap-6 px-4 md:px-8">
+        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-6 px-4 md:px-8">
           {/* LEFT: Globe Panel */}
           <div
             className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
@@ -210,7 +210,7 @@ export function Testimonials() {
               boxShadow: "var(--shadow-geometric)",
             }}
           >
-            <div className="relative w-full flex-1 flex items-center justify-center perspective-[1000px]" style={{ minHeight: 0 }}>
+            <div className="relative w-full flex-1 flex items-center justify-center" style={{ minHeight: 0, perspective: "1000px" }}>
               {CONTACTS.map((contact, i) => (
                 <TestimonialCard
                   key={contact.id}

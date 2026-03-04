@@ -58,7 +58,7 @@ export function SpotlightBlogModal({
         >
           <motion.div
             className="absolute inset-0"
-            style={{ background: "rgba(41, 30, 86, 0.85)", backdropFilter: "blur(8px)" }}
+            style={{ background: "rgba(41, 30, 86, 0.97)", backdropFilter: "blur(16px)" }}
             onClick={onClose}
           />
 

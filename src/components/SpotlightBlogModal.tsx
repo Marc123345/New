@@ -50,8 +50,7 @@ export function SpotlightBlogModal({
     <AnimatePresence>
       {selectedPost !== null && (
         <motion.div
-          className="fixed inset-0 flex items-start justify-center overflow-y-auto"
-          style={{ zIndex: 99999, isolation: "isolate" }}
+          className="fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -59,7 +58,7 @@ export function SpotlightBlogModal({
         >
           <motion.div
             className="absolute inset-0"
-            style={{ zIndex: 0, background: "rgba(41, 30, 86, 0.85)", backdropFilter: "blur(8px)" }}
+            style={{ background: "rgba(41, 30, 86, 0.85)", backdropFilter: "blur(8px)" }}
             onClick={onClose}
           />
 
@@ -70,7 +69,6 @@ export function SpotlightBlogModal({
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              zIndex: 1,
               border: "2px solid var(--color-text-dark)",
               boxShadow: "16px 16px 0 var(--color-primary)",
             }}

@@ -222,8 +222,8 @@ export function Testimonials() {
               ))}
             </div>
 
-            {/* Contact list strip at bottom - Switched to horizontal scroll on mobile */}
-            <div className="shrink-0 border-t border-white/10 px-4 md:px-6 py-3">
+            {/* Contact list strip at bottom */}
+            <div className="relative z-20 shrink-0 border-t border-white/10 px-4 md:px-6 py-3 bg-[var(--color-surface-dark)]">
               <div 
                 className="flex overflow-x-auto gap-2 pb-1 snap-x" 
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hides scrollbar
@@ -359,8 +359,7 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      // Adjusted width and paddings for mobile
-      className="absolute w-[90%] md:w-[85%] lg:w-[80%] bg-[var(--color-primary)] text-white p-6 md:p-10"
+      className="absolute w-[95%] md:w-[85%] lg:w-[80%] max-h-[85%] bg-[var(--color-primary)] text-white p-5 md:p-10 flex flex-col"
       data-geometric-card
     >
       <div
@@ -370,17 +369,15 @@ function TestimonialCard({
           boxShadow: "var(--shadow-geometric)",
         }}
       />
-      <div className="relative flex flex-col gap-4 md:gap-6">
+      <div className="relative flex flex-col gap-4 md:gap-6 overflow-y-auto pr-2" style={{ scrollbarWidth: "none" }}>
         <h3
-          // Responsive text sizing for quotes
-          className="text-[1.1rem] md:text-2xl lg:text-3xl leading-[1.3] md:leading-[1.1] tracking-tight"
+          className="text-sm sm:text-base md:text-2xl lg:text-3xl leading-snug tracking-tight"
           style={{ fontFamily: "var(--font-stack-heading)" }}
         >
           "{contact.quote}"
         </h3>
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-3 md:gap-4 mt-auto">
           <motion.div
-            // Adjusted avatar sizes
             className="w-10 h-10 md:w-14 md:h-14 shrink-0 rounded-full overflow-hidden border-2 border-white/30"
             style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
@@ -401,7 +398,7 @@ function TestimonialCard({
           </motion.div>
           <div>
             <div
-              className="text-lg md:text-2xl leading-none mb-1 text-[#FBFBFC]"
+              className="text-base md:text-2xl leading-none mb-1 text-[#FBFBFC]"
               style={{
                 fontFamily: "var(--font-stack-body)",
                 fontStyle: "italic",
@@ -410,7 +407,7 @@ function TestimonialCard({
               {contact.name}
             </div>
             <div
-              className="inline-block bg-[var(--color-secondary)] px-2 py-1 md:px-3 md:py-1 text-[10px] md:text-xs tracking-widest text-[var(--color-background-light)]"
+              className="inline-block bg-[var(--color-secondary)] px-2 py-1 md:px-3 md:py-1 text-[10px] md:text-xs tracking-widest text-[var(--color-background-light)] whitespace-nowrap"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {contact.role} · {contact.company}

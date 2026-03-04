@@ -121,6 +121,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
         isOpen={videoOpen}
         onClose={() => setVideoOpen(false)}
         title="Hear Our Story"
+        videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
       />
 
       <HologramOverlay

@@ -5,10 +5,14 @@ import { X, Play } from 'lucide-react';
 const FOUNDER_VIDEO_URL =
   'https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214';
 
+const STORY_VIDEO_URL =
+  'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4';
+
 interface HologramOverlayProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
+  videoUrl?: string;
 }
 
 function FloatingParticles() {
@@ -222,7 +226,8 @@ function HoloHUD({ playing }: { playing: boolean }) {
   );
 }
 
-export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }: HologramOverlayProps) {
+export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', videoUrl }: HologramOverlayProps) {
+  const resolvedVideoUrl = videoUrl ?? FOUNDER_VIDEO_URL;
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -531,7 +536,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder' }:
                 >
                   <video
                     ref={videoRef}
-                    src={FOUNDER_VIDEO_URL}
+                    src={resolvedVideoUrl}
                     playsInline
                     onCanPlay={() => setVideoReady(true)}
                     onEnded={handleVideoEnd}

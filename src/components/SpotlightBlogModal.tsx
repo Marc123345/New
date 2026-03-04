@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Clock, User, Calendar } from "lucide-react";
 
@@ -45,11 +46,11 @@ export function SpotlightBlogModal({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {selectedPost !== null && (
         <motion.div
-          className="fixed inset-0 z-[150] flex items-start justify-center overflow-y-auto"
+          className="fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -229,6 +230,7 @@ export function SpotlightBlogModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

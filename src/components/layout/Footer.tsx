@@ -104,7 +104,7 @@ export function Footer() {
                 CONTACT
               </p>
               <a
-                href="mailto:hello@h2h.digital"
+                href="mailto:shannon@h2hsocial.club"
                 className="group block text-[var(--color-text-dark)]/80 hover:text-[var(--color-secondary)] transition-colors duration-300"
                 style={{
                   lineHeight: 'var(--line-height-normal)',
@@ -112,7 +112,7 @@ export function Footer() {
                 }}
               >
                 <span className="relative">
-                  hello@h2h.digital
+                  shannon@h2hsocial.club
                   <span className="absolute left-0 -bottom-0.5 w-full h-px bg-[var(--color-secondary)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                 </span>
               </a>

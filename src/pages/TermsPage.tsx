@@ -74,7 +74,7 @@ const sections = [
   {
     title: 'Contact Us',
     content: [
-      'If you have any questions about these Terms and Conditions, please contact us at hello@h2h.digital.',
+      'If you have any questions about these Terms and Conditions, please contact us at shannon@h2hsocial.club.',
     ],
   },
 ];

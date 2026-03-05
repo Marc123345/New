@@ -221,7 +221,7 @@ export function AboutStory() {
                   playsInline
                   className="w-full object-cover"
                   style={{ aspectRatio: '4 / 5', display: 'block' }}
-                  src="https://ik.imagekit.io/qcvroy8xpd/Shannon_s_Space_Video_Creation.mp4"
+                  src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_With_Earth.mp4"
                 />
                 <div
                   className="pointer-events-none"

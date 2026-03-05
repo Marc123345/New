@@ -59,7 +59,7 @@ export function SpotlightBlogModal({
         >
           <motion.div
             className="absolute inset-0"
-            style={{ background: "rgba(41, 30, 86, 0.97)", backdropFilter: "blur(16px)" }}
+            style={{ background: "rgba(4, 6, 8, 0.97)", backdropFilter: "blur(16px)" }}
             onClick={onClose}
           />
 
@@ -70,7 +70,7 @@ export function SpotlightBlogModal({
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: "#0c0a1a",
+              background: "#0a0c10",
               border: "1px solid rgba(255,255,255,0.12)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}
@@ -94,7 +94,7 @@ export function SpotlightBlogModal({
                   alt={posts[selectedPost].title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a1a] via-transparent to-transparent opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c10] via-transparent to-transparent opacity-80" />
                 <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-8 sm:right-8">
                   <span
                     className="inline-block px-3 py-1 mb-4 text-[10px] uppercase tracking-[0.2em] bg-[var(--color-secondary)] text-[var(--color-primary)]"

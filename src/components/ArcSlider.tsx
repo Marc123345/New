@@ -775,9 +775,11 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
   const containerRef = useRef<HTMLDivElement>(null);
 
   const positionCards = useCallback((index: number, animate: boolean) => {
-    const spreadStep1 = 360;
-    const spreadStep2 = 580;
-    const spreadStep3 = 760;
+    const containerWidth = containerRef.current?.offsetWidth ?? 900;
+    const cardWidth = Math.min(380, Math.max(260, containerWidth * 0.55));
+    const spreadStep1 = cardWidth * 0.82;
+    const spreadStep2 = cardWidth * 1.3;
+    const spreadStep3 = cardWidth * 1.75;
 
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
@@ -796,11 +798,11 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
       if (absOffset === 0) {
         translateX = 0; rotateY = 0; translateZ = 0; scale = 1; opacity = 1; targetZIndex = 10;
       } else if (absOffset === 1) {
-        translateX = offset * spreadStep1; rotateY = offset < 0 ? 30 : -30; translateZ = -120; scale = 0.82; opacity = 0.6; targetZIndex = 5;
+        translateX = offset * spreadStep1; rotateY = offset < 0 ? 28 : -28; translateZ = -100; scale = 0.83; opacity = 0.55; targetZIndex = 5;
       } else if (absOffset === 2) {
-        translateX = offset * spreadStep2; rotateY = offset < 0 ? 45 : -45; translateZ = -240; scale = 0.65; opacity = 0.25; targetZIndex = 2;
+        translateX = offset * spreadStep2; rotateY = offset < 0 ? 42 : -42; translateZ = -200; scale = 0.66; opacity = 0.2; targetZIndex = 2;
       } else {
-        translateX = offset * spreadStep3; rotateY = offset < 0 ? 55 : -55; translateZ = -350; scale = 0.5; opacity = 0; targetZIndex = 1;
+        translateX = offset * spreadStep3; rotateY = offset < 0 ? 52 : -52; translateZ = -300; scale = 0.5; opacity = 0; targetZIndex = 1;
       }
 
       const shadow = absOffset === 0 ? "10px 10px 0 rgba(164,108,252,0.6)" : "none";
@@ -827,7 +829,7 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
   }, [activeIndex, positionCards]);
 
   useEffect(() => {
-    positionCards(0, false);
+    positionCards(activeIndex, false);
     const handleResize = () => positionCards(activeIndex, false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -874,10 +876,10 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
   return (
     <div
       ref={containerRef}
-      className="hidden md:block relative w-full cursor-grab active:cursor-grabbing"
+      className="hidden md:block relative w-full cursor-grab active:cursor-grabbing overflow-hidden"
       style={{
-        height: "clamp(380px, 50vw, 480px)",
-        perspective: "1200px",
+        height: "clamp(380px, 50vw, 500px)",
+        perspective: "1400px",
         perspectiveOrigin: "50% 50%",
         touchAction: "pan-y",
         userSelect: "none",
@@ -897,8 +899,8 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
               ref={(el) => (cardsRef.current[i] = el)}
               className="absolute will-change-transform"
               style={{
-                width: "clamp(260px, 55vw, 380px)",
-                aspectRatio: "3 / 3.5",
+                width: "clamp(240px, 32vw, 360px)",
+                aspectRatio: "3 / 3.8",
                 transformStyle: "preserve-3d",
                 backfaceVisibility: "hidden",
               }}

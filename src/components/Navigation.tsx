@@ -12,7 +12,7 @@ const NAV_LINKS = [
 ];
 
 const SOCIAL = [
-  { label: "LinkedIn", href: "#" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/human2humanmarketing/" },
   { label: "Twitter", href: "#" },
   { label: "Instagram", href: "#" },
 ];

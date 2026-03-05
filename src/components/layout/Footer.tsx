@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { H2HLogo } from '../H2HLogo';
 
 const SOCIAL_LINKS = [
-  { label: 'LinkedIn', icon: Linkedin, href: '#' },
+  { label: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/company/human2humanmarketing/' },
   { label: 'Twitter', icon: Twitter, href: '#' },
   { label: 'Instagram', icon: Instagram, href: '#' },
 ];

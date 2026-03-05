@@ -51,7 +51,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
         className="featured-hero-grid"
       >
         {/* Image side */}
-        <div style={{ position: "relative", overflow: "hidden", minHeight: "240px" }}>
+        <div className="featured-hero-image" style={{ position: "relative", overflow: "hidden", minHeight: "240px" }}>
           {post.image ? (
             <img
               src={post.image}
@@ -110,7 +110,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
         </div>
 
         {/* Content side */}
-        <div style={{
+        <div className="featured-hero-content" style={{
           padding: "clamp(32px, 4vw, 56px)",
           display: "flex",
           flexDirection: "column",
@@ -172,7 +172,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
               gap: "10px",
               marginBottom: "28px",
               paddingTop: "20px",
-              borderTop: "1px solid rgba(35,35,35,0.12)",
+              borderTop: "1px solid rgba(232,226,255,0.12)",
             }}>
               <div style={{
                 width: "32px", height: "32px",
@@ -457,6 +457,15 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
           .featured-hero-grid {
             grid-template-columns: 1fr !important;
           }
+          .featured-hero-image {
+            min-height: 220px !important;
+            aspect-ratio: 16/9;
+          }
+          .featured-hero-content {
+            border-left: none !important;
+            border-top: 2px solid var(--color-text-dark) !important;
+            padding: 20px !important;
+          }
           .secondary-posts-grid {
             grid-template-columns: 1fr !important;
           }
@@ -589,7 +598,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
             alignItems: "center",
             justifyContent: "space-between",
             paddingTop: "16px",
-            borderTop: "1px solid rgba(35,35,35,0.1)",
+            borderTop: "1px solid rgba(232,226,255,0.1)",
           }}>
             <span style={{
               display: "flex",

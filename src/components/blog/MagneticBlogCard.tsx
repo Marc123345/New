@@ -165,7 +165,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
 
           <div
             className="flex items-center justify-between pt-4"
-            style={{ borderTop: "1px solid rgba(35,35,35,0.12)" }}
+            style={{ borderTop: "1px solid rgba(232,226,255,0.12)" }}
           >
             <span
               className="text-[11px] tracking-wider uppercase opacity-50"

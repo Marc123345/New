@@ -451,7 +451,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
             exit={{ opacity: 0, scale: 0.85, rotateX: -12, y: 40 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24, mass: 0.8 }}
-            className="fixed inset-0 flex items-center justify-center p-3 sm:p-4 md:p-10"
+            className="fixed inset-0 flex items-center justify-center px-3 pt-16 pb-3 sm:px-4 sm:pt-16 sm:pb-4 md:p-10"
             style={{ zIndex: 10000, pointerEvents: 'none', perspective: 1400 }}
           >
             <div

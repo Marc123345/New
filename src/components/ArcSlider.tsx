@@ -294,10 +294,10 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
             <div
               ref={scrollRef}
               className="relative z-10 overflow-y-auto overscroll-contain"
-              style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
+              style={{ maxHeight: "100%", WebkitOverflowScrolling: "touch" }}
               onScroll={handleScroll}
             >
-              <div className="px-5 sm:px-7 md:px-8 pt-14 sm:pt-16 pb-8 sm:pb-10 space-y-6 sm:space-y-7">
+              <div className="px-5 sm:px-7 md:px-8 pt-10 sm:pt-12 pb-8 sm:pb-10 space-y-6 sm:space-y-7">
               {service.image && (
                 <motion.div
                   key={`img-${service.id}`}
@@ -446,6 +446,8 @@ export function ArcSlider() {
     const spreadStep1 = isMobile ? 300 : 360;
     const spreadStep2 = isMobile ? 420 : 580;
     const spreadStep3 = isMobile ? 540 : 760;
+    // Cards beyond this offset are fully invisible and skip animation
+    const maxVisibleOffset = 3;
 
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
@@ -494,6 +496,14 @@ export function ArcSlider() {
       const shadow = absOffset === 0
         ? "0 0 60px rgba(0,0,0,0.85), 10px 10px 0 rgba(164,108,252,0.6)"
         : "none";
+
+      if (absOffset > maxVisibleOffset) {
+        gsap.set(card, {
+          x: translateX, rotateY, z: translateZ,
+          scale, opacity: 0, zIndex: 0, boxShadow: "none",
+        });
+        return;
+      }
 
       if (animate) {
         gsap.set(card, { zIndex: targetZIndex });
@@ -635,7 +645,7 @@ export function ArcSlider() {
 
         <div
           ref={tabBarRef}
-          className="relative z-30 flex gap-1.5 sm:gap-2 justify-start md:justify-center px-4 sm:px-6 mb-8 sm:mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
+          className="relative z-30 flex gap-1.5 sm:gap-2 justify-start md:justify-center px-4 sm:px-6 mb-6 sm:mb-8 md:mb-10 overflow-x-auto hide-scrollbar"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           role="tablist"
         >
@@ -677,7 +687,7 @@ export function ArcSlider() {
           ref={containerRef}
           className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            height: "clamp(380px, 50vw, 480px)",
+            height: "clamp(340px, 48vw, 440px)",
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
             touchAction: "pan-y",
@@ -699,7 +709,7 @@ export function ArcSlider() {
                   className="absolute will-change-transform"
                   style={{
                     width: "clamp(260px, 55vw, 380px)",
-                    aspectRatio: "3 / 3.5",
+                    aspectRatio: "3 / 3.2",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}
@@ -798,7 +808,7 @@ export function ArcSlider() {
           </div>
         </div>
 
-        <div className="relative z-20 flex gap-2 justify-center mt-6 md:mt-10">
+        <div className="relative z-20 flex gap-2 justify-center mt-4 md:mt-6">
           {SERVICES.map((_, i) => (
             <button
               key={i}

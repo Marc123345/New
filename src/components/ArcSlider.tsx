@@ -443,7 +443,7 @@ export function ArcSlider() {
 
   const positionCards = useCallback((index: number, animate: boolean) => {
     const isMobile = window.innerWidth < 768;
-    const spreadStep1 = isMobile ? 240 : 360;
+    const spreadStep1 = isMobile ? 300 : 360;
     const spreadStep2 = isMobile ? 420 : 580;
     const spreadStep3 = isMobile ? 540 : 760;
 
@@ -473,7 +473,7 @@ export function ArcSlider() {
         rotateY = offset < 0 ? 30 : -30;
         translateZ = -120;
         scale = 0.82;
-        opacity = 0.6;
+        opacity = 0.4;
         targetZIndex = 5;
       } else if (absOffset === 2) {
         translateX = offset * spreadStep2;
@@ -492,7 +492,7 @@ export function ArcSlider() {
       }
 
       const shadow = absOffset === 0
-        ? "10px 10px 0 rgba(164,108,252,0.6)"
+        ? "0 0 60px rgba(0,0,0,0.85), 10px 10px 0 rgba(164,108,252,0.6)"
         : "none";
 
       if (animate) {
@@ -735,7 +735,7 @@ export function ArcSlider() {
                         </span>
                       </div>
                       <div
-                        className="w-10 h-10 flex items-center justify-center opacity-20"
+                        className="w-10 h-10 flex items-center justify-center opacity-70"
                         style={{ color: "#fff" }}
                       >
                         <IconComponent size={32} strokeWidth={1.5} />
@@ -763,7 +763,7 @@ export function ArcSlider() {
                             e.stopPropagation();
                             setOverlayService(service);
                           }}
-                          className="group inline-flex items-center gap-3 transition-all duration-300"
+                          className="group inline-flex items-center justify-center gap-3 transition-all duration-300"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
                             fontSize: "0.75rem",

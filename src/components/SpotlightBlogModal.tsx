@@ -117,7 +117,7 @@ export function SpotlightBlogModal({
               </div>
             )}
 
-            <div className="px-5 sm:px-8 md:px-12 py-6 sm:py-8" style={{ color: "rgba(255,255,255,0.85)" }}>
+            <div className="pl-5 pr-16 sm:pl-8 sm:pr-16 md:pl-12 md:pr-16 py-6 sm:py-8" style={{ color: "rgba(255,255,255,0.85)" }}>
               {!posts[selectedPost].image && (
                 <>
                   <span
@@ -165,9 +165,10 @@ export function SpotlightBlogModal({
               </div>
 
               <blockquote
-                className="mb-6 sm:mb-8 pl-4 sm:pl-5 italic text-base sm:text-lg leading-relaxed"
+                className="mb-6 sm:mb-8 italic text-base sm:text-lg leading-relaxed"
                 style={{
                   borderLeft: "3px solid var(--color-secondary)",
+                  paddingLeft: "1.5rem",
                   fontFamily: "var(--font-stack-body)",
                   color: "var(--color-text-dark)",
                   opacity: 0.85,

@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
+// Note: "motion/react" is correct for Framer Motion v12+. 
+// If you are on v11 or older, change this to: import { motion, AnimatePresence } from "framer-motion";
 import { motion, AnimatePresence } from "motion/react";
 import { PenLine, Bot, Search, Palette, Video, ChartBar as BarChart2, User, MessageCircle, MousePointerClick, Megaphone, X } from "lucide-react";
 
@@ -198,9 +200,17 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showHint, setShowHint] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const touchRef = useRef({ startY: 0, atTop: false });
   const onCloseRef = useRef(onClose);
-  useEffect(() => { onCloseRef.current = onClose; });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => { 
+    onCloseRef.current = onClose; 
+  }, [onClose]);
 
   useEffect(() => {
     if (!service) return;
@@ -209,12 +219,15 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
     const el = scrollRef.current;
     const isScrollable = el ? el.scrollHeight > el.clientHeight : false;
     setShowHint(isScrollable);
+    
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onCloseRef.current();
     };
+    
     const prevOverflow = document.body.style.overflow;
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
+    
     return () => {
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = prevOverflow;
@@ -239,6 +252,8 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
     const delta = e.changedTouches[0].clientY - touchRef.current.startY;
     if (delta > 100) onCloseRef.current();
   }, []);
+
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>
@@ -446,7 +461,6 @@ export function ArcSlider() {
     const spreadStep1 = isMobile ? 300 : 360;
     const spreadStep2 = isMobile ? 420 : 580;
     const spreadStep3 = isMobile ? 540 : 760;
-    // Cards beyond this offset are fully invisible and skip animation
     const maxVisibleOffset = 3;
 
     SERVICES.forEach((_, i) => {
@@ -558,13 +572,13 @@ export function ArcSlider() {
     const onStart = (e: MouseEvent | TouchEvent) => {
       dragRef.current.isDragging = true;
       dragRef.current.hasMoved = false;
-      dragRef.current.startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      dragRef.current.startX = "touches" in e ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
       container.style.cursor = "grabbing";
     };
 
     const onMove = (e: MouseEvent | TouchEvent) => {
       if (!dragRef.current.isDragging) return;
-      const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const x = "touches" in e ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
       if (Math.abs(x - dragRef.current.startX) > 8) {
         dragRef.current.hasMoved = true;
       }
@@ -578,7 +592,7 @@ export function ArcSlider() {
       if (!dragRef.current.hasMoved) return;
 
       const endX = "changedTouches" in e
-        ? e.changedTouches[0].clientX
+        ? (e as TouchEvent).changedTouches[0].clientX
         : (e as MouseEvent).clientX;
       const delta = endX - dragRef.current.startX;
 

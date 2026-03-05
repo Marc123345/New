@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect, memo } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { GlobeWrapper } from './HeroStory/Globe/GlobeWrapper';
 
@@ -29,7 +29,7 @@ const phases = [
   },
 ];
 
-const PhaseText = ({
+const PhaseText = memo(({
   subtitle,
   title,
   description,
@@ -74,16 +74,31 @@ const PhaseText = ({
       </p>
     </motion.div>
   );
-};
+});
 
 export function HeroStory() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
   });
 
   const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0, rootMargin: '100px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
@@ -92,10 +107,11 @@ export function HeroStory() {
       style={{ height: '500vh' }}
     >
       <div
+        ref={stickyRef}
         className="sticky top-0 h-screen w-full overflow-hidden"
         style={{ background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)' }}
       >
-        <GlobeWrapper scrollYProgress={scrollYProgress} />
+        <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
 
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',

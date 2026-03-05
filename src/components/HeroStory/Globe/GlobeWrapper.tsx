@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
 import { isMobileDevice } from '../../../hooks/useIsMobile';
@@ -6,28 +6,10 @@ import './globe.css';
 
 interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;
+  isVisible?: boolean;
 }
 
-const heatmapColorFn = (t: number) => {
-  if (t == null || isNaN(t)) return 'rgba(0,0,0,0)';
-  const safeT = Math.max(0, Math.min(1, t));
-  const colors = [
-    [0, 0, 0, 0],
-    [0.1, 0, 0.3, 0.3],
-    [0.3, 0, 0.6, 0.5],
-    [0.5, 0.1, 0.8, 0.7],
-    [0.75, 0.3, 1, 0.85],
-    [1, 0.5, 1, 1],
-  ] as number[][];
-  const idx = Math.floor(safeT * (colors.length - 1));
-  const nextIdx = Math.min(idx + 1, colors.length - 1);
-  const blend = safeT * (colors.length - 1) - idx;
-  const color = colors[idx].map((c, i) => c + (colors[nextIdx][i] - c) * blend);
-  return `rgba(${Math.round(color[0] * 255)}, ${Math.round(color[1] * 255)}, ${Math.round(color[2] * 255)}, ${color[3]})`;
-};
-
 const CITIES = worldPopulationData.slice(0, 20);
-
 const ARC_START = 0.15;
 
 function getArcThreshold(progress: number): number {
@@ -35,51 +17,53 @@ function getArcThreshold(progress: number): number {
   return Math.min(Math.floor(((progress - ARC_START) / (1 - ARC_START)) * CITIES.length), CITIES.length - 1);
 }
 
-const buildArcs = (() => {
-  const cache = new Map<number, object[]>();
-  return (progress: number) => {
-    const threshold = getArcThreshold(progress);
-    if (threshold === 0) return [];
-    if (cache.has(threshold)) return cache.get(threshold)!;
-    const arcs: object[] = [];
-    for (let i = 0; i < threshold; i++) {
+const arcCache = new Map<number, object[]>();
+function buildArcs(progress: number): object[] {
+  const threshold = getArcThreshold(progress);
+  if (threshold === 0) return [];
+  if (arcCache.has(threshold)) return arcCache.get(threshold)!;
+  const arcs: object[] = [];
+  for (let i = 0; i < threshold; i++) {
+    arcs.push({
+      startLat: CITIES[i].lat,
+      startLng: CITIES[i].lng,
+      endLat: CITIES[(i + 3) % CITIES.length].lat,
+      endLng: CITIES[(i + 3) % CITIES.length].lng,
+      color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
+    });
+    if (progress > 0.5 && i < threshold - 1) {
       arcs.push({
         startLat: CITIES[i].lat,
         startLng: CITIES[i].lng,
-        endLat: CITIES[(i + 3) % CITIES.length].lat,
-        endLng: CITIES[(i + 3) % CITIES.length].lng,
-        color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
+        endLat: CITIES[(i + 5) % CITIES.length].lat,
+        endLng: CITIES[(i + 5) % CITIES.length].lng,
+        color: ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'],
       });
-      if (progress > 0.5 && i < threshold - 1) {
-        arcs.push({
-          startLat: CITIES[i].lat,
-          startLng: CITIES[i].lng,
-          endLat: CITIES[(i + 5) % CITIES.length].lat,
-          endLng: CITIES[(i + 5) % CITIES.length].lng,
-          color: ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'],
-        });
-      }
     }
-    cache.set(threshold, arcs);
-    return arcs;
-  };
-})();
+  }
+  arcCache.set(threshold, arcs);
+  return arcs;
+}
 
-export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
+export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
   const pendingProgressRef = useRef<number | null>(null);
   const lastArcThresholdRef = useRef<number>(-1);
   const lastAltitudeRef = useRef<number>(2.2);
+  const mobileRef = useRef(isMobileDevice());
+  const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const mobile = isMobileDevice();
+    const mobile = mobileRef.current;
+    let destroyed = false;
 
     const init = async () => {
       const GlobeModule = await import('globe.gl');
+      if (destroyed) return;
       const Globe = GlobeModule.default;
 
       const globe = Globe({ animateIn: false })(containerRef.current!);
@@ -131,27 +115,54 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
 
     init();
 
-    const handleResize = () => {
-      if (globeRef.current && containerRef.current) {
-        globeRef.current
-          .width(containerRef.current.clientWidth)
-          .height(containerRef.current.clientHeight);
-      }
-    };
-
-    window.addEventListener('resize', handleResize, { passive: true });
-
     return () => {
-      window.removeEventListener('resize', handleResize);
+      destroyed = true;
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (globeRef.current) {
+        const renderer = globeRef.current.renderer?.();
+        if (renderer) {
+          renderer.dispose();
+          renderer.forceContextLoss();
+        }
         globeRef.current._destructor?.();
         globeRef.current = null;
       }
     };
   }, []);
 
+  const handleResize = useCallback(() => {
+    if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
+    resizeTimerRef.current = setTimeout(() => {
+      if (globeRef.current && containerRef.current) {
+        globeRef.current
+          .width(containerRef.current.clientWidth)
+          .height(containerRef.current.clientHeight);
+      }
+    }, 200);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
+
+  useEffect(() => {
+    if (!globeRef.current) return;
+    const controls = globeRef.current.controls();
+    if (controls) {
+      controls.autoRotate = isVisible;
+    }
+    const renderer = globeRef.current.renderer?.();
+    if (renderer) {
+      if (isVisible) {
+        renderer.setAnimationLoop(renderer.render);
+      }
+    }
+  }, [isVisible]);
+
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
+    if (!isVisible) return;
     pendingProgressRef.current = progress;
     if (rafRef.current !== null) return;
 
@@ -160,7 +171,7 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
       const p = pendingProgressRef.current;
       if (p === null || !globeRef.current) return;
 
-      const mobile = isMobileDevice();
+      const mobile = mobileRef.current;
       const globe = globeRef.current;
       const newAltitude = Math.max(1.2, 2.2 - p * 0.8);
 
@@ -188,7 +199,7 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
     <div
       ref={containerRef}
       className="absolute inset-0 w-full h-full"
-      style={{ background: 'transparent', willChange: 'transform' }}
+      style={{ background: 'transparent' }}
     />
   );
 }

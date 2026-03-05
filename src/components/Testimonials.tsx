@@ -95,7 +95,6 @@ export function Testimonials() {
   }, [scrollYProgress]);
 
   return (
-    {/* Replaced CSS variable with a deep Dark Purple background */}
     <div ref={containerRef} className="relative h-[300vh] bg-[#13082A]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
 
@@ -208,7 +207,6 @@ export function Testimonials() {
           </div>
 
           {/* RIGHT: Testimonial Cards */}
-          {/* Replaced CSS variable with a lighter dark purple for contrast */}
           <div
             className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
             style={{
@@ -322,7 +320,7 @@ function GlobeMap({
   scrollProgress,
   activeIndex,
 }: {
-  scrollProgress: MotionValue<number>; // Fixed TypeScript "any" issue
+  scrollProgress: MotionValue<number>;
   activeIndex: number;
 }) {
   const active = CONTACTS[activeIndex];
@@ -377,7 +375,7 @@ function TestimonialCard({
   contact: (typeof CONTACTS)[number];
   index: number;
   total: number;
-  scrollProgress: MotionValue<number>; // Fixed TypeScript "any" issue
+  scrollProgress: MotionValue<number>;
 }) {
   const segmentSize = 1 / total;
   const start = index * segmentSize;

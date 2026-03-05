@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { H2HLogo } from "./H2HLogo";
 
 const NAV_LINKS = [
@@ -23,7 +23,10 @@ export function Navigation() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -61,15 +64,37 @@ export function Navigation() {
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setIsOpen(false);
+
     if (href.startsWith("/")) {
-      setTimeout(() => navigate(href), 500);
+      setTimeout(() => navigate(href), 400);
       return;
     }
+
+    if (!isHomePage) {
+      setTimeout(() => {
+        navigate("/");
+        setTimeout(() => {
+          const el = document.getElementById(href.substring(1));
+          if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: "smooth" });
+        }, 300);
+      }, 400);
+      return;
+    }
+
     setTimeout(() => {
       const el = document.getElementById(href.substring(1));
       if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: "smooth" });
-    }, 550);
-  }, [navigate]);
+    }, 450);
+  }, [navigate, isHomePage]);
+
+  const handleLogoClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isHomePage) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+    }
+  }, [navigate, isHomePage]);
 
   return (
     <>
@@ -85,9 +110,9 @@ export function Navigation() {
       >
         <div className="container mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
           <a
-            href="#hero"
+            href="/"
             aria-label="H2H Digital Home"
-            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            onClick={handleLogoClick}
             className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           >
             <H2HLogo height={56} className="transition-all duration-300" />
@@ -100,7 +125,7 @@ export function Navigation() {
             className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
-          style={{ minWidth: 44, minHeight: 44, touchAction: 'manipulation' }}
+            style={{ minWidth: 44, minHeight: 44, touchAction: "manipulation" }}
           >
             <span
               className="hidden sm:block text-[10px] uppercase tracking-[0.3em] font-medium transition-colors duration-500"
@@ -120,15 +145,12 @@ export function Navigation() {
         </div>
       </header>
 
-      {/* Fullscreen overlay */}
       <div
         className={`fixed inset-0 z-[110] transition-opacity duration-700 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
-        style={{ backgroundColor: "#0c0c0c" }}
+        style={{ backgroundColor: "var(--color-background-light, #0e0b1f)" }}
       >
-
-        {/* Accent gradient blob */}
         <div
           className="absolute pointer-events-none"
           style={{
@@ -136,14 +158,23 @@ export function Navigation() {
             right: "-10%",
             width: "60vw",
             height: "60vw",
-            background: "radial-gradient(circle, rgba(180,140,80,0.07) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(164,108,252,0.06) 0%, transparent 70%)",
+            borderRadius: "50%",
+          }}
+        />
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            bottom: "-15%",
+            left: "-10%",
+            width: "50vw",
+            height: "50vw",
+            background: "radial-gradient(circle, rgba(164,108,252,0.04) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
         />
 
-        {/* Main content grid */}
         <div className="absolute inset-0 flex flex-col lg:flex-row">
-          {/* Left: Nav links (60%) */}
           <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 pt-20 sm:pt-28 lg:pt-0 overflow-y-auto">
             <nav
               className="flex flex-col"
@@ -155,51 +186,63 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setActiveIndex(i)}
-                  className="group relative flex items-center py-2.5 sm:py-3 md:py-4 border-b border-white/[0.06] overflow-hidden"
+                  className="group relative flex items-center py-2.5 sm:py-3 md:py-4 overflow-hidden"
                   style={{
+                    borderBottom: "1px solid rgba(164,108,252,0.08)",
                     transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
                     transitionDelay: mounted ? `${i * 60}ms` : "0ms",
                     transform: mounted ? "translateY(0)" : "translateY(40px)",
                     opacity: mounted ? 1 : 0,
                   }}
                 >
-                  {/* Hover background fill */}
                   <div
-                    className="absolute inset-0 bg-white/[0.03] transition-transform duration-500 origin-left"
-                    style={{ transform: activeIndex === i ? "scaleX(1)" : "scaleX(0)" }}
+                    className="absolute inset-0 transition-transform duration-500 origin-left"
+                    style={{
+                      background: "linear-gradient(90deg, rgba(164,108,252,0.06) 0%, transparent 100%)",
+                      transform: activeIndex === i ? "scaleX(1)" : "scaleX(0)",
+                    }}
                   />
 
-                  {/* Number */}
                   <span
-                    className="relative z-10 w-10 text-xs text-white/40 mr-6 transition-colors duration-300 group-hover:text-white/60"
-                    style={{ fontFamily: "var(--font-stack-heading)" }}
+                    className="relative z-10 w-10 text-xs mr-6 transition-colors duration-300"
+                    style={{
+                      fontFamily: "var(--font-stack-heading)",
+                      color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.25)",
+                    }}
                   >
                     {link.id}
                   </span>
 
-                  {/* Label */}
                   <span
                     className="relative z-10 flex-1 text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
-                      color: activeIndex !== null && activeIndex !== i ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.9)",
+                      color: activeIndex !== null && activeIndex !== i
+                        ? "rgba(232,226,255,0.12)"
+                        : "var(--color-text-dark, #e8e2ff)",
                       transition: "color 0.4s ease",
                     }}
                   >
                     {link.label}
                   </span>
 
-                  {/* Sub label */}
                   <span
-                    className="relative z-10 hidden md:block text-xs tracking-widest uppercase text-white/50 transition-all duration-300 group-hover:text-white/70 group-hover:translate-x-1"
-                    style={{ fontFamily: "var(--font-stack-heading)" }}
+                    className="relative z-10 hidden md:block text-xs tracking-widest uppercase transition-all duration-300"
+                    style={{
+                      fontFamily: "var(--font-stack-heading)",
+                      color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.3)",
+                      transform: activeIndex === i ? "translateX(4px)" : "translateX(0)",
+                    }}
                   >
                     {link.sub}
                   </span>
 
-                  {/* Arrow */}
                   <svg
-                    className="relative z-10 ml-4 w-5 h-5 text-white/20 transition-all duration-300 group-hover:text-white/70 group-hover:translate-x-1"
+                    className="relative z-10 ml-4 w-5 h-5 transition-all duration-300"
+                    style={{
+                      color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.15)",
+                      transform: activeIndex === i ? "translateX(4px)" : "translateX(0)",
+                    }}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -212,48 +255,57 @@ export function Navigation() {
             </nav>
           </div>
 
-          {/* Right panel: info (40%) — desktop only */}
           <div
-            className="hidden lg:flex lg:w-[40%] flex-col justify-between py-24 px-16 border-l border-white/[0.06]"
+            className="hidden lg:flex lg:w-[40%] flex-col justify-between py-24 px-16"
             style={{
+              borderLeft: "1px solid rgba(164,108,252,0.08)",
               transition: "opacity 0.8s ease, transform 0.8s ease",
               transitionDelay: mounted ? "200ms" : "0ms",
               opacity: mounted ? 1 : 0,
               transform: mounted ? "translateX(0)" : "translateX(30px)",
             }}
           >
-            {/* Top: tagline */}
             <div>
               <p
-                className="text-[10px] uppercase tracking-[0.4em] text-white/50 mb-6"
-                style={{ fontFamily: "var(--font-stack-heading)" }}
+                className="text-[10px] uppercase tracking-[0.4em] mb-6"
+                style={{
+                  fontFamily: "var(--font-stack-heading)",
+                  color: "var(--color-secondary)",
+                }}
               >
                 H2H Digital
               </p>
-              <p className="text-white/70 text-sm leading-relaxed max-w-xs">
+              <p
+                className="text-sm leading-relaxed max-w-xs"
+                style={{ color: "rgba(232,226,255,0.55)" }}
+              >
                 Bridging human potential with digital innovation across Africa and beyond.
               </p>
             </div>
 
-            {/* Middle: decorative element */}
             <div className="flex items-center gap-4">
-              <div className="h-[1px] flex-1 bg-white/10" />
-              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <div className="h-px flex-1" style={{ background: "rgba(164,108,252,0.1)" }} />
+              <div className="w-1.5 h-1.5" style={{ background: "var(--color-secondary)", opacity: 0.4 }} />
             </div>
 
-            {/* Bottom: contact + social */}
             <div className="space-y-8">
               <div>
                 <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/50 mb-3"
-                  style={{ fontFamily: "var(--font-stack-heading)" }}
+                  className="text-[10px] uppercase tracking-[0.4em] mb-3"
+                  style={{
+                    fontFamily: "var(--font-stack-heading)",
+                    color: "rgba(232,226,255,0.35)",
+                  }}
                 >
                   Get in touch
                 </p>
                 <a
                   href="#contact"
                   onClick={(e) => handleNavClick(e, "#contact")}
-                  className="text-white/60 hover:text-white text-sm transition-colors duration-300"
+                  className="text-sm transition-colors duration-300"
+                  style={{ color: "rgba(232,226,255,0.55)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-secondary)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(232,226,255,0.55)"; }}
                 >
                   hello@h2hdigital.com
                 </a>
@@ -261,8 +313,11 @@ export function Navigation() {
 
               <div>
                 <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/50 mb-3"
-                  style={{ fontFamily: "var(--font-stack-heading)" }}
+                  className="text-[10px] uppercase tracking-[0.4em] mb-3"
+                  style={{
+                    fontFamily: "var(--font-stack-heading)",
+                    color: "rgba(232,226,255,0.35)",
+                  }}
                 >
                   Follow us
                 </p>
@@ -271,8 +326,13 @@ export function Navigation() {
                     <a
                       key={s.label}
                       href={s.href}
-                      className="text-[11px] uppercase tracking-widest text-white/60 hover:text-white transition-colors duration-300"
-                      style={{ fontFamily: "var(--font-stack-heading)" }}
+                      className="text-[11px] uppercase tracking-widest transition-colors duration-300"
+                      style={{
+                        fontFamily: "var(--font-stack-heading)",
+                        color: "rgba(232,226,255,0.45)",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-secondary)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(232,226,255,0.45)"; }}
                     >
                       {s.label}
                     </a>
@@ -283,18 +343,21 @@ export function Navigation() {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div
-          className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 md:px-16 py-4 sm:py-5 flex items-center justify-between border-t border-white/[0.06]"
+          className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 md:px-16 py-4 sm:py-5 flex items-center justify-between"
           style={{
+            borderTop: "1px solid rgba(164,108,252,0.08)",
             transition: "opacity 0.8s ease",
             transitionDelay: mounted ? "350ms" : "0ms",
             opacity: mounted ? 1 : 0,
           }}
         >
           <p
-            className="text-[10px] uppercase tracking-[0.4em] text-white/50"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
+            className="text-[10px] uppercase tracking-[0.4em]"
+            style={{
+              fontFamily: "var(--font-stack-heading)",
+              color: "rgba(232,226,255,0.3)",
+            }}
           >
             &copy; {new Date().getFullYear()} H2H Digital
           </p>
@@ -303,26 +366,40 @@ export function Navigation() {
               <a
                 key={s.label}
                 href={s.href}
-                className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white/70 transition-colors duration-300"
-                style={{ fontFamily: "var(--font-stack-heading)" }}
+                className="text-[10px] uppercase tracking-widest transition-colors duration-300"
+                style={{
+                  fontFamily: "var(--font-stack-heading)",
+                  color: "rgba(232,226,255,0.3)",
+                }}
               >
                 {s.label}
               </a>
             ))}
           </div>
           <p
-            className="hidden sm:block text-[10px] uppercase tracking-[0.4em] text-white/50"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
+            className="hidden sm:block text-[10px] uppercase tracking-[0.4em]"
+            style={{
+              fontFamily: "var(--font-stack-heading)",
+              color: "rgba(232,226,255,0.3)",
+            }}
           >
-            Nairobi · Lagos · Cape Town
+            Nairobi &middot; Lagos &middot; Cape Town
           </p>
         </div>
 
-        {/* Close button -- rendered last so it's on top of all overlay content */}
         <button
           onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
-          className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 text-white/50 hover:text-white active:text-white transition-colors duration-300"
-          style={{ minWidth: 56, minHeight: 56, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
+          className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 transition-colors duration-300"
+          style={{
+            minWidth: 56,
+            minHeight: 56,
+            touchAction: "manipulation",
+            WebkitTapHighlightColor: "transparent",
+            cursor: "pointer",
+            color: "rgba(232,226,255,0.5)",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-secondary)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(232,226,255,0.5)"; }}
           aria-label="Close menu"
         >
           <span

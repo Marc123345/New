@@ -32,27 +32,28 @@ export function Navigation() {
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen]);
+
+  const scrollYRef = useRef(0);
+
+  useEffect(() => {
     if (isOpen) {
-      const scrollY = window.scrollY;
+      scrollYRef.current = window.scrollY;
       document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.top = `-${scrollY}px`;
       timerRef.current = setTimeout(() => setMounted(true), 50);
     } else {
       setMounted(false);
-      const scrollY = document.body.style.top;
       document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      if (scrollY) window.scrollTo(0, parseInt(scrollY || "0") * -1);
+      window.scrollTo(0, scrollYRef.current);
     }
     return () => {
       document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [isOpen]);
@@ -93,8 +94,8 @@ export function Navigation() {
           </a>
 
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => setIsOpen(true)}
+            aria-label="Open navigation"
             aria-expanded={isOpen}
             className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
@@ -139,29 +140,6 @@ export function Navigation() {
             borderRadius: "50%",
           }}
         />
-
-        {/* Close button */}
-        <button
-          onClick={() => setIsOpen(false)}
-          onTouchEnd={(e) => { e.preventDefault(); setIsOpen(false); }}
-          className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
-          style={{ minWidth: 56, minHeight: 56, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
-          aria-label="Close menu"
-        >
-          <span
-            className="text-[10px] uppercase tracking-[0.3em]"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
-          >
-            Close
-          </span>
-          <div className="relative w-5 h-5">
-            <span className="absolute inset-0 flex items-center justify-center">
-              <span className="absolute h-[1px] w-full bg-current rotate-45 transition-transform duration-300 group-hover:rotate-[135deg]" />
-              <span className="absolute h-[1px] w-full bg-current -rotate-45 transition-transform duration-300 group-hover:rotate-[45deg]" />
-            </span>
-          </div>
-        </button>
-
 
         {/* Main content grid */}
         <div className="absolute inset-0 flex flex-col lg:flex-row">
@@ -339,6 +317,27 @@ export function Navigation() {
             Nairobi · Lagos · Cape Town
           </p>
         </div>
+
+        {/* Close button -- rendered last so it's on top of all overlay content */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+          className="absolute top-6 right-6 md:top-8 md:right-10 z-[120] group flex items-center gap-3 text-white/50 hover:text-white active:text-white transition-colors duration-300"
+          style={{ minWidth: 56, minHeight: 56, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
+          aria-label="Close menu"
+        >
+          <span
+            className="text-[10px] uppercase tracking-[0.3em]"
+            style={{ fontFamily: "var(--font-stack-heading)" }}
+          >
+            Close
+          </span>
+          <div className="relative w-5 h-5">
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="absolute h-[1px] w-full bg-current rotate-45 transition-transform duration-300 group-hover:rotate-[135deg]" />
+              <span className="absolute h-[1px] w-full bg-current -rotate-45 transition-transform duration-300 group-hover:rotate-[45deg]" />
+            </span>
+          </div>
+        </button>
       </div>
     </>
   );

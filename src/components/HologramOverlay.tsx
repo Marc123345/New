@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Play } from 'lucide-react';
 
 const FOUNDER_VIDEO_URL =
-  'https://ik.imagekit.io/qcvroy8xpd/Video_Generation_Successful.mp4?updatedAt=1771263861214';
+  'https://ik.imagekit.io/qcvroy8xpd/IMG_9186%20(1).mp4';
 
 const STORY_VIDEO_URL =
   'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4';

@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import gsap from "gsap";
 import { motion, AnimatePresence } from "motion/react";
 import { PenLine, Bot, Search, Palette, Video, ChartBar as BarChart2, User, MessageCircle, MousePointerClick, Megaphone, X } from "lucide-react";
 
@@ -8,7 +7,7 @@ const SERVICES = [
   {
     id: 1,
     title: "Copy Writing",
-    fullTitle: "Copy Writing",
+    fullTitle: "Voice & Ghostwriting",
     category: "Content",
     description:
       "In a digital landscape saturated with AI-generated content, authenticity matters more than ever. Search engines and social platforms are increasingly sophisticated at detecting generic, automated writing, and often limiting its reach and impact. Our professional copywriters craft content that feels human, nuanced, and strategically aligned with your brand voice. The result is compelling storytelling that builds trust, drives organic engagement across platforms.",
@@ -26,10 +25,10 @@ const SERVICES = [
   {
     id: 2,
     title: "Agentic AI",
-    fullTitle: "Agentic AI",
+    fullTitle: "AI Humanization",
     category: "Automation",
     description:
-      "AI agents are transforming how businesses operate by moving beyond simple automation into intelligent, goal-driven execution. We design and deploy AI agents tailored to specific use cases, whether it's automated lead qualification and follow-ups, personalized customer support, content research and generation, sales outreach, internal workflow optimization, or real-time data analysis. These agents can operate across platforms, integrate with your existing tools, and continuously learn from interactions to improve performance. The result is a scalable, always-on digital workforce that increases efficiency, reduces manual workload, and unlocks new growth opportunities.",
+      "AI agents are transforming how businesses operate by moving beyond simple automation into intelligent, goal-driven execution. We design and deploy AI agents tailored to specific use cases, whether it's automated lead qualification and follow-ups, personalized customer support, content research and generation, sales outreach, internal workflow optimization, or real-time data analysis.",
     icon: Bot,
     color: "#9B59F5",
     bgColor: "#6F11F5",
@@ -44,10 +43,10 @@ const SERVICES = [
   {
     id: 3,
     title: "SEO & AEO",
-    fullTitle: "SEO & AEO",
+    fullTitle: "Authority Discovery",
     category: "Search",
     description:
-      "AI agents are transforming how businesses operate by moving beyond simple automation into intelligent, goal-driven execution. We design and deploy AI agents tailored to specific use cases, whether it's automated lead qualification and follow-ups, personalized customer support, content research and generation, sales outreach, internal workflow optimization, or real-time data analysis. These agents can operate across platforms, integrate with your existing tools, and continuously learn from interactions to improve performance. The result is a scalable, always-on digital workforce that increases efficiency, reduces manual workload, and unlocks new growth opportunities.",
+      "Search has evolved beyond keywords. We help your brand rank across traditional search engines and the new wave of AI answer engines. From technical audits to structured content strategy, we ensure your business is found — and trusted — wherever your audience is looking.",
     icon: Search,
     color: "#B181FC",
     bgColor: "#8338EC",
@@ -65,7 +64,7 @@ const SERVICES = [
     fullTitle: "Graphic Design",
     category: "Creative",
     description:
-      "In an era where AI can generate visuals in seconds, true design expertise is what sets brands apart. While automated tools produce volume, they rarely deliver strategic thinking, brand consistency, or emotional depth. Professional graphic design ensures your visuals are attractive and intentionally aligned with your positioning, audience psychology, and long-term brand equity. We translate your identity into cohesive, high-impact design systems and campaign assets that cut through the noise, build recognition, and communicate with clarity and purpose across every touchpoint.",
+      "In an era where AI can generate visuals in seconds, true design expertise is what sets brands apart. Professional graphic design ensures your visuals are attractive and intentionally aligned with your positioning, audience psychology, and long-term brand equity. We translate your identity into cohesive, high-impact design systems.",
     icon: Palette,
     color: "#6610E6",
     bgColor: "#4A00D8",
@@ -79,11 +78,11 @@ const SERVICES = [
   },
   {
     id: 5,
-    title: "Video Creation & Editing",
+    title: "Video Creation",
     fullTitle: "Video Creation & Editing",
     category: "Production",
     description:
-      "Video is the most powerful storytelling medium in today's digital ecosystem. We conceptualize, produce, and edit high-impact videos tailored for social media, advertising, and brand storytelling. From short-form reels to polished brand videos and promotional content, we create visually compelling narratives that captivate audiences and drive measurable results.",
+      "Video is the most powerful storytelling medium in today's digital ecosystem. We conceptualize, produce, and edit high-impact videos tailored for social media, advertising, and brand storytelling. From short-form reels to polished brand videos and promotional content, we create visually compelling narratives that captivate audiences.",
     icon: Video,
     color: "#e8e2ff",
     bgColor: "#1a1535",
@@ -97,8 +96,8 @@ const SERVICES = [
   },
   {
     id: 6,
-    title: "Social Media Management",
-    fullTitle: "Social Media Management",
+    title: "Social Media",
+    fullTitle: "Ecosystem Management",
     category: "Social",
     description:
       "Effective social media requires strategy, consistency, and performance-driven execution. We manage your platforms end-to-end, developing content calendars, publishing optimized posts, engaging audiences, and analyzing results. Our approach ensures your brand remains relevant and aligned with clear business objectives.",
@@ -119,7 +118,7 @@ const SERVICES = [
     fullTitle: "Personal Branding",
     category: "Leadership",
     description:
-      "Leaders' role have shifted from optional participants in social media, to brand assets. We build authentic, strategic personal brands that position executives and founders as industry authorities. Through tailored content, storytelling frameworks, and platform optimization, we transform profiles into influence engines that drive credibility, visibility, and opportunity.",
+      "Leaders' roles have shifted from optional participants in social media, to brand assets. We build authentic, strategic personal brands that position executives and founders as industry authorities. Through tailored content, storytelling frameworks, and platform optimization, we transform profiles into influence engines.",
     icon: User,
     color: "#7B2FF2",
     bgColor: "#5A05E6",
@@ -133,7 +132,7 @@ const SERVICES = [
   },
   {
     id: 8,
-    title: "Community Management",
+    title: "Community Mgmt",
     fullTitle: "Community Management",
     category: "Engagement",
     description:
@@ -173,7 +172,7 @@ const SERVICES = [
     fullTitle: "Social Ads",
     category: "Paid Social",
     description:
-      "Paid social is about reaching the right audience with the right message at the right time. We develop and manage strategic campaigns across leading platforms, combining compelling creative with advanced audience targeting and performance analytics. The result is scalable growth, stronger brand awareness, and consistent lead generation.",
+      "Paid social is about reaching the right audience with the right message at the right time. We develop and manage strategic campaigns across leading platforms, combining compelling creative with advanced audience targeting and performance analytics for scalable growth.",
     icon: Megaphone,
     color: "#6610E6",
     bgColor: "#4A00D8",
@@ -298,113 +297,113 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               onScroll={handleScroll}
             >
               <div className="px-5 sm:px-7 md:px-8 pt-14 sm:pt-16 pb-8 sm:pb-10 space-y-6 sm:space-y-7">
-              {service.image && (
+                {service.image && (
+                  <motion.div
+                    key={`img-${service.id}`}
+                    initial={{ opacity: 0, scale: 1.03 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="relative w-full overflow-hidden"
+                    style={{
+                      height: 'clamp(160px, 28vw, 220px)',
+                      border: `2px solid ${service.color}55`,
+                      boxShadow: `6px 6px 0 ${service.color}44`,
+                    }}
+                  >
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{ background: `linear-gradient(to top, rgba(4,4,8,0.95) 0%, transparent 55%, ${service.bgColor}55 100%)` }}
+                    />
+                    <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs" style={{ color: service.color }}>
+                      <span className="h-px w-8 inline-block" style={{ backgroundColor: service.color }} />
+                      {service.category}
+                    </div>
+                  </motion.div>
+                )}
+
+                <div>
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.08, duration: 0.4 }}
+                    className="block text-[10px] uppercase tracking-[0.35em] mb-5"
+                    style={{ color: service.color, fontFamily: "var(--font-stack-heading)" }}
+                  >
+                    <span className="inline-block w-4 h-[1px] mr-2 align-middle" style={{ background: service.color }} />
+                    {service.category} &mdash; Service {String(service.id).padStart(2, "0")}
+                  </motion.span>
+
+                  <motion.h2
+                    id="service-card-title"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="font-bold leading-[1.05] tracking-[-0.03em] break-words"
+                    style={{ fontSize: "clamp(2.2rem, 7vw, 4rem)", color: "#fff", fontFamily: "var(--font-stack-heading)" }}
+                  >
+                    {service.fullTitle}
+                  </motion.h2>
+                </div>
+
                 <motion.div
-                  key={`img-${service.id}`}
-                  initial={{ opacity: 0, scale: 1.03 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="relative w-full overflow-hidden"
-                  style={{
-                    height: 'clamp(160px, 28vw, 220px)',
-                    border: `2px solid ${service.color}55`,
-                    boxShadow: `6px 6px 0 ${service.color}44`,
-                  }}
-                >
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: `linear-gradient(to top, rgba(4,4,8,0.95) 0%, transparent 55%, ${service.bgColor}55 100%)` }}
-                  />
-                  <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs" style={{ color: service.color }}>
-                    <span className="h-px w-8 inline-block" style={{ backgroundColor: service.color }} />
-                    {service.category}
-                  </div>
-                </motion.div>
-              )}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.16 }}
+                  className="h-px w-full"
+                  style={{ background: `linear-gradient(to right, ${service.color}44, transparent)` }}
+                />
 
-              <div>
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.08, duration: 0.4 }}
-                  className="block text-[10px] uppercase tracking-[0.35em] mb-5"
-                  style={{ color: service.color, fontFamily: "var(--font-stack-heading)" }}
-                >
-                  <span className="inline-block w-4 h-[1px] mr-2 align-middle" style={{ background: service.color }} />
-                  {service.category} &mdash; Service {String(service.id).padStart(2, "0")}
-                </motion.span>
-
-                <motion.h2
-                  id="service-card-title"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="font-bold leading-[1.05] tracking-[-0.03em]"
-                  style={{ fontSize: "clamp(2.2rem, 7vw, 4rem)", color: "#fff", fontFamily: "var(--font-stack-heading)" }}
-                >
-                  {service.title}
-                </motion.h2>
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.16 }}
-                className="h-px w-full"
-                style={{ background: `linear-gradient(to right, ${service.color}44, transparent)` }}
-              />
-
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.45 }}
-                className="leading-[1.8] text-base sm:text-lg"
-                style={{ color: "rgba(255,255,255,0.7)", fontFamily: "var(--font-stack-body)" }}
-              >
-                {service.description}
-              </motion.p>
-
-              {service.details.length > 0 && (
-                <motion.div
+                <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28, duration: 0.45 }}
+                  transition={{ delay: 0.2, duration: 0.45 }}
+                  className="leading-[1.8] text-base sm:text-lg"
+                  style={{ color: "rgba(255,255,255,0.7)", fontFamily: "var(--font-stack-body)" }}
                 >
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-[10px] uppercase tracking-[0.35em]" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-stack-heading)" }}>
-                      What We Deliver
-                    </span>
-                    <span className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
-                  </div>
-                  <ul className="grid sm:grid-cols-2 gap-2">
-                    {service.details.map((detail, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.32 + i * 0.05, duration: 0.35 }}
-                        className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed"
-                        style={{
-                          background: "#110f1e",
-                          border: "1px solid rgba(255,255,255,0.06)",
-                          color: "rgba(255,255,255,0.72)",
-                          fontFamily: "var(--font-stack-body)",
-                        }}
-                      >
-                        <span className="mt-[3px] flex-shrink-0" style={{ color: service.color }}>&#8594;</span>
-                        {detail}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-            </div>
+                  {service.description}
+                </motion.p>
+
+                {service.details.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.28, duration: 0.45 }}
+                  >
+                    <div className="flex items-center gap-3 mb-5">
+                      <span className="text-[10px] uppercase tracking-[0.35em]" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-stack-heading)" }}>
+                        What We Deliver
+                      </span>
+                      <span className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+                    </div>
+                    <ul className="grid sm:grid-cols-2 gap-2">
+                      {service.details.map((detail, i) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.32 + i * 0.05, duration: 0.35 }}
+                          className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed"
+                          style={{
+                            background: "#110f1e",
+                            border: "1px solid rgba(255,255,255,0.06)",
+                            color: "rgba(255,255,255,0.72)",
+                            fontFamily: "var(--font-stack-body)",
+                          }}
+                        >
+                          <span className="mt-[3px] flex-shrink-0" style={{ color: service.color }}>&#8594;</span>
+                          {detail}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+              </div>
             </div>
 
             {showHint && scrollProgress === 0 && (
@@ -431,125 +430,44 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
 }
 
 export function ArcSlider() {
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
   const tabBarRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [overlayService, setOverlayService] = useState<Service | null>(null);
-  const activeIndexRef = useRef(0);
   const dragRef = useRef({ startX: 0, hasMoved: false, isDragging: false });
-
-  const positionCards = useCallback((index: number, animate: boolean) => {
-    const isMobile = window.innerWidth < 768;
-    const spreadStep1 = isMobile ? 240 : 360;
-    const spreadStep2 = isMobile ? 420 : 580;
-    const spreadStep3 = isMobile ? 540 : 760;
-
-    SERVICES.forEach((_, i) => {
-      const card = cardsRef.current[i];
-      if (!card) return;
-
-      const offset = i - index;
-      const absOffset = Math.abs(offset);
-
-      let translateX: number;
-      let rotateY: number;
-      let translateZ: number;
-      let scale: number;
-      let opacity: number;
-      let targetZIndex: number;
-
-      if (absOffset === 0) {
-        translateX = 0;
-        rotateY = 0;
-        translateZ = 0;
-        scale = 1;
-        opacity = 1;
-        targetZIndex = 10;
-      } else if (absOffset === 1) {
-        translateX = offset * spreadStep1;
-        rotateY = offset < 0 ? 30 : -30;
-        translateZ = -120;
-        scale = 0.82;
-        opacity = 0.6;
-        targetZIndex = 5;
-      } else if (absOffset === 2) {
-        translateX = offset * spreadStep2;
-        rotateY = offset < 0 ? 45 : -45;
-        translateZ = -240;
-        scale = 0.65;
-        opacity = 0.25;
-        targetZIndex = 2;
-      } else {
-        translateX = offset * spreadStep3;
-        rotateY = offset < 0 ? 55 : -55;
-        translateZ = -350;
-        scale = 0.5;
-        opacity = 0;
-        targetZIndex = 1;
-      }
-
-      const shadow = absOffset === 0
-        ? "10px 10px 0 rgba(164,108,252,0.6)"
-        : "none";
-
-      if (animate) {
-        gsap.set(card, { zIndex: targetZIndex });
-        gsap.to(card, {
-          x: translateX,
-          rotateY: rotateY,
-          z: translateZ,
-          scale: scale,
-          opacity: opacity,
-          boxShadow: shadow,
-          duration: 0.7,
-          ease: "power3.out",
-          overwrite: true,
-        });
-      } else {
-        gsap.set(card, {
-          x: translateX,
-          rotateY: rotateY,
-          z: translateZ,
-          scale: scale,
-          opacity: opacity,
-          zIndex: targetZIndex,
-          boxShadow: shadow,
-        });
-      }
-    });
-  }, []);
 
   const navigateTo = useCallback((index: number) => {
     const clamped = Math.max(0, Math.min(SERVICES.length - 1, index));
-    activeIndexRef.current = clamped;
     setActiveIndex(clamped);
-    positionCards(clamped, true);
 
     const tab = tabRefs.current[clamped];
     if (tab) {
       tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
-  }, [positionCards]);
+
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && sliderRef.current) {
+      const cardWidth = sliderRef.current.offsetWidth * 0.82;
+      sliderRef.current.scrollTo({
+        left: clamped * cardWidth,
+        behavior: "smooth",
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    positionCards(0, false);
-    const handleResize = () => positionCards(activeIndexRef.current, false);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [positionCards]);
-
-  useEffect(() => {
-    const container = containerRef.current;
+    const container = sliderRef.current;
     if (!container) return;
+
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) return;
 
     const onStart = (e: MouseEvent | TouchEvent) => {
       dragRef.current.isDragging = true;
       dragRef.current.hasMoved = false;
       dragRef.current.startX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      container.style.cursor = "grabbing";
     };
 
     const onMove = (e: MouseEvent | TouchEvent) => {
@@ -563,7 +481,6 @@ export function ArcSlider() {
     const onEnd = (e: MouseEvent | TouchEvent) => {
       if (!dragRef.current.isDragging) return;
       dragRef.current.isDragging = false;
-      container.style.cursor = "grab";
 
       if (!dragRef.current.hasMoved) return;
 
@@ -574,7 +491,7 @@ export function ArcSlider() {
 
       if (Math.abs(delta) > 40) {
         const dir = delta < 0 ? 1 : -1;
-        navigateTo(activeIndexRef.current + dir);
+        navigateTo(activeIndex + dir);
       }
     };
 
@@ -593,17 +510,19 @@ export function ArcSlider() {
       window.removeEventListener("touchmove", onMove);
       window.removeEventListener("touchend", onEnd);
     };
-  }, [navigateTo]);
+  }, [navigateTo, activeIndex]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (overlayService) return;
-      if (e.key === "ArrowLeft") navigateTo(activeIndexRef.current - 1);
-      if (e.key === "ArrowRight") navigateTo(activeIndexRef.current + 1);
+      if (e.key === "ArrowLeft") navigateTo(activeIndex - 1);
+      if (e.key === "ArrowRight") navigateTo(activeIndex + 1);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [navigateTo, overlayService]);
+  }, [navigateTo, overlayService, activeIndex]);
+
+  const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <>
@@ -633,10 +552,11 @@ export function ArcSlider() {
           </h2>
         </div>
 
+        {/* Horizontal Scrollable Tab Bar */}
         <div
           ref={tabBarRef}
-          className="relative z-30 flex gap-1.5 sm:gap-2 justify-start md:justify-center px-4 sm:px-6 mb-8 sm:mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          className="relative z-30 flex gap-1.5 sm:gap-2 justify-start md:justify-center px-6 sm:px-8 mb-8 sm:mb-12 md:mb-16 overflow-x-auto"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
           role="tablist"
         >
           {SERVICES.map((service, i) => (
@@ -660,7 +580,7 @@ export function ArcSlider() {
                   ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
                 color: i === activeIndex
-                  ? "var(--color-background-light, #fff)"
+                  ? "#ffffff"
                   : "var(--color-text-dark, #111)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
@@ -673,115 +593,119 @@ export function ArcSlider() {
           ))}
         </div>
 
-        <div
-          ref={containerRef}
-          className="relative w-full cursor-grab active:cursor-grabbing"
-          style={{
-            height: "clamp(380px, 50vw, 480px)",
-            perspective: "1200px",
-            perspectiveOrigin: "50% 50%",
-            touchAction: "pan-y",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-          }}
-          role="tabpanel"
-        >
+        {/* Mobile: Horizontal scroll slider with peek */}
+        <div className="block md:hidden relative w-full">
           <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ transformStyle: "preserve-3d" }}
+            ref={sliderRef}
+            className="flex overflow-x-auto gap-4 px-6 snap-x snap-mandatory"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+            onScroll={() => {
+              if (!sliderRef.current) return;
+              const cardWidth = sliderRef.current.offsetWidth * 0.82;
+              const scrollLeft = sliderRef.current.scrollLeft;
+              const newIndex = Math.round(scrollLeft / cardWidth);
+              if (newIndex !== activeIndex) {
+                setActiveIndex(newIndex);
+                const tab = tabRefs.current[newIndex];
+                if (tab) tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+              }
+            }}
           >
             {SERVICES.map((service, i) => {
               const IconComponent = service.icon;
               return (
                 <div
                   key={service.id}
-                  ref={(el) => (cardsRef.current[i] = el)}
-                  className="absolute will-change-transform"
+                  className="flex-shrink-0 snap-center"
                   style={{
-                    width: "clamp(260px, 55vw, 380px)",
-                    aspectRatio: "3 / 3.5",
-                    transformStyle: "preserve-3d",
-                    backfaceVisibility: "hidden",
+                    width: "82vw",
+                    paddingRight: i === SERVICES.length - 1 ? "0" : "0",
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-8 md:p-10 transition-colors duration-500"
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-6 transition-all duration-300"
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",
                       borderRadius: "0",
+                      minHeight: "380px",
+                      boxShadow: i === activeIndex ? "8px 8px 0 rgba(164,108,252,0.5)" : "none",
+                      opacity: i === activeIndex ? 1 : 0.7,
                     }}
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <span
-                          className="text-[10px] tracking-[0.3em] opacity-60 font-semibold block"
+                          className="block font-semibold"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "#fff",
+                            fontSize: "0.6rem",
+                            letterSpacing: "0.3em",
+                            textTransform: "uppercase",
+                            color: "rgba(255,255,255,0.9)",
                             marginBottom: "4px",
                           }}
                         >
                           SERVICE {String(service.id).padStart(2, "0")}
                         </span>
                         <span
-                          className="text-[10px] tracking-[0.15em] opacity-40 font-medium uppercase"
+                          className="block font-medium uppercase"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            color: "#fff",
+                            fontSize: "0.6rem",
+                            letterSpacing: "0.15em",
+                            color: "rgba(255,255,255,0.85)",
                           }}
                         >
                           {service.category}
                         </span>
                       </div>
                       <div
-                        className="w-10 h-10 flex items-center justify-center opacity-20"
+                        className="w-10 h-10 flex items-center justify-center opacity-25"
                         style={{ color: "#fff" }}
                       >
-                        <IconComponent size={32} strokeWidth={1.5} />
+                        <IconComponent size={28} strokeWidth={1.5} />
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-5 mt-8">
                       <h3
-                        className="tracking-tight leading-[1] font-bold"
+                        className="font-bold leading-tight break-words"
                         style={{
-                          fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
+                          fontSize: "clamp(1.75rem, 8vw, 2.4rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
                           margin: 0,
+                          wordBreak: "break-word",
                         }}
                       >
                         {service.fullTitle}
                       </h3>
 
-                      <div className="mt-2">
+                      <div className="mt-1">
                         <button
                           onClick={(e) => {
-                            if (dragRef.current.hasMoved) return;
-                            if (i !== activeIndex) { navigateTo(i); return; }
                             e.stopPropagation();
+                            if (i !== activeIndex) { navigateTo(i); return; }
                             setOverlayService(service);
                           }}
-                          className="group inline-flex items-center gap-3 transition-all duration-300"
+                          className="group inline-flex items-center gap-3 transition-all duration-300 active:scale-95"
                           style={{
                             fontFamily: "var(--font-stack-heading)",
-                            fontSize: "0.75rem",
+                            fontSize: "0.7rem",
                             letterSpacing: "0.15em",
                             textTransform: "uppercase",
                             color: "#fff",
-                            background: "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.25)",
+                            background: "rgba(255,255,255,0.1)",
+                            border: "1px solid rgba(255,255,255,0.3)",
                             borderRadius: "0",
                             padding: "12px 24px",
                             cursor: "pointer",
-                            pointerEvents: "auto",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.18)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                            minHeight: "44px",
                           }}
                         >
                           Discover
@@ -795,8 +719,18 @@ export function ArcSlider() {
                 </div>
               );
             })}
+            {/* Right padding for peek effect */}
+            <div className="flex-shrink-0 w-6" />
           </div>
         </div>
+
+        {/* Desktop: Arc / 3D card arrangement */}
+        <DesktopArcSlider
+          activeIndex={activeIndex}
+          navigateTo={navigateTo}
+          dragRef={dragRef}
+          setOverlayService={setOverlayService}
+        />
 
         <div className="relative z-20 flex gap-2 justify-center mt-6 md:mt-10">
           {SERVICES.map((_, i) => (
@@ -826,5 +760,249 @@ export function ArcSlider() {
         onClose={() => setOverlayService(null)}
       />
     </>
+  );
+}
+
+interface DesktopArcSliderProps {
+  activeIndex: number;
+  navigateTo: (index: number) => void;
+  dragRef: React.MutableRefObject<{ startX: number; hasMoved: boolean; isDragging: boolean }>;
+  setOverlayService: (s: Service | null) => void;
+}
+
+function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService }: DesktopArcSliderProps) {
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const positionCards = useCallback((index: number, animate: boolean) => {
+    const spreadStep1 = 360;
+    const spreadStep2 = 580;
+    const spreadStep3 = 760;
+
+    SERVICES.forEach((_, i) => {
+      const card = cardsRef.current[i];
+      if (!card) return;
+
+      const offset = i - index;
+      const absOffset = Math.abs(offset);
+
+      let translateX: number;
+      let rotateY: number;
+      let translateZ: number;
+      let scale: number;
+      let opacity: number;
+      let targetZIndex: number;
+
+      if (absOffset === 0) {
+        translateX = 0; rotateY = 0; translateZ = 0; scale = 1; opacity = 1; targetZIndex = 10;
+      } else if (absOffset === 1) {
+        translateX = offset * spreadStep1; rotateY = offset < 0 ? 30 : -30; translateZ = -120; scale = 0.82; opacity = 0.6; targetZIndex = 5;
+      } else if (absOffset === 2) {
+        translateX = offset * spreadStep2; rotateY = offset < 0 ? 45 : -45; translateZ = -240; scale = 0.65; opacity = 0.25; targetZIndex = 2;
+      } else {
+        translateX = offset * spreadStep3; rotateY = offset < 0 ? 55 : -55; translateZ = -350; scale = 0.5; opacity = 0; targetZIndex = 1;
+      }
+
+      const shadow = absOffset === 0 ? "10px 10px 0 rgba(164,108,252,0.6)" : "none";
+
+      const transform = `translateX(${translateX}px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+      if (animate) {
+        card.style.zIndex = String(targetZIndex);
+        card.style.transition = "transform 0.7s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.7s ease, box-shadow 0.7s ease";
+        card.style.transform = transform;
+        card.style.opacity = String(opacity);
+        card.style.boxShadow = shadow;
+      } else {
+        card.style.transition = "none";
+        card.style.transform = transform;
+        card.style.opacity = String(opacity);
+        card.style.zIndex = String(targetZIndex);
+        card.style.boxShadow = shadow;
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    positionCards(activeIndex, true);
+  }, [activeIndex, positionCards]);
+
+  useEffect(() => {
+    positionCards(0, false);
+    const handleResize = () => positionCards(activeIndex, false);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [positionCards, activeIndex]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onStart = (e: MouseEvent | TouchEvent) => {
+      dragRef.current.isDragging = true;
+      dragRef.current.hasMoved = false;
+      dragRef.current.startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      container.style.cursor = "grabbing";
+    };
+
+    const onMove = (e: MouseEvent | TouchEvent) => {
+      if (!dragRef.current.isDragging) return;
+      const x = "touches" in e ? e.touches[0].clientX : e.clientX;
+      if (Math.abs(x - dragRef.current.startX) > 8) dragRef.current.hasMoved = true;
+    };
+
+    const onEnd = (e: MouseEvent | TouchEvent) => {
+      if (!dragRef.current.isDragging) return;
+      dragRef.current.isDragging = false;
+      container.style.cursor = "grab";
+      if (!dragRef.current.hasMoved) return;
+      const endX = "changedTouches" in e ? e.changedTouches[0].clientX : (e as MouseEvent).clientX;
+      const delta = endX - dragRef.current.startX;
+      if (Math.abs(delta) > 40) navigateTo(activeIndex + (delta < 0 ? 1 : -1));
+    };
+
+    container.addEventListener("mousedown", onStart);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+
+    return () => {
+      container.removeEventListener("mousedown", onStart);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+    };
+  }, [navigateTo, activeIndex, dragRef]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="hidden md:block relative w-full cursor-grab active:cursor-grabbing"
+      style={{
+        height: "clamp(380px, 50vw, 480px)",
+        perspective: "1200px",
+        perspectiveOrigin: "50% 50%",
+        touchAction: "pan-y",
+        userSelect: "none",
+        WebkitUserSelect: "none",
+      }}
+      role="tabpanel"
+    >
+      <div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {SERVICES.map((service, i) => {
+          const IconComponent = service.icon;
+          return (
+            <div
+              key={service.id}
+              ref={(el) => (cardsRef.current[i] = el)}
+              className="absolute will-change-transform"
+              style={{
+                width: "clamp(260px, 55vw, 380px)",
+                aspectRatio: "3 / 3.5",
+                transformStyle: "preserve-3d",
+                backfaceVisibility: "hidden",
+              }}
+            >
+              <div
+                className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-8 md:p-10 transition-colors duration-500"
+                style={{
+                  backgroundColor: service.bgColor,
+                  border: "2px solid rgba(255,255,255,0.12)",
+                  borderRadius: "0",
+                }}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span
+                      className="block font-semibold"
+                      style={{
+                        fontFamily: "var(--font-stack-heading)",
+                        fontSize: "0.6rem",
+                        letterSpacing: "0.3em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.9)",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      SERVICE {String(service.id).padStart(2, "0")}
+                    </span>
+                    <span
+                      className="block font-medium uppercase"
+                      style={{
+                        fontFamily: "var(--font-stack-heading)",
+                        fontSize: "0.6rem",
+                        letterSpacing: "0.15em",
+                        color: "rgba(255,255,255,0.85)",
+                      }}
+                    >
+                      {service.category}
+                    </span>
+                  </div>
+                  <div
+                    className="w-10 h-10 flex items-center justify-center opacity-20"
+                    style={{ color: "#fff" }}
+                  >
+                    <IconComponent size={32} strokeWidth={1.5} />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  <h3
+                    className="tracking-tight leading-[1] font-bold break-words"
+                    style={{
+                      fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
+                      fontFamily: "var(--font-stack-heading)",
+                      color: "#fff",
+                      margin: 0,
+                    }}
+                  >
+                    {service.fullTitle}
+                  </h3>
+
+                  <div className="mt-2">
+                    <button
+                      onClick={(e) => {
+                        if (dragRef.current.hasMoved) return;
+                        if (i !== activeIndex) { navigateTo(i); return; }
+                        e.stopPropagation();
+                        setOverlayService(service);
+                      }}
+                      className="group inline-flex items-center gap-3 transition-all duration-300"
+                      style={{
+                        fontFamily: "var(--font-stack-heading)",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.15em",
+                        textTransform: "uppercase",
+                        color: "#fff",
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.25)",
+                        borderRadius: "0",
+                        padding: "12px 24px",
+                        cursor: "pointer",
+                        pointerEvents: "auto",
+                        marginTop: "4px",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
+                      }}
+                    >
+                      Discover
+                      <span className="transition-transform duration-300 group-hover:translate-x-1.5 inline-block">
+                        &#8594;
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

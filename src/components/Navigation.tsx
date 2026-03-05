@@ -83,7 +83,7 @@ export function Navigation() {
           backdropFilter: scrolled ? "blur(12px)" : "none",
         }}
       >
-        <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="container mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
           <a
             href="#hero"
             aria-label="H2H Digital Home"

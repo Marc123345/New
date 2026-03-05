@@ -839,39 +839,77 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
     const container = containerRef.current;
     if (!container) return;
 
+    let startX = 0;
+    let isDragging = false;
+    let hasMoved = false;
+    let currentDelta = 0;
+
     const onStart = (e: MouseEvent | TouchEvent) => {
+      isDragging = true;
+      hasMoved = false;
+      currentDelta = 0;
+      startX = "touches" in e ? e.touches[0].clientX : e.clientX;
       dragRef.current.isDragging = true;
       dragRef.current.hasMoved = false;
-      dragRef.current.startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      dragRef.current.startX = startX;
       container.style.cursor = "grabbing";
     };
 
     const onMove = (e: MouseEvent | TouchEvent) => {
-      if (!dragRef.current.isDragging) return;
+      if (!isDragging) return;
       const x = "touches" in e ? e.touches[0].clientX : e.clientX;
-      if (Math.abs(x - dragRef.current.startX) > 8) dragRef.current.hasMoved = true;
+      currentDelta = x - startX;
+      if (Math.abs(currentDelta) > 5) {
+        hasMoved = true;
+        dragRef.current.hasMoved = true;
+      }
+
+      const dampened = currentDelta * 0.3;
+      const activeCard = cardsRef.current[activeIndex];
+      if (activeCard) {
+        activeCard.style.transition = "none";
+        const baseTransform = `translateX(${dampened}px) rotateY(0deg) translateZ(0px) scale(1)`;
+        activeCard.style.transform = baseTransform;
+      }
     };
 
     const onEnd = (e: MouseEvent | TouchEvent) => {
-      if (!dragRef.current.isDragging) return;
+      if (!isDragging) return;
+      isDragging = false;
       dragRef.current.isDragging = false;
       container.style.cursor = "grab";
-      if (!dragRef.current.hasMoved) return;
+
+      if (!hasMoved) {
+        positionCards(activeIndex, false);
+        return;
+      }
+
       const endX = "changedTouches" in e ? e.changedTouches[0].clientX : (e as MouseEvent).clientX;
-      const delta = endX - dragRef.current.startX;
-      if (Math.abs(delta) > 40) navigateTo(activeIndex + (delta < 0 ? 1 : -1));
+      const delta = endX - startX;
+
+      if (Math.abs(delta) > 30) {
+        navigateTo(activeIndex + (delta < 0 ? 1 : -1));
+      } else {
+        positionCards(activeIndex, true);
+      }
     };
 
     container.addEventListener("mousedown", onStart);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onEnd);
+    container.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
 
     return () => {
       container.removeEventListener("mousedown", onStart);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onEnd);
+      container.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onEnd);
     };
-  }, [navigateTo, activeIndex, dragRef]);
+  }, [navigateTo, activeIndex, dragRef, positionCards]);
 
   return (
     <div
@@ -906,14 +944,17 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
               }}
             >
               <div
-                className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-8 md:p-10 transition-colors duration-500"
+                className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-8 md:p-10 transition-colors duration-500 cursor-grab active:cursor-grabbing"
                 style={{
                   backgroundColor: service.bgColor,
                   border: "2px solid rgba(255,255,255,0.12)",
                   borderRadius: "0",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
                 }}
+                onDragStart={(e) => e.preventDefault()}
               >
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start pointer-events-none">
                   <div>
                     <span
                       className="block font-semibold"
@@ -950,7 +991,7 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
 
                 <div className="flex flex-col gap-6">
                   <h3
-                    className="tracking-tight leading-[1] font-bold break-words"
+                    className="tracking-tight leading-[1] font-bold break-words pointer-events-none"
                     style={{
                       fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
                       fontFamily: "var(--font-stack-heading)",

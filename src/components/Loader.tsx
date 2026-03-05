@@ -273,13 +273,26 @@ export function Loader({ onComplete }: LoaderProps) {
             {/* Mute switch (left) */}
             <rect x="-1" y="62" width="3" height="12" rx="1.5" fill="#2a2a40" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
 
-            {/* H2H Logo on screen */}
-            <foreignObject x="20" y="105" width="120" height="70" opacity={0.2 + screenFill * 0.8} clipPath="url(#screenClip)">
-              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <H2HLogo height={40} />
-              </div>
-            </foreignObject>
           </svg>
+
+          {/* H2H Logo overlaid on screen — absolute positioned over the phone SVG */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '38%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0.2 + screenFill * 0.8,
+              transition: 'opacity 0.1s linear',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}
+          >
+            <H2HLogo height={40} />
+          </div>
         </div>
       </div>
 

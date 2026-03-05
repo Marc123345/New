@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Linkedin, Twitter, Instagram } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { H2HLogo } from '../H2HLogo';
 
 const SOCIAL_LINKS = [
@@ -135,20 +136,20 @@ export function Footer() {
               &copy; 2026 H2H DIGITAL HOME
             </p>
             <div className="flex items-center" style={{ gap: 'clamp(16px, 4vw, 64px)' }}>
-              <a
-                href="#"
+              <Link
+                to="/privacy"
                 className="text-[var(--color-text-dark)]/60 text-xs tracking-widest hover:text-[var(--color-text-dark)]/90 transition-colors duration-300"
                 style={{ fontFamily: 'var(--font-stack-heading)' }}
               >
                 PRIVACY
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/terms"
                 className="text-[var(--color-text-dark)]/60 text-xs tracking-widest hover:text-[var(--color-text-dark)]/90 transition-colors duration-300"
                 style={{ fontFamily: 'var(--font-stack-heading)' }}
               >
                 TERMS
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -344,8 +344,8 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="font-bold leading-[1.05] tracking-[-0.03em] break-words"
-                    style={{ fontSize: "clamp(2.2rem, 7vw, 4rem)", color: "#fff", fontFamily: "var(--font-stack-heading)" }}
+                    className="font-bold leading-[1.05] tracking-[-0.03em]"
+                    style={{ fontSize: "clamp(1.6rem, 4.5vw, 3rem)", color: "#fff", fontFamily: "var(--font-stack-heading)", whiteSpace: "nowrap" }}
                   >
                     {service.fullTitle}
                   </motion.h2>
@@ -674,13 +674,13 @@ export function ArcSlider() {
 
                     <div className="flex flex-col gap-5 mt-8">
                       <h3
-                        className="font-bold leading-tight break-words"
+                        className="font-bold leading-tight"
                         style={{
-                          fontSize: "clamp(1.75rem, 8vw, 2.4rem)",
+                          fontSize: "clamp(1.3rem, 5.5vw, 2rem)",
                           fontFamily: "var(--font-stack-heading)",
                           color: "#fff",
                           margin: 0,
-                          wordBreak: "break-word",
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {service.fullTitle}
@@ -991,12 +991,13 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
 
                 <div className="flex flex-col gap-6">
                   <h3
-                    className="tracking-tight leading-[1] font-bold break-words pointer-events-none"
+                    className="tracking-tight leading-[1] font-bold pointer-events-none"
                     style={{
-                      fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)",
+                      fontSize: "clamp(1.3rem, 3vw, 2rem)",
                       fontFamily: "var(--font-stack-heading)",
                       color: "#fff",
                       margin: 0,
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {service.fullTitle}

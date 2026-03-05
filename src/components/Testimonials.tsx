@@ -95,7 +95,7 @@ export function Testimonials() {
   }, [scrollYProgress]);
 
   return (
-    <div ref={containerRef} className="relative h-[300vh] bg-[var(--color-surface-dark)]">
+    <div ref={containerRef} className="relative h-[300vh] bg-[var(--color-background-light)]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
 
         <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
@@ -208,7 +208,7 @@ export function Testimonials() {
 
           {/* RIGHT: Testimonial Cards */}
           <div
-            className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col min-w-0"
+            className="flex-1 bg-[var(--color-background-light)] relative overflow-hidden flex flex-col min-w-0"
             style={{
               border: "1px solid rgba(255,255,255,0.15)",
               boxShadow: "var(--shadow-geometric)",
@@ -231,7 +231,7 @@ export function Testimonials() {
             </div>
 
             {/* Client navigation strip */}
-            <div className="relative z-20 shrink-0 border-t border-white/10 bg-[var(--color-surface-dark)]">
+            <div className="relative z-20 shrink-0 border-t border-white/10 bg-[var(--color-background-light)]">
               {/* Mobile: dot pagination */}
               <div className="flex sm:hidden items-center justify-between px-4 py-3 gap-3">
                 <div className="flex items-center gap-1.5 min-w-0">

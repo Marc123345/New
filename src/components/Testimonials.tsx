@@ -95,7 +95,7 @@ export function Testimonials() {
   }, [scrollYProgress]);
 
   return (
-    <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
+    <div ref={containerRef} className="relative h-[300vh] bg-[var(--color-surface-dark)]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
 
         <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
@@ -125,7 +125,7 @@ export function Testimonials() {
           </h2>
         </div>
 
-        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-4 sm:px-5 md:px-8">
+        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">
           {/* LEFT: Globe Panel — desktop only */}
           <div
             className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
@@ -212,10 +212,11 @@ export function Testimonials() {
             style={{
               border: "1px solid rgba(255,255,255,0.15)",
               boxShadow: "var(--shadow-geometric)",
+              minHeight: "clamp(360px, 60vh, 600px)",
             }}
           >
             <div
-              className="relative w-full flex-1 flex items-center justify-center min-h-0"
+              className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"
               style={{ perspective: "1000px" }}
             >
               {CONTACTS.map((contact, i) => (
@@ -376,28 +377,41 @@ function TestimonialCard({
   total: number;
   scrollProgress: any;
 }) {
-  const start = index / total;
-  const end = (index + 1) / total;
+  const segmentSize = 1 / total;
+  const start = index * segmentSize;
+  const end = (index + 1) * segmentSize;
+  const fadeIn = Math.min(start + segmentSize * 0.2, end);
+  const fadeOut = Math.max(end - segmentSize * 0.2, start);
 
-  const opacity = useTransform(
-    scrollProgress,
-    [start, start + 0.05, end - 0.05, end],
-    [0, 1, 1, 0]
-  );
+  const isFirst = index === 0;
+  const isLast = index === total - 1;
+
+  const opacityInput = isFirst
+    ? [start, start, fadeOut, end]
+    : isLast
+      ? [start, fadeIn, end, end]
+      : [start, fadeIn, fadeOut, end];
+  const opacityOutput = isFirst
+    ? [1, 1, 1, 0]
+    : isLast
+      ? [0, 1, 1, 1]
+      : [0, 1, 1, 0];
+
+  const opacity = useTransform(scrollProgress, opacityInput, opacityOutput);
   const y = useTransform(
     scrollProgress,
-    [start, start + 0.1, end - 0.1, end],
-    [60, 0, 0, -60]
+    opacityInput,
+    isFirst ? [0, 0, 0, -50] : isLast ? [50, 0, 0, 0] : [50, 0, 0, -50]
   );
   const rotateX = useTransform(
     scrollProgress,
-    [start, start + 0.1, end - 0.1, end],
-    [-45, 0, 0, 45]
+    opacityInput,
+    isFirst ? [0, 0, 0, 35] : isLast ? [-35, 0, 0, 0] : [-35, 0, 0, 35]
   );
   const scale = useTransform(
     scrollProgress,
-    [start, start + 0.1, end - 0.1, end],
-    [0.9, 1, 1, 0.9]
+    opacityInput,
+    isFirst ? [1, 1, 1, 0.92] : isLast ? [0.92, 1, 1, 1] : [0.92, 1, 1, 0.92]
   );
 
   return (
@@ -410,9 +424,9 @@ function TestimonialCard({
         y,
         rotateX,
         scale,
-        width: "min(90%, 560px)",
-        maxHeight: "calc(100% - 2rem)",
-        padding: "clamp(1.25rem, 4vw, 3rem)",
+        width: "min(92%, 560px)",
+        maxHeight: "calc(100% - 1.5rem)",
+        padding: "clamp(1.25rem, 4vw, 2.5rem)",
         border: "1px solid rgba(255,255,255,0.15)",
         boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
       }}

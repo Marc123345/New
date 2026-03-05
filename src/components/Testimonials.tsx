@@ -236,7 +236,7 @@ export function Testimonials() {
                       border: i === activeIndex
                         ? "1px solid var(--color-secondary)"
                         : "1px solid rgba(255,255,255,0.1)",
-                      background: i === activeIndex ? "rgba(56,189,248,0.12)" : "transparent",
+                      background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent",
                     }}
                   >
                     <img
@@ -279,7 +279,7 @@ function GlobeMap({
   const active = CONTACTS[activeIndex];
 
   return (
-    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#0c1018] border border-[var(--color-primary)]/20">
+    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
       <motion.div
         className="relative w-full h-full"
         animate={{
@@ -379,13 +379,13 @@ function TestimonialCard({
         <div className="flex items-center gap-3 md:gap-4 mt-auto">
           <motion.div
             className="w-10 h-10 md:w-14 md:h-14 shrink-0 rounded-full overflow-hidden border-2 border-white/30"
-            style={{ boxShadow: "0 0 0 0 rgba(56, 189, 248, 0)" }}
+            style={{ boxShadow: "0 0 0 0 rgba(164, 108, 252, 0)" }}
             animate={{
               scale: [1, 1.08, 1],
               boxShadow: [
-                "0 0 0 0 rgba(56, 189, 248, 0)",
-                "0 0 20px 4px rgba(56, 189, 248, 0.4)",
-                "0 0 0 0 rgba(56, 189, 248, 0)",
+                "0 0 0 0 rgba(164, 108, 252, 0)",
+                "0 0 20px 4px rgba(164, 108, 252, 0.4)",
+                "0 0 0 0 rgba(164, 108, 252, 0)",
               ],
             }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}

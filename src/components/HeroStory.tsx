@@ -55,7 +55,7 @@ const PhaseText = ({
     >
       <p
         className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"
-        style={{ color: 'rgba(56,189,248,0.95)' }}
+        style={{ color: 'rgba(192,132,252,0.95)' }}
       >
         {subtitle}
       </p>
@@ -63,7 +63,7 @@ const PhaseText = ({
         className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-6 text-white"
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          textShadow: `0 0 50px rgba(14,165,233,${0.4 + phaseIndex * 0.15})`,
+          textShadow: `0 0 50px rgba(168,85,247,${0.4 + phaseIndex * 0.15})`,
           whiteSpace: 'pre-line',
         }}
       >
@@ -93,12 +93,12 @@ export function HeroStory() {
     >
       <div
         className="sticky top-0 h-screen w-full overflow-hidden"
-        style={{ background: 'radial-gradient(ellipse at 60% 50%, #0a1018 0%, #060a10 40%, #020406 100%)' }}
+        style={{ background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)' }}
       >
         <GlobeWrapper scrollYProgress={scrollYProgress} />
 
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'linear-gradient(to right, rgba(2,4,6,0.75) 0%, rgba(2,4,6,0.4) 35%, transparent 60%)',
+          background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
         }} />
 
         <div className="relative z-10 h-full flex items-center">
@@ -120,12 +120,12 @@ export function HeroStory() {
         </div>
 
         <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 flex flex-col gap-2">
-          <div className="w-64 h-px relative" style={{ background: 'rgba(14,165,233,0.2)' }}>
+          <div className="w-64 h-px relative" style={{ background: 'rgba(168,85,247,0.2)' }}>
             <motion.div
               className="absolute inset-y-0 left-0"
               style={{
                 width: progressBarWidth,
-                background: 'linear-gradient(to right, rgba(14,165,233,0.9), rgba(56,189,248,0.5))',
+                background: 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))',
               }}
             />
             <motion.div
@@ -135,17 +135,17 @@ export function HeroStory() {
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
-                background: '#38bdf8',
-                boxShadow: '0 0 8px rgba(56,189,248,0.8)',
+                background: '#c084fc',
+                boxShadow: '0 0 8px rgba(192,132,252,0.8)',
                 translateX: '-50%',
               }}
             />
           </div>
           <div className="flex items-center gap-2">
             <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
-              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(56,189,248,0.5)" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.5)" strokeWidth="1" strokeLinecap="round"/>
             </svg>
-            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(56,189,248,0.45)', fontFamily: 'var(--font-stack-heading)' }}>
+            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(192,132,252,0.45)', fontFamily: 'var(--font-stack-heading)' }}>
               scroll to explore
             </span>
           </div>
@@ -153,7 +153,7 @@ export function HeroStory() {
 
         <div
           className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={{ background: 'linear-gradient(to top, rgba(2,4,6,0.6) 0%, transparent 100%)' }}
+          style={{ background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)' }}
         />
       </div>
     </div>

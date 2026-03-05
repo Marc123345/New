@@ -147,7 +147,7 @@ export function Loader({ onComplete }: LoaderProps) {
             width: 200,
             height: 320,
             borderRadius: '50%',
-            background: `radial-gradient(ellipse at center, rgba(56,189,248,${0.12 + screenFill * 0.22}) 0%, rgba(56,189,248,0) 70%)`,
+            background: `radial-gradient(ellipse at center, rgba(164,108,252,${0.12 + screenFill * 0.22}) 0%, rgba(164,108,252,0) 70%)`,
             pointerEvents: 'none',
             zIndex: 0,
           }}
@@ -163,30 +163,30 @@ export function Loader({ onComplete }: LoaderProps) {
           >
             <defs>
               <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#1a1e2a" />
-                <stop offset="40%" stopColor="#2a2e3a" />
-                <stop offset="100%" stopColor="#0f1118" />
+                <stop offset="0%" stopColor="#1a1a2e" />
+                <stop offset="40%" stopColor="#2a2a3e" />
+                <stop offset="100%" stopColor="#0f0f1a" />
               </linearGradient>
               <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0d1018" />
-                <stop offset="100%" stopColor="#060810" />
+                <stop offset="0%" stopColor="#0d0d1f" />
+                <stop offset="100%" stopColor="#060610" />
               </linearGradient>
               <linearGradient id="screenFillGrad" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stopColor="#0c4a6e" />
-                <stop offset="60%" stopColor="#0284c7" />
-                <stop offset="100%" stopColor="#38bdf8" />
+                <stop offset="0%" stopColor="#291e56" />
+                <stop offset="60%" stopColor="#6a3dbd" />
+                <stop offset="100%" stopColor="#a46cfc" />
               </linearGradient>
               <linearGradient id="screenGlow" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="rgba(56,189,248,0.25)" />
-                <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+                <stop offset="0%" stopColor="rgba(164,108,252,0.25)" />
+                <stop offset="100%" stopColor="rgba(164,108,252,0)" />
               </linearGradient>
               <linearGradient id="speculRight" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="rgba(255,255,255,0)" />
                 <stop offset="100%" stopColor="rgba(255,255,255,0.06)" />
               </linearGradient>
               <linearGradient id="islandGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#2a2e3a" />
-                <stop offset="100%" stopColor="#111418" />
+                <stop offset="0%" stopColor="#2a2a3e" />
+                <stop offset="100%" stopColor="#111120" />
               </linearGradient>
               <clipPath id="screenClip">
                 <rect x="10" y="18" width="140" height="244" rx="6" />
@@ -256,8 +256,8 @@ export function Loader({ onComplete }: LoaderProps) {
             <rect x="52" y="26" width="56" height="16" rx="8" stroke="rgba(255,255,255,0.08)" strokeWidth="0.75" />
 
             {/* Camera dot inside island */}
-            <circle cx="95" cy="34" r="4" fill="#111418" />
-            <circle cx="95" cy="34" r="2.2" fill="#1a1e2a" />
+            <circle cx="95" cy="34" r="4" fill="#111120" />
+            <circle cx="95" cy="34" r="2.2" fill="#1a1a30" />
             <circle cx="94" cy="33" r="0.7" fill="rgba(255,255,255,0.15)" />
 
             {/* Home indicator */}
@@ -304,7 +304,7 @@ export function Loader({ onComplete }: LoaderProps) {
               color: '#ffffff',
               fontVariantNumeric: 'tabular-nums',
               filter: glitchActive
-                ? 'drop-shadow(2px 0 0 rgba(56,189,248,0.9)) drop-shadow(-2px 0 0 rgba(14,165,233,0.7))'
+                ? 'drop-shadow(2px 0 0 rgba(164,108,252,0.9)) drop-shadow(-2px 0 0 rgba(100,60,200,0.7))'
                 : 'none',
               transform: glitchActive ? 'translateX(1px)' : 'none',
               transition: 'filter 0.05s, transform 0.05s',
@@ -341,9 +341,9 @@ export function Loader({ onComplete }: LoaderProps) {
               position: 'absolute',
               inset: 0,
               right: `${100 - progress}%`,
-              background: 'linear-gradient(90deg, #0c4a6e, #38bdf8)',
+              background: 'linear-gradient(90deg, #291e56, #a46cfc)',
               transition: 'right 0.08s linear',
-              boxShadow: '0 0 10px rgba(56,189,248,0.7), 0 0 4px rgba(56,189,248,1)',
+              boxShadow: '0 0 10px rgba(164,108,252,0.7), 0 0 4px rgba(164,108,252,1)',
             }}
           />
           <div
@@ -356,7 +356,7 @@ export function Loader({ onComplete }: LoaderProps) {
               height: 5,
               borderRadius: '50%',
               background: '#fff',
-              boxShadow: '0 0 6px 2px rgba(56,189,248,0.9)',
+              boxShadow: '0 0 6px 2px rgba(164,108,252,0.9)',
               transition: 'left 0.08s linear',
             }}
           />
@@ -380,7 +380,7 @@ export function Loader({ onComplete }: LoaderProps) {
               color: 'var(--color-secondary)',
               opacity: 0.75,
               filter: glitchActive
-                ? 'drop-shadow(1px 0 0 rgba(56,189,248,0.9)) drop-shadow(-1px 0 0 rgba(10,14,22,0.5))'
+                ? 'drop-shadow(1px 0 0 rgba(164,108,252,0.9)) drop-shadow(-1px 0 0 rgba(41,30,86,0.5))'
                 : 'none',
             }}
           >
@@ -397,7 +397,7 @@ export function Loader({ onComplete }: LoaderProps) {
                 fontSize: '0.65rem',
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
-                color: 'rgba(56,189,248,0.4)',
+                color: 'rgba(164,108,252,0.4)',
                 transform: 'translateX(2px)',
                 pointerEvents: 'none',
               }}
@@ -419,8 +419,8 @@ export function Loader({ onComplete }: LoaderProps) {
                   width: i % 5 === 4 ? 2 : 1,
                   height: i % 5 === 4 ? 10 : 6,
                   borderRadius: 1,
-                  background: active ? '#7dd3fc' : 'rgba(255,255,255,0.12)',
-                  boxShadow: active ? '0 0 4px rgba(56,189,248,0.5)' : 'none',
+                  background: active ? '#d4b8ff' : 'rgba(255,255,255,0.12)',
+                  boxShadow: active ? '0 0 4px rgba(164,108,252,0.5)' : 'none',
                   transition: 'background 0.15s, box-shadow 0.15s',
                 }}
               />

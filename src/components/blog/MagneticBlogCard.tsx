@@ -79,7 +79,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: `radial-gradient(200px circle at ${spotlight.x}% ${spotlight.y}%, rgba(56,189,248,0.12) 0%, transparent 70%)`,
+            background: `radial-gradient(200px circle at ${spotlight.x}% ${spotlight.y}%, rgba(164,108,252,0.12) 0%, transparent 70%)`,
             opacity: spotlight.opacity,
             transition: "opacity 0.3s ease",
             zIndex: 2,
@@ -94,7 +94,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             fontWeight: 900,
             lineHeight: 1,
             color: "transparent",
-            WebkitTextStroke: "1.5px rgba(56,189,248,0.18)",
+            WebkitTextStroke: "1.5px rgba(164,108,252,0.18)",
             transition: "color 0.35s ease, -webkit-text-stroke 0.35s ease",
             zIndex: 1,
           }}

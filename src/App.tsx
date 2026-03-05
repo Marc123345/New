@@ -95,13 +95,13 @@ function AppContent() {
                 style={{
                   background: 'transparent',
                   border: '2px solid rgba(255,255,255,0.18)',
-                  boxShadow: '4px 4px 0 rgba(56,189,248,0.7)',
+                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '6px 6px 0 #38bdf8';
+                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(56,189,248,0.7)';
+                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
                 <HeroWebGLPanel />

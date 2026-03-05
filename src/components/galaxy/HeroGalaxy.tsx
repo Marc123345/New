@@ -9,7 +9,7 @@ const INNER_RADIUS = 140;
 const OUTER_RADIUS = 230;
 
 const INNER_PLANETS = [
-  { icon: <Megaphone size={20} />, label: 'Advocacy Program', accent: '#38bdf8', startAngle: 0 },
+  { icon: <Megaphone size={20} />, label: 'Advocacy Program', accent: '#c084fc', startAngle: 0 },
 ];
 
 const OUTER_PLANETS = [
@@ -47,14 +47,14 @@ export function HeroGalaxy() {
       >
         <OrbitRing
           radius={INNER_RADIUS}
-          strokeColor="rgba(56,189,248,0.14)"
+          strokeColor="rgba(164,108,252,0.14)"
           dashPattern="4 8"
           rotationDuration={90}
           paused={hovering}
         />
         <OrbitRing
           radius={OUTER_RADIUS}
-          strokeColor="rgba(56,189,248,0.08)"
+          strokeColor="rgba(164,108,252,0.08)"
           dashPattern="6 12"
           rotationDuration={120}
           reverse

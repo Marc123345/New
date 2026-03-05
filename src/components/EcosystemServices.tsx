@@ -52,9 +52,9 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
         <div
           className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
           style={{
-            background: 'linear-gradient(135deg, var(--color-primary), rgba(56,189,248,0.4))',
+            background: 'linear-gradient(135deg, var(--color-primary), rgba(164,108,252,0.4))',
             border: '2px solid var(--color-secondary)',
-            boxShadow: '0 0 24px rgba(56,189,248,0.35), inset 0 0 12px rgba(56,189,248,0.15)',
+            boxShadow: '0 0 24px rgba(164,108,252,0.35), inset 0 0 12px rgba(164,108,252,0.15)',
           }}
         >
           <div style={{ color: '#ffffff' }}>{item.icon}</div>
@@ -65,7 +65,7 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
             style={{
               fontFamily: 'var(--font-stack-heading)',
               color: '#ffffff',
-              background: 'rgba(10,14,22,0.95)',
+              background: 'rgba(41,30,86,0.95)',
               border: '1px solid var(--color-secondary)',
             }}
           >
@@ -147,7 +147,7 @@ function LaptopCenter() {
             alt="Website at the center of everything"
             className="w-[180px] sm:w-[240px] md:w-[340px] h-auto"
             style={{
-              filter: 'drop-shadow(0 0 32px rgba(56,189,248,0.55)) drop-shadow(0 24px 48px rgba(0,0,0,0.8))',
+              filter: 'drop-shadow(0 0 32px rgba(164,108,252,0.55)) drop-shadow(0 24px 48px rgba(0,0,0,0.8))',
               userSelect: 'none',
               pointerEvents: 'none',
             }}
@@ -164,7 +164,7 @@ function LaptopCenter() {
           bottom: '-10%',
           left: '50%',
           translateX: '-50%',
-          background: 'radial-gradient(ellipse, rgba(56,189,248,0.25) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(164,108,252,0.25) 0%, transparent 70%)',
           filter: 'blur(12px)',
         }}
         animate={{ scaleX: [1, 0.85, 1], opacity: [0.6, 0.35, 0.6] }}
@@ -187,7 +187,7 @@ export function EcosystemServices() {
     <section
       id="ecosystem"
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden py-20 sm:py-28"
-      style={{ background: 'linear-gradient(160deg, #080c14 0%, var(--color-primary) 40%, #0a1018 70%, #060a10 100%)' }}
+      style={{ background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)' }}
     >
       {/* Background Layer */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -252,7 +252,7 @@ export function EcosystemServices() {
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2rem, 8vw, 9rem)',
-              textShadow: '0 20px 40px rgba(10,14,22,0.6)',
+              textShadow: '0 20px 40px rgba(41,30,86,0.6)',
               color: 'transparent',
               WebkitTextStroke: '1.5px #ffffff',
             }}
@@ -289,8 +289,8 @@ export function EcosystemServices() {
               style={{
                 width: ORBIT_DIAMETER,
                 height: ORBIT_DIAMETER,
-                border: '1px solid rgba(56,189,248,0.2)',
-                boxShadow: '0 0 40px rgba(56,189,248,0.06)',
+                border: '1px solid rgba(164,108,252,0.2)',
+                boxShadow: '0 0 40px rgba(164,108,252,0.06)',
               }}
             />
           </div>

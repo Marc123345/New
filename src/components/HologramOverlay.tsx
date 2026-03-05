@@ -28,8 +28,6 @@ function FloatingParticles() {
     const resize = () => {
       canvas.width = canvas.offsetWidth * window.devicePixelRatio;
       canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      // Reset transform before scaling to prevent accumulation on repeated resize calls
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     };
     resize();
@@ -39,7 +37,7 @@ function FloatingParticles() {
     const w = () => canvas.offsetWidth;
     const h = () => canvas.offsetHeight;
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 60; i++) {
       particles.push({
         x: Math.random() * w(),
         y: Math.random() * h(),
@@ -83,11 +81,11 @@ function FloatingParticles() {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 60) {
+          if (dist < 80) {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * (1 - dist / 60)})`;
+            ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * (1 - dist / 80)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -351,8 +349,8 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
       ctx.save();
       ctx.globalCompositeOperation = 'overlay';
       const intensity = 0.03 + 0.02 * Math.sin(t * 0.05);
-      for (let y = 0; y < vh; y += 4) {
-        const lineAlpha = y % 8 === 0 ? intensity * 1.5 : intensity;
+      for (let y = 0; y < vh; y += 2) {
+        const lineAlpha = y % 4 === 0 ? intensity * 1.5 : intensity;
         ctx.fillStyle = `rgba(56, 189, 248, ${lineAlpha})`;
         ctx.fillRect(0, y, vw, 1);
       }
@@ -377,8 +375,8 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
       drawScan(scanY2, 15, 0.05);
       ctx.restore();
 
-      if (Math.random() > 0.97) {
-        const glitchCount = 1 + Math.floor(Math.random() * 2);
+      if (Math.random() > 0.94) {
+        const glitchCount = 1 + Math.floor(Math.random() * 3);
         for (let g = 0; g < glitchCount; g++) {
           const gy = Math.random() * vh;
           const gh = 1 + Math.random() * 8;
@@ -453,7 +451,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
             exit={{ opacity: 0, scale: 0.85, rotateX: -12, y: 40 }}
             transition={{ type: 'spring', stiffness: 200, damping: 24, mass: 0.8 }}
-            className="fixed inset-0 flex items-center justify-center px-3 pt-10 pb-3 sm:px-4 sm:pt-10 sm:pb-4 md:p-10"
+            className="fixed inset-0 flex items-center justify-center px-3 pt-16 pb-3 sm:px-4 sm:pt-16 sm:pb-4 md:p-10"
             style={{ zIndex: 10000, pointerEvents: 'none', perspective: 1400 }}
           >
             <div
@@ -467,7 +465,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                 aria-label="Close"
                 className="absolute flex items-center justify-center"
                 style={{
-                  top: -44,
+                  top: -48,
                   right: 0,
                   width: 44,
                   height: 44,

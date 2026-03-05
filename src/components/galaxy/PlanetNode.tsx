@@ -87,7 +87,7 @@ export function PlanetNode({
                 style={{
                   top: -36,
                   transform: 'translateX(-50%)',
-                  background: 'rgba(8,12,18,0.9)',
+                  background: 'rgba(10,8,20,0.9)',
                   border: `1px solid ${accentColor}40`,
                   borderRadius: 4,
                   padding: '6px 12px',

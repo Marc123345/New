@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { brandLogos } from "../lib/brandLogos";
+import { isMobileDevice } from "../hooks/useIsMobile";
 
 const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -130,34 +131,43 @@ export function HeroWebGLPanel() {
     const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 36);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    const mobile = isMobileDevice();
+    const maxDpr = mobile ? 1 : Math.min(window.devicePixelRatio, 2);
+    const renderer = new THREE.WebGLRenderer({ antialias: !mobile, alpha: true, powerPreference: mobile ? "low-power" : "high-performance" });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(maxDpr);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
-    const renderTarget = new THREE.WebGLRenderTarget(
-      container.clientWidth * Math.min(window.devicePixelRatio, 2),
-      container.clientHeight * Math.min(window.devicePixelRatio, 2)
-    );
+    let renderTarget: THREE.WebGLRenderTarget | null = null;
+    let displacementScene: THREE.Scene | null = null;
+    let displacementCamera: THREE.OrthographicCamera | null = null;
+    let displacementMaterial: THREE.ShaderMaterial | null = null;
+    let displacementQuad: THREE.Mesh | null = null;
 
-    const displacementScene = new THREE.Scene();
-    const displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const displacementMaterial = new THREE.ShaderMaterial({
-      vertexShader: DISPLACEMENT_VERT,
-      fragmentShader: DISPLACEMENT_FRAG,
-      uniforms: {
-        uScene: { value: renderTarget.texture },
-        uMouse: { value: new THREE.Vector2(-1, -1) },
-        uRadius: { value: 0.18 },
-        uStrength: { value: 0.0 },
-        uVelocity: { value: new THREE.Vector2(0, 0) },
-        uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
-      },
-    });
-    const displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
-    displacementScene.add(displacementQuad);
+    if (!mobile) {
+      renderTarget = new THREE.WebGLRenderTarget(
+        container.clientWidth * maxDpr,
+        container.clientHeight * maxDpr
+      );
+      displacementScene = new THREE.Scene();
+      displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      displacementMaterial = new THREE.ShaderMaterial({
+        vertexShader: DISPLACEMENT_VERT,
+        fragmentShader: DISPLACEMENT_FRAG,
+        uniforms: {
+          uScene: { value: renderTarget.texture },
+          uMouse: { value: new THREE.Vector2(-1, -1) },
+          uRadius: { value: 0.18 },
+          uStrength: { value: 0.0 },
+          uVelocity: { value: new THREE.Vector2(0, 0) },
+          uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
+        },
+      });
+      displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
+      displacementScene.add(displacementQuad);
+    }
 
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
@@ -400,7 +410,7 @@ export function HeroWebGLPanel() {
         }
       }
 
-      const SUB = 8;
+      const SUB = mobile ? 3 : 8;
       const subDt = dt / SUB;
       const sphereSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
 
@@ -593,16 +603,20 @@ export function HeroWebGLPanel() {
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
 
-      const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
-      displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
-      displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
-      displacementMaterial.uniforms.uStrength.value =
-        displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
+      if (!mobile && displacementMaterial && renderTarget && displacementScene && displacementCamera) {
+        const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
+        displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
+        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
+        displacementMaterial.uniforms.uStrength.value =
+          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
 
-      renderer.setRenderTarget(renderTarget);
-      renderer.render(scene, camera);
-      renderer.setRenderTarget(null);
-      renderer.render(displacementScene, displacementCamera);
+        renderer.setRenderTarget(renderTarget);
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(null);
+        renderer.render(displacementScene, displacementCamera);
+      } else {
+        renderer.render(scene, camera);
+      }
     };
 
     const handleVisibility = () => {
@@ -625,9 +639,10 @@ export function HeroWebGLPanel() {
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-      const pr = Math.min(window.devicePixelRatio, 2);
-      renderTarget.setSize(w * pr, h * pr);
-      displacementMaterial.uniforms.uResolution.value.set(w, h);
+      if (renderTarget && displacementMaterial) {
+        renderTarget.setSize(w * maxDpr, h * maxDpr);
+        displacementMaterial.uniforms.uResolution.value.set(w, h);
+      }
     };
     window.addEventListener("resize", handleResize);
 
@@ -639,9 +654,9 @@ export function HeroWebGLPanel() {
       container.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animId);
 
-      renderTarget.dispose();
-      displacementMaterial.dispose();
-      displacementQuad.geometry.dispose();
+      if (renderTarget) renderTarget.dispose();
+      if (displacementMaterial) displacementMaterial.dispose();
+      if (displacementQuad) displacementQuad.geometry.dispose();
       loadedTextures.forEach((t) => t.dispose());
       geoCache.forEach(([g1, g2]) => {
         g1.dispose();

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
+import { isMobileDevice } from '../../../hooks/useIsMobile';
 import './globe.css';
 
 interface GlobeWrapperProps {
@@ -75,6 +76,8 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const mobile = isMobileDevice();
+
     const init = async () => {
       const GlobeModule = await import('globe.gl');
       const Globe = GlobeModule.default;
@@ -82,35 +85,48 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
       const globe = Globe({ animateIn: false })(containerRef.current!);
       globeRef.current = globe;
 
+      const w = containerRef.current!.clientWidth || 800;
+      const h = containerRef.current!.clientHeight || 800;
+
       globe
         .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
         .atmosphereColor('rgba(120,60,220,0.5)')
-        .atmosphereAltitude(0.15)
-        .width(containerRef.current!.clientWidth || 800)
-        .height(containerRef.current!.clientHeight || 800)
-        .heatmapPointLat('lat')
-        .heatmapPointLng('lng')
-        .heatmapPointWeight('pop')
-        .heatmapBandwidth(0.9)
-        .heatmapColorSaturation(2.8)
-        .heatmapsData([worldPopulationData])
-        .arcsData([])
-        .arcColor('color')
-        .arcDashLength(0.4)
-        .arcDashGap(0.2)
-        .arcDashAnimateTime(1500)
-        .arcStroke(1.2);
+        .atmosphereAltitude(mobile ? 0.1 : 0.15)
+        .width(w)
+        .height(h);
+
+      if (!mobile) {
+        globe
+          .heatmapPointLat('lat')
+          .heatmapPointLng('lng')
+          .heatmapPointWeight('pop')
+          .heatmapBandwidth(0.9)
+          .heatmapColorSaturation(2.8)
+          .heatmapsData([worldPopulationData])
+          .arcColor('color')
+          .arcDashLength(0.4)
+          .arcDashGap(0.2)
+          .arcDashAnimateTime(1500)
+          .arcStroke(1.2);
+      }
+
+      globe.arcsData([]);
 
       const controls = globe.controls();
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.4;
+      controls.autoRotateSpeed = mobile ? 0.3 : 0.4;
       controls.enableZoom = false;
       controls.enablePan = false;
       controls.enableRotate = false;
 
       globe.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
+
+      if (mobile) {
+        const renderer = globe.renderer?.();
+        if (renderer) renderer.setPixelRatio(1);
+      }
     };
 
     init();
@@ -144,21 +160,26 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
       const p = pendingProgressRef.current;
       if (p === null || !globeRef.current) return;
 
+      const mobile = isMobileDevice();
       const globe = globeRef.current;
       const newAltitude = Math.max(1.2, 2.2 - p * 0.8);
 
       if (Math.abs(newAltitude - lastAltitudeRef.current) > 0.01) {
         lastAltitudeRef.current = newAltitude;
         globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 300);
-        globe.atmosphereAltitude(0.15 + p * 0.35);
+        if (!mobile) {
+          globe.atmosphereAltitude(0.15 + p * 0.35);
+        }
         const controls = globe.controls();
-        if (controls) controls.autoRotateSpeed = 0.4 + p * 1.2;
+        if (controls) controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + p * (mobile ? 0.6 : 1.2);
       }
 
-      const newThreshold = getArcThreshold(p);
-      if (newThreshold !== lastArcThresholdRef.current) {
-        lastArcThresholdRef.current = newThreshold;
-        globe.arcsData(buildArcs(p));
+      if (!mobile) {
+        const newThreshold = getArcThreshold(p);
+        if (newThreshold !== lastArcThresholdRef.current) {
+          lastArcThresholdRef.current = newThreshold;
+          globe.arcsData(buildArcs(p));
+        }
       }
     });
   });

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 import THREE from "../lib/three";
 
 const VERT = `
@@ -93,8 +94,11 @@ const GLOW_FRAG = `
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
+    if (isMobile) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -230,7 +234,9 @@ export function CursorTrail() {
       rtA.dispose();
       rtB.dispose();
     };
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) return null;
 
   return (
     <canvas

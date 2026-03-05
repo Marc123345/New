@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { motion, useInView, useScroll, useTransform } from "motion/react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -64,7 +65,10 @@ function ThreeDReveal({ children, className = "" }: Omit<ScrollRevealProps, 'mod
 }
 
 export const ScrollReveal = ({ mode = "blur", ...props }: ScrollRevealProps) => {
-  if (mode === "parallax") return <ParallaxReveal {...props} />;
-  if (mode === "3d") return <ThreeDReveal {...props} />;
+  const isMobile = useIsMobile();
+  const effectiveMode = isMobile ? "blur" : mode;
+
+  if (effectiveMode === "parallax") return <ParallaxReveal {...props} />;
+  if (effectiveMode === "3d") return <ThreeDReveal {...props} />;
   return <BlurReveal {...props} />;
 };

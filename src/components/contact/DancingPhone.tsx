@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { isMobileDevice } from "../../hooks/useIsMobile";
 
 export function DancingPhone() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -8,13 +9,14 @@ export function DancingPhone() {
     const el = mountRef.current;
     if (!el) return;
 
+    const mobile = isMobileDevice();
     const w = el.clientWidth;
     const h = el.clientHeight;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: !mobile, alpha: true, powerPreference: mobile ? "low-power" : "default" });
+    renderer.setPixelRatio(mobile ? 1 : Math.min(window.devicePixelRatio, 2));
     renderer.setSize(w, h);
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = !mobile;
     el.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();

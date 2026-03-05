@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useMotionValue, useTransform } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
 const LAPTOP_URL = 'https://ik.imagekit.io/qcvroy8xpd/download.png';
@@ -178,7 +179,9 @@ const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
+  const isMobile = useIsMobile();
   const orbitAngle = useOrbitAngle(isHoveringOrbit);
+  const visiblePlanets = useMemo(() => isMobile ? PLANET_IMAGES.slice(0, 3) : PLANET_IMAGES, [isMobile]);
 
   return (
     <section
@@ -188,18 +191,20 @@ export function EcosystemServices() {
     >
       {/* Background Layer */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-40"
-          style={{ filter: 'brightness(0.7) contrast(1.05)' }}
-        >
-          <source src={VIDEO_URL} type="video/mp4" />
-        </video>
+        {!isMobile && (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover opacity-40"
+            style={{ filter: 'brightness(0.7) contrast(1.05)' }}
+          >
+            <source src={VIDEO_URL} type="video/mp4" />
+          </video>
+        )}
 
-        {PLANET_IMAGES.map((planet, i) => (
+        {visiblePlanets.map((planet, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full overflow-hidden"

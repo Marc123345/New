@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface Star {
   id: number;
@@ -15,8 +16,12 @@ interface ShootingStarsProps {
 }
 
 export function ShootingStars({ count = 18 }: ShootingStarsProps) {
+  const isMobile = useIsMobile();
+  const effectiveCount = isMobile ? Math.min(count, 6) : count;
+  const twinkleCount = isMobile ? 15 : 60;
+
   const stars = useMemo<Star[]>(() => {
-    return Array.from({ length: count }, (_, i) => ({
+    return Array.from({ length: effectiveCount }, (_, i) => ({
       id: i,
       top: `${Math.random() * 70}%`,
       left: `${Math.random() * 100}%`,
@@ -25,10 +30,10 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
       size: 1 + Math.random() * 2,
       opacity: 0.4 + Math.random() * 0.6,
     }));
-  }, [count]);
+  }, [effectiveCount]);
 
   const twinkleStars = useMemo(() => {
-    return Array.from({ length: 60 }, (_, i) => ({
+    return Array.from({ length: twinkleCount }, (_, i) => ({
       id: i,
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
@@ -37,7 +42,7 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
       duration: `${2 + Math.random() * 4}s`,
       delay: `${Math.random() * 5}s`,
     }));
-  }, []);
+  }, [twinkleCount]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">

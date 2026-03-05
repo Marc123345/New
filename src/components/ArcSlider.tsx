@@ -677,7 +677,7 @@ export function ArcSlider() {
           ref={containerRef}
           className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            height: "clamp(380px, 50vw, 480px)",
+            height: "clamp(320px, 42vw, 400px)",
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
             touchAction: "pan-y",
@@ -699,13 +699,13 @@ export function ArcSlider() {
                   className="absolute will-change-transform"
                   style={{
                     width: "clamp(260px, 55vw, 380px)",
-                    aspectRatio: "3 / 3.5",
+                    aspectRatio: "4 / 3",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-8 md:p-10 transition-colors duration-500"
+                    className="relative h-full w-full overflow-hidden flex flex-col p-5 sm:p-6 md:p-8 transition-colors duration-500"
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",
@@ -742,7 +742,8 @@ export function ArcSlider() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-6">
+                    <div className="flex-1" />
+                    <div className="flex flex-col gap-4">
                       <h3
                         className="tracking-tight leading-[1] font-bold"
                         style={{
@@ -755,7 +756,7 @@ export function ArcSlider() {
                         {service.fullTitle}
                       </h3>
 
-                      <div className="mt-2">
+                      <div>
                         <button
                           onClick={(e) => {
                             if (dragRef.current.hasMoved) return;

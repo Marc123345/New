@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, MotionValue } from "motion/react";
 
 const CONTACTS = [
   {
@@ -95,7 +95,8 @@ export function Testimonials() {
   }, [scrollYProgress]);
 
   return (
-    <div ref={containerRef} className="relative h-[300vh] bg-[var(--color-surface-dark)]">
+    {/* Replaced CSS variable with a deep Dark Purple background */}
+    <div ref={containerRef} className="relative h-[300vh] bg-[#13082A]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
 
         <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
@@ -128,7 +129,7 @@ export function Testimonials() {
         <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">
           {/* LEFT: Globe Panel — desktop only */}
           <div
-            className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
+            className="hidden lg:flex w-[400px] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0 bg-[#1A1040]"
             style={{
               border: "4px solid var(--color-secondary)",
               boxShadow: "var(--shadow-geometric)",
@@ -207,8 +208,9 @@ export function Testimonials() {
           </div>
 
           {/* RIGHT: Testimonial Cards */}
+          {/* Replaced CSS variable with a lighter dark purple for contrast */}
           <div
-            className="flex-1 bg-[var(--color-background-light)] relative overflow-hidden flex flex-col min-w-0"
+            className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
             style={{
               border: "1px solid rgba(255,255,255,0.15)",
               boxShadow: "var(--shadow-geometric)",
@@ -231,7 +233,7 @@ export function Testimonials() {
             </div>
 
             {/* Client navigation strip */}
-            <div className="relative z-20 shrink-0 border-t border-white/10 bg-[var(--color-background-light)]">
+            <div className="relative z-20 shrink-0 border-t border-white/10 bg-[#1A1040]">
               {/* Mobile: dot pagination */}
               <div className="flex sm:hidden items-center justify-between px-4 py-3 gap-3">
                 <div className="flex items-center gap-1.5 min-w-0">
@@ -320,7 +322,7 @@ function GlobeMap({
   scrollProgress,
   activeIndex,
 }: {
-  scrollProgress: any;
+  scrollProgress: MotionValue<number>; // Fixed TypeScript "any" issue
   activeIndex: number;
 }) {
   const active = CONTACTS[activeIndex];
@@ -375,7 +377,7 @@ function TestimonialCard({
   contact: (typeof CONTACTS)[number];
   index: number;
   total: number;
-  scrollProgress: any;
+  scrollProgress: MotionValue<number>; // Fixed TypeScript "any" issue
 }) {
   const segmentSize = 1 / total;
   const start = index * segmentSize;

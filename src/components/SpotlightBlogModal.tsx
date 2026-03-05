@@ -50,7 +50,7 @@ export function SpotlightBlogModal({
     <AnimatePresence>
       {selectedPost !== null && (
         <motion.div
-          className="fixed inset-0 flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 flex items-start justify-center overflow-y-auto"
           style={{ zIndex: 9999 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -64,7 +64,7 @@ export function SpotlightBlogModal({
           />
 
           <motion.div
-            className="relative w-full max-w-3xl mx-5 sm:mx-6 overflow-y-auto"
+            className="relative w-full max-w-3xl mx-5 sm:mx-6 my-8 sm:my-12"
             initial={{ opacity: 0, y: 60, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
@@ -73,12 +73,11 @@ export function SpotlightBlogModal({
               background: "#0c0a1a",
               border: "1px solid rgba(255,255,255,0.12)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
-              maxHeight: "calc(100vh - 64px)",
             }}
           >
             <button
               onClick={onClose}
-              className="sticky top-4 float-right mr-4 z-10 w-10 h-10 flex items-center justify-center transition-colors duration-200"
+              className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center transition-colors duration-200"
               style={{
                 background: "rgba(255,255,255,0.08)",
                 border: "1px solid rgba(255,255,255,0.15)",

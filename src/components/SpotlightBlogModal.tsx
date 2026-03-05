@@ -50,7 +50,8 @@ export function SpotlightBlogModal({
     <AnimatePresence>
       {selectedPost !== null && (
         <motion.div
-          className="fixed inset-0 z-[1000] flex items-start justify-center overflow-y-auto"
+          className="fixed inset-0 flex items-start justify-center overflow-y-auto"
+          style={{ zIndex: 9999 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

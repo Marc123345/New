@@ -249,8 +249,8 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-8"
-          style={{ background: "#040408" }}
+          className="fixed inset-0 flex items-center justify-center p-3 sm:p-8"
+          style={{ background: "#040408", zIndex: 9999 }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}

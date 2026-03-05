@@ -99,7 +99,7 @@ export function ContactForm() {
             <p style={{
               fontSize: "0.875rem",
               color: "var(--color-text-dark)",
-              opacity: 0.45,
+              opacity: 0.75,
               fontFamily: "var(--font-stack-heading)",
             }}>
               Share your vision — we'll handle the rest.
@@ -146,7 +146,7 @@ export function ContactForm() {
                 </div>
                 <div style={{
                   color: "var(--color-text-dark)",
-                  opacity: 0.45,
+                  opacity: 0.75,
                   fontSize: "0.875rem",
                   fontFamily: "var(--font-stack-heading)",
                 }}>
@@ -186,7 +186,7 @@ export function ContactForm() {
                           position: "absolute",
                           left: "13px",
                           color: "var(--color-text-dark)",
-                          opacity: 0.4,
+                          opacity: 0.6,
                           pointerEvents: "none",
                         }}
                       />
@@ -242,7 +242,7 @@ export function ContactForm() {
                         left: "13px",
                         top: "15px",
                         color: "var(--color-text-dark)",
-                        opacity: 0.4,
+                        opacity: 0.6,
                         pointerEvents: "none",
                       }}
                     />
@@ -333,7 +333,7 @@ export function ContactForm() {
                   textAlign: "center",
                   fontSize: "0.75rem",
                   color: "var(--color-text-dark)",
-                  opacity: 0.3,
+                  opacity: 0.6,
                   marginTop: "4px",
                   fontFamily: "var(--font-stack-heading)",
                   letterSpacing: "0.05em",
@@ -360,7 +360,7 @@ export function ContactForm() {
         .contact-grid input::placeholder,
         .contact-grid textarea::placeholder {
           color: var(--color-text-dark);
-          opacity: 0.3;
+          opacity: 0.5;
         }
       `}</style>
     </section>

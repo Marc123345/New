@@ -136,7 +136,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
 
         <div className="p-5 sm:p-6" style={{ position: "relative", zIndex: 3 }}>
           <div
-            className="flex items-center gap-3 mb-4 text-[11px] tracking-wider uppercase opacity-50"
+            className="flex items-center gap-3 mb-4 text-[11px] tracking-wider uppercase opacity-65"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             <span>{post.date}</span>
@@ -157,7 +157,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           </h3>
 
           <p
-            className="text-sm leading-relaxed opacity-70 mb-5 line-clamp-2"
+            className="text-sm leading-relaxed opacity-80 mb-5 line-clamp-2"
             style={{ fontFamily: "var(--font-stack-body)" }}
           >
             {post.excerpt}
@@ -168,7 +168,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             style={{ borderTop: "1px solid rgba(232,226,255,0.12)" }}
           >
             <span
-              className="text-[11px] tracking-wider uppercase opacity-50"
+              className="text-[11px] tracking-wider uppercase opacity-65"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {post.author}

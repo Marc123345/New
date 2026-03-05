@@ -171,7 +171,7 @@ export function Navigation() {
 
                   {/* Number */}
                   <span
-                    className="relative z-10 w-10 text-xs text-white/20 mr-6 transition-colors duration-300 group-hover:text-white/40"
+                    className="relative z-10 w-10 text-xs text-white/40 mr-6 transition-colors duration-300 group-hover:text-white/60"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
                   >
                     {link.id}
@@ -191,7 +191,7 @@ export function Navigation() {
 
                   {/* Sub label */}
                   <span
-                    className="relative z-10 hidden md:block text-xs tracking-widest uppercase text-white/30 transition-all duration-300 group-hover:text-white/60 group-hover:translate-x-1"
+                    className="relative z-10 hidden md:block text-xs tracking-widest uppercase text-white/50 transition-all duration-300 group-hover:text-white/70 group-hover:translate-x-1"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
                   >
                     {link.sub}
@@ -225,12 +225,12 @@ export function Navigation() {
             {/* Top: tagline */}
             <div>
               <p
-                className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-6"
+                className="text-[10px] uppercase tracking-[0.4em] text-white/50 mb-6"
                 style={{ fontFamily: "var(--font-stack-heading)" }}
               >
                 H2H Digital
               </p>
-              <p className="text-white/50 text-sm leading-relaxed max-w-xs">
+              <p className="text-white/70 text-sm leading-relaxed max-w-xs">
                 Bridging human potential with digital innovation across Africa and beyond.
               </p>
             </div>
@@ -245,7 +245,7 @@ export function Navigation() {
             <div className="space-y-8">
               <div>
                 <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3"
+                  className="text-[10px] uppercase tracking-[0.4em] text-white/50 mb-3"
                   style={{ fontFamily: "var(--font-stack-heading)" }}
                 >
                   Get in touch
@@ -261,7 +261,7 @@ export function Navigation() {
 
               <div>
                 <p
-                  className="text-[10px] uppercase tracking-[0.4em] text-white/20 mb-3"
+                  className="text-[10px] uppercase tracking-[0.4em] text-white/50 mb-3"
                   style={{ fontFamily: "var(--font-stack-heading)" }}
                 >
                   Follow us
@@ -271,7 +271,7 @@ export function Navigation() {
                     <a
                       key={s.label}
                       href={s.href}
-                      className="text-[11px] uppercase tracking-widest text-white/40 hover:text-white transition-colors duration-300"
+                      className="text-[11px] uppercase tracking-widest text-white/60 hover:text-white transition-colors duration-300"
                       style={{ fontFamily: "var(--font-stack-heading)" }}
                     >
                       {s.label}
@@ -293,7 +293,7 @@ export function Navigation() {
           }}
         >
           <p
-            className="text-[10px] uppercase tracking-[0.4em] text-white/20"
+            className="text-[10px] uppercase tracking-[0.4em] text-white/50"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             &copy; {new Date().getFullYear()} H2H Digital
@@ -303,7 +303,7 @@ export function Navigation() {
               <a
                 key={s.label}
                 href={s.href}
-                className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white/70 transition-colors duration-300"
+                className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white/70 transition-colors duration-300"
                 style={{ fontFamily: "var(--font-stack-heading)" }}
               >
                 {s.label}
@@ -311,7 +311,7 @@ export function Navigation() {
             ))}
           </div>
           <p
-            className="hidden sm:block text-[10px] uppercase tracking-[0.4em] text-white/20"
+            className="hidden sm:block text-[10px] uppercase tracking-[0.4em] text-white/50"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             Nairobi · Lagos · Cape Town

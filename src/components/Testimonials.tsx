@@ -300,7 +300,7 @@ export function Testimonials() {
                       className="text-[10px] tracking-widest uppercase whitespace-nowrap"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
-                        color: i === activeIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
+                        color: i === activeIndex ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.55)",
                       }}
                     >
                       {contact.name.split(" ")[0]} · {contact.country}

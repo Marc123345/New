@@ -45,7 +45,7 @@ export function Footer() {
                 <H2HLogo height={48} />
               </div>
               <p
-                className="text-[var(--color-text-dark)]/60 text-sm max-w-xs"
+                className="text-[var(--color-text-dark)]/75 text-sm max-w-xs"
                 style={{ lineHeight: 'var(--line-height-relaxed)' }}
               >
                 Transforming businesses across Africa through award-winning digital innovation.
@@ -60,7 +60,7 @@ export function Footer() {
               custom={1}
             >
               <p
-                className="text-xs tracking-[0.2em] text-[var(--color-text-dark)]/40"
+                className="text-xs tracking-[0.2em] text-[var(--color-text-dark)]/60"
                 style={{
                   fontFamily: 'var(--font-stack-heading)',
                   marginBottom: 'var(--space-6x)'
@@ -76,7 +76,7 @@ export function Footer() {
                     className="group flex items-center gap-3 text-[var(--color-text-dark)]/80 hover:text-[var(--color-secondary)] transition-colors duration-300"
                     style={{ lineHeight: 'var(--line-height-normal)' }}
                   >
-                    <link.icon className="w-4 h-4 opacity-40 group-hover:opacity-100 transition-opacity duration-300" />
+                    <link.icon className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
                     <span className="relative">
                       {link.label}
                       <span className="absolute left-0 -bottom-0.5 w-full h-px bg-[var(--color-secondary)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
@@ -94,7 +94,7 @@ export function Footer() {
               custom={2}
             >
               <p
-                className="text-xs tracking-[0.2em] text-[var(--color-text-dark)]/40"
+                className="text-xs tracking-[0.2em] text-[var(--color-text-dark)]/60"
                 style={{
                   fontFamily: 'var(--font-stack-heading)',
                   marginBottom: 'var(--space-6x)'
@@ -129,7 +129,7 @@ export function Footer() {
             style={{ paddingTop: 'clamp(16px, 4vw, 64px)' }}
           >
             <p
-              className="text-[var(--color-text-dark)]/40 text-xs tracking-widest"
+              className="text-[var(--color-text-dark)]/60 text-xs tracking-widest"
               style={{ fontFamily: 'var(--font-stack-heading)' }}
             >
               &copy; 2026 H2H DIGITAL HOME
@@ -137,14 +137,14 @@ export function Footer() {
             <div className="flex items-center" style={{ gap: 'clamp(16px, 4vw, 64px)' }}>
               <a
                 href="#"
-                className="text-[var(--color-text-dark)]/40 text-xs tracking-widest hover:text-[var(--color-text-dark)]/80 transition-colors duration-300"
+                className="text-[var(--color-text-dark)]/60 text-xs tracking-widest hover:text-[var(--color-text-dark)]/90 transition-colors duration-300"
                 style={{ fontFamily: 'var(--font-stack-heading)' }}
               >
                 PRIVACY
               </a>
               <a
                 href="#"
-                className="text-[var(--color-text-dark)]/40 text-xs tracking-widest hover:text-[var(--color-text-dark)]/80 transition-colors duration-300"
+                className="text-[var(--color-text-dark)]/60 text-xs tracking-widest hover:text-[var(--color-text-dark)]/90 transition-colors duration-300"
                 style={{ fontFamily: 'var(--font-stack-heading)' }}
               >
                 TERMS

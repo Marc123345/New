@@ -143,9 +143,9 @@ export function HeroStory() {
           </div>
           <div className="flex items-center gap-2">
             <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
-              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.5)" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.75)" strokeWidth="1" strokeLinecap="round"/>
             </svg>
-            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(192,132,252,0.45)', fontFamily: 'var(--font-stack-heading)' }}>
+            <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(192,132,252,0.75)', fontFamily: 'var(--font-stack-heading)' }}>
               scroll to explore
             </span>
           </div>

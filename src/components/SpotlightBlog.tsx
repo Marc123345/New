@@ -126,7 +126,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
               fontSize: "0.7rem",
               letterSpacing: "0.15em",
               textTransform: "uppercase",
-              opacity: 0.45,
+              opacity: 0.65,
               fontFamily: "var(--font-stack-heading)",
             }}>
               <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -157,7 +157,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
             <p style={{
               fontSize: "clamp(0.875rem, 1.1vw, 1rem)",
               lineHeight: 1.7,
-              opacity: 0.65,
+              opacity: 0.8,
               fontFamily: "var(--font-stack-body)",
               marginBottom: "32px",
             }}>
@@ -374,7 +374,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
               exit={{ opacity: 0 }}
               style={{ textAlign: "center", padding: "80px 0" }}
             >
-              <p style={{ opacity: 0.5, marginBottom: "24px", fontFamily: "var(--font-stack-body)" }}>
+              <p style={{ opacity: 0.75, marginBottom: "24px", fontFamily: "var(--font-stack-body)" }}>
                 No articles in this category.
               </p>
               <button
@@ -551,7 +551,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
             fontSize: "0.68rem",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            opacity: 0.45,
+            opacity: 0.65,
             fontFamily: "var(--font-stack-heading)",
           }}>
             <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
@@ -582,7 +582,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
           <p style={{
             fontSize: "0.875rem",
             lineHeight: 1.6,
-            opacity: 0.6,
+            opacity: 0.78,
             fontFamily: "var(--font-stack-body)",
             marginBottom: "20px",
             display: "-webkit-box",
@@ -607,7 +607,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
               fontSize: "0.7rem",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              opacity: 0.5,
+              opacity: 0.7,
               fontFamily: "var(--font-stack-heading)",
             }}>
               <User size={11} /> {post.author}

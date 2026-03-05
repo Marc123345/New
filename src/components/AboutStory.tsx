@@ -196,7 +196,7 @@ export function AboutStory() {
               fontFamily: 'var(--font-stack-body)',
               fontSize: 'clamp(1rem, 1.4vw, 1.15rem)',
               lineHeight: 1.8,
-              color: 'rgba(232,226,255,0.5)',
+              color: 'rgba(232,226,255,0.78)',
               textAlign: 'center',
             }}
           >
@@ -255,7 +255,7 @@ export function AboutStory() {
                   fontWeight: 700,
                   letterSpacing: '0.25em',
                   textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.6)',
+                  color: 'rgba(164,108,252,0.85)',
                   fontFamily: 'var(--font-stack-heading)',
                 }}
               >
@@ -267,7 +267,7 @@ export function AboutStory() {
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
                   lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.55)',
+                  color: 'rgba(232,226,255,0.78)',
                   marginBottom: '1.5rem',
                 }}
               >
@@ -279,7 +279,7 @@ export function AboutStory() {
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
                   lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.55)',
+                  color: 'rgba(232,226,255,0.78)',
                   marginBottom: '2.5rem',
                 }}
               >
@@ -302,7 +302,7 @@ export function AboutStory() {
                   fontWeight: 700,
                   letterSpacing: '0.25em',
                   textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.6)',
+                  color: 'rgba(164,108,252,0.85)',
                   fontFamily: 'var(--font-stack-heading)',
                 }}
               >
@@ -327,7 +327,7 @@ export function AboutStory() {
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
                   lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.55)',
+                  color: 'rgba(232,226,255,0.78)',
                   marginBottom: '1.5rem',
                 }}
               >
@@ -339,7 +339,7 @@ export function AboutStory() {
                   fontFamily: 'var(--font-stack-body)',
                   fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
                   lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.55)',
+                  color: 'rgba(232,226,255,0.78)',
                   marginBottom: '2.5rem',
                 }}
               >

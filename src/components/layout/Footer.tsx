@@ -133,7 +133,7 @@ export function Footer() {
               className="text-[var(--color-text-dark)]/60 text-xs tracking-widest"
               style={{ fontFamily: 'var(--font-stack-heading)' }}
             >
-              &copy; 2026 H2H DIGITAL HOME
+              &copy; 2026 H2H SOCIAL
             </p>
             <div className="flex items-center" style={{ gap: 'clamp(16px, 4vw, 64px)' }}>
               <Link

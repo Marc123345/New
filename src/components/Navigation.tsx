@@ -111,7 +111,7 @@ export function Navigation() {
         <div className="container mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
           <a
             href="/"
-            aria-label="H2H Digital Home"
+            aria-label="H2H Social Home"
             onClick={handleLogoClick}
             className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           >
@@ -175,7 +175,7 @@ export function Navigation() {
         />
 
         <div className="absolute inset-0 flex flex-col lg:flex-row">
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 pt-20 sm:pt-28 lg:pt-0 overflow-y-auto">
+          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 pt-14 sm:pt-16 lg:pt-0 overflow-y-auto">
             <nav
               className="flex flex-col"
               onMouseLeave={() => setActiveIndex(null)}
@@ -273,7 +273,7 @@ export function Navigation() {
                   color: "var(--color-secondary)",
                 }}
               >
-                H2H Digital
+                H2H Social
               </p>
               <p
                 className="text-sm leading-relaxed max-w-xs"
@@ -359,7 +359,7 @@ export function Navigation() {
               color: "rgba(232,226,255,0.3)",
             }}
           >
-            &copy; {new Date().getFullYear()} H2H Digital
+            &copy; {new Date().getFullYear()} H2H Social
           </p>
           <div className="flex lg:hidden gap-5">
             {SOCIAL.map((s) => (

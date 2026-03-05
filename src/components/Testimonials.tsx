@@ -13,7 +13,7 @@ const CONTACTS = [
     countryCode: "NG",
     dot: { x: 44.5, y: 45.5 },
     avatar: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=400&h=400&fit=crop",
-    quote: "H2H Digital didn't just build a platform; they built a digital ecosystem that understands the heartbeat of Lagos markets. Their expertise in African fintech is unmatched.",
+    quote: "H2H Social didn't just build a platform; they built a digital ecosystem that understands the heartbeat of Lagos markets. Their expertise in African fintech is unmatched.",
     mapView: { x: "-15%", y: "8%", scale: 2.5 },
   },
   {

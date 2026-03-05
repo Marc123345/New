@@ -6,21 +6,21 @@ const sections = [
   {
     title: 'Acceptance of Terms',
     content: [
-      'By accessing or using the H2H Digital website and services, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.',
+      'By accessing or using the H2H Social website and services, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.',
       'We reserve the right to update or modify these terms at any time without prior notice. Your continued use of the site after any changes constitutes acceptance of the revised terms.',
     ],
   },
   {
     title: 'Services',
     content: [
-      'H2H Digital provides digital marketing, branding, web development, and related consultancy services. The specific scope, deliverables, and timelines for any engagement will be outlined in a separate agreement or proposal.',
+      'H2H Social provides digital marketing, branding, web development, and related consultancy services. The specific scope, deliverables, and timelines for any engagement will be outlined in a separate agreement or proposal.',
       'We reserve the right to modify, suspend, or discontinue any part of our services at any time, with or without notice.',
     ],
   },
   {
     title: 'Intellectual Property',
     content: [
-      'All content on this website, including but not limited to text, graphics, logos, images, and software, is the property of H2H Digital or its content suppliers and is protected by applicable intellectual property laws.',
+      'All content on this website, including but not limited to text, graphics, logos, images, and software, is the property of H2H Social or its content suppliers and is protected by applicable intellectual property laws.',
       'You may not reproduce, distribute, modify, or create derivative works from any content on this website without our express written permission.',
       'Upon full payment for services rendered, ownership of deliverables will transfer to the client as specified in the applicable project agreement.',
     ],
@@ -44,7 +44,7 @@ const sections = [
   {
     title: 'Limitation of Liability',
     content: [
-      'H2H Digital shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website or services.',
+      'H2H Social shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website or services.',
       'Our total liability for any claim arising from or related to our services shall not exceed the amount paid by you for the specific service giving rise to the claim.',
       'We do not guarantee that our website will be available at all times or that it will be free from errors or viruses.',
     ],

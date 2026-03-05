@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { HologramOverlay } from './HologramOverlay';
-import { HeroGalaxy } from './galaxy/HeroGalaxy';
 
 function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
   const isPrimary = variant === 'primary';
@@ -44,7 +43,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
 
   return (
     <div className="flex flex-col gap-8 lg:gap-12">
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+      <div>
         <header>
           <motion.h1
             {...fadeInUp}
@@ -96,15 +95,6 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
             </HeroButton>
           </motion.div>
         </header>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="hidden md:flex justify-center"
-        >
-          <HeroGalaxy />
-        </motion.div>
       </div>
 
       {children && (

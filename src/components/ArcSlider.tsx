@@ -2,19 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  PenLine,
-  Bot,
-  Search,
-  Palette,
-  Video,
-  BarChart2,
-  User,
-  MessageCircle,
-  MousePointerClick,
-  Megaphone,
-  X,
-} from "lucide-react";
+import { PenLine, Bot, Search, Palette, Video, ChartBar as BarChart2, User, MessageCircle, MousePointerClick, Megaphone, X } from "lucide-react";
 
 const SERVICES = [
   {

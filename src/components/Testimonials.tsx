@@ -359,19 +359,19 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[94%] sm:w-[93%] md:w-[85%] lg:w-[80%] max-h-[88%] sm:max-h-[85%] bg-[var(--color-primary)] text-white p-5 sm:p-6 md:p-10 flex flex-col"
+      className="absolute w-[90%] sm:w-[88%] md:w-[82%] lg:w-[76%] max-h-[84%] sm:max-h-[80%] bg-[var(--color-primary)] text-white p-6 sm:p-8 md:p-12 flex flex-col"
       data-geometric-card
     >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          border: "4px solid rgba(255,255,255,0.2)",
-          boxShadow: "var(--shadow-geometric)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
         }}
       />
-      <div className="relative flex flex-col gap-4 md:gap-6 overflow-y-auto pr-2" style={{ scrollbarWidth: "none" }}>
+      <div className="relative flex flex-col gap-5 md:gap-8 overflow-y-auto pr-2" style={{ scrollbarWidth: "none" }}>
         <h3
-          className="text-sm sm:text-base md:text-2xl lg:text-3xl leading-snug tracking-tight"
+          className="text-base sm:text-lg md:text-2xl lg:text-3xl leading-relaxed tracking-tight"
           style={{ fontFamily: "var(--font-stack-heading)" }}
         >
           "{contact.quote}"

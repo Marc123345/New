@@ -677,7 +677,7 @@ export function ArcSlider() {
           ref={containerRef}
           className="relative w-full cursor-grab active:cursor-grabbing"
           style={{
-            height: "clamp(440px, 60vw, 560px)",
+            height: "clamp(380px, 50vw, 480px)",
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
             touchAction: "pan-y",
@@ -699,7 +699,7 @@ export function ArcSlider() {
                   className="absolute will-change-transform"
                   style={{
                     width: "clamp(260px, 55vw, 380px)",
-                    aspectRatio: "3 / 4",
+                    aspectRatio: "3 / 3.5",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}

@@ -64,22 +64,24 @@ export function SpotlightBlogModal({
           />
 
           <motion.div
-            className="relative w-full max-w-3xl mx-5 sm:mx-6 my-8 sm:my-12 bg-[var(--color-background-light)]"
+            className="relative w-full max-w-3xl mx-5 sm:mx-6 my-8 sm:my-12"
             initial={{ opacity: 0, y: 60, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              border: "2px solid var(--color-text-dark)",
-              boxShadow: "12px 12px 0 var(--color-primary)",
+              background: "#0c0a1a",
+              border: "1px solid rgba(255,255,255,0.12)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
             }}
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-primary)] hover:text-[var(--color-background-light)]"
+              className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center transition-colors duration-200"
               style={{
-                border: "2px solid var(--color-text-dark)",
-                color: "var(--color-text-dark)",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.7)",
               }}
             >
               <X size={18} />
@@ -92,7 +94,7 @@ export function SpotlightBlogModal({
                   alt={posts[selectedPost].title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)] via-transparent to-transparent opacity-60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a1a] via-transparent to-transparent opacity-80" />
                 <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-8 sm:right-8">
                   <span
                     className="inline-block px-3 py-1 mb-4 text-[10px] uppercase tracking-[0.2em] bg-[var(--color-secondary)] text-[var(--color-primary)]"
@@ -101,7 +103,7 @@ export function SpotlightBlogModal({
                     {posts[selectedPost].category}
                   </span>
                   <h2
-                    className="text-[var(--color-background-light)]"
+                    className="text-white"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
@@ -115,7 +117,7 @@ export function SpotlightBlogModal({
               </div>
             )}
 
-            <div className="px-5 sm:px-8 md:px-12 py-6 sm:py-8">
+            <div className="px-5 sm:px-8 md:px-12 py-6 sm:py-8" style={{ color: "rgba(255,255,255,0.85)" }}>
               {!posts[selectedPost].image && (
                 <>
                   <span
@@ -140,7 +142,7 @@ export function SpotlightBlogModal({
 
               <div
                 className="flex flex-wrap items-center gap-5 mb-8 pb-6"
-                style={{ borderBottom: "1px solid rgba(35,35,35,0.1)" }}
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
               >
                 <div className="flex items-center gap-2 text-sm opacity-60">
                   <User size={15} className="text-[var(--color-secondary)]" />
@@ -187,15 +189,16 @@ export function SpotlightBlogModal({
 
               <div
                 className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-5 sm:pt-6 mt-2"
-                style={{ borderTop: "2px solid var(--color-text-dark)" }}
+                style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }}
               >
                 <button
                   onClick={onClose}
-                  className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] transition-colors duration-200 hover:bg-[var(--color-text-dark)] hover:text-[var(--color-background-light)]"
+                  className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] transition-colors duration-200"
                   style={{
                     fontFamily: "var(--font-stack-heading)",
-                    border: "2px solid var(--color-text-dark)",
-                    color: "var(--color-text-dark)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "rgba(255,255,255,0.8)",
+                    background: "transparent",
                   }}
                 >
                   Back to Articles
@@ -204,10 +207,12 @@ export function SpotlightBlogModal({
                   {selectedPost > 0 && (
                     <button
                       onClick={() => onNavigate(selectedPost - 1)}
-                      className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] bg-[var(--color-primary)] text-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-secondary)]"
+                      className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] transition-colors duration-200"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
-                        border: "2px solid var(--color-text-dark)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        background: "rgba(255,255,255,0.06)",
+                        color: "rgba(255,255,255,0.8)",
                       }}
                     >
                       Prev
@@ -216,10 +221,12 @@ export function SpotlightBlogModal({
                   {selectedPost < posts.length - 1 && (
                     <button
                       onClick={() => onNavigate(selectedPost + 1)}
-                      className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] bg-[var(--color-primary)] text-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-secondary)]"
+                      className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] transition-colors duration-200"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
-                        border: "2px solid var(--color-text-dark)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        background: "rgba(255,255,255,0.06)",
+                        color: "rgba(255,255,255,0.8)",
                       }}
                     >
                       Next

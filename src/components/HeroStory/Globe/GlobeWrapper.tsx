@@ -2,15 +2,15 @@ import { useEffect, useRef, useCallback } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
 import { isMobileDevice } from '../../../hooks/useIsMobile';
-import './globe.css';
 
 interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;
   isVisible?: boolean;
 }
 
-const CITIES = worldPopulationData.slice(0, 20);
+const CITIES = worldPopulationData.slice(0, 15);
 const ARC_START = 0.15;
+const SCROLL_THRESHOLD = 0.02;
 
 function getArcThreshold(progress: number): number {
   if (progress < ARC_START) return 0;
@@ -51,9 +51,10 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
   const rafRef = useRef<number | null>(null);
   const pendingProgressRef = useRef<number | null>(null);
   const lastArcThresholdRef = useRef<number>(-1);
-  const lastAltitudeRef = useRef<number>(2.2);
+  const lastProgressRef = useRef<number>(0);
   const mobileRef = useRef(isMobileDevice());
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animLoopRef = useRef<((t: number) => void) | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -88,7 +89,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
           .heatmapPointWeight('pop')
           .heatmapBandwidth(0.9)
           .heatmapColorSaturation(2.8)
-          .heatmapsData([worldPopulationData])
+          .heatmapsData([worldPopulationData.slice(0, 30)])
           .arcColor('color')
           .arcDashLength(0.4)
           .arcDashGap(0.2)
@@ -107,9 +108,13 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
 
       globe.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
 
-      if (mobile) {
-        const renderer = globe.renderer?.();
-        if (renderer) renderer.setPixelRatio(1);
+      const renderer = globe.renderer?.();
+      if (renderer) {
+        if (mobile) renderer.setPixelRatio(1);
+        else renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        animLoopRef.current = renderer.setAnimationLoop
+          ? renderer.setAnimationLoop.bind(renderer)
+          : null;
       }
     };
 
@@ -122,6 +127,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
       if (globeRef.current) {
         const renderer = globeRef.current.renderer?.();
         if (renderer) {
+          renderer.setAnimationLoop(null);
           renderer.dispose();
           renderer.forceContextLoss();
         }
@@ -139,7 +145,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
           .width(containerRef.current.clientWidth)
           .height(containerRef.current.clientHeight);
       }
-    }, 200);
+    }, 300);
   }, []);
 
   useEffect(() => {
@@ -150,19 +156,26 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
   useEffect(() => {
     if (!globeRef.current) return;
     const controls = globeRef.current.controls();
-    if (controls) {
-      controls.autoRotate = isVisible;
-    }
+    if (controls) controls.autoRotate = isVisible;
+
     const renderer = globeRef.current.renderer?.();
     if (renderer) {
-      if (isVisible) {
-        renderer.setAnimationLoop(renderer.render);
+      if (!isVisible) {
+        renderer.setAnimationLoop(null);
+      } else {
+        const scene = globeRef.current.scene?.();
+        const camera = globeRef.current.camera?.();
+        if (scene && camera) {
+          renderer.setAnimationLoop(() => renderer.render(scene, camera));
+        }
       }
     }
   }, [isVisible]);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
     if (!isVisible) return;
+    if (Math.abs(progress - lastProgressRef.current) < SCROLL_THRESHOLD) return;
+
     pendingProgressRef.current = progress;
     if (rafRef.current !== null) return;
 
@@ -171,19 +184,17 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
       const p = pendingProgressRef.current;
       if (p === null || !globeRef.current) return;
 
+      lastProgressRef.current = p;
       const mobile = mobileRef.current;
       const globe = globeRef.current;
       const newAltitude = Math.max(1.2, 2.2 - p * 0.8);
 
-      if (Math.abs(newAltitude - lastAltitudeRef.current) > 0.01) {
-        lastAltitudeRef.current = newAltitude;
-        globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 300);
-        if (!mobile) {
-          globe.atmosphereAltitude(0.15 + p * 0.35);
-        }
-        const controls = globe.controls();
-        if (controls) controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + p * (mobile ? 0.6 : 1.2);
+      globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 400);
+      if (!mobile) {
+        globe.atmosphereAltitude(0.15 + p * 0.35);
       }
+      const controls = globe.controls();
+      if (controls) controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + p * (mobile ? 0.6 : 1.2);
 
       if (!mobile) {
         const newThreshold = getArcThreshold(p);
@@ -199,7 +210,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
     <div
       ref={containerRef}
       className="absolute inset-0 w-full h-full"
-      style={{ background: 'transparent' }}
+      style={{ background: 'transparent', contain: 'strict' }}
     />
   );
 }

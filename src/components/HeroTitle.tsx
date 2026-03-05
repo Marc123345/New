@@ -12,10 +12,10 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="inline-block px-8 py-4 border-2 cursor-pointer uppercase"
+      className="inline-block px-5 py-3 sm:px-8 sm:py-4 border-2 cursor-pointer uppercase"
       style={{
         fontFamily: 'var(--font-stack-heading)',
-        fontSize: '0.75rem',
+        fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
         letterSpacing: '0.15em',
         background: isPrimary ? '#fbfbfc' : 'transparent',
         color: isPrimary ? '#291e56' : '#fbfbfc',
@@ -50,7 +50,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.05 }}
             style={{
-              fontSize: 'clamp(2.8rem, 7vw, 5rem)',
+              fontSize: 'clamp(2.2rem, 7vw, 5rem)',
               lineHeight: 1.08,
               letterSpacing: '-0.03em',
               fontFamily: 'var(--font-stack-heading)',
@@ -61,16 +61,16 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
           >
             From <span className="outline-text">B2B</span>{' '}
             to <span className="outline-text">H2H</span>
-            <br />
-            Build a Brand People
-            <br />
-            Want to Talk To
+            <br className="hidden sm:block" />
+            {' '}Build a Brand People
+            <br className="hidden sm:block" />
+            {' '}Want to Talk To
           </motion.h1>
 
           <motion.p
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.2 }}
-            className="text-xl md:text-2xl"
+            className="text-base sm:text-xl md:text-2xl"
             style={{
               color: 'rgba(255,255,255,0.85)',
               lineHeight: 1.6,
@@ -101,7 +101,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="flex justify-center"
+          className="hidden md:flex justify-center"
         >
           <HeroGalaxy />
         </motion.div>

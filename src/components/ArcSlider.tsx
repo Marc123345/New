@@ -261,7 +261,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-8"
           style={{ background: "#040408" }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
@@ -309,7 +309,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
               onScroll={handleScroll}
             >
-              <div className="px-6 sm:px-8 pt-14 pb-8 space-y-6">
+              <div className="px-4 sm:px-6 md:px-8 pt-12 sm:pt-14 pb-6 sm:pb-8 space-y-5 sm:space-y-6">
               {service.image && (
                 <motion.div
                   key={`img-${service.id}`}
@@ -623,9 +623,9 @@ export function ArcSlider() {
         className="relative w-full py-16 md:py-24 overflow-hidden"
         style={{ background: "var(--color-background-light, #f8f9fa)" }}
       >
-        <div className="relative z-30 text-center px-6 mb-10 md:mb-14">
+        <div className="relative z-30 text-center px-5 sm:px-6 mb-8 md:mb-14">
           <span
-            className="text-xs font-semibold tracking-[0.3em] mb-4 block uppercase"
+            className="text-xs font-semibold tracking-[0.3em] mb-3 sm:mb-4 block uppercase"
             style={{
               fontFamily: "var(--font-stack-heading)",
               color: "var(--color-secondary, #9B59F5)",
@@ -636,7 +636,7 @@ export function ArcSlider() {
           <h2
             className="tracking-tight font-bold"
             style={{
-              fontSize: "clamp(2.5rem, 5vw, 4rem)",
+              fontSize: "clamp(2rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
               color: "var(--color-text-dark, #111)",
             }}
@@ -647,7 +647,7 @@ export function ArcSlider() {
 
         <div
           ref={tabBarRef}
-          className="relative z-30 flex gap-2 justify-start md:justify-center px-6 mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
+          className="relative z-30 flex gap-1.5 sm:gap-2 justify-start md:justify-center px-4 sm:px-6 mb-8 sm:mb-12 md:mb-16 overflow-x-auto hide-scrollbar"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           role="tablist"
         >
@@ -661,10 +661,10 @@ export function ArcSlider() {
               className="flex-shrink-0 transition-all duration-300 font-semibold"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                fontSize: "0.75rem",
-                letterSpacing: "0.1em",
+                fontSize: "0.65rem",
+                letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                padding: "10px 24px",
+                padding: "8px 14px",
                 whiteSpace: "nowrap",
                 border: "2px solid var(--color-secondary, #9B59F5)",
                 borderRadius: "0",
@@ -710,14 +710,14 @@ export function ArcSlider() {
                   ref={(el) => (cardsRef.current[i] = el)}
                   className="absolute will-change-transform"
                   style={{
-                    width: "clamp(280px, 28vw, 380px)",
+                    width: "clamp(260px, 55vw, 380px)",
                     aspectRatio: "3 / 4",
                     transformStyle: "preserve-3d",
                     backfaceVisibility: "hidden",
                   }}
                 >
                   <div
-                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-8 sm:p-10 transition-colors duration-500"
+                    className="relative h-full w-full overflow-hidden flex flex-col justify-between p-5 sm:p-8 md:p-10 transition-colors duration-500"
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",

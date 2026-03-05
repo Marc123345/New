@@ -21,7 +21,7 @@ export function Footer() {
   return (
     <footer
       className="bg-[var(--color-background-light)] relative"
-      style={{ padding: 'var(--space-16x) 0 var(--space-8x)' }}
+      style={{ padding: 'clamp(32px, 8vw, 128px) 0 var(--space-8x)' }}
     >
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--color-secondary)]/30 to-transparent" />
 
@@ -30,8 +30,8 @@ export function Footer() {
           <div
             className="grid md:grid-cols-3"
             style={{
-              gap: 'var(--space-16x)',
-              marginBottom: 'var(--space-16x)'
+              gap: 'clamp(24px, 6vw, 128px)',
+              marginBottom: 'clamp(32px, 6vw, 128px)'
             }}
           >
             <motion.div
@@ -125,8 +125,8 @@ export function Footer() {
           </div>
 
           <div
-            className="border-t border-[var(--color-text-dark)]/10 flex flex-wrap justify-between items-center gap-4"
-            style={{ paddingTop: 'var(--space-8x)' }}
+            className="border-t border-[var(--color-text-dark)]/10 flex flex-wrap justify-between items-center gap-3 sm:gap-4"
+            style={{ paddingTop: 'clamp(16px, 4vw, 64px)' }}
           >
             <p
               className="text-[var(--color-text-dark)]/40 text-xs tracking-widest"
@@ -134,7 +134,7 @@ export function Footer() {
             >
               &copy; 2026 H2H DIGITAL HOME
             </p>
-            <div className="flex items-center" style={{ gap: 'var(--space-8x)' }}>
+            <div className="flex items-center" style={{ gap: 'clamp(16px, 4vw, 64px)' }}>
               <a
                 href="#"
                 className="text-[var(--color-text-dark)]/40 text-xs tracking-widest hover:text-[var(--color-text-dark)]/80 transition-colors duration-300"

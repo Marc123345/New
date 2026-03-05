@@ -63,7 +63,7 @@ export function SpotlightBlogModal({
           />
 
           <motion.div
-            className="relative w-full max-w-3xl mx-4 my-12 bg-[var(--color-background-light)]"
+            className="relative w-full max-w-3xl mx-3 sm:mx-4 my-6 sm:my-12 bg-[var(--color-background-light)]"
             initial={{ opacity: 0, y: 60, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
@@ -85,14 +85,14 @@ export function SpotlightBlogModal({
             </button>
 
             {posts[selectedPost].image && (
-              <div className="relative h-72 md:h-96 overflow-hidden">
+              <div className="relative h-48 sm:h-72 md:h-96 overflow-hidden">
                 <img
                   src={posts[selectedPost].image}
                   alt={posts[selectedPost].title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)] via-transparent to-transparent opacity-60" />
-                <div className="absolute bottom-6 left-8 right-8">
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-8 sm:right-8">
                   <span
                     className="inline-block px-3 py-1 mb-4 text-[10px] uppercase tracking-[0.2em] bg-[var(--color-secondary)] text-[var(--color-primary)]"
                     style={{ fontFamily: "var(--font-stack-heading)" }}
@@ -114,7 +114,7 @@ export function SpotlightBlogModal({
               </div>
             )}
 
-            <div className="px-8 md:px-12 py-8">
+            <div className="px-4 sm:px-8 md:px-12 py-5 sm:py-8">
               {!posts[selectedPost].image && (
                 <>
                   <span
@@ -162,7 +162,7 @@ export function SpotlightBlogModal({
               </div>
 
               <blockquote
-                className="mb-8 pl-5 italic text-lg leading-relaxed"
+                className="mb-6 sm:mb-8 pl-4 sm:pl-5 italic text-base sm:text-lg leading-relaxed"
                 style={{
                   borderLeft: "3px solid var(--color-secondary)",
                   fontFamily: "var(--font-stack-body)",
@@ -174,7 +174,7 @@ export function SpotlightBlogModal({
               </blockquote>
 
               <div
-                className="text-base leading-[1.8] mb-8"
+                className="text-sm sm:text-base leading-[1.8] mb-6 sm:mb-8"
                 style={{
                   fontFamily: "var(--font-stack-body)",
                   color: "var(--color-text-dark)",
@@ -185,12 +185,12 @@ export function SpotlightBlogModal({
               </div>
 
               <div
-                className="flex flex-wrap items-center justify-between gap-4 pt-6"
+                className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6"
                 style={{ borderTop: "2px solid var(--color-text-dark)" }}
               >
                 <button
                   onClick={onClose}
-                  className="px-5 py-3 text-[11px] uppercase tracking-[0.15em] transition-colors duration-200 hover:bg-[var(--color-text-dark)] hover:text-[var(--color-background-light)]"
+                  className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] transition-colors duration-200 hover:bg-[var(--color-text-dark)] hover:text-[var(--color-background-light)]"
                   style={{
                     fontFamily: "var(--font-stack-heading)",
                     border: "2px solid var(--color-text-dark)",
@@ -203,7 +203,7 @@ export function SpotlightBlogModal({
                   {selectedPost > 0 && (
                     <button
                       onClick={() => onNavigate(selectedPost - 1)}
-                      className="px-5 py-3 text-[11px] uppercase tracking-[0.15em] bg-[var(--color-primary)] text-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-secondary)]"
+                      className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] bg-[var(--color-primary)] text-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-secondary)]"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
                         border: "2px solid var(--color-text-dark)",
@@ -215,7 +215,7 @@ export function SpotlightBlogModal({
                   {selectedPost < posts.length - 1 && (
                     <button
                       onClick={() => onNavigate(selectedPost + 1)}
-                      className="px-5 py-3 text-[11px] uppercase tracking-[0.15em] bg-[var(--color-primary)] text-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-secondary)]"
+                      className="px-4 py-2.5 sm:px-5 sm:py-3 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] bg-[var(--color-primary)] text-[var(--color-background-light)] transition-colors duration-200 hover:bg-[var(--color-secondary)]"
                       style={{
                         fontFamily: "var(--font-stack-heading)",
                         border: "2px solid var(--color-text-dark)",

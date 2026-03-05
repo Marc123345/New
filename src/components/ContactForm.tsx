@@ -35,12 +35,12 @@ export function ContactForm() {
         style={{
           maxWidth: "1280px",
           margin: "0 auto",
-          padding: "clamp(60px, 8vw, 120px) clamp(20px, 5vw, 60px)",
+          padding: "clamp(40px, 8vw, 120px) clamp(16px, 5vw, 60px)",
           position: "relative",
           zIndex: 1,
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "clamp(40px, 6vw, 80px)",
+          gap: "clamp(24px, 6vw, 80px)",
           alignItems: "start",
         }}
         className="contact-grid"
@@ -58,7 +58,7 @@ export function ContactForm() {
             justifyContent: "center",
           }}
         >
-          <div style={{
+          <div className="contact-phone-box" style={{
             width: "100%",
             aspectRatio: "3 / 4",
             position: "relative",
@@ -79,7 +79,7 @@ export function ContactForm() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
           style={{
             border: "3px solid var(--color-text-dark)",
-            padding: "clamp(32px, 4vw, 52px)",
+            padding: "clamp(20px, 4vw, 52px)",
             background: "var(--color-background-light)",
             boxShadow: "8px 8px 0 var(--color-surface-dark)",
             position: "relative",
@@ -351,6 +351,10 @@ export function ContactForm() {
         @media (max-width: 768px) {
           .contact-grid {
             grid-template-columns: 1fr !important;
+          }
+          .contact-phone-box {
+            aspect-ratio: 4 / 3 !important;
+            max-height: 320px;
           }
         }
         .contact-grid input::placeholder,

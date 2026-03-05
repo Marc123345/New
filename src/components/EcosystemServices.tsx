@@ -236,7 +236,7 @@ export function EcosystemServices() {
       </div>
 
       {/* Typography Content */}
-      <div className="relative z-10 w-full text-center pointer-events-none select-none px-4">
+      <div className="relative z-10 w-full text-center pointer-events-none select-none px-5 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

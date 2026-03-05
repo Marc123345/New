@@ -166,7 +166,7 @@ export function Navigation() {
         {/* Main content grid */}
         <div className="absolute inset-0 flex flex-col lg:flex-row">
           {/* Left: Nav links (60%) */}
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-28 lg:pt-0">
+          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 pt-20 sm:pt-28 lg:pt-0 overflow-y-auto">
             <nav
               className="flex flex-col"
               onMouseLeave={() => setActiveIndex(null)}
@@ -177,7 +177,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setActiveIndex(i)}
-                  className="group relative flex items-center py-3 md:py-4 border-b border-white/[0.06] overflow-hidden"
+                  className="group relative flex items-center py-2.5 sm:py-3 md:py-4 border-b border-white/[0.06] overflow-hidden"
                   style={{
                     transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
                     transitionDelay: mounted ? `${i * 60}ms` : "0ms",
@@ -201,7 +201,7 @@ export function Navigation() {
 
                   {/* Label */}
                   <span
-                    className="relative z-10 flex-1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
+                    className="relative z-10 flex-1 text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex !== null && activeIndex !== i ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.9)",
@@ -307,7 +307,7 @@ export function Navigation() {
 
         {/* Bottom bar */}
         <div
-          className="absolute bottom-0 left-0 right-0 px-8 md:px-16 py-5 flex items-center justify-between border-t border-white/[0.06]"
+          className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 md:px-16 py-4 sm:py-5 flex items-center justify-between border-t border-white/[0.06]"
           style={{
             transition: "opacity 0.8s ease",
             transitionDelay: mounted ? "350ms" : "0ms",
@@ -333,7 +333,7 @@ export function Navigation() {
             ))}
           </div>
           <p
-            className="text-[10px] uppercase tracking-[0.4em] text-white/20"
+            className="hidden sm:block text-[10px] uppercase tracking-[0.4em] text-white/20"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             Nairobi · Lagos · Cape Town

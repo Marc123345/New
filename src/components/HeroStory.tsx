@@ -54,13 +54,13 @@ const PhaseText = ({
       style={{ opacity, y, scale, pointerEvents: 'none' }}
     >
       <p
-        className="text-sm uppercase tracking-[0.25em] font-bold mb-4"
+        className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"
         style={{ color: 'rgba(192,132,252,0.95)' }}
       >
         {subtitle}
       </p>
       <h2
-        className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-white"
+        className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-6 text-white"
         style={{
           fontFamily: 'var(--font-stack-heading)',
           textShadow: `0 0 50px rgba(168,85,247,${0.4 + phaseIndex * 0.15})`,
@@ -69,7 +69,7 @@ const PhaseText = ({
       >
         {title}
       </h2>
-      <p className="text-base md:text-lg leading-relaxed max-w-sm" style={{ color: 'rgba(209,213,219,0.9)' }}>
+      <p className="text-sm sm:text-base md:text-lg leading-relaxed max-w-sm" style={{ color: 'rgba(209,213,219,0.9)' }}>
         {description}
       </p>
     </motion.div>
@@ -102,8 +102,8 @@ export function HeroStory() {
         }} />
 
         <div className="relative z-10 h-full flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-8 md:px-14 lg:px-20">
-            <div className="w-full md:w-1/2 relative" style={{ minHeight: 280 }}>
+          <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-14 lg:px-20">
+            <div className="w-full md:w-1/2 relative" style={{ minHeight: 200 }}>
               {phases.map((phase, i) => (
                 <PhaseText
                   key={i}
@@ -119,7 +119,7 @@ export function HeroStory() {
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-8 md:left-14 lg:left-20 right-8 z-20 flex flex-col gap-2">
+        <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 flex flex-col gap-2">
           <div className="w-64 h-px relative" style={{ background: 'rgba(168,85,247,0.2)' }}>
             <motion.div
               className="absolute inset-y-0 left-0"

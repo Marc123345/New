@@ -93,7 +93,7 @@ export function Testimonials() {
     <div ref={containerRef} className="relative h-[250vh] bg-[var(--color-surface-dark)]">
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
 
-        <div className="text-center mb-6 md:mb-8 px-4 md:px-8">
+        <div className="text-center mb-4 sm:mb-6 md:mb-8 px-4 md:px-8">
           <div
             className="inline-block mb-3 md:mb-4 px-3 py-1.5 md:px-4 md:py-2"
             style={{
@@ -121,7 +121,7 @@ export function Testimonials() {
         </div>
 
         {/* Adjusted Height for Mobile Responsiveness */}
-        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-6 px-4 md:px-8">
+        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-3 sm:px-4 md:px-8">
           {/* LEFT: Globe Panel */}
           <div
             className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
@@ -204,9 +204,9 @@ export function Testimonials() {
 
           {/* RIGHT: Testimonial Cards */}
           <div
-            className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col"
+            className="flex-1 bg-[var(--color-surface-dark)] relative overflow-hidden flex flex-col min-w-0"
             style={{
-              border: "2px solid rgba(255,255,255,0.15)",
+              border: "1px solid rgba(255,255,255,0.15)",
               boxShadow: "var(--shadow-geometric)",
             }}
           >
@@ -223,7 +223,7 @@ export function Testimonials() {
             </div>
 
             {/* Contact list strip at bottom */}
-            <div className="relative z-20 shrink-0 border-t border-white/10 px-4 md:px-6 py-3 bg-[var(--color-surface-dark)]">
+            <div className="relative z-20 shrink-0 border-t border-white/10 px-2 sm:px-4 md:px-6 py-2 sm:py-3 bg-[var(--color-surface-dark)]">
               <div 
                 className="flex overflow-x-auto gap-2 pb-1 snap-x" 
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hides scrollbar
@@ -231,7 +231,7 @@ export function Testimonials() {
                 {CONTACTS.map((contact, i) => (
                   <div
                     key={contact.id}
-                    className="flex items-center shrink-0 snap-start gap-2 px-3 py-1.5 transition-all duration-200"
+                    className="flex items-center shrink-0 snap-start gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200"
                     style={{
                       border: i === activeIndex
                         ? "1px solid var(--color-secondary)"
@@ -359,7 +359,7 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[95%] md:w-[85%] lg:w-[80%] max-h-[85%] bg-[var(--color-primary)] text-white p-5 md:p-10 flex flex-col"
+      className="absolute w-[96%] sm:w-[95%] md:w-[85%] lg:w-[80%] max-h-[90%] sm:max-h-[85%] bg-[var(--color-primary)] text-white p-4 sm:p-5 md:p-10 flex flex-col"
       data-geometric-card
     >
       <div

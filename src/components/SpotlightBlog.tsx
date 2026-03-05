@@ -40,7 +40,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          minHeight: "480px",
+          minHeight: "auto",
           border: "2px solid var(--color-text-dark)",
           boxShadow: hovered ? "var(--shadow-geometric-hover)" : "var(--shadow-geometric)",
           transform: hovered ? "translate(-3px,-3px)" : "translate(0,0)",
@@ -51,7 +51,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
         className="featured-hero-grid"
       >
         {/* Image side */}
-        <div style={{ position: "relative", overflow: "hidden", minHeight: "360px" }}>
+        <div style={{ position: "relative", overflow: "hidden", minHeight: "240px" }}>
           {post.image ? (
             <img
               src={post.image}
@@ -264,7 +264,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
         overflow: "clip",
       }}
     >
-      <div className="container mx-auto px-6 md:px-12 relative" style={{ zIndex: 10 }}>
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 relative" style={{ zIndex: 10 }}>
 
         {/* Header */}
         <motion.div
@@ -326,14 +326,14 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
             )}
 
             {/* Category filters */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   style={{
-                    padding: "8px 16px",
-                    fontSize: "0.65rem",
+                    padding: "6px 12px",
+                    fontSize: "0.6rem",
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
                     fontFamily: "var(--font-stack-heading)",

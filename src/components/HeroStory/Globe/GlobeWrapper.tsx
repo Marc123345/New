@@ -8,53 +8,71 @@ interface GlobeWrapperProps {
   isVisible?: boolean;
 }
 
-const CITIES = worldPopulationData.slice(0, 15);
+const TOP_CITIES = worldPopulationData.slice(0, 12);
+const HEATMAP_CITIES = worldPopulationData.slice(0, 20);
 const ARC_START = 0.15;
-const SCROLL_THRESHOLD = 0.02;
+const SCROLL_THRESHOLD = 0.03;
 
 function getArcThreshold(progress: number): number {
   if (progress < ARC_START) return 0;
-  return Math.min(Math.floor(((progress - ARC_START) / (1 - ARC_START)) * CITIES.length), CITIES.length - 1);
+  return Math.min(
+    Math.floor(((progress - ARC_START) / (1 - ARC_START)) * TOP_CITIES.length),
+    TOP_CITIES.length - 1
+  );
 }
 
-const arcCache = new Map<number, object[]>();
-function buildArcs(progress: number): object[] {
-  const threshold = getArcThreshold(progress);
-  if (threshold === 0) return [];
-  if (arcCache.has(threshold)) return arcCache.get(threshold)!;
-  const arcs: object[] = [];
-  for (let i = 0; i < threshold; i++) {
-    arcs.push({
-      startLat: CITIES[i].lat,
-      startLng: CITIES[i].lng,
-      endLat: CITIES[(i + 3) % CITIES.length].lat,
-      endLng: CITIES[(i + 3) % CITIES.length].lng,
-      color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
-    });
-    if (progress > 0.5 && i < threshold - 1) {
-      arcs.push({
-        startLat: CITIES[i].lat,
-        startLng: CITIES[i].lng,
-        endLat: CITIES[(i + 5) % CITIES.length].lat,
-        endLng: CITIES[(i + 5) % CITIES.length].lng,
-        color: ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'],
+const ARC_COLOR_PRIMARY = ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'];
+const ARC_COLOR_SECONDARY = ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'];
+const EMPTY_ARCS: object[] = [];
+
+const precomputedArcs = new Map<string, object[]>();
+function initArcs() {
+  const len = TOP_CITIES.length;
+  for (let threshold = 1; threshold <= len; threshold++) {
+    const arcsA: object[] = [];
+    const arcsB: object[] = [];
+    for (let i = 0; i < threshold; i++) {
+      arcsA.push({
+        startLat: TOP_CITIES[i].lat,
+        startLng: TOP_CITIES[i].lng,
+        endLat: TOP_CITIES[(i + 3) % len].lat,
+        endLng: TOP_CITIES[(i + 3) % len].lng,
+        color: ARC_COLOR_PRIMARY,
       });
+      if (i < threshold - 1) {
+        arcsB.push({
+          startLat: TOP_CITIES[i].lat,
+          startLng: TOP_CITIES[i].lng,
+          endLat: TOP_CITIES[(i + 5) % len].lat,
+          endLng: TOP_CITIES[(i + 5) % len].lng,
+          color: ARC_COLOR_SECONDARY,
+        });
+      }
     }
+    precomputedArcs.set(`${threshold}-a`, arcsA);
+    precomputedArcs.set(`${threshold}-ab`, [...arcsA, ...arcsB]);
   }
-  arcCache.set(threshold, arcs);
-  return arcs;
+}
+initArcs();
+
+function getArcs(progress: number): object[] {
+  const threshold = getArcThreshold(progress);
+  if (threshold === 0) return EMPTY_ARCS;
+  const key = progress > 0.5 ? `${threshold}-ab` : `${threshold}-a`;
+  return precomputedArcs.get(key) || EMPTY_ARCS;
 }
 
 export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
-  const pendingProgressRef = useRef<number | null>(null);
   const lastArcThresholdRef = useRef<number>(-1);
+  const lastHalfRef = useRef<boolean>(false);
   const lastProgressRef = useRef<number>(0);
   const mobileRef = useRef(isMobileDevice());
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const animLoopRef = useRef<((t: number) => void) | null>(null);
+  const frameCountRef = useRef(0);
+  const isBackgroundRef = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -62,66 +80,84 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
     const mobile = mobileRef.current;
     let destroyed = false;
 
-    const init = async () => {
-      const GlobeModule = await import('globe.gl');
-      if (destroyed) return;
-      const Globe = GlobeModule.default;
+    const init = () => {
+      const idleInit = () => {
+        if (destroyed) return;
+        import('globe.gl').then((GlobeModule) => {
+          if (destroyed || !containerRef.current) return;
+          const Globe = GlobeModule.default;
 
-      const globe = Globe({ animateIn: false })(containerRef.current!);
-      globeRef.current = globe;
+          const globe = Globe({ animateIn: false })(containerRef.current!);
+          globeRef.current = globe;
 
-      const w = containerRef.current!.clientWidth || 800;
-      const h = containerRef.current!.clientHeight || 800;
+          const w = containerRef.current!.clientWidth || 800;
+          const h = containerRef.current!.clientHeight || 800;
 
-      globe
-        .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
-        .backgroundColor('rgba(0,0,0,0)')
-        .showAtmosphere(true)
-        .atmosphereColor('rgba(120,60,220,0.5)')
-        .atmosphereAltitude(mobile ? 0.1 : 0.15)
-        .width(w)
-        .height(h);
+          globe
+            .backgroundColor('rgba(0,0,0,0)')
+            .showAtmosphere(true)
+            .atmosphereColor('rgba(120,60,220,0.5)')
+            .atmosphereAltitude(mobile ? 0.1 : 0.15)
+            .width(w)
+            .height(h);
 
-      if (!mobile) {
-        globe
-          .heatmapPointLat('lat')
-          .heatmapPointLng('lng')
-          .heatmapPointWeight('pop')
-          .heatmapBandwidth(0.9)
-          .heatmapColorSaturation(2.8)
-          .heatmapsData([worldPopulationData.slice(0, 30)])
-          .arcColor('color')
-          .arcDashLength(0.4)
-          .arcDashGap(0.2)
-          .arcDashAnimateTime(1500)
-          .arcStroke(1.2);
-      }
+          if (!mobile) {
+            globe
+              .heatmapPointLat('lat')
+              .heatmapPointLng('lng')
+              .heatmapPointWeight('pop')
+              .heatmapBandwidth(0.9)
+              .heatmapColorSaturation(2.8)
+              .heatmapsData([HEATMAP_CITIES])
+              .arcColor('color')
+              .arcDashLength(0.4)
+              .arcDashGap(0.2)
+              .arcDashAnimateTime(1500)
+              .arcStroke(1.2);
+          }
 
-      globe.arcsData([]);
+          globe.arcsData(EMPTY_ARCS);
 
-      const controls = globe.controls();
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = mobile ? 0.3 : 0.4;
-      controls.enableZoom = false;
-      controls.enablePan = false;
-      controls.enableRotate = false;
+          const controls = globe.controls();
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = mobile ? 0.3 : 0.4;
+          controls.enableZoom = false;
+          controls.enablePan = false;
+          controls.enableRotate = false;
 
-      globe.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
+          globe.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
 
-      const renderer = globe.renderer?.();
-      if (renderer) {
-        if (mobile) renderer.setPixelRatio(1);
-        else renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        animLoopRef.current = renderer.setAnimationLoop
-          ? renderer.setAnimationLoop.bind(renderer)
-          : null;
+          const renderer = globe.renderer?.();
+          if (renderer) {
+            renderer.setPixelRatio(mobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
+          }
+
+          requestIdleCallback(() => {
+            if (destroyed || !globeRef.current) return;
+            globeRef.current.globeImageUrl(
+              '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
+            );
+          });
+        });
+      };
+
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(idleInit, { timeout: 200 });
+      } else {
+        setTimeout(idleInit, 50);
       }
     };
 
     init();
 
+    const handleVisibility = () => {
+      isBackgroundRef.current = document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       destroyed = true;
+      document.removeEventListener('visibilitychange', handleVisibility);
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (globeRef.current) {
@@ -166,41 +202,50 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
         const scene = globeRef.current.scene?.();
         const camera = globeRef.current.camera?.();
         if (scene && camera) {
-          renderer.setAnimationLoop(() => renderer.render(scene, camera));
+          const renderLoop = () => {
+            frameCountRef.current++;
+            if (isBackgroundRef.current && frameCountRef.current % 2 !== 0) return;
+            renderer.render(scene, camera);
+          };
+          renderer.setAnimationLoop(renderLoop);
         }
       }
     }
   }, [isVisible]);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
-    if (!isVisible) return;
+    if (!isVisible || !globeRef.current) return;
     if (Math.abs(progress - lastProgressRef.current) < SCROLL_THRESHOLD) return;
 
-    pendingProgressRef.current = progress;
-    if (rafRef.current !== null) return;
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
 
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = null;
-      const p = pendingProgressRef.current;
-      if (p === null || !globeRef.current) return;
+      if (!globeRef.current) return;
 
-      lastProgressRef.current = p;
+      lastProgressRef.current = progress;
       const mobile = mobileRef.current;
       const globe = globeRef.current;
-      const newAltitude = Math.max(1.2, 2.2 - p * 0.8);
 
+      const newAltitude = Math.max(1.2, 2.2 - progress * 0.8);
       globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 400);
-      if (!mobile) {
-        globe.atmosphereAltitude(0.15 + p * 0.35);
-      }
-      const controls = globe.controls();
-      if (controls) controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + p * (mobile ? 0.6 : 1.2);
 
       if (!mobile) {
-        const newThreshold = getArcThreshold(p);
-        if (newThreshold !== lastArcThresholdRef.current) {
+        globe.atmosphereAltitude(0.15 + progress * 0.35);
+      }
+
+      const controls = globe.controls();
+      if (controls) {
+        controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + progress * (mobile ? 0.6 : 1.2);
+      }
+
+      if (!mobile) {
+        const newThreshold = getArcThreshold(progress);
+        const newHalf = progress > 0.5;
+        if (newThreshold !== lastArcThresholdRef.current || newHalf !== lastHalfRef.current) {
           lastArcThresholdRef.current = newThreshold;
-          globe.arcsData(buildArcs(p));
+          lastHalfRef.current = newHalf;
+          globe.arcsData(getArcs(progress));
         }
       }
     });

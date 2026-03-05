@@ -30,27 +30,31 @@ const phases = [
     description: 'We help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.',
     range: [0.72, 0.8, 1, 1] as [number, number, number, number],
   },
-];
+] as const;
+
+const HEADING_STYLES = phases.map((_, i) => ({
+  fontFamily: 'var(--font-stack-heading)',
+  textShadow: `0 0 50px rgba(168,85,247,${0.4 + i * 0.15})`,
+  whiteSpace: 'pre-line' as const,
+}));
+
+const SUBTITLE_STYLE = { color: 'rgba(192,132,252,0.95)' } as const;
+const DESC_STYLE = { color: 'rgba(209,213,219,0.9)' } as const;
 
 const PhaseText = memo(({
   progressRange,
   scrollYProgress,
   phaseIndex,
 }: {
-  progressRange: [number, number, number, number];
+  progressRange: readonly [number, number, number, number];
   scrollYProgress: MotionValue<number>;
   phaseIndex: number;
 }) => {
   const phase = phases[phaseIndex];
-  const opacity = useTransform(scrollYProgress, progressRange, [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, progressRange, [40, 0, 0, -40]);
-  const scale = useTransform(scrollYProgress, progressRange, [0.95, 1, 1, 0.95]);
-
-  const headingStyle = useMemo(() => ({
-    fontFamily: 'var(--font-stack-heading)',
-    textShadow: `0 0 50px rgba(168,85,247,${0.4 + phaseIndex * 0.15})`,
-    whiteSpace: 'pre-line' as const,
-  }), [phaseIndex]);
+  const range = progressRange as unknown as [number, number, number, number];
+  const opacity = useTransform(scrollYProgress, range, [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, range, [40, 0, 0, -40]);
+  const scale = useTransform(scrollYProgress, range, [0.95, 1, 1, 0.95]);
 
   return (
     <motion.div
@@ -59,58 +63,73 @@ const PhaseText = memo(({
     >
       <p
         className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"
-        style={{ color: 'rgba(192,132,252,0.95)' }}
+        style={SUBTITLE_STYLE}
       >
         {phase.subtitle}
       </p>
       <h2
         className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-6 text-white"
-        style={headingStyle}
+        style={HEADING_STYLES[phaseIndex]}
       >
         {phase.title}
       </h2>
-      <p className="text-sm sm:text-base md:text-lg leading-relaxed max-w-sm" style={{ color: 'rgba(209,213,219,0.9)' }}>
+      <p className="text-sm sm:text-base md:text-lg leading-relaxed max-w-sm" style={DESC_STYLE}>
         {phase.description}
       </p>
     </motion.div>
   );
 });
 
+const PROGRESS_BG_STYLE = { background: 'rgba(168,85,247,0.2)' } as const;
+const PROGRESS_FILL_BG = 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))';
+const DOT_STYLE_BASE = {
+  width: 6,
+  height: 6,
+  borderRadius: '50%',
+  background: '#c084fc',
+  boxShadow: '0 0 8px rgba(192,132,252,0.8)',
+  translateX: '-50%',
+} as const;
+const SCROLL_LABEL_STYLE = {
+  color: 'rgba(192,132,252,0.75)',
+  fontFamily: 'var(--font-stack-heading)',
+} as const;
+
 const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<string> }) => (
   <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 flex flex-col gap-2">
-    <div className="w-64 h-px relative" style={{ background: 'rgba(168,85,247,0.2)' }}>
+    <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
       <motion.div
         className="absolute inset-y-0 left-0"
-        style={{
-          width: progressBarWidth,
-          background: 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))',
-          willChange: 'width',
-        }}
+        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG, willChange: 'width' }}
       />
       <motion.div
         className="absolute top-1/2 -translate-y-1/2"
-        style={{
-          left: progressBarWidth,
-          width: 6,
-          height: 6,
-          borderRadius: '50%',
-          background: '#c084fc',
-          boxShadow: '0 0 8px rgba(192,132,252,0.8)',
-          translateX: '-50%',
-          willChange: 'left',
-        }}
+        style={{ left: progressBarWidth, ...DOT_STYLE_BASE, willChange: 'left' }}
       />
     </div>
     <div className="flex items-center gap-2">
       <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
         <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.75)" strokeWidth="1" strokeLinecap="round"/>
       </svg>
-      <span className="text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(192,132,252,0.75)', fontFamily: 'var(--font-stack-heading)' }}>
+      <span className="text-xs uppercase tracking-[0.2em]" style={SCROLL_LABEL_STYLE}>
         scroll to explore
       </span>
     </div>
   </div>
 ));
+
+const GRADIENT_OVERLAY_STYLE = {
+  background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+} as const;
+
+const BOTTOM_FADE_STYLE = {
+  background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)',
+} as const;
+
+const STICKY_BG = {
+  background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)',
+  contain: 'strict' as const,
+} as const;
 
 export function HeroStory() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -150,7 +169,7 @@ export function HeroStory() {
       <div
         ref={stickyRef}
         className="sticky top-0 h-screen w-full overflow-hidden"
-        style={{ background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)' }}
+        style={STICKY_BG}
       >
         {globeReady && (
           <Suspense fallback={null}>
@@ -158,9 +177,7 @@ export function HeroStory() {
           </Suspense>
         )}
 
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
-        }} />
+        <div className="absolute inset-0 pointer-events-none" style={GRADIENT_OVERLAY_STYLE} />
 
         <div className="relative z-10 h-full flex items-center">
           <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-14 lg:px-20">
@@ -181,7 +198,7 @@ export function HeroStory() {
 
         <div
           className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={{ background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)' }}
+          style={BOTTOM_FADE_STYLE}
         />
       </div>
     </div>

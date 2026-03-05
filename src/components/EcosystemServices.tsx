@@ -4,7 +4,7 @@ import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
 import { useIsMobile } from '../hooks/useIsMobile';
 
-const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/rotating-galaxy-4k-2026-01-28-03-26-41-utc.mp4';
+const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
 const LAPTOP_URL = 'https://ik.imagekit.io/qcvroy8xpd/download.png';
 
 const PLANET_IMAGES = [

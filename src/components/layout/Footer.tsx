@@ -116,12 +116,6 @@ export function Footer() {
                   <span className="absolute left-0 -bottom-0.5 w-full h-px bg-[var(--color-secondary)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                 </span>
               </a>
-              <p
-                className="text-[var(--color-text-dark)]/60 text-sm"
-                style={{ lineHeight: 'var(--line-height-normal)' }}
-              >
-                Lagos, Nigeria
-              </p>
             </motion.div>
           </div>
 

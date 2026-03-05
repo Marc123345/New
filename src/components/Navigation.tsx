@@ -383,7 +383,7 @@ export function Navigation() {
               color: "rgba(232,226,255,0.3)",
             }}
           >
-            Nairobi &middot; Lagos &middot; Cape Town
+            Nairobi &middot; Cape Town
           </p>
         </div>
 

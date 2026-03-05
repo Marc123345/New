@@ -221,7 +221,7 @@ export function AboutStory() {
                   playsInline
                   className="w-full object-cover"
                   style={{ aspectRatio: '4 / 5', display: 'block' }}
-                  src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_With_Earth.mp4"
+                  src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
                 />
                 <div
                   className="pointer-events-none"

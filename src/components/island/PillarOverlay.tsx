@@ -103,7 +103,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             {/* FIXED: Scrollable Content Area */}
             <div
               ref={scrollRef}
-              className="flex-1 overflow-y-auto min-h-0 px-5 sm:px-10 pt-12 sm:pt-16 pb-10 scrollbar-hide relative z-10 scroll-smooth"
+              className="flex-1 overflow-y-auto min-h-0 px-5 sm:px-10 pt-16 sm:pt-18 pb-10 scrollbar-hide relative z-10 scroll-smooth"
             >
               <div className="max-w-3xl mx-auto space-y-10 sm:space-y-12">
                 
@@ -148,7 +148,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   transition={{ duration: 0.4 }}
                   className="space-y-4 pt-2"
                 >
-                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none pr-8">
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none pr-12 sm:pr-8">
                     {displayService?.title}
                   </h2>
                   <p className="text-base sm:text-lg md:text-xl text-white/70 leading-relaxed max-w-2xl">
@@ -236,7 +236,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
             </div>
 
             {/* FIXED: Footer Navigation */}
-            <div className="relative z-20 p-4 sm:p-6 border-t border-white/10 bg-[#0a0618] flex justify-between items-center shrink-0">
+            <div className="relative z-20 px-4 py-3 sm:p-6 border-t border-white/10 bg-[#0a0618] flex justify-between items-center shrink-0">
               <button
                 type="button"
                 disabled={displayIndex === 0}

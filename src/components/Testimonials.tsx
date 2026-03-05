@@ -121,7 +121,7 @@ export function Testimonials() {
         </div>
 
         {/* Adjusted Height for Mobile Responsiveness */}
-        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-3 sm:px-4 md:px-8">
+        <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-4 sm:px-5 md:px-8">
           {/* LEFT: Globe Panel */}
           <div
             className="hidden lg:flex w-[400px] bg-[var(--color-primary)] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0"
@@ -359,7 +359,7 @@ function TestimonialCard({
   return (
     <motion.div
       style={{ opacity, y, rotateX, scale }}
-      className="absolute w-[96%] sm:w-[95%] md:w-[85%] lg:w-[80%] max-h-[90%] sm:max-h-[85%] bg-[var(--color-primary)] text-white p-4 sm:p-5 md:p-10 flex flex-col"
+      className="absolute w-[94%] sm:w-[93%] md:w-[85%] lg:w-[80%] max-h-[88%] sm:max-h-[85%] bg-[var(--color-primary)] text-white p-5 sm:p-6 md:p-10 flex flex-col"
       data-geometric-card
     >
       <div

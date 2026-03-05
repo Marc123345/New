@@ -64,14 +64,14 @@ export function SpotlightBlogModal({
           />
 
           <motion.div
-            className="relative w-full max-w-3xl mx-3 sm:mx-4 my-6 sm:my-12 bg-[var(--color-background-light)]"
+            className="relative w-full max-w-3xl mx-5 sm:mx-6 my-8 sm:my-12 bg-[var(--color-background-light)]"
             initial={{ opacity: 0, y: 60, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{
               border: "2px solid var(--color-text-dark)",
-              boxShadow: "16px 16px 0 var(--color-primary)",
+              boxShadow: "12px 12px 0 var(--color-primary)",
             }}
           >
             <button
@@ -115,7 +115,7 @@ export function SpotlightBlogModal({
               </div>
             )}
 
-            <div className="px-4 sm:px-8 md:px-12 py-5 sm:py-8">
+            <div className="px-5 sm:px-8 md:px-12 py-6 sm:py-8">
               {!posts[selectedPost].image && (
                 <>
                   <span
@@ -186,7 +186,7 @@ export function SpotlightBlogModal({
               </div>
 
               <div
-                className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6"
+                className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-5 sm:pt-6 mt-2"
                 style={{ borderTop: "2px solid var(--color-text-dark)" }}
               >
                 <button

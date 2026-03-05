@@ -28,14 +28,14 @@ export function ContactForm() {
         background: "var(--color-background-light)",
         borderTop: "3px solid var(--color-text-dark)",
         position: "relative",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <div
         style={{
           maxWidth: "1280px",
           margin: "0 auto",
-          padding: "clamp(40px, 8vw, 120px) clamp(16px, 5vw, 60px)",
+          padding: "clamp(40px, 8vw, 120px) clamp(20px, 5vw, 60px)",
           position: "relative",
           zIndex: 1,
           display: "grid",
@@ -79,7 +79,7 @@ export function ContactForm() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
           style={{
             border: "3px solid var(--color-text-dark)",
-            padding: "clamp(20px, 4vw, 52px)",
+            padding: "clamp(24px, 4vw, 52px)",
             background: "var(--color-background-light)",
             boxShadow: "8px 8px 0 var(--color-surface-dark)",
             position: "relative",

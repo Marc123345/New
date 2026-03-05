@@ -260,11 +260,11 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
       style={{
         background: "var(--color-background-light)",
         paddingTop: "clamp(60px, 8vw, 100px)",
-        paddingBottom: "clamp(60px, 8vw, 100px)",
+        paddingBottom: "clamp(80px, 8vw, 120px)",
         overflow: "clip",
       }}
     >
-      <div className="container mx-auto px-4 sm:px-6 md:px-12 relative" style={{ zIndex: 10 }}>
+      <div className="container mx-auto px-5 sm:px-8 md:px-12 relative" style={{ zIndex: 10 }}>
 
         {/* Header */}
         <motion.div
@@ -533,7 +533,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
         </div>
 
         {/* Content */}
-        <div style={{ padding: "clamp(20px, 2.5vw, 32px)" }}>
+        <div style={{ padding: "clamp(20px, 3vw, 32px)" }}>
           <div style={{
             display: "flex",
             alignItems: "center",

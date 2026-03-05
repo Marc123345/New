@@ -249,7 +249,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          className="fixed inset-0 flex items-center justify-center p-3 sm:p-8"
+          className="fixed inset-0 flex items-center justify-center p-4 sm:p-8"
           style={{ background: "#040408", zIndex: 9999 }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
           onTouchStart={handleTouchStart}
@@ -286,7 +286,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute top-3 right-3 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
+              className="absolute top-4 right-4 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
             >
               <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
             </motion.button>
@@ -297,7 +297,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               style={{ maxHeight: "85vh", WebkitOverflowScrolling: "touch" }}
               onScroll={handleScroll}
             >
-              <div className="px-4 sm:px-6 md:px-8 pt-12 sm:pt-14 pb-6 sm:pb-8 space-y-5 sm:space-y-6">
+              <div className="px-5 sm:px-7 md:px-8 pt-14 sm:pt-16 pb-8 sm:pb-10 space-y-6 sm:space-y-7">
               {service.image && (
                 <motion.div
                   key={`img-${service.id}`}

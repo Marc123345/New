@@ -48,7 +48,7 @@ const buildArcs = (() => {
         startLng: CITIES[i].lng,
         endLat: CITIES[(i + 3) % CITIES.length].lat,
         endLng: CITIES[(i + 3) % CITIES.length].lng,
-        color: ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'],
+        color: ['rgba(56,189,248,0.9)', 'rgba(125,211,252,0.6)'],
       });
       if (progress > 0.5 && i < threshold - 1) {
         arcs.push({
@@ -56,7 +56,7 @@ const buildArcs = (() => {
           startLng: CITIES[i].lng,
           endLat: CITIES[(i + 5) % CITIES.length].lat,
           endLng: CITIES[(i + 5) % CITIES.length].lng,
-          color: ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'],
+          color: ['rgba(14,165,233,0.7)', 'rgba(56,189,248,0.4)'],
         });
       }
     }
@@ -92,7 +92,7 @@ export function GlobeWrapper({ scrollYProgress }: GlobeWrapperProps) {
         .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
-        .atmosphereColor('rgba(120,60,220,0.5)')
+        .atmosphereColor('rgba(56,189,248,0.5)')
         .atmosphereAltitude(mobile ? 0.1 : 0.15)
         .width(w)
         .height(h);

@@ -6,8 +6,8 @@ export function CentralHub() {
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(41,30,86,0.6) 0%, rgba(41,30,86,0.15) 60%, transparent 100%)',
-          boxShadow: '0 0 40px rgba(164,108,252,0.15), 0 0 80px rgba(41,30,86,0.1)',
+          background: 'radial-gradient(circle, rgba(10,14,22,0.6) 0%, rgba(10,14,22,0.15) 60%, transparent 100%)',
+          boxShadow: '0 0 40px rgba(56,189,248,0.15), 0 0 80px rgba(10,14,22,0.1)',
         }}
       />
 
@@ -20,9 +20,9 @@ export function CentralHub() {
         style={{
           width: 64,
           height: 64,
-          background: 'linear-gradient(145deg, rgba(41,30,86,0.8) 0%, rgba(20,14,42,0.9) 100%)',
-          border: '1px solid rgba(164,108,252,0.3)',
-          boxShadow: '0 0 20px rgba(164,108,252,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+          background: 'linear-gradient(145deg, rgba(10,14,22,0.8) 0%, rgba(8,12,18,0.9) 100%)',
+          border: '1px solid rgba(56,189,248,0.3)',
+          boxShadow: '0 0 20px rgba(56,189,248,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
         <H2HLogo height={32} />
@@ -32,7 +32,7 @@ export function CentralHub() {
         .hub-ring {
           position: absolute;
           border-radius: 50%;
-          border: 1px solid rgba(164,108,252,0.15);
+          border: 1px solid rgba(56,189,248,0.15);
           animation: hubPulse 4s ease-out infinite;
         }
         .hub-ring-1 { width: 80px; height: 80px; animation-delay: 0s; }

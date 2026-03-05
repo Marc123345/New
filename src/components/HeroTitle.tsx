@@ -18,11 +18,11 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
         fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
         letterSpacing: '0.15em',
         background: isPrimary ? '#fbfbfc' : 'transparent',
-        color: isPrimary ? '#291e56' : '#fbfbfc',
+        color: isPrimary ? '#0a0c14' : '#fbfbfc',
         borderColor: '#fbfbfc',
         boxShadow: hovered
-          ? `6px 6px 0 #a46cfc`
-          : `4px 4px 0 rgba(164,108,252,0.7)`,
+          ? `6px 6px 0 #38bdf8`
+          : `4px 4px 0 rgba(56,189,248,0.7)`,
         transform: hovered ? 'translate(-2px, -2px)' : 'translate(0, 0)',
         transition: 'box-shadow 0.18s ease, transform 0.18s ease',
       }}
@@ -135,21 +135,21 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
           100% { background-position: 200% 50%; }
         }
         @keyframes glowPulse {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.3)); }
-          50% { filter: drop-shadow(0 0 18px rgba(139,92,246,0.6)) drop-shadow(0 0 40px rgba(124,58,237,0.2)); }
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(56,189,248,0.3)); }
+          50% { filter: drop-shadow(0 0 18px rgba(56,189,248,0.6)) drop-shadow(0 0 40px rgba(14,165,233,0.2)); }
         }
         .outline-text {
           position: relative;
           -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
           background: linear-gradient(
             110deg,
-            rgba(139,92,246,0.6) 0%,
-            #a78bfa 20%,
-            #e0d4ff 35%,
-            #c4b5fd 50%,
-            #8b5cf6 65%,
-            #a78bfa 80%,
-            rgba(139,92,246,0.6) 100%
+            rgba(56,189,248,0.6) 0%,
+            #7dd3fc 20%,
+            #e0f2fe 35%,
+            #bae6fd 50%,
+            #38bdf8 65%,
+            #7dd3fc 80%,
+            rgba(56,189,248,0.6) 100%
           );
           background-size: 200% 100%;
           -webkit-background-clip: text;

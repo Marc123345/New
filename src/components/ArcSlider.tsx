@@ -15,8 +15,8 @@ const SERVICES = [
     description:
       "In a digital landscape saturated with AI-generated content, authenticity matters more than ever. Search engines and social platforms are increasingly sophisticated at detecting generic, automated writing, and often limiting its reach and impact. Our professional copywriters craft content that feels human, nuanced, and strategically aligned with your brand voice. The result is compelling storytelling that builds trust, drives organic engagement across platforms.",
     icon: PenLine,
-    color: "#7B2FF2",
-    bgColor: "#5A05E6",
+    color: "#38bdf8",
+    bgColor: "#0c4a6e",
     image: "https://images.pexels.com/photos/3059745/pexels-photo-3059745.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Brand voice development",
@@ -33,8 +33,8 @@ const SERVICES = [
     description:
       "AI agents are transforming how businesses operate by moving beyond simple automation into intelligent, goal-driven execution. We design and deploy AI agents tailored to specific use cases, whether it's automated lead qualification and follow-ups, personalized customer support, content research and generation, sales outreach, internal workflow optimization, or real-time data analysis. These agents can operate across platforms, integrate with your existing tools, and continuously learn from interactions to improve performance. The result is a scalable, always-on digital workforce that increases efficiency, reduces manual workload, and unlocks new growth opportunities.",
     icon: Bot,
-    color: "#9B59F5",
-    bgColor: "#6F11F5",
+    color: "#34d399",
+    bgColor: "#065f46",
     image: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Automated lead qualification & follow-ups",
@@ -49,10 +49,10 @@ const SERVICES = [
     fullTitle: "SEO & AEO",
     category: "Search",
     description:
-      "AI agents are transforming how businesses operate by moving beyond simple automation into intelligent, goal-driven execution. We design and deploy AI agents tailored to specific use cases, whether it's automated lead qualification and follow-ups, personalized customer support, content research and generation, sales outreach, internal workflow optimization, or real-time data analysis. These agents can operate across platforms, integrate with your existing tools, and continuously learn from interactions to improve performance. The result is a scalable, always-on digital workforce that increases efficiency, reduces manual workload, and unlocks new growth opportunities.",
+      "Search is evolving beyond traditional keywords into AI-driven answer engines. We optimize your digital presence for both classic search rankings and the new wave of AI-powered answer platforms. Through technical audits, structured data implementation, content optimization, and strategic keyword targeting, we ensure your brand surfaces when it matters most. Our approach combines proven SEO fundamentals with forward-looking AEO strategies to future-proof your visibility and drive qualified organic traffic.",
     icon: Search,
-    color: "#B181FC",
-    bgColor: "#8338EC",
+    color: "#fbbf24",
+    bgColor: "#78350f",
     image: "https://images.pexels.com/photos/270637/pexels-photo-270637.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Technical SEO audits & optimization",
@@ -69,8 +69,8 @@ const SERVICES = [
     description:
       "In an era where AI can generate visuals in seconds, true design expertise is what sets brands apart. While automated tools produce volume, they rarely deliver strategic thinking, brand consistency, or emotional depth. Professional graphic design ensures your visuals are attractive and intentionally aligned with your positioning, audience psychology, and long-term brand equity. We translate your identity into cohesive, high-impact design systems and campaign assets that cut through the noise, build recognition, and communicate with clarity and purpose across every touchpoint.",
     icon: Palette,
-    color: "#6610E6",
-    bgColor: "#4A00D8",
+    color: "#fb923c",
+    bgColor: "#7c2d12",
     image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Brand identity & design systems",
@@ -87,8 +87,8 @@ const SERVICES = [
     description:
       "Video is the most powerful storytelling medium in today's digital ecosystem. We conceptualize, produce, and edit high-impact videos tailored for social media, advertising, and brand storytelling. From short-form reels to polished brand videos and promotional content, we create visually compelling narratives that captivate audiences and drive measurable results.",
     icon: Video,
-    color: "#e8e2ff",
-    bgColor: "#1a1535",
+    color: "#e2e8f0",
+    bgColor: "#1e293b",
     image: "https://images.pexels.com/photos/2510428/pexels-photo-2510428.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Short-form reels & social content",
@@ -105,8 +105,8 @@ const SERVICES = [
     description:
       "Effective social media requires strategy, consistency, and performance-driven execution. We manage your platforms end-to-end, developing content calendars, publishing optimized posts, engaging audiences, and analyzing results. Our approach ensures your brand remains relevant and aligned with clear business objectives.",
     icon: BarChart2,
-    color: "#C9A3FF",
-    bgColor: "#3A0CA3",
+    color: "#2dd4bf",
+    bgColor: "#134e4a",
     image: "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Content calendar development",
@@ -123,8 +123,8 @@ const SERVICES = [
     description:
       "Leaders' role have shifted from optional participants in social media, to brand assets. We build authentic, strategic personal brands that position executives and founders as industry authorities. Through tailored content, storytelling frameworks, and platform optimization, we transform profiles into influence engines that drive credibility, visibility, and opportunity.",
     icon: User,
-    color: "#7B2FF2",
-    bgColor: "#5A05E6",
+    color: "#38bdf8",
+    bgColor: "#0c4a6e",
     image: "https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Personal brand audit & strategy",
@@ -141,8 +141,8 @@ const SERVICES = [
     description:
       "A strong community turns followers into advocates. We actively manage conversations, nurture relationships, and create meaningful engagement across your digital platforms. By fostering dialogue and responding with purpose, we help build loyal communities that strengthen brand trust and long-term growth.",
     icon: MessageCircle,
-    color: "#9B59F5",
-    bgColor: "#6F11F5",
+    color: "#34d399",
+    bgColor: "#065f46",
     image: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Active conversation & comment management",
@@ -159,8 +159,8 @@ const SERVICES = [
     description:
       "Our Google Ads campaigns are designed to capture high-intent audiences at the exact moment they are searching for your solutions. Through data-backed optimization, continuous testing, and conversion-focused execution, we maximize ROI and drive measurable business outcomes.",
     icon: MousePointerClick,
-    color: "#B181FC",
-    bgColor: "#8338EC",
+    color: "#fbbf24",
+    bgColor: "#78350f",
     image: "https://images.pexels.com/photos/905163/pexels-photo-905163.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Search & display campaign strategy",
@@ -177,8 +177,8 @@ const SERVICES = [
     description:
       "Paid social is about reaching the right audience with the right message at the right time. We develop and manage strategic campaigns across leading platforms, combining compelling creative with advanced audience targeting and performance analytics. The result is scalable growth, stronger brand awareness, and consistent lead generation.",
     icon: Megaphone,
-    color: "#6610E6",
-    bgColor: "#4A00D8",
+    color: "#fb923c",
+    bgColor: "#7c2d12",
     image: "https://images.pexels.com/photos/7688336/pexels-photo-7688336.jpeg?auto=compress&cs=tinysrgb&w=1200",
     details: [
       "Multi-platform campaign management",
@@ -283,7 +283,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
             style={{
               maxWidth: "680px",
               maxHeight: "85vh",
-              background: "#0a0814",
+              background: "#0a0c10",
               border: `1px solid ${service.color}44`,
               boxShadow: `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${service.color}22`,
             }}
@@ -301,7 +301,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute top-4 right-4 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#1a1530] hover:bg-[#2a2345] transition-all text-white cursor-pointer active:scale-95 group"
+              className="absolute top-4 right-4 z-30 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-[#141820] hover:bg-[#1e2430] transition-all text-white cursor-pointer active:scale-95 group"
             >
               <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
             </motion.button>
@@ -406,7 +406,7 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                         transition={{ delay: 0.32 + i * 0.05, duration: 0.35 }}
                         className="flex items-start gap-3 py-3 px-4 text-sm leading-relaxed"
                         style={{
-                          background: "#110f1e",
+                          background: "#0e1117",
                           border: "1px solid rgba(255,255,255,0.06)",
                           color: "rgba(255,255,255,0.72)",
                           fontFamily: "var(--font-stack-body)",
@@ -508,7 +508,7 @@ export function ArcSlider() {
       }
 
       const shadow = absOffset === 0
-        ? "0 0 60px rgba(0,0,0,0.85), 10px 10px 0 rgba(164,108,252,0.6)"
+        ? "0 0 60px rgba(0,0,0,0.85), 10px 10px 0 rgba(56,189,248,0.6)"
         : "none";
 
       if (absOffset > maxVisibleOffset) {
@@ -640,7 +640,7 @@ export function ArcSlider() {
             className="text-xs font-semibold tracking-[0.3em] mb-3 sm:mb-4 block uppercase"
             style={{
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-secondary, #9B59F5)",
+              color: "var(--color-secondary, #38bdf8)",
             }}
           >
             Our Capabilities
@@ -678,17 +678,17 @@ export function ArcSlider() {
                 textTransform: "uppercase",
                 padding: "8px 14px",
                 whiteSpace: "nowrap",
-                border: "2px solid var(--color-secondary, #9B59F5)",
+                border: "2px solid var(--color-secondary, #38bdf8)",
                 borderRadius: "0",
                 background: i === activeIndex
-                  ? "var(--color-secondary, #9B59F5)"
+                  ? "var(--color-secondary, #38bdf8)"
                   : "transparent",
                 color: i === activeIndex
                   ? "var(--color-background-light, #fff)"
                   : "var(--color-text-dark, #111)",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
-                  ? "0 4px 14px rgba(155, 89, 245, 0.4)"
+                  ? "0 4px 14px rgba(56, 189, 248, 0.4)"
                   : "none",
               }}
             >
@@ -834,8 +834,8 @@ export function ArcSlider() {
                 height: 4,
                 borderRadius: "0",
                 background: i === activeIndex
-                  ? "var(--color-secondary, #9B59F5)"
-                  : "rgba(155, 89, 245, 0.2)",
+                  ? "var(--color-secondary, #38bdf8)"
+                  : "rgba(56, 189, 248, 0.2)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,

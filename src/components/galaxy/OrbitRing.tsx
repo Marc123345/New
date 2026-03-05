@@ -9,7 +9,7 @@ interface OrbitRingProps {
 
 export function OrbitRing({
   radius,
-  strokeColor = 'rgba(164,108,252,0.12)',
+  strokeColor = 'rgba(56,189,248,0.12)',
   dashPattern = '4 8',
   rotationDuration = 90,
   reverse = false,

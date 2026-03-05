@@ -70,9 +70,9 @@ function SectionBadge({ label }: { label: string }) {
       <div
         className="inline-flex items-center gap-2.5 px-4 py-1.5"
         style={{
-          border: '1px solid rgba(164,108,252,0.15)',
+          border: '1px solid rgba(56,189,248,0.15)',
           borderRadius: '100px',
-          background: 'rgba(164,108,252,0.05)',
+          background: 'rgba(56,189,248,0.05)',
         }}
       >
         <motion.span
@@ -82,7 +82,7 @@ function SectionBadge({ label }: { label: string }) {
             borderRadius: '50%',
             background: 'var(--color-secondary)',
             display: 'inline-block',
-            boxShadow: '0 0 8px rgba(164,108,252,0.5)',
+            boxShadow: '0 0 8px rgba(56,189,248,0.5)',
           }}
           animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -116,7 +116,7 @@ export function AboutStory() {
       id="about"
       className="relative w-full overflow-hidden flex flex-col items-center justify-center"
       style={{
-        background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
+        background: 'linear-gradient(160deg, #060810 0%, #0a0e18 30%, #080c14 70%, #030508 100%)',
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
@@ -255,7 +255,7 @@ export function AboutStory() {
                   fontWeight: 700,
                   letterSpacing: '0.25em',
                   textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.6)',
+                  color: 'rgba(56,189,248,0.6)',
                   fontFamily: 'var(--font-stack-heading)',
                 }}
               >
@@ -288,7 +288,7 @@ export function AboutStory() {
 
               <motion.div
                 className="h-px mb-8"
-                style={{ background: 'rgba(164,108,252,0.2)', transformOrigin: 'left' }}
+                style={{ background: 'rgba(56,189,248,0.2)', transformOrigin: 'left' }}
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
@@ -302,7 +302,7 @@ export function AboutStory() {
                   fontWeight: 700,
                   letterSpacing: '0.25em',
                   textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.6)',
+                  color: 'rgba(56,189,248,0.6)',
                   fontFamily: 'var(--font-stack-heading)',
                 }}
               >

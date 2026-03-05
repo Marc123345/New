@@ -446,6 +446,8 @@ export function ArcSlider() {
     const spreadStep1 = isMobile ? 300 : 360;
     const spreadStep2 = isMobile ? 420 : 580;
     const spreadStep3 = isMobile ? 540 : 760;
+    // Cards beyond this offset are fully invisible and skip animation
+    const maxVisibleOffset = 3;
 
     SERVICES.forEach((_, i) => {
       const card = cardsRef.current[i];
@@ -495,7 +497,7 @@ export function ArcSlider() {
         ? "0 0 60px rgba(0,0,0,0.85), 10px 10px 0 rgba(164,108,252,0.6)"
         : "none";
 
-      if (absOffset > 3) {
+      if (absOffset > maxVisibleOffset) {
         gsap.set(card, {
           x: translateX, rotateY, z: translateZ,
           scale, opacity: 0, zIndex: 0, boxShadow: "none",

@@ -5,9 +5,9 @@ import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
 
 const PILLAR_ACCENTS = [
-  { from: '#0c4a6e', to: '#0284c7', light: 'rgba(14,165,233,0.14)', border: 'rgba(56,189,248,0.3)', dot: '#38bdf8' },
-  { from: '#065f46', to: '#059669', light: 'rgba(16,185,129,0.14)', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
-  { from: '#78350f', to: '#d97706', light: 'rgba(245,158,11,0.14)', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
+  { from: '#291e56', to: '#7B2FF2', light: 'rgba(123,47,242,0.14)', border: 'rgba(123,47,242,0.35)', dot: '#7B2FF2' },
+  { from: '#3b2470', to: '#a46cfc', light: 'rgba(164,108,252,0.14)', border: 'rgba(164,108,252,0.35)', dot: '#a46cfc' },
+  { from: '#4a2d8a', to: '#b181fc', light: 'rgba(177,129,252,0.14)', border: 'rgba(177,129,252,0.35)', dot: '#b181fc' },
 ];
 
 interface PillarOverlayProps {

@@ -158,13 +158,13 @@ export function HeroStory() {
       ([entry]) => {
         const visible = entry.isIntersecting;
         setIsVisible(visible);
-        if (visible && !globeReady) setGlobeReady(true);
+        if (visible) setGlobeReady(true);
       },
-      { threshold: 0, rootMargin: '200px' }
+      { threshold: 0, rootMargin: '400px 0px' }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [globeReady]);
+  }, []);
 
   return (
     <div

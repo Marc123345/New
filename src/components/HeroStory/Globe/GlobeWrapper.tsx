@@ -141,9 +141,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
   const lastProgressRef = useRef<number>(0);
   const mobileRef = useRef(isMobileDevice());
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const isBackgroundRef = useRef(false);
   const destroyedRef = useRef(false);
-  const idleCallbackRef = useRef<number>(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -151,102 +149,72 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
 
     const mobile = mobileRef.current;
 
-    const idleInit = () => {
+    import('globe.gl').then((GlobeModule) => {
       if (destroyedRef.current || !containerRef.current) return;
-      import('globe.gl').then((GlobeModule) => {
-        if (destroyedRef.current || !containerRef.current) return;
-        const Globe = GlobeModule.default;
+      const Globe = GlobeModule.default;
 
-        const globe = Globe({ animateIn: false })(containerRef.current!);
-        globeRef.current = globe;
+      const globe = Globe({ animateIn: false })(containerRef.current!);
+      globeRef.current = globe;
 
-        const w = containerRef.current!.clientWidth || 800;
-        const h = containerRef.current!.clientHeight || 800;
+      const w = containerRef.current!.clientWidth || 800;
+      const h = containerRef.current!.clientHeight || 800;
 
-        globe
-          .backgroundColor('rgba(0,0,0,0)')
-          .showAtmosphere(true)
-          .atmosphereColor('rgba(140,80,230,0.6)')
-          .atmosphereAltitude(mobile ? 0.12 : 0.18)
-          .width(w)
-          .height(h);
+      globe
+        .backgroundColor('rgba(0,0,0,0)')
+        .showAtmosphere(true)
+        .atmosphereColor('rgba(140,80,230,0.6)')
+        .atmosphereAltitude(mobile ? 0.12 : 0.18)
+        .width(w)
+        .height(h);
 
-        globe
-          .heatmapPointLat('lat')
-          .heatmapPointLng('lng')
-          .heatmapPointWeight('pop')
-          .heatmapBandwidth(mobile ? 0.8 : 1.1)
-          .heatmapColorSaturation(mobile ? 2.8 : 3.5)
-          .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
-          .arcColor('color')
-          .arcDashLength(mobile ? 0.6 : 0.5)
-          .arcDashGap(mobile ? 0.15 : 0.1)
-          .arcDashAnimateTime(mobile ? 1800 : 1200)
-          .arcStroke(mobile ? 1.5 : 2.2)
-          .arcsTransitionDuration(400);
+      globe
+        .heatmapPointLat('lat')
+        .heatmapPointLng('lng')
+        .heatmapPointWeight('pop')
+        .heatmapBandwidth(mobile ? 0.8 : 1.1)
+        .heatmapColorSaturation(mobile ? 2.8 : 3.5)
+        .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
+        .arcColor('color')
+        .arcDashLength(mobile ? 0.6 : 0.5)
+        .arcDashGap(mobile ? 0.15 : 0.1)
+        .arcDashAnimateTime(mobile ? 1800 : 1200)
+        .arcStroke(mobile ? 1.5 : 2.2)
+        .arcsTransitionDuration(400);
 
-        globe
-          .pointLat('lat')
-          .pointLng('lng')
-          .pointColor('color')
-          .pointAltitude(0.01)
-          .pointRadius('size')
-          .pointsMerge(true)
-          .pointsData(EMPTY_POINTS);
+      globe
+        .pointLat('lat')
+        .pointLng('lng')
+        .pointColor('color')
+        .pointAltitude(0.01)
+        .pointRadius('size')
+        .pointsMerge(true)
+        .pointsData(EMPTY_POINTS);
 
-        globe.arcsData(EMPTY_ARCS);
+      globe.arcsData(EMPTY_ARCS);
 
-        const controls = globe.controls();
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = mobile ? 0.3 : 0.4;
-        controls.enableZoom = false;
-        controls.enablePan = false;
-        controls.enableRotate = false;
+      const controls = globe.controls();
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = mobile ? 0.3 : 0.4;
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.enableRotate = false;
 
-        globe.pointOfView({ lat: 5, lng: 20, altitude: mobile ? 2.8 : 2.2 });
+      globe.pointOfView({ lat: 5, lng: 20, altitude: mobile ? 2.8 : 2.2 });
 
-        const renderer = globe.renderer?.();
-        if (renderer) {
-          renderer.setPixelRatio(mobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
-        }
+      const renderer = globe.renderer?.();
+      if (renderer) {
+        renderer.setPixelRatio(mobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
+      }
 
-        if ('requestIdleCallback' in window) {
-          idleCallbackRef.current = (window as any).requestIdleCallback(() => {
-            if (destroyedRef.current || !globeRef.current) return;
-            globeRef.current.globeImageUrl(
-              '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
-            );
-          });
-        } else {
-          setTimeout(() => {
-            if (destroyedRef.current || !globeRef.current) return;
-            globeRef.current.globeImageUrl(
-              '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
-            );
-          }, 50);
-        }
-      });
-    };
-
-    if ('requestIdleCallback' in window) {
-      idleCallbackRef.current = (window as any).requestIdleCallback(idleInit, { timeout: 200 });
-    } else {
-      setTimeout(idleInit, 50);
-    }
-
-    const handleVisibility = () => {
-      isBackgroundRef.current = document.hidden;
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
+      globe.globeImageUrl(
+        '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
+      );
+    });
 
     return () => {
       destroyedRef.current = true;
-      document.removeEventListener('visibilitychange', handleVisibility);
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (idleCallbackRef.current && 'cancelIdleCallback' in window) {
-        (window as any).cancelIdleCallback(idleCallbackRef.current);
-      }
       if (globeRef.current) {
         disposeThreeScene(globeRef.current);
         globeRef.current = null;
@@ -274,25 +242,6 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
     if (!globeRef.current) return;
     const controls = globeRef.current.controls();
     if (controls) controls.autoRotate = isVisible;
-
-    const renderer = globeRef.current.renderer?.();
-    if (renderer) {
-      if (!isVisible) {
-        renderer.setAnimationLoop(null);
-      } else {
-        const scene = globeRef.current.scene?.();
-        const camera = globeRef.current.camera?.();
-        if (scene && camera) {
-          let frameCount = 0;
-          const renderLoop = () => {
-            frameCount++;
-            if (isBackgroundRef.current && frameCount % 2 !== 0) return;
-            renderer.render(scene, camera);
-          };
-          renderer.setAnimationLoop(renderLoop);
-        }
-      }
-    }
   }, [isVisible]);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {

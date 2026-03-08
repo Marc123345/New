@@ -366,8 +366,15 @@ export function HeroWebGLPanel() {
     container.addEventListener("mouseleave", handleMouseLeave);
 
     let hidden = document.hidden;
+    let offscreen = false;
     let animId: number;
     let animating = false;
+
+    const visObserver = new IntersectionObserver(
+      ([entry]) => { offscreen = !entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    visObserver.observe(container);
 
     let tiltX = 0, tiltY = 0;
     let time = 0;
@@ -376,9 +383,14 @@ export function HeroWebGLPanel() {
     const animate = () => {
       if (hidden) {
         animating = false;
-        return; // handleVisibility will restart
+        return;
       }
       animId = requestAnimationFrame(animate);
+
+      if (offscreen) {
+        clock.getDelta();
+        return;
+      }
 
       const rawDelta = clock.getDelta();
       const dt = Math.min(rawDelta, 0.05);
@@ -659,6 +671,7 @@ export function HeroWebGLPanel() {
     window.addEventListener("resize", handleResize);
 
     return () => {
+      visObserver.disconnect();
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibility);

@@ -167,6 +167,7 @@ export function CursorTrail() {
       prevMouse.copy(mouse);
       mouse.set(e.clientX / width, 1 - e.clientY / height);
       hasEntered = true;
+      lastMoveTime = performance.now();
     };
 
     const onMouseLeave = () => {
@@ -187,11 +188,16 @@ export function CursorTrail() {
 
     let rafId: number;
     let isHidden = document.hidden;
+    let lastMoveTime = 0;
+    const IDLE_TIMEOUT = 3000;
 
     const tick = () => {
-      if (isHidden) return; // don't reschedule; onVisibilityChange will restart
+      if (isHidden) return;
       rafId = requestAnimationFrame(tick);
-      if (!hasEntered) return;
+
+      const now = performance.now();
+      const idle = now - lastMoveTime > IDLE_TIMEOUT;
+      if (!hasEntered || idle) return;
 
       fluidMat.uniforms.uPrev.value = rtA.texture;
       fluidMat.uniforms.uMouse.value = mouse;

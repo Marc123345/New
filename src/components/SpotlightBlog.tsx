@@ -86,7 +86,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 textTransform: "uppercase",
                 fontFamily: "var(--font-stack-heading)",
                 background: "var(--color-primary)",
-                color: "var(--color-background-light)",
+                color: "#ffffff",
                 border: "1px solid var(--color-text-dark)",
               }}
             >

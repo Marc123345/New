@@ -65,7 +65,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 md:p-12"
-          style={{ background: 'rgba(4, 6, 8, 0.88)', backdropFilter: 'blur(8px)', zIndex: 9999 }}
+          style={{ background: 'rgba(4, 6, 8, 0.7)', backdropFilter: 'blur(8px)', zIndex: 9999 }}
         >
           {/* Clickable backdrop to close */}
           <div className="absolute inset-0 cursor-pointer" onClick={onClose} aria-label="Close modal background" />

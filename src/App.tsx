@@ -81,6 +81,7 @@ function AppContent() {
           backgroundRepeat: 'no-repeat',
         }}
       >
+        <div className="absolute inset-0 bg-black/60" />
         <div className="absolute inset-0">
           <ShootingStars count={22} />
         </div>

@@ -22,18 +22,18 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
-      className="mb-8 last:mb-0"
+      className="mb-6 last:mb-0"
     >
       <span
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.6rem',
+          fontSize: '0.55rem',
           fontWeight: 700,
           letterSpacing: '0.25em',
           textTransform: 'uppercase',
           color: 'var(--color-secondary)',
           display: 'block',
-          marginBottom: '8px',
+          marginBottom: '6px',
         }}
       >
         {tag}
@@ -41,8 +41,8 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
       <p
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
-          lineHeight: 1.75,
+          fontSize: 'clamp(0.85rem, 1.1vw, 0.95rem)',
+          lineHeight: 1.7,
           color: 'rgba(232,226,255,0.72)',
           margin: 0,
         }}
@@ -61,13 +61,13 @@ function FounderPortrait() {
   });
 
   const imgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
-  const captionX = useTransform(scrollYProgress, [0, 1], ['-4%', '4%']);
+  const captionY = useTransform(scrollYProgress, [0, 1], ['-4%', '4%']);
 
   return (
     <motion.div
       ref={portraitRef}
-      className="relative w-full"
-      initial={{ opacity: 0, y: 40 }}
+      className="relative"
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 1, ease: EASE_OUT_EXPO }}
@@ -76,12 +76,12 @@ function FounderPortrait() {
         <div
           className="relative overflow-hidden group"
           style={{
-            maxWidth: '340px',
+            maxWidth: '280px',
             width: '100%',
             transform: 'rotate(-2deg)',
           }}
         >
-          <motion.div
+          <div
             className="absolute -inset-1 opacity-0 group-hover:opacity-100"
             style={{
               background: 'linear-gradient(135deg, rgba(164,108,252,0.15), transparent 60%)',
@@ -123,19 +123,19 @@ function FounderPortrait() {
           </div>
 
           <motion.div
-            className="absolute bottom-0 left-0 right-0 p-5"
-            style={{ y: captionX, zIndex: 2 }}
+            className="absolute bottom-0 left-0 right-0 p-4"
+            style={{ y: captionY, zIndex: 2 }}
           >
             <span
               style={{
                 fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.55rem',
+                fontSize: '0.5rem',
                 fontWeight: 700,
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
                 color: 'var(--color-secondary)',
                 display: 'block',
-                marginBottom: '4px',
+                marginBottom: '3px',
               }}
             >
               Founder
@@ -143,7 +143,7 @@ function FounderPortrait() {
             <span
               style={{
                 fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
+                fontSize: 'clamp(0.9rem, 1.3vw, 1.1rem)',
                 fontWeight: 800,
                 letterSpacing: '-0.01em',
                 color: 'var(--color-text-dark)',
@@ -156,14 +156,14 @@ function FounderPortrait() {
       </div>
 
       <motion.div
-        className="hidden md:block text-center mt-4"
+        className="text-center mt-3"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.5rem',
+          fontSize: '0.45rem',
           fontWeight: 700,
           letterSpacing: '0.35em',
           textTransform: 'uppercase',
@@ -176,33 +176,11 @@ function FounderPortrait() {
   );
 }
 
-function ColumnHeader({ label, delay = 0 }: { label: string; delay?: number }) {
-  return (
-    <motion.span
-      className="block mb-8"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay, ease: EASE_OUT_EXPO }}
-      style={{
-        fontFamily: 'var(--font-stack-heading)',
-        fontSize: '0.75rem',
-        fontWeight: 700,
-        letterSpacing: '0.1em',
-        textTransform: 'uppercase',
-        color: 'var(--color-text-dark)',
-      }}
-    >
-      {label}
-    </motion.span>
-  );
-}
-
-export function StoryColumns() {
+export function WhyH2HPanel() {
   return (
     <div className="w-full">
       <motion.div
-        className="mb-16 md:mb-20"
+        className="mb-10 md:mb-14"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -217,7 +195,7 @@ export function StoryColumns() {
             textTransform: 'uppercase',
             color: 'rgba(164,108,252,0.7)',
             display: 'block',
-            marginBottom: '16px',
+            marginBottom: '14px',
           }}
         >
           Why H2H
@@ -225,7 +203,7 @@ export function StoryColumns() {
         <h3
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(1.4rem, 2.5vw, 2rem)',
+            fontSize: 'clamp(1.3rem, 2.2vw, 1.8rem)',
             fontWeight: 800,
             lineHeight: 1.15,
             letterSpacing: '-0.02em',
@@ -241,22 +219,54 @@ export function StoryColumns() {
         </h3>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-6 items-start">
         <div className="md:col-span-4 order-2 md:order-1">
-          <ColumnHeader label="Your Partner" />
+          <motion.span
+            className="block mb-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-dark)',
+            }}
+          >
+            Your Partner
+          </motion.span>
           {LEFT_ITEMS.map((item, i) => (
-            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.1} />
+            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.08} />
           ))}
         </div>
 
-        <div className="md:col-span-4 order-1 md:order-2 flex flex-col items-center">
+        <div className="md:col-span-4 order-1 md:order-2 flex justify-center">
           <FounderPortrait />
         </div>
 
         <div className="md:col-span-4 order-3">
-          <ColumnHeader label="Structure & Soul" delay={0.15} />
+          <motion.span
+            className="block mb-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT_EXPO }}
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-dark)',
+            }}
+          >
+            Structure & Soul
+          </motion.span>
           {RIGHT_ITEMS.map((item, i) => (
-            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.1} />
+            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.08} />
           ))}
         </div>
       </div>

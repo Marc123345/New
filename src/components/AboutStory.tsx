@@ -7,11 +7,10 @@ import {
 } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
-import { StoryColumns } from './about/StoryColumns';
+import { WhyH2HPanel } from './about/WhyH2HPanel';
 import { SignatureEnding } from './about/SignatureEnding';
 import { SpinningH2H } from './about/SpinningH2H';
 
-// Consistent premium easing curve
 const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 function Eyebrow({ label }: { label: string }) {
@@ -157,36 +156,40 @@ function NarrativeBlock() {
   );
 }
 
-function AsymmetricHero() {
+function AboutPanel() {
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start">
-      <div className="lg:col-span-7 flex flex-col gap-10">
-        <HeroBlock />
-        <NarrativeBlock />
-      </div>
+    <div className="w-full">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start">
+        <div className="lg:col-span-7 flex flex-col gap-10">
+          <HeroBlock />
+          <NarrativeBlock />
+        </div>
 
-      <div className="lg:col-span-5 lg:mt-24">
-        <div className="lg:pl-8">
-          <motion.span
-            className="block mb-8"
-            initial={{ opacity: 0, filter: 'blur(4px)' }}
-            whileInView={{ opacity: 1, filter: 'blur(0px)' }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              color: 'rgba(164,108,252,0.6)',
-            }}
-          >
-            Impact
-          </motion.span>
-          <ImpactStack />
+        <div className="lg:col-span-5 lg:mt-24">
+          <div className="lg:pl-8">
+            <motion.span
+              className="block mb-8"
+              initial={{ opacity: 0, filter: 'blur(4px)' }}
+              whileInView={{ opacity: 1, filter: 'blur(0px)' }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
+              style={{
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                letterSpacing: '0.3em',
+                textTransform: 'uppercase',
+                color: 'rgba(164,108,252,0.6)',
+              }}
+            >
+              Impact
+            </motion.span>
+            <ImpactStack />
+          </div>
         </div>
       </div>
+
+      <VideoBlock />
     </div>
   );
 }
@@ -202,17 +205,17 @@ function VideoBlock() {
     >
       <motion.div
         className="relative overflow-hidden cursor-pointer group"
-        whileHover={{ 
-          y: -8, 
+        whileHover={{
+          y: -8,
           x: -8,
-          boxShadow: 'var(--shadow-geometric-hover)' 
+          boxShadow: 'var(--shadow-geometric-hover)',
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         style={{
           border: '1px solid rgba(255,255,255,0.1)',
           background: 'var(--color-background-light)',
           boxShadow: 'var(--shadow-geometric)',
-          maxHeight: '500px', // Slightly taller for more visual impact
+          maxHeight: '500px',
         }}
       >
         <motion.video
@@ -224,8 +227,7 @@ function VideoBlock() {
           style={{ display: 'block', maxHeight: '500px' }}
           src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
         />
-        
-        {/* Gradients to ensure text/badges pop */}
+
         <div
           className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
           style={{
@@ -245,88 +247,142 @@ function VideoBlock() {
   );
 }
 
-function Divider() {
+function SwipeTransition() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    damping: 40,
+    stiffness: 120,
+    mass: 0.8,
+  });
+
+  const panel1X = useTransform(smoothProgress, [0, 0.35, 0.65, 1], ['0%', '0%', '-100%', '-100%']);
+  const panel1Opacity = useTransform(smoothProgress, [0, 0.35, 0.6, 0.65], [1, 1, 0.3, 0]);
+  const panel1Scale = useTransform(smoothProgress, [0, 0.35, 0.65], [1, 1, 0.96]);
+
+  const panel2X = useTransform(smoothProgress, [0, 0.35, 0.65, 1], ['100%', '100%', '0%', '0%']);
+  const panel2Opacity = useTransform(smoothProgress, [0.3, 0.35, 0.65, 1], [0, 0, 1, 1]);
+  const panel2Scale = useTransform(smoothProgress, [0.35, 0.65, 1], [0.96, 1, 1]);
+
+  const lineScaleX = useTransform(smoothProgress, [0.3, 0.5, 0.7], [0, 1, 0]);
+  const lineOpacity = useTransform(smoothProgress, [0.3, 0.45, 0.55, 0.7], [0, 1, 1, 0]);
+
   return (
-    <motion.div
-      className="w-full my-24 md:my-32 flex justify-center"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 1 }}
+    <div
+      ref={containerRef}
+      className="relative"
+      style={{ height: '400vh' }}
     >
-      <motion.div
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.5, ease: EASE_OUT_EXPO }}
-        style={{
-          height: '1px',
-          width: '100%',
-          background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.4), transparent)',
-          transformOrigin: 'center',
-        }}
-      />
-    </motion.div>
+      <div
+        className="sticky top-0 left-0 w-full overflow-hidden"
+        style={{ height: '100vh' }}
+      >
+        <SignalBackground />
+
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.14) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.16) 0%, transparent 50%)
+            `,
+          }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(180deg, #06030f 0%, transparent 10%),
+              linear-gradient(0deg, #06030f 0%, transparent 10%)
+            `,
+          }}
+        />
+
+        <div className="relative h-full" style={{ zIndex: 10 }}>
+          <motion.div
+            className="absolute inset-0 flex items-center"
+            style={{
+              x: panel1X,
+              opacity: panel1Opacity,
+              scale: panel1Scale,
+            }}
+          >
+            <div
+              className="w-full mx-auto overflow-y-auto hide-scrollbar"
+              style={{
+                maxWidth: '1300px',
+                padding: 'clamp(2rem, 4vw, 4rem) clamp(1.5rem, 5vw, 3rem)',
+                maxHeight: '100vh',
+              }}
+            >
+              <AboutPanel />
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            style={{
+              width: '1px',
+              height: '60vh',
+              background: 'linear-gradient(180deg, transparent, rgba(164,108,252,0.5), transparent)',
+              scaleX: lineScaleX,
+              opacity: lineOpacity,
+              transformOrigin: 'center',
+            }}
+          />
+
+          <motion.div
+            className="absolute inset-0 flex items-center"
+            style={{
+              x: panel2X,
+              opacity: panel2Opacity,
+              scale: panel2Scale,
+            }}
+          >
+            <div
+              className="w-full mx-auto overflow-y-auto hide-scrollbar"
+              style={{
+                maxWidth: '1300px',
+                padding: 'clamp(2rem, 4vw, 4rem) clamp(1.5rem, 5vw, 3rem)',
+                maxHeight: '100vh',
+              }}
+            >
+              <WhyH2HPanel />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export function AboutStory() {
-  const sectionRef = useRef<HTMLElement>(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
-
-  // Adding spring physics to the parallax makes the whole section feel incredibly premium
-  const smoothScroll = useSpring(scrollYProgress, { damping: 30, stiffness: 100, mass: 1 });
-  const contentY = useTransform(smoothScroll, [0, 1], ['3%', '-3%']);
-
   return (
     <section
-      ref={sectionRef}
       id="about"
-      className="relative w-full overflow-hidden"
+      className="relative w-full"
       style={{
         background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
-        padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
-      <SignalBackground />
+      <SwipeTransition />
 
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="relative"
         style={{
-          background: `
-            radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.14) 0%, transparent 55%),
-            radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.16) 0%, transparent 50%)
-          `,
+          background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
+          padding: 'clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 3rem)',
         }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            linear-gradient(180deg, #06030f 0%, transparent 10%),
-            linear-gradient(0deg, #06030f 0%, transparent 10%)
-          `,
-        }}
-      />
-
-      <motion.div
-        className="relative mx-auto"
-        style={{ y: contentY, maxWidth: '1300px', zIndex: 10 }}
       >
-        <AsymmetricHero />
-
-        <VideoBlock />
-
-        <Divider />
-
-        <StoryColumns />
-
-        <SignatureEnding />
-      </motion.div>
+        <div className="relative mx-auto" style={{ maxWidth: '1300px', zIndex: 10 }}>
+          <SignatureEnding />
+        </div>
+      </div>
     </section>
   );
 }

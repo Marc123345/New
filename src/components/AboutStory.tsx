@@ -171,29 +171,71 @@ function StatsBar() {
   );
 }
 
-function StarburstIcon() {
+function SpinningH2H() {
   return (
     <motion.div
-      className="hidden md:flex items-center justify-center"
-      initial={{ opacity: 0, scale: 0.6, rotate: -45 }}
-      whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+      className="hidden md:flex items-center justify-center flex-shrink-0"
+      initial={{ opacity: 0, scale: 0.6 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
     >
-      <motion.svg
-        width="100"
-        height="100"
-        viewBox="0 0 121 121"
-        fill="none"
+      <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        style={{
+          width: 110,
+          height: 110,
+          position: 'relative',
+        }}
       >
-        <path
-          opacity="0.2"
-          d="M0 54.3207C0.346705 54.3523 0.693411 54.3838 1.04012 54.3838C15.5702 54.3838 30.1003 54.3838 44.6619 54.3838C44.9771 54.3838 45.2923 54.3838 45.5444 54.3838C34.765 43.6016 23.9857 32.8194 13.2378 22.0688C16.2951 19.0422 19.1003 16.2994 21.9685 13.462C32.5903 24.0865 43.3696 34.8687 54.4327 45.9346C54.4327 30.3919 54.4327 15.1959 54.4327 0C58.5301 0 62.5014 0 66.5673 0C66.5673 15.2275 66.5673 30.3603 66.5673 45.4617C77.3467 34.6795 88.1261 23.8973 98.8109 13.2097C101.868 16.2678 104.642 19.0422 107.479 21.8796C96.8567 32.5042 86.0774 43.2863 75.298 54.0685C75.3295 54.1631 75.3925 54.2577 75.4241 54.3523C90.5845 54.3523 105.777 54.3523 121 54.3523C121 58.4508 121 62.4231 121 66.5216C105.777 66.5216 90.6161 66.5216 75.3295 66.5216C86.235 77.4299 96.9828 88.1806 107.731 98.9312C104.768 101.832 101.994 104.575 99.1576 107.38C88.5358 96.7559 77.7564 85.9737 66.788 74.9708C66.7249 75.5698 66.6619 75.822 66.6619 76.0743C66.6619 90.7658 66.6619 105.457 66.6619 120.18C66.6619 120.464 66.7249 120.716 66.7249 121C62.6275 121 58.5301 121 54.4327 121C54.4642 120.653 54.4957 120.306 54.4957 119.96C54.4957 105.426 54.4957 90.8919 54.4957 76.358C54.4957 76.0427 54.4327 75.6959 54.4011 75.0023C43.3381 86.0052 32.5587 96.7874 21.937 107.412C19.1003 104.606 16.2951 101.863 13.2063 98.8366C23.9542 88.086 34.702 77.3353 45.4814 66.5531C45.2607 66.5531 44.9456 66.5531 44.6304 66.5531C30.1003 66.5531 15.5702 66.5531 1.04012 66.5531C0.693411 66.5531 0.346705 66.6162 0 66.6162C0 62.5177 0 58.4192 0 54.3207Z"
-          fill="var(--color-secondary)"
-        />
-      </motion.svg>
+        <svg viewBox="0 0 200 200" width="110" height="110">
+          <defs>
+            <path
+              id="h2h-circle-path"
+              d="M 100,100 m -72,0 a 72,72 0 1,1 144,0 a 72,72 0 1,1 -144,0"
+            />
+          </defs>
+          <text
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '17.5px',
+              fontWeight: 700,
+              letterSpacing: '0.35em',
+              textTransform: 'uppercase',
+            }}
+            fill="var(--color-secondary)"
+          >
+            <textPath href="#h2h-circle-path" startOffset="0%">
+              H2H Agency &#x2022; H2H Agency &#x2022; H2H Agency &#x2022;
+            </textPath>
+          </text>
+        </svg>
+
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <motion.span
+            animate={{ rotate: -360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '1.4rem',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: 'var(--color-text-dark)',
+            }}
+          >
+            H2H
+          </motion.span>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -250,7 +292,7 @@ function AboutCTA() {
           paddingTop: 'clamp(1.5rem, 3vw, 2.5rem)',
         }}
       >
-        <StarburstIcon />
+        <SpinningH2H />
 
         <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
           <motion.p

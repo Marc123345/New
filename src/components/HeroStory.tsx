@@ -179,7 +179,7 @@ export function HeroStory() {
       >
         {globeReady && (
           <Suspense fallback={null}>
-            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} hideArcs={isMobile} />
+            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
           </Suspense>
         )}
 

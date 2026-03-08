@@ -9,12 +9,12 @@ interface GlobeWrapperProps {
   hideArcs?: boolean;
 }
 
-const TOP_CITIES = worldPopulationData.slice(0, 12);
-const TOP_CITIES_MOBILE = worldPopulationData.slice(0, 6);
-const HEATMAP_CITIES = worldPopulationData.slice(0, 20);
-const HEATMAP_CITIES_MOBILE = worldPopulationData.slice(0, 10);
-const ARC_START = 0.15;
-const SCROLL_THRESHOLD = 0.03;
+const TOP_CITIES = worldPopulationData.slice(0, 18);
+const TOP_CITIES_MOBILE = worldPopulationData.slice(0, 10);
+const HEATMAP_CITIES = worldPopulationData.slice(0, 30);
+const HEATMAP_CITIES_MOBILE = worldPopulationData.slice(0, 14);
+const ARC_START = 0.08;
+const SCROLL_THRESHOLD = 0.02;
 
 function getArcThreshold(progress: number, mobile: boolean): number {
   if (progress < ARC_START) return 0;
@@ -25,8 +25,11 @@ function getArcThreshold(progress: number, mobile: boolean): number {
   );
 }
 
-const ARC_COLOR_PRIMARY = ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'];
-const ARC_COLOR_SECONDARY = ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'];
+const ARC_COLORS = [
+  ['rgba(192,132,252,1)', 'rgba(168,85,247,0.85)'],
+  ['rgba(139,92,246,0.95)', 'rgba(167,139,250,0.8)'],
+  ['rgba(216,180,254,1)', 'rgba(192,132,252,0.85)'],
+];
 const EMPTY_ARCS: object[] = [];
 
 const precomputedArcs = new Map<string, object[]>();
@@ -35,26 +38,35 @@ function initArcsForSet(cities: typeof TOP_CITIES, prefix: string) {
   for (let threshold = 1; threshold <= len; threshold++) {
     const arcsA: object[] = [];
     const arcsB: object[] = [];
+    const arcsC: object[] = [];
     for (let i = 0; i < threshold; i++) {
       arcsA.push({
         startLat: cities[i].lat,
         startLng: cities[i].lng,
-        endLat: cities[(i + 3) % len].lat,
-        endLng: cities[(i + 3) % len].lng,
-        color: ARC_COLOR_PRIMARY,
+        endLat: cities[(i + 2) % len].lat,
+        endLng: cities[(i + 2) % len].lng,
+        color: ARC_COLORS[0],
       });
-      if (i < threshold - 1) {
-        arcsB.push({
+      arcsB.push({
+        startLat: cities[i].lat,
+        startLng: cities[i].lng,
+        endLat: cities[(i + 4) % len].lat,
+        endLng: cities[(i + 4) % len].lng,
+        color: ARC_COLORS[1],
+      });
+      if (i % 2 === 0) {
+        arcsC.push({
           startLat: cities[i].lat,
           startLng: cities[i].lng,
-          endLat: cities[(i + 5) % len].lat,
-          endLng: cities[(i + 5) % len].lng,
-          color: ARC_COLOR_SECONDARY,
+          endLat: cities[(i + 7) % len].lat,
+          endLng: cities[(i + 7) % len].lng,
+          color: ARC_COLORS[2],
         });
       }
     }
     precomputedArcs.set(`${prefix}${threshold}-a`, arcsA);
     precomputedArcs.set(`${prefix}${threshold}-ab`, [...arcsA, ...arcsB]);
+    precomputedArcs.set(`${prefix}${threshold}-abc`, [...arcsA, ...arcsB, ...arcsC]);
   }
 }
 initArcsForSet(TOP_CITIES, 'd-');
@@ -64,9 +76,25 @@ function getArcs(progress: number, mobile: boolean): object[] {
   const threshold = getArcThreshold(progress, mobile);
   if (threshold === 0) return EMPTY_ARCS;
   const prefix = mobile ? 'm-' : 'd-';
-  const key = progress > 0.5 ? `${prefix}${threshold}-ab` : `${prefix}${threshold}-a`;
-  return precomputedArcs.get(key) || EMPTY_ARCS;
+  let suffix: string;
+  if (progress > 0.6) suffix = 'abc';
+  else if (progress > 0.3) suffix = 'ab';
+  else suffix = 'a';
+  return precomputedArcs.get(`${prefix}${threshold}-${suffix}`) || EMPTY_ARCS;
 }
+
+function buildPointData(cities: typeof TOP_CITIES, count: number) {
+  return cities.slice(0, count).map((c) => ({
+    lat: c.lat,
+    lng: c.lng,
+    size: 0.6,
+    color: 'rgba(216,180,254,0.95)',
+  }));
+}
+
+const POINT_DATA_DESKTOP = buildPointData(TOP_CITIES, 18);
+const POINT_DATA_MOBILE = buildPointData(TOP_CITIES_MOBILE, 10);
+const EMPTY_POINTS: object[] = [];
 
 function disposeThreeScene(globe: any) {
   try {
@@ -109,7 +137,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
   const globeRef = useRef<any>(null);
   const rafRef = useRef<number>(0);
   const lastArcThresholdRef = useRef<number>(-1);
-  const lastHalfRef = useRef<boolean>(false);
+  const lastArcTierRef = useRef<string>('');
   const lastProgressRef = useRef<number>(0);
   const mobileRef = useRef(isMobileDevice());
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -138,8 +166,8 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         globe
           .backgroundColor('rgba(0,0,0,0)')
           .showAtmosphere(true)
-          .atmosphereColor('rgba(120,60,220,0.5)')
-          .atmosphereAltitude(mobile ? 0.1 : 0.15)
+          .atmosphereColor('rgba(140,80,230,0.6)')
+          .atmosphereAltitude(mobile ? 0.12 : 0.18)
           .width(w)
           .height(h);
 
@@ -147,14 +175,24 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
           .heatmapPointLat('lat')
           .heatmapPointLng('lng')
           .heatmapPointWeight('pop')
-          .heatmapBandwidth(mobile ? 0.7 : 0.9)
-          .heatmapColorSaturation(mobile ? 2.2 : 2.8)
+          .heatmapBandwidth(mobile ? 0.8 : 1.1)
+          .heatmapColorSaturation(mobile ? 2.8 : 3.5)
           .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
           .arcColor('color')
-          .arcDashLength(mobile ? 0.5 : 0.4)
-          .arcDashGap(mobile ? 0.3 : 0.2)
-          .arcDashAnimateTime(mobile ? 2000 : 1500)
-          .arcStroke(mobile ? 0.8 : 1.2);
+          .arcDashLength(mobile ? 0.6 : 0.5)
+          .arcDashGap(mobile ? 0.15 : 0.1)
+          .arcDashAnimateTime(mobile ? 1800 : 1200)
+          .arcStroke(mobile ? 1.5 : 2.2)
+          .arcsTransitionDuration(400);
+
+        globe
+          .pointLat('lat')
+          .pointLng('lng')
+          .pointColor('color')
+          .pointAltitude(0.01)
+          .pointRadius('size')
+          .pointsMerge(true)
+          .pointsData(EMPTY_POINTS);
 
         globe.arcsData(EMPTY_ARCS);
 
@@ -278,7 +316,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
       globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 400);
 
       globe.atmosphereAltitude(
-        mobile ? 0.1 + progress * 0.2 : 0.15 + progress * 0.35
+        mobile ? 0.12 + progress * 0.25 : 0.18 + progress * 0.4
       );
 
       const controls = globe.controls();
@@ -286,12 +324,22 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + progress * (mobile ? 0.6 : 1.2);
       }
 
+      if (progress > ARC_START && !hideArcs) {
+        const pointData = mobile ? POINT_DATA_MOBILE : POINT_DATA_DESKTOP;
+        globe.pointsData(pointData);
+      } else {
+        globe.pointsData(EMPTY_POINTS);
+      }
+
       if (!hideArcs) {
         const newThreshold = getArcThreshold(progress, mobile);
-        const newHalf = progress > 0.5;
-        if (newThreshold !== lastArcThresholdRef.current || newHalf !== lastHalfRef.current) {
+        let tier: string;
+        if (progress > 0.6) tier = 'abc';
+        else if (progress > 0.3) tier = 'ab';
+        else tier = 'a';
+        if (newThreshold !== lastArcThresholdRef.current || tier !== lastArcTierRef.current) {
           lastArcThresholdRef.current = newThreshold;
-          lastHalfRef.current = newHalf;
+          lastArcTierRef.current = tier;
           globe.arcsData(getArcs(progress, mobile));
         }
       }

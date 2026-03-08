@@ -6,6 +6,7 @@ import { isMobileDevice } from '../../../hooks/useIsMobile';
 interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;
   isVisible?: boolean;
+  hideArcs?: boolean;
 }
 
 const TOP_CITIES = worldPopulationData.slice(0, 12);
@@ -67,7 +68,7 @@ function getArcs(progress: number, mobile: boolean): object[] {
   return precomputedArcs.get(key) || EMPTY_ARCS;
 }
 
-export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapperProps) {
+export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = false }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
   const rafRef = useRef<number | null>(null);
@@ -128,7 +129,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
           controls.enablePan = false;
           controls.enableRotate = false;
 
-          globe.pointOfView({ lat: 5, lng: 20, altitude: 2.2 });
+          globe.pointOfView({ lat: 5, lng: 20, altitude: mobile ? 2.8 : 2.2 });
 
           const renderer = globe.renderer?.();
           if (renderer) {
@@ -230,7 +231,10 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
       const mobile = mobileRef.current;
       const globe = globeRef.current;
 
-      const newAltitude = Math.max(1.2, 2.2 - progress * 0.8);
+      const startAlt = mobile ? 2.8 : 2.2;
+      const zoomRange = mobile ? 0.5 : 0.8;
+      const minAlt = mobile ? 1.8 : 1.2;
+      const newAltitude = Math.max(minAlt, startAlt - progress * zoomRange);
       globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 400);
 
       globe.atmosphereAltitude(
@@ -242,12 +246,14 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
         controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + progress * (mobile ? 0.6 : 1.2);
       }
 
-      const newThreshold = getArcThreshold(progress, mobile);
-      const newHalf = progress > 0.5;
-      if (newThreshold !== lastArcThresholdRef.current || newHalf !== lastHalfRef.current) {
-        lastArcThresholdRef.current = newThreshold;
-        lastHalfRef.current = newHalf;
-        globe.arcsData(getArcs(progress, mobile));
+      if (!hideArcs) {
+        const newThreshold = getArcThreshold(progress, mobile);
+        const newHalf = progress > 0.5;
+        if (newThreshold !== lastArcThresholdRef.current || newHalf !== lastHalfRef.current) {
+          lastArcThresholdRef.current = newThreshold;
+          lastHalfRef.current = newHalf;
+          globe.arcsData(getArcs(progress, mobile));
+        }
       }
     });
   });

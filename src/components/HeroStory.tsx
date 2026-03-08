@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useMemo, memo, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const GlobeWrapper = lazy(() =>
   import('./HeroStory/Globe/GlobeWrapper').then((m) => ({ default: m.GlobeWrapper }))
@@ -96,7 +97,7 @@ const SCROLL_LABEL_STYLE = {
 } as const;
 
 const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<string> }) => (
-  <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 flex flex-col gap-2">
+  <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 hidden md:flex flex-col gap-2">
     <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
       <motion.div
         className="absolute inset-y-0 left-0"
@@ -118,8 +119,12 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
   </div>
 ));
 
-const GRADIENT_OVERLAY_STYLE = {
+const GRADIENT_OVERLAY_DESKTOP = {
   background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+} as const;
+
+const GRADIENT_OVERLAY_MOBILE = {
+  background: 'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.75) 35%, rgba(2,0,8,0.2) 60%, transparent 80%)',
 } as const;
 
 const BOTTOM_FADE_STYLE = {
@@ -136,6 +141,7 @@ export function HeroStory() {
   const stickyRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [globeReady, setGlobeReady] = useState(false);
+  const isMobile = useIsMobile();
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -173,15 +179,18 @@ export function HeroStory() {
       >
         {globeReady && (
           <Suspense fallback={null}>
-            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
+            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} hideArcs={isMobile} />
           </Suspense>
         )}
 
-        <div className="absolute inset-0 pointer-events-none" style={GRADIENT_OVERLAY_STYLE} />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={isMobile ? GRADIENT_OVERLAY_MOBILE : GRADIENT_OVERLAY_DESKTOP}
+        />
 
-        <div className="relative z-10 h-full flex items-center">
+        <div className={`relative z-10 h-full flex ${isMobile ? 'items-end pb-24' : 'items-center'}`}>
           <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-14 lg:px-20">
-            <div className="w-full md:w-1/2 relative" style={{ minHeight: 200 }}>
+            <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
               {phases.map((phase, i) => (
                 <PhaseText
                   key={i}

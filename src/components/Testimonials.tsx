@@ -96,7 +96,7 @@ export function Testimonials() {
 
   return (
     <div ref={containerRef} className="relative h-[300vh] bg-[#13082A]">
-      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 py-4 md:py-0">
+      <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0">
 
         <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
           <div

@@ -34,11 +34,11 @@ const phases = [
 
 const HEADING_STYLES = phases.map((_, i) => ({
   fontFamily: 'var(--font-stack-heading)',
-  textShadow: `0 0 50px rgba(0,180,255,${0.3 + i * 0.12})`,
+  textShadow: `0 0 50px rgba(168,85,247,${0.4 + i * 0.15})`,
   whiteSpace: 'pre-line' as const,
 }));
 
-const SUBTITLE_STYLE = { color: 'rgba(56,189,248,0.95)' } as const;
+const SUBTITLE_STYLE = { color: 'rgba(192,132,252,0.95)' } as const;
 const DESC_STYLE = { color: 'rgba(209,213,219,0.9)' } as const;
 
 const PhaseText = memo(({
@@ -80,18 +80,18 @@ const PhaseText = memo(({
   );
 });
 
-const PROGRESS_BG_STYLE = { background: 'rgba(14,165,233,0.2)' } as const;
-const PROGRESS_FILL_BG = 'linear-gradient(to right, rgba(14,165,233,0.9), rgba(56,189,248,0.5))';
+const PROGRESS_BG_STYLE = { background: 'rgba(168,85,247,0.2)' } as const;
+const PROGRESS_FILL_BG = 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))';
 const DOT_STYLE_BASE = {
   width: 6,
   height: 6,
   borderRadius: '50%',
-  background: '#38bdf8',
-  boxShadow: '0 0 8px rgba(56,189,248,0.8)',
+  background: '#c084fc',
+  boxShadow: '0 0 8px rgba(192,132,252,0.8)',
   translateX: '-50%',
 } as const;
 const SCROLL_LABEL_STYLE = {
-  color: 'rgba(56,189,248,0.75)',
+  color: 'rgba(192,132,252,0.75)',
   fontFamily: 'var(--font-stack-heading)',
 } as const;
 
@@ -109,7 +109,7 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
     </div>
     <div className="flex items-center gap-2">
       <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
-        <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(56,189,248,0.75)" strokeWidth="1" strokeLinecap="round"/>
+        <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.75)" strokeWidth="1" strokeLinecap="round"/>
       </svg>
       <span className="text-xs uppercase tracking-[0.2em]" style={SCROLL_LABEL_STYLE}>
         scroll to explore
@@ -120,22 +120,22 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
 
 const OVERLAY_DESKTOP = {
   background: [
-    'radial-gradient(ellipse at 50% 40%, rgba(7,59,76,0.35) 0%, rgba(3,30,50,0.25) 40%, rgba(2,12,30,0.2) 70%, transparent 100%)',
-    'linear-gradient(to right, rgba(2,4,12,0.75) 0%, rgba(2,4,12,0.4) 35%, transparent 60%)',
-    'linear-gradient(to top, rgba(2,4,12,0.6) 0%, transparent 40%)',
+    'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
+    'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+    'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 40%)',
   ].join(', '),
 } as const;
 
 const OVERLAY_MOBILE = {
   background: [
-    'radial-gradient(ellipse at 50% 40%, rgba(7,59,76,0.35) 0%, rgba(3,30,50,0.25) 40%, rgba(2,12,30,0.2) 70%, transparent 100%)',
-    'linear-gradient(to top, rgba(2,4,12,0.95) 0%, rgba(2,4,12,0.8) 25%, rgba(2,4,12,0.5) 45%, rgba(2,4,12,0.15) 65%, transparent 80%)',
-    'linear-gradient(to top, rgba(2,4,12,0.6) 0%, transparent 40%)',
+    'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
+    'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
+    'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 40%)',
   ].join(', '),
 } as const;
 
 const STICKY_BG = {
-  background: 'radial-gradient(ellipse at 60% 50%, #0a1e2e 0%, #060e1a 40%, #020408 100%)',
+  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
   contain: 'strict' as const,
 } as const;
 

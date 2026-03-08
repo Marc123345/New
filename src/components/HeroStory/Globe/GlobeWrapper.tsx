@@ -7,7 +7,7 @@ interface GlobeWrapperProps {
   isVisible?: boolean;
 }
 
-const ARC_COLORS = ['#00d4ff', '#ffffff', '#0ea5e9', '#38bdf8', '#7dd3fc', '#06b6d4'];
+const ARC_COLORS = ['#a46cfc', '#ffffff', '#c084fc', '#b181fc', '#d8b4fe', '#8b5cf6'];
 
 function generateArcs(count: number) {
   return Array.from({ length: count }, () => {
@@ -59,7 +59,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
         globe
           .backgroundColor('rgba(0,0,0,0)')
           .showAtmosphere(true)
-          .atmosphereColor('rgba(0,180,255,0.25)')
+          .atmosphereColor('rgba(164,108,252,0.25)')
           .atmosphereAltitude(mobile ? 0.1 : 0.15)
           .width(w)
           .height(h);

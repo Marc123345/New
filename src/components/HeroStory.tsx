@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, useMemo, memo, lazy, Suspense } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
+import { motion, useScroll, useTransform, MotionValue } from 'motion/react';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 const GlobeWrapper = lazy(() =>
@@ -43,24 +43,21 @@ const SUBTITLE_STYLE = { color: 'rgba(192,132,252,0.95)' } as const;
 const DESC_STYLE = { color: 'rgba(209,213,219,0.9)' } as const;
 
 const PhaseText = memo(({
-  progressRange,
   scrollYProgress,
   phaseIndex,
 }: {
-  progressRange: readonly [number, number, number, number];
   scrollYProgress: MotionValue<number>;
   phaseIndex: number;
 }) => {
   const phase = phases[phaseIndex];
-  const range = progressRange as unknown as [number, number, number, number];
+  const range = phase.range as unknown as [number, number, number, number];
   const opacity = useTransform(scrollYProgress, range, [0, 1, 1, 0]);
   const y = useTransform(scrollYProgress, range, [40, 0, 0, -40]);
-  const scale = useTransform(scrollYProgress, range, [0.95, 1, 1, 0.95]);
 
   return (
     <motion.div
       className="absolute inset-0 flex flex-col justify-center"
-      style={{ opacity, y, scale, pointerEvents: 'none', willChange: 'transform, opacity' }}
+      style={{ opacity, y, willChange: 'transform, opacity' }}
     >
       <p
         className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"
@@ -101,11 +98,11 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
     <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
       <motion.div
         className="absolute inset-y-0 left-0"
-        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG, willChange: 'width' }}
+        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG }}
       />
       <motion.div
         className="absolute top-1/2 -translate-y-1/2"
-        style={{ left: progressBarWidth, ...DOT_STYLE_BASE, willChange: 'left' }}
+        style={{ left: progressBarWidth, ...DOT_STYLE_BASE }}
       />
     </div>
     <div className="flex items-center gap-2">
@@ -137,7 +134,6 @@ const BOTTOM_FADE_STYLE = {
 
 const STICKY_BG = {
   background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
-  contain: 'strict' as const,
 } as const;
 
 export function HeroStory() {
@@ -174,7 +170,7 @@ export function HeroStory() {
     <div
       ref={containerRef}
       className="relative w-full"
-      style={{ height: '500vh', contain: 'layout style' }}
+      style={{ height: '500vh' }}
     >
       <div
         ref={stickyRef}
@@ -200,10 +196,9 @@ export function HeroStory() {
         <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
           <div className="w-full max-w-8xl mx-auto px-4 md:px-8 lg:px-12">
             <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
-              {phases.map((phase, i) => (
+              {phases.map((_, i) => (
                 <PhaseText
                   key={i}
-                  progressRange={phase.range}
                   scrollYProgress={scrollYProgress}
                   phaseIndex={i}
                 />

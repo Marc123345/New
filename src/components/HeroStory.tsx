@@ -127,7 +127,7 @@ const BOTTOM_FADE_STYLE = {
 } as const;
 
 const STICKY_BG = {
-  background: 'radial-gradient(ellipse at 60% 50%, #0d0520 0%, #060110 40%, #020008 100%)',
+  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
   contain: 'strict' as const,
 } as const;
 

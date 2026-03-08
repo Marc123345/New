@@ -270,7 +270,7 @@ export function EcosystemServices() {
                 color: 'var(--color-secondary)',
               }}
             >
-              Our Capabilities
+              Framework
             </span>
           </motion.div>
           <h1

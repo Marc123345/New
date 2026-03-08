@@ -246,7 +246,33 @@ export function EcosystemServices() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
+          className="flex flex-col items-center"
         >
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{
+              display: 'inline-block',
+              marginBottom: '10px',
+              padding: '6px 16px',
+              border: '2px solid var(--color-secondary)',
+              boxShadow: '4px 4px 0 var(--color-secondary)',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '0.68rem',
+                letterSpacing: '0.3em',
+                textTransform: 'uppercase',
+                fontFamily: 'var(--font-stack-heading)',
+                color: 'var(--color-secondary)',
+              }}
+            >
+              Our Capabilities
+            </span>
+          </motion.div>
           <h1
             className="leading-tight sm:leading-[0.9] tracking-tighter uppercase mb-12 sm:mb-16"
             style={{

@@ -61,42 +61,28 @@ function GeometricFrame({ children }: { children: React.ReactNode }) {
 function SectionBadge({ label }: { label: string }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -15 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -16 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+      transition={{ duration: 0.5, delay: 0.1, ease: EASE_OUT_EXPO }}
       className="inline-block mb-10"
+      style={{
+        padding: '6px 16px',
+        border: '2px solid var(--color-secondary)',
+        boxShadow: '4px 4px 0 var(--color-secondary)',
+      }}
     >
-      <div
-        className="inline-flex items-center gap-2.5 px-4 py-1.5"
+      <span
         style={{
-          border: '1px solid rgba(164,108,252,0.15)',
-          borderRadius: '100px',
-          background: 'rgba(164,108,252,0.05)',
+          fontSize: '0.68rem',
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          fontFamily: 'var(--font-stack-heading)',
+          color: 'var(--color-secondary)',
         }}
       >
-        <motion.span
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: '50%',
-            background: 'var(--color-secondary)',
-            display: 'inline-block',
-            boxShadow: '0 0 8px rgba(164,108,252,0.5)',
-          }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <span
-          className="text-[0.55rem] font-bold uppercase tracking-[0.3em]"
-          style={{
-            fontFamily: 'var(--font-stack-heading)',
-            color: 'var(--color-surface-dark)',
-          }}
-        >
-          {label}
-        </span>
-      </div>
+        {label}
+      </span>
     </motion.div>
   );
 }

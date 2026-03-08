@@ -119,6 +119,10 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
   </div>
 ));
 
+const PURPLE_OVERLAY = {
+  background: 'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
+} as const;
+
 const GRADIENT_OVERLAY_DESKTOP = {
   background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
 } as const;
@@ -182,6 +186,11 @@ export function HeroStory() {
             <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} hideArcs={isMobile} />
           </Suspense>
         )}
+
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={PURPLE_OVERLAY}
+        />
 
         <div
           className="absolute inset-0 pointer-events-none"

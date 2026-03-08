@@ -192,9 +192,9 @@ export function HeroStory() {
           style={isMobile ? OVERLAY_MOBILE : OVERLAY_DESKTOP}
         />
 
-        <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
+        <div className="relative z-10 h-full flex items-center">
           <div className="w-full max-w-8xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-            <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
+            <div className="w-full md:w-1/2 relative" style={{ minHeight: 200 }}>
               {phases.map((phase, i) => (
                 <PhaseText
                   key={i}

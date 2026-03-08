@@ -233,104 +233,155 @@ export function AboutStory() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
+              className="flex flex-col gap-10"
             >
-              <span
-                className="inline-block mb-6"
-                style={{
-                  fontSize: '0.55rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.85)',
-                  fontFamily: 'var(--font-stack-heading)',
-                }}
-              >
-                Our Story
-              </span>
+              <div>
+                <span
+                  className="inline-block mb-5"
+                  style={{
+                    fontSize: '0.55rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(164,108,252,0.85)',
+                    fontFamily: 'var(--font-stack-heading)',
+                  }}
+                >
+                  Our Story
+                </span>
 
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
-                  lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.78)',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                Perfect, polished campaigns are something that we take very seriously. But, people want more than that. They want personality. They want to see and hear brands that speak like humans and offer something meaningful.
-              </p>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-stack-body)',
+                    fontSize: 'clamp(1.08rem, 1.5vw, 1.2rem)',
+                    lineHeight: 1.85,
+                    color: 'rgba(232,226,255,0.82)',
+                    marginBottom: '1.25rem',
+                  }}
+                >
+                  Perfect, polished campaigns are something that we take very seriously. But, people want more than that. They want personality. They want to see and hear brands that speak like humans and offer something meaningful.
+                </p>
 
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
-                  lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.78)',
-                  marginBottom: '2.5rem',
-                }}
-              >
-                H2H is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
-              </p>
+                <p
+                  className="relative pl-5"
+                  style={{
+                    fontFamily: 'var(--font-stack-body)',
+                    fontSize: 'clamp(1.08rem, 1.5vw, 1.2rem)',
+                    lineHeight: 1.85,
+                    color: 'rgba(255,255,255,0.95)',
+                    fontWeight: 500,
+                    borderLeft: '2px solid rgba(164,108,252,0.5)',
+                  }}
+                >
+                  H2H is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
+                </p>
+              </div>
 
               <motion.div
-                className="h-px mb-8"
-                style={{ background: 'rgba(164,108,252,0.2)', transformOrigin: 'left' }}
+                className="h-px"
+                style={{ background: 'linear-gradient(to right, rgba(164,108,252,0.35), transparent)', transformOrigin: 'left' }}
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
               />
 
-              <span
-                className="inline-block mb-5"
-                style={{
-                  fontSize: '0.55rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(164,108,252,0.85)',
-                  fontFamily: 'var(--font-stack-heading)',
-                }}
-              >
-                Why H2H?
-              </span>
+              <div>
+                <span
+                  className="inline-block mb-4"
+                  style={{
+                    fontSize: '0.55rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(164,108,252,0.85)',
+                    fontFamily: 'var(--font-stack-heading)',
+                  }}
+                >
+                  Why H2H?
+                </span>
 
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: 'clamp(1.1rem, 1.6vw, 1.25rem)',
-                  lineHeight: 1.6,
-                  color: 'var(--color-text-dark)',
-                  fontWeight: 700,
-                  marginBottom: '1.25rem',
-                }}
-              >
-                Because we embed ourselves in your world.
-              </p>
+                <p
+                  className="mb-6"
+                  style={{
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: 'clamp(1.15rem, 1.8vw, 1.35rem)',
+                    lineHeight: 1.5,
+                    color: 'var(--color-text-dark)',
+                    fontWeight: 700,
+                  }}
+                >
+                  Because we embed ourselves in your world.
+                </p>
 
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
-                  lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.78)',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                When you work with H2H, you don't get an agency. You get a partner — a flexible, responsive extension of your team. Like a living, breathing part of your organization, we adapt to your rhythm, align with your goals, and help you scale with clarity and purpose.
-              </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div
+                    className="p-5 transition-all duration-300 hover:-translate-y-0.5"
+                    style={{
+                      background: 'rgba(164,108,252,0.04)',
+                      border: '1px solid rgba(164,108,252,0.15)',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <span
+                      className="block mb-2"
+                      style={{
+                        fontFamily: 'var(--font-stack-heading)',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(164,108,252,0.9)',
+                      }}
+                    >
+                      Your Partner
+                    </span>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-stack-body)',
+                        fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+                        lineHeight: 1.75,
+                        color: 'rgba(232,226,255,0.75)',
+                      }}
+                    >
+                      When you work with H2H, you don't get an agency. You get a partner — a flexible, responsive extension of your team. Like a living, breathing part of your organization, we adapt to your rhythm, align with your goals, and help you scale with clarity and purpose.
+                    </p>
+                  </div>
 
-              <p
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: 'clamp(1.05rem, 1.5vw, 1.15rem)',
-                  lineHeight: 1.8,
-                  color: 'rgba(232,226,255,0.78)',
-                  marginBottom: '2.5rem',
-                }}
-              >
-                We're strategists, creatives, and storytellers who bring a mix of structure and soul. We combine insight with efficiency to help you build brand ecosystems that actually work — across every platform, every touchpoint, and every stage of growth.
-              </p>
+                  <div
+                    className="p-5 transition-all duration-300 hover:-translate-y-0.5"
+                    style={{
+                      background: 'rgba(164,108,252,0.04)',
+                      border: '1px solid rgba(164,108,252,0.15)',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <span
+                      className="block mb-2"
+                      style={{
+                        fontFamily: 'var(--font-stack-heading)',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(164,108,252,0.9)',
+                      }}
+                    >
+                      Structure & Soul
+                    </span>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-stack-body)',
+                        fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+                        lineHeight: 1.75,
+                        color: 'rgba(232,226,255,0.75)',
+                      }}
+                    >
+                      We're strategists, creatives, and storytellers who bring a mix of structure and soul. We combine insight with efficiency to help you build brand ecosystems that actually work — across every platform, every touchpoint, and every stage of growth.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
             </motion.div>
           </motion.div>

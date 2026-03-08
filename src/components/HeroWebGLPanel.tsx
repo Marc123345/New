@@ -28,22 +28,20 @@ const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
 const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
 const N = ALL_URLS.length;
 
-const BOUNDS_X = 18;
-const BOUNDS_Y = 12;
+const BOUNDS_X = 16;
+const BOUNDS_Y = 10;
 
-// TWEAKED: Wider, softer cursor influence
-const CURSOR_SPHERE_R = 4.5;
-const CURSOR_SMOOTH = 8.0; 
-const CURSOR_FIELD_R = 14.0;
+const CURSOR_SPHERE_R = 3.5;
+const CURSOR_SMOOTH = 12.0;
+const CURSOR_FIELD_R = 10.0;
 
-// TWEAKED: Syrupy, fluid physics settings
-const SPRING_HOME = 0.02; // Gentler pull back to home
-const FRICTION = 0.90;    // More drag (underwater feel)
-const MAX_SPEED = 20.0;   // Slower max movement
+const SPRING_HOME = 0.06;
+const FRICTION = 0.965;
+const MAX_SPEED = 40.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
 
-const JELLY_SPRING = 10.0;  // Softer jelly bounces
-const JELLY_DAMPING = 8.0;
+const JELLY_SPRING = 18.0;
+const JELLY_DAMPING = 6.0;
 
 const CUBE_VERT = `
 varying vec3 vNormal;
@@ -56,8 +54,7 @@ void main() {
   vec4 vp = viewMatrix * wp;
   vViewDir = normalize(-vp.xyz);
   vNormal = normalize(normalMatrix * normal);
-  // Smoother fresnel curve
-  vFresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.5);
+  vFresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
   gl_Position = projectionMatrix * vp;
 }`;
 
@@ -72,16 +69,14 @@ varying float vFresnel;
 void main() {
   vec4 tex = texture2D(uMap, vUv);
   vec3 L = normalize(vec3(0.3, 0.6, 1.0));
-  float diff = max(dot(vNormal, L), 0.0) * 0.4;
+  float diff = max(dot(vNormal, L), 0.0) * 0.35;
   vec3 H = normalize(L + vViewDir);
-  
-  // Softer specular highlight
-  float spec = pow(max(dot(vNormal, H), 0.0), 60.0) * (0.6 + uHover * 0.4);
-  vec3 ambient = tex.rgb * 0.7; // Brighter ambient
+  float spec = pow(max(dot(vNormal, H), 0.0), 90.0) * (0.5 + uHover * 0.5);
+  vec3 ambient = tex.rgb * 0.62;
   vec3 lit = tex.rgb * diff;
-  vec3 glassRim = vec3(1.0) * vFresnel * (0.2 + uHover * 0.3);
-  vec3 final = ambient + lit + vec3(spec) + glassRim;
-  float fog = mix(1.0, 0.65, uDepth);
+  vec3 glassRim = vec3(1.0) * vFresnel * (0.18 + uHover * 0.22);
+  vec3 final = ambient + lit + vec3(spec * 0.7) + glassRim;
+  float fog = mix(1.0, 0.55, uDepth);
   gl_FragColor = vec4(final * fog, 1.0);
 }`;
 
@@ -100,9 +95,9 @@ uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 void main() {
-  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.0);
-  float glow = fr * (0.15 + uHover * 0.3);
-  gl_FragColor = vec4(vec3(0.9, 0.95, 1.0) * glow, glow * 0.5);
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.5);
+  float glow = fr * (0.12 + uHover * 0.25);
+  gl_FragColor = vec4(vec3(0.85, 0.90, 1.0) * glow, glow * 0.45);
 }`;
 
 const DISPLACEMENT_VERT = `
@@ -129,14 +124,11 @@ void main() {
   vec2 dir = normalize(diff + 0.0001);
   vec2 vel = uVelocity * aspect;
   float velMag = length(vel);
-  
-  // Smoother liquid displacement
-  vec2 displacement = dir * falloff * uStrength * 0.005;
-  displacement += vel * falloff * 0.003 * min(velMag * 1.5, 1.0);
-  
-  vec2 r = texture2D(uScene, uv + displacement * 1.03).rg;
+  vec2 displacement = dir * falloff * uStrength * 0.008;
+  displacement += vel * falloff * 0.005 * min(velMag * 2.0, 1.0);
+  vec2 r = texture2D(uScene, uv + displacement * 1.05).rg;
   float g = texture2D(uScene, uv + displacement).g;
-  vec2 b = texture2D(uScene, uv + displacement * 0.97).ba;
+  vec2 b = texture2D(uScene, uv + displacement * 0.96).ba;
   gl_FragColor = vec4(r.x, g, b.x, b.y);
 }`;
 
@@ -179,7 +171,7 @@ export function HeroWebGLPanel() {
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },
-          uRadius: { value: 0.22 }, // Slightly wider distortion
+          uRadius: { value: 0.18 },
           uStrength: { value: 0.0 },
           uVelocity: { value: new THREE.Vector2(0, 0) },
           uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
@@ -198,8 +190,8 @@ export function HeroWebGLPanel() {
       if (!geoCache.has(key)) {
         const s = r * 2;
         geoCache.set(key, [
-          new THREE.BoxGeometry(s, s, s, 2, 2, 2), // Slightly more vertices
-          new THREE.BoxGeometry(s * 1.05, s * 1.05, s * 1.05), // Tighter shell
+          new THREE.BoxGeometry(s, s, s, 1, 1, 1),
+          new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07),
         ]);
       }
       return geoCache.get(key)!;
@@ -234,7 +226,6 @@ export function HeroWebGLPanel() {
 
     const homeX = new Float32Array(N);
     const homeY = new Float32Array(N);
-    const homeZ = new Float32Array(N); // ADDED: 3D home positions
 
     const rotVelX = new Float32Array(N);
     const rotVelY = new Float32Array(N);
@@ -264,32 +255,23 @@ export function HeroWebGLPanel() {
       floatPhaseX[i] = Math.random() * Math.PI * 2;
       floatPhaseY[i] = Math.random() * Math.PI * 2;
       floatPhaseZ[i] = Math.random() * Math.PI * 2;
-      
-      // Slower floating
-      floatSpeedX[i] = 0.02 + Math.random() * 0.03;
-      floatSpeedY[i] = 0.015 + Math.random() * 0.025;
-      floatSpeedZ[i] = 0.01 + Math.random() * 0.02;
+      floatSpeedX[i] = 0.04 + Math.random() * 0.06;
+      floatSpeedY[i] = 0.03 + Math.random() * 0.05;
+      floatSpeedZ[i] = 0.025 + Math.random() * 0.04;
 
-      baseRotX[i] = (Math.random() - 0.5) * 0.015;
-      baseRotY[i] = (Math.random() - 0.5) * 0.015;
-      baseRotZ[i] = (Math.random() - 0.5) * 0.01;
+      baseRotX[i] = (Math.random() - 0.5) * 0.025;
+      baseRotY[i] = (Math.random() - 0.5) * 0.025;
+      baseRotZ[i] = (Math.random() - 0.5) * 0.012;
 
       depthFactor[i] = Math.random();
 
-      // TWEAKED: Create a 3D cloud/cluster instead of a flat ring
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const rCloud = Math.cbrt(Math.random()) * 11.0; 
-
-      homeX[i] = rCloud * Math.sin(phi) * Math.cos(theta);
-      homeY[i] = rCloud * Math.sin(phi) * Math.sin(theta) * 0.8; // slightly wider than tall
-      homeZ[i] = rCloud * Math.cos(phi) * 0.5; // Flattened depth
-
+      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+      const dist = 0.25 + Math.random() * 0.6;
+      homeX[i] = Math.cos(angle) * BOUNDS_X * dist * 0.78;
+      homeY[i] = Math.sin(angle) * BOUNDS_Y * dist * 0.78;
       px[i] = homeX[i] + (Math.random() - 0.5) * 2;
       py[i] = homeY[i] + (Math.random() - 0.5) * 2;
-      pz[i] = homeZ[i] + (Math.random() - 0.5) * 2;
+      pz[i] = (Math.random() - 0.5) * 4;
 
       const group = new THREE.Group();
       const inner = new THREE.Group();
@@ -394,7 +376,7 @@ export function HeroWebGLPanel() {
     const animate = () => {
       if (hidden) {
         animating = false;
-        return; 
+        return; // handleVisibility will restart
       }
       animId = requestAnimationFrame(animate);
 
@@ -416,11 +398,10 @@ export function HeroWebGLPanel() {
       prevSphereX = sphereX;
       prevSphereY = sphereY;
 
-      // Softer tilt
-      const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.03 : 0;
-      const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.025 : 0;
-      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-2.0 * dt));
-      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-2.0 * dt));
+      const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.04 : 0;
+      const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.035 : 0;
+      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-2.5 * dt));
+      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-2.5 * dt));
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
@@ -447,17 +428,16 @@ export function HeroWebGLPanel() {
 
       for (let s = 0; s < SUB; s++) {
         for (let i = 0; i < N; i++) {
-          const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * 0.12;
-          const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * 0.1;
-          const floatOffZ = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.08;
+          const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * 0.08;
+          const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * 0.06;
 
           const dx = (homeX[i] + floatOffX) - px[i];
           const dy = (homeY[i] + floatOffY) - py[i];
-          const dz = (homeZ[i] + floatOffZ) - pz[i]; // TWEAKED: Pulls towards 3D home
+          const dz = -pz[i];
 
           vx[i] += dx * SPRING_HOME * subDt;
           vy[i] += dy * SPRING_HOME * subDt;
-          vz[i] += dz * SPRING_HOME * subDt;
+          vz[i] += dz * SPRING_HOME * 0.25 * subDt;
 
           const frictionPow = Math.pow(FRICTION, subDt * 60);
           vx[i] *= frictionPow;
@@ -475,13 +455,13 @@ export function HeroWebGLPanel() {
           pz[i] += vz[i] * subDt;
 
           const r = radii[i];
-          const mX = BOUNDS_X - r, mY = BOUNDS_Y - r, mZ = 6.0;
-          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.2; } // Softer wall bounce
-          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.2; }
-          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.2; }
-          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.2; }
-          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.2; }
-          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.2; }
+          const mX = BOUNDS_X - r, mY = BOUNDS_Y - r, mZ = 3.5;
+          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.35; }
+          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.35; }
+          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.35; }
+          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.35; }
+          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.35; }
+          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.35; }
         }
 
         for (let i = 0; i < N; i++) {
@@ -507,15 +487,13 @@ export function HeroWebGLPanel() {
 
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
-            
-            // TWEAKED: Extremely soft elasticity (bounciness)
-            const imp = (-(1 + 0.15) * rvn) / mT; 
+            const imp = (-(1 + 0.55) * rvn) / mT;
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
 
             const impact = Math.abs(rvn);
-            if (impact > 0.2) {
-              const amt = Math.min(impact * 0.03, 0.2); // softer squish
+            if (impact > 0.4) {
+              const amt = Math.min(impact * 0.05, 0.3);
               jellyTargetX[i] = 1 - Math.abs(nx) * amt;
               jellyTargetY[i] = 1 - Math.abs(ny) * amt;
               jellyTargetZ[i] = 1 - Math.abs(nz) * amt;
@@ -542,32 +520,31 @@ export function HeroWebGLPanel() {
 
               const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
               if (relVn < 0) {
-                const impulseMag = -(1 + 0.3) * relVn; // Softer mouse push
+                const impulseMag = -(1 + 0.7) * relVn;
                 vx[i] += nx * impulseMag;
                 vy[i] += ny * impulseMag;
               }
 
-              const sweepFactor = Math.min(sphereSpeed * 0.006, 0.5); // gentler sweep
+              const sweepFactor = Math.min(sphereSpeed * 0.012, 1.0);
               vx[i] += sphereVx * sweepFactor * subDt * 60;
               vy[i] += sphereVy * sweepFactor * subDt * 60;
 
-              const squishAmt = Math.min(overlap / contactDist * 0.3, 0.2);
-              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.5;
-              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.5;
-              jellyTargetZ[i] = 1 - squishAmt * 0.2;
+              const squishAmt = Math.min(overlap / contactDist * 0.45, 0.28);
+              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.6;
+              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.6;
+              jellyTargetZ[i] = 1 - squishAmt * 0.35;
             }
 
             if (dist < CURSOR_FIELD_R && dist > contactDist) {
               const nx = ddx / dist, ny = ddy / dist;
               const t = (dist - contactDist) / (CURSOR_FIELD_R - contactDist);
               const falloff = (1 - t) * (1 - t);
-              // TWEAKED: gentler, wider repulsion
-              const pushStr = 6.0 * falloff * (1 + sphereSpeed * 0.02) * subDt; 
+              const pushStr = 12.0 * falloff * (1 + sphereSpeed * 0.035) * subDt;
               vx[i] += nx * pushStr;
               vy[i] += ny * pushStr;
 
-              if (sphereSpeed > 1.0) {
-                const sweepStr = sphereSpeed * 0.0015 * falloff * subDt * 60;
+              if (sphereSpeed > 2.0) {
+                const sweepStr = sphereSpeed * 0.0025 * falloff * subDt * 60;
                 vx[i] += sphereVx * sweepStr;
                 vy[i] += sphereVy * sweepStr;
               }
@@ -590,7 +567,7 @@ export function HeroWebGLPanel() {
         jellyScaleY[i] += jellyVelY[i] * dt;
         jellyScaleZ[i] += jellyVelZ[i] * dt;
 
-        const recover = 1 - Math.exp(-2.0 * dt);
+        const recover = 1 - Math.exp(-2.5 * dt);
         jellyTargetX[i] += (1 - jellyTargetX[i]) * recover;
         jellyTargetY[i] += (1 - jellyTargetY[i]) * recover;
         jellyTargetZ[i] += (1 - jellyTargetZ[i]) * recover;
@@ -602,10 +579,10 @@ export function HeroWebGLPanel() {
           continue;
         }
 
-        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.15;
+        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.12;
         meshes[i].position.set(px[i], py[i], pz[i] + zFloat);
 
-        const breath = 1 + Math.sin(time * 0.3 + breathPhase[i]) * 0.006;
+        const breath = 1 + Math.sin(time * 0.5 + breathPhase[i]) * 0.004;
         meshes[i].scale.set(
           jellyScaleX[i] * breath,
           jellyScaleY[i] * breath,
@@ -613,14 +590,13 @@ export function HeroWebGLPanel() {
         );
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        // TWEAKED: gentler, slower rotations 
-        const targetRotVelX = baseRotX[i] + vy[i] * 0.06; 
-        const targetRotVelY = baseRotY[i] - vx[i] * 0.06;
-        const rLerp = 1 - Math.exp(-3 * dt);
+        const targetRotVelX = baseRotX[i] + vy[i] * 0.12;
+        const targetRotVelY = baseRotY[i] - vx[i] * 0.12;
+        const rLerp = 1 - Math.exp(-5 * dt);
         rotVelX[i] += (targetRotVelX - rotVelX[i]) * rLerp;
         rotVelY[i] += (targetRotVelY - rotVelY[i]) * rLerp;
 
-        const speedMult = 1 + Math.min(speed * 0.03, 1.0) * 4.0;
+        const speedMult = 1 + Math.min(speed * 0.05, 1.0) * 8.0;
         innerGroups[i].rotation.x += rotVelX[i] * dt * speedMult;
         innerGroups[i].rotation.y += rotVelY[i] * dt * speedMult;
         innerGroups[i].rotation.z += baseRotZ[i] * dt;
@@ -630,11 +606,11 @@ export function HeroWebGLPanel() {
           const hDx = px[i] - sphereX;
           const hDy = py[i] - sphereY;
           const hDist = Math.sqrt(hDx * hDx + hDy * hDy);
-          if (hDist < CURSOR_FIELD_R * 0.7) {
-            targetHover = 1 - hDist / (CURSOR_FIELD_R * 0.7);
+          if (hDist < CURSOR_FIELD_R * 0.6) {
+            targetHover = 1 - hDist / (CURSOR_FIELD_R * 0.6);
           }
         }
-        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.exp(-3 * dt));
+        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.exp(-4 * dt));
         cubeMaterials[i].uniforms.uHover.value = hoverAmount[i];
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
@@ -644,7 +620,7 @@ export function HeroWebGLPanel() {
         displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
         displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
         displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.04 + 0.2, 1.5);
+          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
 
         renderer.setRenderTarget(renderTarget);
         renderer.render(scene, camera);

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, useInView } from 'motion/react';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -10,38 +10,49 @@ const STATS = [
   { value: 40, suffix: 'M+', label: 'Impressions Driven', detail: 'Real reach, not vanity metrics.' },
 ];
 
-function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
-  const [display, setDisplay] = useState(0);
+const COUNTER_DURATION = 1800;
+
+function easeOutQuart(t: number) {
+  return 1 - Math.pow(1 - t, 4);
+}
+
+function useCounterBatch(targets: number[], active: boolean) {
+  const [values, setValues] = useState(() => targets.map(() => 0));
+  const rafRef = useRef(0);
+  const startRef = useRef(0);
+
+  const tick = useCallback((now: number) => {
+    if (!startRef.current) startRef.current = now;
+    const elapsed = now - startRef.current;
+    const progress = Math.min(elapsed / COUNTER_DURATION, 1);
+    const eased = easeOutQuart(progress);
+
+    setValues(targets.map(t => Math.round(eased * t)));
+
+    if (progress < 1) {
+      rafRef.current = requestAnimationFrame(tick);
+    }
+  }, [targets]);
 
   useEffect(() => {
-    if (!isInView) return;
-    const duration = 1800;
-    const startTime = performance.now();
+    if (!active) return;
+    startRef.current = 0;
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [active, tick]);
 
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 4);
-      setDisplay(Math.round(eased * value));
-      if (progress < 1) requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
-  }, [isInView, value]);
-
-  return (
-    <span ref={ref}>
-      {display}
-      {suffix}
-    </span>
-  );
+  return values;
 }
 
 export function ImpactStack() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: '-60px' });
+
+  const targets = STATS.map(s => s.value);
+  const counters = useCounterBatch(targets, isInView);
+
   return (
-    <div className="flex flex-col gap-3">
+    <div ref={containerRef} className="flex flex-col gap-3">
       {STATS.map((stat, i) => (
         <motion.div
           key={stat.label}
@@ -81,7 +92,7 @@ export function ImpactStack() {
                 minWidth: '90px',
               }}
             >
-              <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+              {counters[i]}{stat.suffix}
             </span>
 
             <div className="flex flex-col">

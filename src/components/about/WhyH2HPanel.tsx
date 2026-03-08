@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { memo } from 'react';
+import { motion } from 'motion/react';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -54,18 +54,8 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
 }
 
 function FounderPortrait() {
-  const portraitRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: portraitRef,
-    offset: ['start end', 'end start'],
-  });
-
-  const imgY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
-  const captionY = useTransform(scrollYProgress, [0, 1], ['-4%', '4%']);
-
   return (
     <motion.div
-      ref={portraitRef}
       className="relative"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -98,18 +88,18 @@ function FounderPortrait() {
               position: 'relative',
             }}
           >
-            <motion.div style={{ y: imgY, scale: 1.08 }}>
-              <img
-                src="https://ik.imagekit.io/qcvroy8xpd/image%201%20(1).png"
-                alt="Shannon, Founder of H2H"
-                className="w-full block"
-                style={{
-                  aspectRatio: '3 / 4',
-                  objectFit: 'cover',
-                  objectPosition: 'center top',
-                }}
-              />
-            </motion.div>
+            <img
+              src="https://ik.imagekit.io/qcvroy8xpd/image%201%20(1).png"
+              alt="Shannon, Founder of H2H"
+              loading="lazy"
+              decoding="async"
+              className="w-full block"
+              style={{
+                aspectRatio: '3 / 4',
+                objectFit: 'cover',
+                objectPosition: 'center top',
+              }}
+            />
 
             <div
               className="absolute inset-0 pointer-events-none"
@@ -122,9 +112,9 @@ function FounderPortrait() {
             />
           </div>
 
-          <motion.div
+          <div
             className="absolute bottom-0 left-0 right-0 p-4"
-            style={{ y: captionY, zIndex: 2 }}
+            style={{ zIndex: 2 }}
           >
             <span
               style={{
@@ -151,7 +141,7 @@ function FounderPortrait() {
             >
               Shannon
             </span>
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -176,9 +166,9 @@ function FounderPortrait() {
   );
 }
 
-export function WhyH2HPanel() {
+export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
-    <div className="w-full">
+    <div className="w-full" style={{ contain: 'layout style' }}>
       <motion.div
         className="mb-10 md:mb-14"
         initial={{ opacity: 0, y: 20 }}
@@ -272,4 +262,4 @@ export function WhyH2HPanel() {
       </div>
     </div>
   );
-}
+});

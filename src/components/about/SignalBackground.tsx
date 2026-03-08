@@ -1,15 +1,14 @@
-import { useRef, useEffect, useCallback } from 'react';
-import { useScroll, useTransform, motion, useMotionValueEvent } from 'motion/react';
+import { useRef, useEffect, useCallback, memo } from 'react';
 
-const LINE_COUNT = 28;
-const POINTS_PER_LINE = 80;
+const LINE_COUNT = 16;
+const POINTS_PER_LINE = 40;
+const TARGET_INTERVAL = 1000 / 30;
 
 function generateWaveLine(
   index: number,
   total: number,
   width: number,
   height: number,
-  coherence: number,
   time: number,
 ) {
   const y = (height / (total + 1)) * (index + 1);
@@ -18,65 +17,60 @@ function generateWaveLine(
   for (let i = 0; i <= POINTS_PER_LINE; i++) {
     const x = (width / POINTS_PER_LINE) * i;
     const noise = Math.sin(i * 0.15 + index * 0.7 + time * 0.4) * 12;
-    const scatter = (1 - coherence) * (Math.sin(i * 0.4 + index * 2.3 + time) * 18 + Math.cos(i * 0.25 + time * 0.7) * 10);
-    const signal = coherence * Math.sin(i * 0.08 + time * 0.3) * 6;
-    const py = y + noise + scatter + signal;
-    points.push(`${x.toFixed(1)},${py.toFixed(1)}`);
+    const scatter = Math.sin(i * 0.4 + index * 2.3 + time) * 14 + Math.cos(i * 0.25 + time * 0.7) * 8;
+    const py = y + noise + scatter;
+    points.push(`${x.toFixed(0)},${py.toFixed(0)}`);
   }
 
   return `M${points.join(' L')}`;
 }
 
-export function SignalBackground() {
-  const containerRef = useRef<HTMLDivElement>(null);
+export const SignalBackground = memo(function SignalBackground() {
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRefs = useRef<(SVGPathElement | null)[]>([]);
-  const coherenceRef = useRef(0);
-  const rafRef = useRef<number>(0);
+  const rafRef = useRef(0);
   const timeRef = useRef(0);
   const lastFrameRef = useRef(0);
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
-
-  const coherenceMotion = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.85, 0.85, 0]);
-
-  useMotionValueEvent(coherenceMotion, 'change', (v) => {
-    coherenceRef.current = v;
-  });
-
   const animate = useCallback((now: number) => {
-    if (!svgRef.current) return;
-    const delta = lastFrameRef.current ? (now - lastFrameRef.current) / 1000 : 0.016;
-    lastFrameRef.current = now;
-    timeRef.current += delta;
+    const elapsed = now - lastFrameRef.current;
+    if (elapsed < TARGET_INTERVAL) {
+      rafRef.current = requestAnimationFrame(animate);
+      return;
+    }
+
+    lastFrameRef.current = now - (elapsed % TARGET_INTERVAL);
+    timeRef.current += elapsed / 1000;
 
     const svg = svgRef.current;
+    if (!svg) {
+      rafRef.current = requestAnimationFrame(animate);
+      return;
+    }
+
     const w = svg.clientWidth || 1400;
     const h = svg.clientHeight || 800;
 
     for (let i = 0; i < LINE_COUNT; i++) {
       const path = pathRefs.current[i];
-      if (!path) continue;
-      const d = generateWaveLine(i, LINE_COUNT, w, h, coherenceRef.current, timeRef.current);
-      path.setAttribute('d', d);
+      if (path) {
+        path.setAttribute('d', generateWaveLine(i, LINE_COUNT, w, h, timeRef.current));
+      }
     }
 
     rafRef.current = requestAnimationFrame(animate);
   }, []);
 
   useEffect(() => {
+    lastFrameRef.current = performance.now();
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
   }, [animate]);
 
   return (
-    <motion.div
-      ref={containerRef}
+    <div
       className="absolute inset-0 pointer-events-none"
-      style={{ opacity: 0.12 }}
+      style={{ opacity: 0.12, contain: 'strict' }}
     >
       <svg
         ref={svgRef}
@@ -94,6 +88,6 @@ export function SignalBackground() {
           />
         ))}
       </svg>
-    </motion.div>
+    </div>
   );
-}
+});

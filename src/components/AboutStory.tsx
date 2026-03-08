@@ -1,9 +1,8 @@
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
 } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
@@ -16,8 +15,8 @@ const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 function Eyebrow({ label }: { label: string }) {
   return (
     <motion.span
-      initial={{ opacity: 0, x: -16, filter: 'blur(4px)' }}
-      whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, x: -16 }}
+      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
       style={{
@@ -87,8 +86,8 @@ function NarrativeBlock() {
   return (
     <div className="flex flex-col gap-8" style={{ maxWidth: '600px' }}>
       <motion.p
-        initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 1, delay: 0.2, ease: EASE_OUT_EXPO }}
         style={{
@@ -103,8 +102,8 @@ function NarrativeBlock() {
       </motion.p>
 
       <motion.p
-        initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 1, delay: 0.3, ease: EASE_OUT_EXPO }}
         style={{
@@ -119,8 +118,8 @@ function NarrativeBlock() {
       </motion.p>
 
       <motion.div
-        initial={{ opacity: 0, x: -20, filter: 'blur(6px)' }}
-        whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 1, delay: 0.4, ease: EASE_OUT_EXPO }}
         className="relative pl-6 py-2 mt-2"
@@ -156,9 +155,9 @@ function NarrativeBlock() {
   );
 }
 
-function AboutPanel() {
+const AboutPanel = memo(function AboutPanel() {
   return (
-    <div className="w-full">
+    <div className="w-full" style={{ contain: 'layout style' }}>
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start">
         <div className="lg:col-span-7 flex flex-col gap-10">
           <HeroBlock />
@@ -169,8 +168,8 @@ function AboutPanel() {
           <div className="lg:pl-8">
             <motion.span
               className="block mb-8"
-              initial={{ opacity: 0, filter: 'blur(4px)' }}
-              whileInView={{ opacity: 1, filter: 'blur(0px)' }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
               style={{
@@ -192,14 +191,14 @@ function AboutPanel() {
       <VideoBlock />
     </div>
   );
-}
+});
 
 function VideoBlock() {
   return (
     <motion.div
       className="w-full mt-24 md:mt-32"
-      initial={{ opacity: 0, y: 60, filter: 'blur(10px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-15%' }}
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
     >
@@ -218,7 +217,7 @@ function VideoBlock() {
           maxHeight: '500px',
         }}
       >
-        <motion.video
+        <video
           autoPlay
           loop
           muted
@@ -255,22 +254,16 @@ function SwipeTransition() {
     offset: ['start start', 'end end'],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 40,
-    stiffness: 120,
-    mass: 0.8,
-  });
+  const panel1X = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], ['0%', '0%', '-100%', '-100%']);
+  const panel1Opacity = useTransform(scrollYProgress, [0, 0.35, 0.6, 0.65], [1, 1, 0.3, 0]);
+  const panel1Scale = useTransform(scrollYProgress, [0, 0.35, 0.65], [1, 1, 0.96]);
 
-  const panel1X = useTransform(smoothProgress, [0, 0.35, 0.65, 1], ['0%', '0%', '-100%', '-100%']);
-  const panel1Opacity = useTransform(smoothProgress, [0, 0.35, 0.6, 0.65], [1, 1, 0.3, 0]);
-  const panel1Scale = useTransform(smoothProgress, [0, 0.35, 0.65], [1, 1, 0.96]);
+  const panel2X = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], ['100%', '100%', '0%', '0%']);
+  const panel2Opacity = useTransform(scrollYProgress, [0.3, 0.35, 0.65, 1], [0, 0, 1, 1]);
+  const panel2Scale = useTransform(scrollYProgress, [0.35, 0.65, 1], [0.96, 1, 1]);
 
-  const panel2X = useTransform(smoothProgress, [0, 0.35, 0.65, 1], ['100%', '100%', '0%', '0%']);
-  const panel2Opacity = useTransform(smoothProgress, [0.3, 0.35, 0.65, 1], [0, 0, 1, 1]);
-  const panel2Scale = useTransform(smoothProgress, [0.35, 0.65, 1], [0.96, 1, 1]);
-
-  const lineScaleX = useTransform(smoothProgress, [0.3, 0.5, 0.7], [0, 1, 0]);
-  const lineOpacity = useTransform(smoothProgress, [0.3, 0.45, 0.55, 0.7], [0, 1, 1, 0]);
+  const lineScaleX = useTransform(scrollYProgress, [0.3, 0.5, 0.7], [0, 1, 0]);
+  const lineOpacity = useTransform(scrollYProgress, [0.3, 0.45, 0.55, 0.7], [0, 1, 1, 0]);
 
   return (
     <div
@@ -280,7 +273,7 @@ function SwipeTransition() {
     >
       <div
         className="sticky top-0 left-0 w-full overflow-hidden"
-        style={{ height: '100vh' }}
+        style={{ height: '100vh', contain: 'layout paint' }}
       >
         <SignalBackground />
 
@@ -310,6 +303,7 @@ function SwipeTransition() {
               x: panel1X,
               opacity: panel1Opacity,
               scale: panel1Scale,
+              willChange: 'transform, opacity',
             }}
           >
             <div
@@ -342,6 +336,7 @@ function SwipeTransition() {
               x: panel2X,
               opacity: panel2Opacity,
               scale: panel2Scale,
+              willChange: 'transform, opacity',
             }}
           >
             <div

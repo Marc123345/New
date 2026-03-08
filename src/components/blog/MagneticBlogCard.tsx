@@ -123,10 +123,13 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           <div className="absolute top-4 left-4">
             <span
-              className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.2em] bg-[var(--color-background-light)] text-[var(--color-primary)]"
+              className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.2em]"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                border: "1px solid var(--color-text-dark)",
+                background: "rgba(0,0,0,0.65)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "#ffffff",
               }}
             >
               {post.category}

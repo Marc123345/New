@@ -99,9 +99,10 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 fontFamily: "var(--font-stack-heading)",
-                background: "var(--color-background-light)",
-                color: "var(--color-text-dark)",
-                border: "1px solid var(--color-text-dark)",
+                background: "rgba(0,0,0,0.65)",
+                backdropFilter: "blur(8px)",
+                color: "#ffffff",
+                border: "1px solid rgba(255,255,255,0.2)",
               }}
             >
               {post.category}
@@ -532,9 +533,10 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
               letterSpacing: "0.18em",
               textTransform: "uppercase",
               fontFamily: "var(--font-stack-heading)",
-              background: "var(--color-background-light)",
-              color: "var(--color-text-dark)",
-              border: "1px solid var(--color-text-dark)",
+              background: "rgba(0,0,0,0.65)",
+              backdropFilter: "blur(8px)",
+              color: "#ffffff",
+              border: "1px solid rgba(255,255,255,0.2)",
             }}>
               {post.category}
             </span>

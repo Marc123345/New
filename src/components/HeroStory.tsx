@@ -97,7 +97,7 @@ const SCROLL_LABEL_STYLE = {
 } as const;
 
 const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<string> }) => (
-  <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 hidden md:flex flex-col gap-2">
+  <div className="absolute bottom-6 left-4 md:left-8 lg:left-12 right-4 md:right-8 z-20 hidden md:flex flex-col gap-2">
     <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
       <motion.div
         className="absolute inset-y-0 left-0"
@@ -198,7 +198,7 @@ export function HeroStory() {
         />
 
         <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
-          <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-14 lg:px-20">
+          <div className="w-full max-w-8xl mx-auto px-4 md:px-8 lg:px-12">
             <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
               {phases.map((phase, i) => (
                 <PhaseText

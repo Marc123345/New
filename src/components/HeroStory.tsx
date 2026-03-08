@@ -136,7 +136,10 @@ const OVERLAY_MOBILE = {
 } as const;
 
 const STICKY_BG = {
-  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
+  backgroundImage: `url('https://ik.imagekit.io/qcvroy8xpd/istockphoto-1401387054-612x612.jpg?updatedAt=1772992288758')`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
   contain: 'strict' as const,
 } as const;
 

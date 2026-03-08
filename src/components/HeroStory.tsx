@@ -6,44 +6,34 @@ const GlobeWrapper = lazy(() =>
   import('./HeroStory/Globe/GlobeWrapper').then((m) => ({ default: m.GlobeWrapper }))
 );
 
-const desktopRanges: [number, number, number, number][] = [
-  [0, 0.1, 0.22, 0.28],
-  [0.22, 0.32, 0.45, 0.52],
-  [0.48, 0.56, 0.68, 0.76],
-  [0.72, 0.8, 1, 1],
-];
-
-const mobileRanges: [number, number, number, number][] = [
-  [0, 0.08, 0.2, 0.25],
-  [0.26, 0.32, 0.46, 0.5],
-  [0.51, 0.57, 0.72, 0.76],
-  [0.77, 0.83, 1, 1],
-];
-
-const phaseContent = [
+const phases = [
   {
     subtitle: 'The World Is Connected',
     title: 'But connection\nis not enough.',
     description: 'Billions of people online. Infinite content. Yet most brands still struggle to be heard — let alone felt.',
+    range: [0, 0.1, 0.22, 0.28] as [number, number, number, number],
   },
   {
     subtitle: 'The Digital Era',
     title: 'Brands went\ndigital. Fast.',
     description: 'Social media, paid ads, automation. The tools multiplied. But somewhere along the way, the human voice got lost.',
+    range: [0.22, 0.32, 0.45, 0.52] as [number, number, number, number],
   },
   {
     subtitle: 'The AI Era',
     title: 'More content.\nLess connection.',
     description: "AI accelerated everything — except authenticity. People don't want more noise. They want brands that speak like humans.",
+    range: [0.48, 0.56, 0.68, 0.76] as [number, number, number, number],
   },
   {
     subtitle: 'The H2H Difference',
     title: 'Human to\nHuman.',
     description: 'We help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.',
+    range: [0.72, 0.8, 1, 1] as [number, number, number, number],
   },
 ] as const;
 
-const HEADING_STYLES = phaseContent.map((_, i) => ({
+const HEADING_STYLES = phases.map((_, i) => ({
   fontFamily: 'var(--font-stack-heading)',
   textShadow: `0 0 50px rgba(168,85,247,${0.4 + i * 0.15})`,
   whiteSpace: 'pre-line' as const,
@@ -57,14 +47,15 @@ const PhaseText = memo(({
   scrollYProgress,
   phaseIndex,
 }: {
-  progressRange: [number, number, number, number];
+  progressRange: readonly [number, number, number, number];
   scrollYProgress: MotionValue<number>;
   phaseIndex: number;
 }) => {
-  const phase = phaseContent[phaseIndex];
-  const opacity = useTransform(scrollYProgress, progressRange, [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, progressRange, [40, 0, 0, -40]);
-  const scale = useTransform(scrollYProgress, progressRange, [0.95, 1, 1, 0.95]);
+  const phase = phases[phaseIndex];
+  const range = progressRange as unknown as [number, number, number, number];
+  const opacity = useTransform(scrollYProgress, range, [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, range, [40, 0, 0, -40]);
+  const scale = useTransform(scrollYProgress, range, [0.95, 1, 1, 0.95]);
 
   return (
     <motion.div
@@ -203,11 +194,11 @@ export function HeroStory() {
 
         <div className="relative z-10 h-full flex items-center">
           <div className="w-full max-w-8xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-            <div className="w-full md:w-1/2 relative overflow-hidden" style={{ minHeight: 200 }}>
-              {phaseContent.map((_, i) => (
+            <div className="w-full md:w-1/2 relative" style={{ minHeight: 200 }}>
+              {phases.map((phase, i) => (
                 <PhaseText
                   key={i}
-                  progressRange={isMobile ? mobileRanges[i] : desktopRanges[i]}
+                  progressRange={phase.range}
                   scrollYProgress={scrollYProgress}
                   phaseIndex={i}
                 />

@@ -158,11 +158,10 @@ export function HeroWebGLPanel() {
     let displacementMaterial: THREE.ShaderMaterial | null = null;
     let displacementQuad: THREE.Mesh | null = null;
 
-    const rtScale = Math.max(maxDpr * 0.75, 1);
     if (!mobile) {
       renderTarget = new THREE.WebGLRenderTarget(
-        container.clientWidth * rtScale,
-        container.clientHeight * rtScale
+        container.clientWidth * maxDpr,
+        container.clientHeight * maxDpr
       );
       displacementScene = new THREE.Scene();
       displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -369,29 +368,15 @@ export function HeroWebGLPanel() {
     let hidden = document.hidden;
     let animId: number;
     let animating = false;
-    let inView = true;
-
-    const viewObserver = new IntersectionObserver(
-      ([entry]) => {
-        inView = entry.isIntersecting;
-        if (inView && !animating && !hidden) {
-          animating = true;
-          clock.getDelta();
-          animId = requestAnimationFrame(animate);
-        }
-      },
-      { threshold: 0 }
-    );
-    viewObserver.observe(container);
 
     let tiltX = 0, tiltY = 0;
     let time = 0;
     const clock = new THREE.Clock();
 
     const animate = () => {
-      if (hidden || !inView) {
+      if (hidden) {
         animating = false;
-        return;
+        return; // handleVisibility will restart
       }
       animId = requestAnimationFrame(animate);
 
@@ -437,7 +422,7 @@ export function HeroWebGLPanel() {
         }
       }
 
-      const SUB = mobile ? 2 : 4;
+      const SUB = mobile ? 3 : 8;
       const subDt = dt / SUB;
       const sphereSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
 
@@ -659,27 +644,21 @@ export function HeroWebGLPanel() {
     animating = true;
     animId = requestAnimationFrame(animate);
 
-    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     const handleResize = () => {
-      if (resizeTimer) clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        if (!container) return;
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-        if (renderTarget && displacementMaterial) {
-          renderTarget.setSize(w * rtScale, h * rtScale);
-          displacementMaterial.uniforms.uResolution.value.set(w, h);
-        }
-      }, 200);
+      if (!container) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      if (renderTarget && displacementMaterial) {
+        renderTarget.setSize(w * maxDpr, h * maxDpr);
+        displacementMaterial.uniforms.uResolution.value.set(w, h);
+      }
     };
-    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      viewObserver.disconnect();
-      if (resizeTimer) clearTimeout(resizeTimer);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibility);

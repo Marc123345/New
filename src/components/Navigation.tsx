@@ -29,16 +29,7 @@ export function Navigation() {
   const isHomePage = location.pathname === "/";
 
   useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 40);
-          ticking = false;
-        });
-      }
-    };
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);

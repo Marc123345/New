@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
+import React, { useRef, useState, useEffect, useMemo, memo, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -97,15 +97,15 @@ const SCROLL_LABEL_STYLE = {
 } as const;
 
 const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<string> }) => (
-  <div className="absolute bottom-6 left-6 sm:left-8 md:left-12 lg:left-16 right-6 sm:right-8 z-20 hidden md:flex flex-col gap-2">
+  <div className="absolute bottom-6 left-5 sm:left-8 md:left-14 lg:left-20 right-5 sm:right-8 z-20 hidden md:flex flex-col gap-2">
     <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
       <motion.div
         className="absolute inset-y-0 left-0"
-        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG }}
+        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG, willChange: 'width' }}
       />
       <motion.div
         className="absolute top-1/2 -translate-y-1/2"
-        style={{ left: progressBarWidth, ...DOT_STYLE_BASE }}
+        style={{ left: progressBarWidth, ...DOT_STYLE_BASE, willChange: 'left' }}
       />
     </div>
     <div className="flex items-center gap-2">
@@ -119,24 +119,24 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
   </div>
 ));
 
-const OVERLAY_DESKTOP = {
-  background: [
-    'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
-    'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
-    'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 40%)',
-  ].join(', '),
+const PURPLE_OVERLAY = {
+  background: 'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
 } as const;
 
-const OVERLAY_MOBILE = {
-  background: [
-    'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
-    'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
-    'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 40%)',
-  ].join(', '),
+const GRADIENT_OVERLAY_DESKTOP = {
+  background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+} as const;
+
+const GRADIENT_OVERLAY_MOBILE = {
+  background: 'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
+} as const;
+
+const BOTTOM_FADE_STYLE = {
+  background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)',
 } as const;
 
 const STICKY_BG = {
-  backgroundColor: '#020008',
+  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
   contain: 'strict' as const,
 } as const;
 
@@ -189,12 +189,17 @@ export function HeroStory() {
 
         <div
           className="absolute inset-0 pointer-events-none"
-          style={isMobile ? OVERLAY_MOBILE : OVERLAY_DESKTOP}
+          style={PURPLE_OVERLAY}
         />
 
-        <div className="relative z-10 h-full flex items-center">
-          <div className="w-full max-w-8xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-            <div className="w-full md:w-1/2 relative" style={{ minHeight: 200 }}>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={isMobile ? GRADIENT_OVERLAY_MOBILE : GRADIENT_OVERLAY_DESKTOP}
+        />
+
+        <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
+          <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-14 lg:px-20">
+            <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
               {phases.map((phase, i) => (
                 <PhaseText
                   key={i}
@@ -208,6 +213,11 @@ export function HeroStory() {
         </div>
 
         <ProgressBar progressBarWidth={progressBarWidth} />
+
+        <div
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+          style={BOTTOM_FADE_STYLE}
+        />
       </div>
     </div>
   );

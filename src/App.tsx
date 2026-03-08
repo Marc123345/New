@@ -74,7 +74,12 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#040608' }}
+        style={{
+          backgroundImage: `url('https://ik.imagekit.io/qcvroy8xpd/purple-nebula-and-glowing-cosmic-dust-in-outer-spa-2026-01-05-00-45-10-utc.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
       >
         <div className="absolute inset-0">
           <ShootingStars count={22} />

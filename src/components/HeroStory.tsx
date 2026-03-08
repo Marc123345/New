@@ -124,7 +124,7 @@ const GRADIENT_OVERLAY_DESKTOP = {
 } as const;
 
 const GRADIENT_OVERLAY_MOBILE = {
-  background: 'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.75) 35%, rgba(2,0,8,0.2) 60%, transparent 80%)',
+  background: 'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
 } as const;
 
 const BOTTOM_FADE_STYLE = {
@@ -188,7 +188,7 @@ export function HeroStory() {
           style={isMobile ? GRADIENT_OVERLAY_MOBILE : GRADIENT_OVERLAY_DESKTOP}
         />
 
-        <div className={`relative z-10 h-full flex ${isMobile ? 'items-end pb-24' : 'items-center'}`}>
+        <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
           <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-14 lg:px-20">
             <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
               {phases.map((phase, i) => (

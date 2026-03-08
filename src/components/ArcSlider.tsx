@@ -530,16 +530,28 @@ export function ArcSlider() {
         className="relative w-full py-16 md:py-24 overflow-hidden"
         style={{ background: "var(--color-background-light, #f8f9fa)" }}
       >
-        <div className="relative z-30 text-center px-5 sm:px-6 mb-8 md:mb-14">
-          <span
-            className="text-xs font-semibold tracking-[0.3em] mb-3 sm:mb-4 block uppercase"
+        <div className="relative z-30 text-center px-5 sm:px-6 mb-8 md:mb-14 flex flex-col items-center">
+          <div
             style={{
-              fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-secondary, #9B59F5)",
+              display: "inline-block",
+              marginBottom: "12px",
+              padding: "6px 16px",
+              border: "2px solid var(--color-secondary)",
+              boxShadow: "4px 4px 0 var(--color-secondary)",
             }}
           >
-            Our Capabilities
-          </span>
+            <span
+              style={{
+                fontSize: "0.68rem",
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                fontFamily: "var(--font-stack-heading)",
+                color: "var(--color-secondary)",
+              }}
+            >
+              Our Capabilities
+            </span>
+          </div>
           <h2
             className="tracking-tight font-bold"
             style={{

@@ -60,7 +60,7 @@ const PhaseText = memo(({
   return (
     <motion.div
       className="absolute inset-0 flex flex-col justify-center"
-      style={{ opacity, y, scale, pointerEvents: 'none' }}
+      style={{ opacity, y, scale, pointerEvents: 'none', willChange: 'transform, opacity' }}
     >
       <p
         className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"

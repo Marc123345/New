@@ -79,6 +79,7 @@ function AppContent() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          contain: 'layout paint',
         }}
       >
         <div className="absolute inset-0 bg-black/60" />

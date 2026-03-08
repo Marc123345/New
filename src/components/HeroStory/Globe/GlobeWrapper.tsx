@@ -14,7 +14,7 @@ const TOP_CITIES_MOBILE = worldPopulationData.slice(0, 6);
 const HEATMAP_CITIES = worldPopulationData.slice(0, 20);
 const HEATMAP_CITIES_MOBILE = worldPopulationData.slice(0, 10);
 const ARC_START = 0.15;
-const SCROLL_THRESHOLD = 0.05;
+const SCROLL_THRESHOLD = 0.08;
 const POV_TRANSITION_MS = 600;
 
 function getArcThreshold(progress: number, mobile: boolean): number {
@@ -132,7 +132,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
 
         const renderer = globe.renderer?.();
         if (renderer) {
-          renderer.setPixelRatio(mobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
+          renderer.setPixelRatio(mobile ? 1 : Math.min(window.devicePixelRatio, 1.25));
         }
 
         requestIdleCallback(() => {

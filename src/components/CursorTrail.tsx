@@ -115,8 +115,9 @@ export function CursorTrail() {
 
     const geo = new THREE.PlaneGeometry(2, 2);
 
+    const RT_SCALE = 0.5;
     const createRT = () =>
-      new THREE.WebGLRenderTarget(width, height, {
+      new THREE.WebGLRenderTarget(Math.round(width * RT_SCALE), Math.round(height * RT_SCALE), {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
         format: THREE.RGBAFormat,
@@ -173,16 +174,20 @@ export function CursorTrail() {
       hasEntered = false;
     };
 
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     const onResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      renderer.setSize(width, height);
-      rtA.dispose();
-      rtB.dispose();
-      rtA = createRT();
-      rtB = createRT();
-      fluidMat.uniforms.uAspect.value = width / height;
-      glowMat.uniforms.uAspect.value = width / height;
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        renderer.setSize(width, height);
+        rtA.dispose();
+        rtB.dispose();
+        rtA = createRT();
+        rtB = createRT();
+        fluidMat.uniforms.uAspect.value = width / height;
+        glowMat.uniforms.uAspect.value = width / height;
+      }, 250);
     };
 
     let rafId: number;
@@ -225,6 +230,7 @@ export function CursorTrail() {
     rafId = requestAnimationFrame(tick);
 
     return () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);

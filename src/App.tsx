@@ -11,6 +11,7 @@ import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { ShootingStars } from "./components/ShootingStars";
+import { SpaceBackground } from "./components/SpaceBackground";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -76,6 +77,7 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#040608' }}
       >
+        <SpaceBackground />
         <div className="absolute inset-0">
           <ShootingStars count={22} />
         </div>

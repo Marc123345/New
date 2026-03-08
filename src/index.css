@@ -251,3 +251,38 @@ a {
   border-color: rgba(164, 108, 252, 0.5);
   animation-delay: 0.5s;
 }
+
+/* ─── Space Background Effects ──────────────────────────────────────────── */
+@keyframes nebulaDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25% { transform: translate(15px, -10px) scale(1.05); opacity: 0.9; }
+  50% { transform: translate(-10px, 8px) scale(0.98); opacity: 0.7; }
+  75% { transform: translate(8px, 12px) scale(1.03); opacity: 0.85; }
+}
+@keyframes depthTwinkle {
+  0%, 100% { opacity: var(--star-base-opacity); transform: scale(1); }
+  50% { opacity: calc(var(--star-base-opacity) * 0.3); transform: scale(0.8); }
+}
+@keyframes constellationFade {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes auroraPulse {
+  0%, 100% { opacity: 0.5; transform: scaleX(1) translateY(0); }
+  33% { opacity: 0.8; transform: scaleX(1.05) translateY(-5px); }
+  66% { opacity: 0.6; transform: scaleX(0.97) translateY(3px); }
+}
+
+.space-nebula {
+  animation: nebulaDrift 20s var(--nebula-delay, 0s) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.space-depth-star {
+  animation: depthTwinkle var(--star-twinkle-dur, 4s) var(--star-twinkle-delay, 0s) ease-in-out infinite;
+}
+.space-constellation-line {
+  animation: constellationFade 8s var(--const-delay, 0s) ease-in-out infinite;
+}
+.space-aurora {
+  animation: auroraPulse 12s ease-in-out infinite;
+}

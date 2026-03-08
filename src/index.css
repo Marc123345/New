@@ -258,3 +258,11 @@ a {
   opacity: 1 !important;
   margin-top: 6px !important;
 }
+
+@media (hover: none) and (pointer: coarse) {
+  .about-impact-card .about-impact-detail {
+    max-height: 40px !important;
+    opacity: 1 !important;
+    margin-top: 6px !important;
+  }
+}

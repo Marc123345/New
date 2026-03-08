@@ -31,8 +31,12 @@ export const SignalBackground = memo(function SignalBackground() {
   const rafRef = useRef(0);
   const timeRef = useRef(0);
   const lastFrameRef = useRef(0);
+  const visibleRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const animate = useCallback((now: number) => {
+    if (!visibleRef.current) return;
+
     const elapsed = now - lastFrameRef.current;
     if (elapsed < TARGET_INTERVAL) {
       rafRef.current = requestAnimationFrame(animate);
@@ -62,13 +66,31 @@ export const SignalBackground = memo(function SignalBackground() {
   }, []);
 
   useEffect(() => {
-    lastFrameRef.current = performance.now();
-    rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const wasVisible = visibleRef.current;
+        visibleRef.current = entry.isIntersecting;
+        if (!wasVisible && entry.isIntersecting) {
+          lastFrameRef.current = performance.now();
+          rafRef.current = requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(rafRef.current);
+    };
   }, [animate]);
 
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 pointer-events-none"
       style={{ opacity: 0.12, contain: 'strict' }}
     >

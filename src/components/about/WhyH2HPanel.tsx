@@ -22,7 +22,7 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
-      className="mb-6 last:mb-0"
+      className="mb-5 last:mb-0 md:mb-6"
     >
       <span
         style={{
@@ -170,7 +170,7 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
     <div className="w-full" style={{ contain: 'layout style' }}>
       <motion.div
-        className="mb-10 md:mb-14"
+        className="mb-8 md:mb-14"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -193,7 +193,7 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         <h3
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(1.3rem, 2.2vw, 1.8rem)',
+            fontSize: 'clamp(1.2rem, 2.2vw, 1.8rem)',
             fontWeight: 800,
             lineHeight: 1.15,
             letterSpacing: '-0.02em',
@@ -209,10 +209,14 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         </h3>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-6 items-start">
-        <div className="md:col-span-4 order-2 md:order-1">
+      <div className="flex flex-col md:grid md:grid-cols-12 gap-8 md:gap-6 items-start">
+        <div className="md:col-span-4 flex justify-center md:order-2">
+          <FounderPortrait />
+        </div>
+
+        <div className="md:col-span-4 md:order-1">
           <motion.span
-            className="block mb-6"
+            className="block mb-5 md:mb-6"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -233,13 +237,9 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
           ))}
         </div>
 
-        <div className="md:col-span-4 order-1 md:order-2 flex justify-center">
-          <FounderPortrait />
-        </div>
-
-        <div className="md:col-span-4 order-3">
+        <div className="md:col-span-4 md:order-3">
           <motion.span
-            className="block mb-6"
+            className="block mb-5 md:mb-6"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

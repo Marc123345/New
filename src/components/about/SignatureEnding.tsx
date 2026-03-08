@@ -12,9 +12,9 @@ export function SignatureEnding() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center text-center" style={{ paddingTop: 'clamp(4rem, 8vw, 7rem)' }}>
+    <div className="w-full flex flex-col items-center text-center" style={{ paddingTop: 'clamp(2rem, 6vw, 7rem)' }}>
       <motion.div
-        className="w-16 h-px mb-12"
+        className="w-16 h-px mb-8 md:mb-12"
         style={{ background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.4), transparent)', transformOrigin: 'center' }}
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
@@ -27,9 +27,10 @@ export function SignatureEnding() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+        className="px-4"
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: 'clamp(1.6rem, 4vw, 3rem)',
+          fontSize: 'clamp(1.4rem, 4vw, 3rem)',
           fontWeight: 800,
           lineHeight: 1.1,
           letterSpacing: '-0.03em',
@@ -46,7 +47,7 @@ export function SignatureEnding() {
       </motion.h3>
 
       <motion.div
-        className="relative mt-10 inline-flex items-center gap-3 cursor-pointer group"
+        className="relative mt-8 md:mt-10 inline-flex items-center gap-3 cursor-pointer group"
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -56,7 +57,8 @@ export function SignatureEnding() {
         <motion.button
           className="flex-shrink-0"
           style={{
-            padding: '16px 36px',
+            padding: '16px 32px',
+            minHeight: '48px',
             background: 'var(--color-text-dark)',
             border: '2px solid var(--color-text-dark)',
             color: 'var(--color-background-light)',
@@ -95,7 +97,7 @@ export function SignatureEnding() {
       </motion.div>
 
       <motion.div
-        className="w-24 h-px mt-16"
+        className="w-24 h-px mt-12 md:mt-16"
         style={{ background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.2), transparent)', transformOrigin: 'center' }}
         initial={{ scaleX: 0, opacity: 0 }}
         whileInView={{ scaleX: 1, opacity: 1 }}

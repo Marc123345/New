@@ -4,6 +4,7 @@ import {
   useScroll,
   useTransform,
 } from 'motion/react';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
 import { WhyH2HPanel } from './about/WhyH2HPanel';
@@ -42,7 +43,7 @@ function HeroBlock() {
 
       <h2
         style={{
-          fontSize: 'clamp(2.8rem, 7vw, 6rem)',
+          fontSize: 'clamp(2.2rem, 7vw, 6rem)',
           fontFamily: 'var(--font-stack-heading)',
           color: 'var(--color-text-dark)',
           lineHeight: 1.05,
@@ -84,7 +85,7 @@ function HeroBlock() {
 
 function NarrativeBlock() {
   return (
-    <div className="flex flex-col gap-8" style={{ maxWidth: '600px' }}>
+    <div className="flex flex-col gap-6 md:gap-8" style={{ maxWidth: '600px' }}>
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -92,7 +93,7 @@ function NarrativeBlock() {
         transition={{ duration: 1, delay: 0.2, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(1.1rem, 1.5vw, 1.25rem)',
+          fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
           lineHeight: 1.8,
           color: 'rgba(232,226,255,0.85)',
           margin: 0,
@@ -108,7 +109,7 @@ function NarrativeBlock() {
         transition={{ duration: 1, delay: 0.3, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(1.1rem, 1.5vw, 1.25rem)',
+          fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
           lineHeight: 1.8,
           color: 'rgba(232,226,255,0.65)',
           margin: 0,
@@ -122,7 +123,7 @@ function NarrativeBlock() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 1, delay: 0.4, ease: EASE_OUT_EXPO }}
-        className="relative pl-6 py-2 mt-2"
+        className="relative pl-5 md:pl-6 py-2 mt-2"
         style={{
           borderLeft: '2px solid rgba(164,108,252,0.5)',
           background: 'linear-gradient(90deg, rgba(164,108,252,0.05) 0%, transparent 100%)',
@@ -131,7 +132,7 @@ function NarrativeBlock() {
         <p
           style={{
             fontFamily: 'var(--font-stack-body)',
-            fontSize: 'clamp(1.1rem, 1.5vw, 1.25rem)',
+            fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
             lineHeight: 1.8,
             color: 'rgba(255,255,255,0.95)',
             fontWeight: 500,
@@ -158,8 +159,8 @@ function NarrativeBlock() {
 const AboutPanel = memo(function AboutPanel() {
   return (
     <div className="w-full" style={{ contain: 'layout style' }}>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start">
-        <div className="lg:col-span-7 flex flex-col gap-10">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
+        <div className="lg:col-span-7 flex flex-col gap-8 md:gap-10">
           <HeroBlock />
           <NarrativeBlock />
         </div>
@@ -196,7 +197,7 @@ const AboutPanel = memo(function AboutPanel() {
 function VideoBlock() {
   return (
     <motion.div
-      className="w-full mt-24 md:mt-32"
+      className="w-full mt-16 md:mt-24 lg:mt-32"
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-15%' }}
@@ -246,7 +247,68 @@ function VideoBlock() {
   );
 }
 
-function SwipeTransition() {
+function MobileAbout() {
+  return (
+    <div
+      className="relative w-full"
+      style={{
+        background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
+      }}
+    >
+      <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.08 }}>
+        <SignalBackground />
+      </div>
+
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.14) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.16) 0%, transparent 50%)
+          `,
+        }}
+      />
+
+      <div
+        className="relative"
+        style={{
+          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2rem)',
+          zIndex: 10,
+        }}
+      >
+        <div className="mx-auto" style={{ maxWidth: '1300px' }}>
+          <AboutPanel />
+        </div>
+      </div>
+
+      <div
+        className="relative"
+        style={{
+          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2rem)',
+          zIndex: 10,
+        }}
+      >
+        <div className="mx-auto" style={{ maxWidth: '1300px' }}>
+          <WhyH2HPanel />
+        </div>
+      </div>
+
+      <div
+        className="relative"
+        style={{
+          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2rem)',
+          zIndex: 10,
+        }}
+      >
+        <div className="relative mx-auto" style={{ maxWidth: '1300px' }}>
+          <SignatureEnding />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DesktopSwipeTransition() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -357,6 +419,16 @@ function SwipeTransition() {
 }
 
 export function AboutStory() {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <section id="about" className="relative w-full">
+        <MobileAbout />
+      </section>
+    );
+  }
+
   return (
     <section
       id="about"
@@ -365,7 +437,7 @@ export function AboutStory() {
         background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
       }}
     >
-      <SwipeTransition />
+      <DesktopSwipeTransition />
 
       <div
         className="relative"

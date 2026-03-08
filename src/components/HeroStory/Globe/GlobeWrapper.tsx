@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
 import { worldPopulationData } from './worldPopulation';
-import { LAND_PATHS, LAND_PATHS_MOBILE } from './pathsData';
 import { isMobileDevice } from '../../../hooks/useIsMobile';
 
 interface GlobeWrapperProps {
@@ -121,21 +120,6 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
           .arcStroke(mobile ? 0.8 : 1.2);
 
         globe.arcsData(EMPTY_ARCS);
-
-        const paths = mobile ? LAND_PATHS_MOBILE : LAND_PATHS;
-        globe
-          .pathsData(paths)
-          .pathPoints('points')
-          .pathPointLat((p: [number, number]) => p[0])
-          .pathPointLng((p: [number, number]) => p[1])
-          .pathPointAlt(mobile ? 0.004 : 0.006)
-          .pathColor('color')
-          .pathStroke(mobile ? 0.4 : 0.6)
-          .pathDashLength(0.15)
-          .pathDashGap(0.02)
-          .pathDashAnimateTime(mobile ? 6000 : 4500)
-          .pathResolution(3)
-          .pathTransitionDuration(1000);
 
         const controls = globe.controls();
         controls.autoRotate = true;

@@ -1,346 +1,246 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef } from 'react';
 import {
   motion,
   useScroll,
   useTransform,
-  Variants,
-  useInView,
 } from 'motion/react';
-import { ShootingStars } from './ShootingStars';
-import { getButtonHoverHandlers } from '../utils/buttonHover';
+import { SignalBackground } from './about/SignalBackground';
+import { ImpactStack } from './about/ImpactStack';
+import { StoryColumns } from './about/StoryColumns';
+import { SignatureEnding } from './about/SignatureEnding';
+import { SpinningH2H } from './about/SpinningH2H';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const staggerContainer: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
-  },
-};
-
-const fadeUpItem: Variants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.9, ease: EASE_OUT_EXPO },
-  },
-};
-
-function GeometricFrame({ children }: { children: React.ReactNode }) {
+function Eyebrow({ label }: { label: string }) {
   return (
-    <div
-      className="transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 overflow-hidden"
+    <motion.span
+      initial={{ opacity: 0, x: -12 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
       style={{
-        position: 'relative',
-        border: '2px solid var(--color-surface-dark)',
-        background: 'var(--color-background-light)',
-        boxShadow: 'var(--shadow-geometric)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'var(--shadow-geometric)';
+        fontFamily: 'var(--font-stack-heading)',
+        fontSize: '0.6rem',
+        fontWeight: 700,
+        letterSpacing: '0.3em',
+        textTransform: 'uppercase',
+        color: 'rgba(164,108,252,0.65)',
+        display: 'block',
+        marginBottom: '24px',
       }}
     >
-      {children}
+      {label}
+    </motion.span>
+  );
+}
+
+function HeroBlock() {
+  return (
+    <div className="flex flex-col items-start w-full">
+      <Eyebrow label="About H2H" />
+
+      <h2
+        style={{
+          fontSize: 'clamp(2.5rem, 6.5vw, 5.5rem)',
+          fontFamily: 'var(--font-stack-heading)',
+          color: 'var(--color-text-dark)',
+          lineHeight: 1.02,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '-0.04em',
+          margin: 0,
+        }}
+      >
+        <motion.span
+          className="block"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+        >
+          From Brand Voice
+        </motion.span>
+        <motion.span
+          className="block"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 1, delay: 0.1, ease: EASE_OUT_EXPO }}
+        >
+          <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
+            To Human
+          </span>{' '}
+          Connection
+        </motion.span>
+      </h2>
     </div>
   );
 }
 
-function SectionBadge({ label }: { label: string }) {
+function NarrativeBlock() {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -16 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: 0.1, ease: EASE_OUT_EXPO }}
-      className="inline-block mb-10"
-      style={{
-        padding: '6px 16px',
-        border: '2px solid var(--color-secondary)',
-        boxShadow: '4px 4px 0 var(--color-secondary)',
-      }}
-    >
-      <span
-        style={{
-          fontSize: '0.68rem',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          fontFamily: 'var(--font-stack-heading)',
-          color: 'var(--color-secondary)',
-        }}
-      >
-        {label}
-      </span>
-    </motion.div>
-  );
-}
-
-const STATS = [
-  { value: 120, suffix: '+', label: 'Brands Served' },
-  { value: 6, suffix: '', label: 'Years Running' },
-  { value: 98, suffix: '%', label: 'Client Retention' },
-  { value: 40, suffix: 'M+', label: 'Impressions Driven' },
-];
-
-function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    const duration = 1800;
-    const startTime = performance.now();
-
-    function tick(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 4);
-      setDisplay(Math.round(eased * value));
-      if (progress < 1) requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
-  }, [isInView, value]);
-
-  return (
-    <span ref={ref}>
-      {display}
-      {suffix}
-    </span>
-  );
-}
-
-function StatsBar() {
-  return (
-    <motion.div
-      className="w-full grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-      style={{
-        padding: 'clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem)',
-        background: 'rgba(164,108,252,0.04)',
-        border: '1px solid rgba(164,108,252,0.12)',
-        borderRadius: '12px',
-      }}
-    >
-      {STATS.map((stat, i) => (
-        <motion.div
-          key={stat.label}
-          className="flex flex-col items-center text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.15 * i, ease: EASE_OUT_EXPO }}
-          style={{
-            borderRight: i < STATS.length - 1 ? '1px solid rgba(164,108,252,0.12)' : 'none',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(2rem, 4vw, 3rem)',
-              fontWeight: 800,
-              color: 'var(--color-secondary)',
-              lineHeight: 1.1,
-            }}
-          >
-            <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-          </span>
-          <span
-            style={{
-              fontFamily: 'var(--font-stack-body)',
-              fontSize: 'clamp(0.7rem, 1vw, 0.82rem)',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: 'rgba(232,226,255,0.5)',
-              marginTop: '0.5rem',
-            }}
-          >
-            {stat.label}
-          </span>
-        </motion.div>
-      ))}
-    </motion.div>
-  );
-}
-
-function SpinningH2H() {
-  return (
-    <motion.div
-      className="hidden md:flex items-center justify-center flex-shrink-0"
-      initial={{ opacity: 0, scale: 0.6 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-    >
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        style={{
-          width: 110,
-          height: 110,
-          position: 'relative',
-        }}
-      >
-        <svg viewBox="0 0 200 200" width="110" height="110">
-          <defs>
-            <path
-              id="h2h-circle-path"
-              d="M 100,100 m -72,0 a 72,72 0 1,1 144,0 a 72,72 0 1,1 -144,0"
-            />
-          </defs>
-          <text
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '17.5px',
-              fontWeight: 700,
-              letterSpacing: '0.35em',
-              textTransform: 'uppercase',
-            }}
-            fill="var(--color-secondary)"
-          >
-            <textPath href="#h2h-circle-path" startOffset="0%">
-              H2H Agency &#x2022; H2H Agency &#x2022; H2H Agency &#x2022;
-            </textPath>
-          </text>
-        </svg>
-
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <motion.span
-            animate={{ rotate: -360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '1.4rem',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: 'var(--color-text-dark)',
-            }}
-          >
-            H2H
-          </motion.span>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function AboutCTA() {
-  const btnHover = getButtonHoverHandlers();
-
-  const scrollToContact = () => {
-    const el = document.getElementById('contact');
-    if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: 'smooth' });
-  };
-
-  return (
-    <motion.div
-      className="w-full"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-      style={{
-        border: '2px solid var(--color-text-dark)',
-        boxShadow: '8px 8px 0 var(--color-surface-dark)',
-        background: 'rgba(14,11,31,0.6)',
-        backdropFilter: 'blur(12px)',
-        padding: 'clamp(2rem, 5vw, 3.5rem)',
-      }}
-    >
-      <motion.h3
-        initial={{ opacity: 0, y: 20 }}
+    <div className="flex flex-col gap-8" style={{ maxWidth: '560px' }}>
+      <motion.p
+        initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT_EXPO }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
         style={{
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: 'clamp(2rem, 5vw, 4rem)',
-          fontWeight: 800,
-          lineHeight: 1.05,
-          letterSpacing: '-0.03em',
-          textTransform: 'uppercase',
-          color: 'var(--color-text-dark)',
-          marginBottom: 'clamp(2rem, 4vw, 3rem)',
+          fontFamily: 'var(--font-stack-body)',
+          fontSize: 'clamp(1.05rem, 1.4vw, 1.18rem)',
+          lineHeight: 1.85,
+          color: 'rgba(232,226,255,0.8)',
+          margin: 0,
         }}
       >
-        Let's Build Something{' '}
-        <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
-          Unforgettable
-        </span>
-      </motion.h3>
+        At H2H we believe the most impactful brands are the ones that know how to connect, not just communicate.
+      </motion.p>
 
-      <div
-        className="flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-12"
+      <motion.p
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
         style={{
-          borderTop: '1px solid rgba(232,226,255,0.12)',
-          paddingTop: 'clamp(1.5rem, 3vw, 2.5rem)',
+          fontFamily: 'var(--font-stack-body)',
+          fontSize: 'clamp(1.05rem, 1.4vw, 1.18rem)',
+          lineHeight: 1.85,
+          color: 'rgba(232,226,255,0.65)',
+          margin: 0,
         }}
       >
-        <SpinningH2H />
+        Perfect, polished campaigns are something that we take very seriously. But people want more than that. They want personality. They want to see and hear brands that speak like humans.
+      </motion.p>
 
-        <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.25, ease: EASE_OUT_EXPO }}
-            className="flex-1"
-            style={{
-              fontFamily: 'var(--font-stack-body)',
-              fontSize: 'clamp(0.95rem, 1.3vw, 1.1rem)',
-              lineHeight: 1.75,
-              color: 'rgba(232,226,255,0.7)',
-              margin: 0,
-            }}
-          >
-            Ready to make your brand impossible to ignore? We're strategists, creatives, and storytellers who turn ambition into momentum.
-          </motion.p>
+      <motion.p
+        className="relative pl-5"
+        initial={{ opacity: 0, x: -12 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.9, delay: 0.35, ease: EASE_OUT_EXPO }}
+        style={{
+          fontFamily: 'var(--font-stack-body)',
+          fontSize: 'clamp(1.05rem, 1.4vw, 1.18rem)',
+          lineHeight: 1.85,
+          color: 'rgba(255,255,255,0.95)',
+          fontWeight: 500,
+          borderLeft: '2px solid rgba(164,108,252,0.5)',
+          margin: 0,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontWeight: 800,
+            letterSpacing: '0.02em',
+            color: 'var(--color-secondary)',
+          }}
+        >
+          H2H
+        </span>{' '}
+        is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
+      </motion.p>
+    </div>
+  );
+}
 
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+function AsymmetricHero() {
+  return (
+    <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+      <div className="lg:col-span-7 flex flex-col gap-12">
+        <HeroBlock />
+        <NarrativeBlock />
+      </div>
+
+      <div className="lg:col-span-5 lg:mt-16">
+        <div className="lg:pl-6">
+          <motion.span
+            className="block mb-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.35, ease: EASE_OUT_EXPO }}
-            onClick={scrollToContact}
-            className="flex-shrink-0"
+            transition={{ duration: 0.6, delay: 0.2, ease: EASE_OUT_EXPO }}
             style={{
-              padding: '16px 32px',
-              background: 'var(--color-text-dark)',
-              border: '2px solid var(--color-text-dark)',
-              color: 'var(--color-background-light)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
               fontFamily: 'var(--font-stack-heading)',
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-button)',
-              transition: 'box-shadow 0.2s, transform 0.2s',
-              whiteSpace: 'nowrap',
+              fontSize: '0.55rem',
+              fontWeight: 700,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: 'rgba(164,108,252,0.5)',
             }}
-            {...btnHover}
           >
-            Start a Project
-          </motion.button>
+            Impact
+          </motion.span>
+          <ImpactStack />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VideoBlock() {
+  return (
+    <motion.div
+      className="w-full mt-20 md:mt-28"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+    >
+      <div
+        className="relative overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
+        style={{
+          border: '2px solid var(--color-surface-dark)',
+          background: 'var(--color-background-light)',
+          boxShadow: 'var(--shadow-geometric)',
+          maxHeight: '420px',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-geometric)'; }}
+      >
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full object-cover"
+          style={{ display: 'block', maxHeight: '420px' }}
+          src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(180deg, rgba(14,11,31,0.4) 0%, transparent 30%),
+              linear-gradient(180deg, transparent 60%, rgba(14,11,31,0.8) 100%),
+              linear-gradient(90deg, rgba(14,11,31,0.3) 0%, transparent 30%)
+            `,
+          }}
+        />
+
+        <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex items-center gap-4">
+          <SpinningH2H />
         </div>
       </div>
     </motion.div>
+  );
+}
+
+function Divider() {
+  return (
+    <motion.div
+      className="w-full my-20 md:my-28"
+      initial={{ scaleX: 0 }}
+      whileInView={{ scaleX: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+      style={{
+        height: '1px',
+        background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.2), rgba(164,108,252,0.2), transparent)',
+        transformOrigin: 'left',
+      }}
+    />
   );
 }
 
@@ -351,339 +251,52 @@ export function AboutStory() {
     offset: ['start end', 'end start'],
   });
 
-  const contentParallax = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
+  const contentY = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
 
   return (
     <section
       ref={sectionRef}
       id="about"
-      className="relative w-full overflow-hidden flex flex-col items-center justify-center"
+      className="relative w-full overflow-hidden"
       style={{
         background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
         padding: 'clamp(6rem, 12vw, 12rem) clamp(1.5rem, 5vw, 3rem)',
       }}
     >
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <ShootingStars count={16} />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.18) 0%, transparent 55%),
-              radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.2) 0%, transparent 50%),
-              radial-gradient(ellipse at 50% 50%, rgba(10, 5, 30, 0.4) 0%, transparent 70%)
-            `,
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              linear-gradient(180deg, #06030f 0%, transparent 12%),
-              linear-gradient(0deg, #06030f 0%, transparent 12%)
-            `,
-          }}
-        />
-      </div>
+      <SignalBackground />
+
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.14) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.16) 0%, transparent 50%)
+          `,
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            linear-gradient(180deg, #06030f 0%, transparent 10%),
+            linear-gradient(0deg, #06030f 0%, transparent 10%)
+          `,
+        }}
+      />
 
       <motion.div
-        className="relative w-full mx-auto flex flex-col items-center"
-        style={{ y: contentParallax, maxWidth: '1300px', zIndex: 10 }}
+        className="relative mx-auto"
+        style={{ y: contentY, maxWidth: '1300px', zIndex: 10 }}
       >
-        <div className="flex flex-col items-center text-center mb-16 md:mb-24">
-          <SectionBadge label="About Us" />
+        <AsymmetricHero />
 
-          <h2
-            style={{
-              fontSize: 'clamp(2.5rem, 6.5vw, 5.5rem)',
-              fontFamily: 'var(--font-stack-heading)',
-              color: 'var(--color-text-dark)',
-              lineHeight: 1.05,
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '-0.04em',
-              textAlign: 'center',
-              margin: 0,
-            }}
-          >
-            <motion.span
-              className="block"
-              initial={{ opacity: 0, y: 35 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
-            >
-              From Brand Voice
-            </motion.span>
-            <motion.span
-              className="block mt-1"
-              initial={{ opacity: 0, y: 35 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, delay: 0.12, ease: EASE_OUT_EXPO }}
-            >
-              <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
-                To Human
-              </span>{' '}
-              Connection
-            </motion.span>
-          </h2>
+        <VideoBlock />
 
-          <motion.p
-            className="mt-8 max-w-2xl"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-body)',
-              fontSize: 'clamp(1rem, 1.4vw, 1.15rem)',
-              lineHeight: 1.8,
-              color: 'rgba(232,226,255,0.78)',
-              textAlign: 'center',
-            }}
-          >
-            At H2H we believe the most impactful brands are the ones that know how to connect, not just communicate.
-          </motion.p>
-        </div>
+        <Divider />
 
-        <div className="w-full mb-16 md:mb-24">
-          <StatsBar />
-        </div>
+        <StoryColumns />
 
-        <motion.div
-          className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-        >
-          <motion.div className="lg:col-span-5" variants={fadeUpItem}>
-            <GeometricFrame>
-              <div style={{ position: 'relative' }}>
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full object-cover"
-                  style={{ aspectRatio: '4 / 5', display: 'block' }}
-                  src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
-                />
-                <div
-                  className="pointer-events-none"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: `
-                      linear-gradient(180deg, rgba(14,11,31,0.3) 0%, transparent 25%),
-                      linear-gradient(180deg, transparent 70%, rgba(14,11,31,0.7) 100%)
-                    `,
-                  }}
-                />
-              </div>
-            </GeometricFrame>
-          </motion.div>
-
-          <motion.div
-            className="lg:col-span-7 flex flex-col justify-center"
-            variants={fadeUpItem}
-          >
-            <div className="flex flex-col gap-10">
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
-              >
-                <motion.span
-                  className="inline-block mb-5"
-                  initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-                  whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-                  style={{
-                    fontSize: '0.55rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.25em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(164,108,252,0.85)',
-                    fontFamily: 'var(--font-stack-heading)',
-                  }}
-                >
-                  Our Story
-                </motion.span>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT_EXPO }}
-                  style={{
-                    fontFamily: 'var(--font-stack-body)',
-                    fontSize: 'clamp(1.08rem, 1.5vw, 1.2rem)',
-                    lineHeight: 1.85,
-                    color: 'rgba(232,226,255,0.82)',
-                    marginBottom: '1.25rem',
-                  }}
-                >
-                  Perfect, polished campaigns are something that we take very seriously. But, people want more than that. They want personality. They want to see and hear brands that speak like humans and offer something meaningful.
-                </motion.p>
-
-                <motion.p
-                  className="relative pl-5"
-                  initial={{ opacity: 0, x: -16, borderLeftColor: 'rgba(164,108,252,0)' }}
-                  whileInView={{ opacity: 1, x: 0, borderLeftColor: 'rgba(164,108,252,0.5)' }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
-                  style={{
-                    fontFamily: 'var(--font-stack-body)',
-                    fontSize: 'clamp(1.08rem, 1.5vw, 1.2rem)',
-                    lineHeight: 1.85,
-                    color: 'rgba(255,255,255,0.95)',
-                    fontWeight: 500,
-                    borderLeft: '2px solid rgba(164,108,252,0.5)',
-                  }}
-                >
-                  H2H is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
-                </motion.p>
-              </motion.div>
-
-              <motion.div
-                className="h-px"
-                style={{ background: 'linear-gradient(to right, rgba(164,108,252,0.35), transparent)', transformOrigin: 'left' }}
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 1.2, delay: 0.3, ease: EASE_OUT_EXPO }}
-              />
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-              >
-                <motion.span
-                  className="inline-block mb-4"
-                  initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-                  whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: EASE_OUT_EXPO }}
-                  style={{
-                    fontSize: '0.55rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.25em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(164,108,252,0.85)',
-                    fontFamily: 'var(--font-stack-heading)',
-                  }}
-                >
-                  Why H2H?
-                </motion.span>
-
-                <motion.p
-                  className="mb-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: EASE_OUT_EXPO }}
-                  style={{
-                    fontFamily: 'var(--font-stack-heading)',
-                    fontSize: 'clamp(1.15rem, 1.8vw, 1.35rem)',
-                    lineHeight: 1.5,
-                    color: 'var(--color-text-dark)',
-                    fontWeight: 700,
-                  }}
-                >
-                  Because we embed ourselves in your world.
-                </motion.p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <motion.div
-                    className="p-5"
-                    initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    whileHover={{ y: -3, background: 'rgba(164,108,252,0.08)', borderColor: 'rgba(164,108,252,0.3)' }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.7, delay: 0.3, ease: EASE_OUT_EXPO }}
-                    style={{
-                      background: 'rgba(164,108,252,0.04)',
-                      border: '1px solid rgba(164,108,252,0.15)',
-                      borderRadius: '8px',
-                    }}
-                  >
-                    <span
-                      className="block mb-2"
-                      style={{
-                        fontFamily: 'var(--font-stack-heading)',
-                        fontSize: '0.7rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.15em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(164,108,252,0.9)',
-                      }}
-                    >
-                      Your Partner
-                    </span>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-stack-body)',
-                        fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
-                        lineHeight: 1.75,
-                        color: 'rgba(232,226,255,0.75)',
-                      }}
-                    >
-                      When you work with H2H, you don't get an agency. You get a partner — a flexible, responsive extension of your team. Like a living, breathing part of your organization, we adapt to your rhythm, align with your goals, and help you scale with clarity and purpose.
-                    </p>
-                  </motion.div>
-
-                  <motion.div
-                    className="p-5"
-                    initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    whileHover={{ y: -3, background: 'rgba(164,108,252,0.08)', borderColor: 'rgba(164,108,252,0.3)' }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.7, delay: 0.45, ease: EASE_OUT_EXPO }}
-                    style={{
-                      background: 'rgba(164,108,252,0.04)',
-                      border: '1px solid rgba(164,108,252,0.15)',
-                      borderRadius: '8px',
-                    }}
-                  >
-                    <span
-                      className="block mb-2"
-                      style={{
-                        fontFamily: 'var(--font-stack-heading)',
-                        fontSize: '0.7rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.15em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(164,108,252,0.9)',
-                      }}
-                    >
-                      Structure & Soul
-                    </span>
-                    <p
-                      style={{
-                        fontFamily: 'var(--font-stack-body)',
-                        fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
-                        lineHeight: 1.75,
-                        color: 'rgba(232,226,255,0.75)',
-                      }}
-                    >
-                      We're strategists, creatives, and storytellers who bring a mix of structure and soul. We combine insight with efficiency to help you build brand ecosystems that actually work — across every platform, every touchpoint, and every stage of growth.
-                    </p>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        <div className="w-full mt-16 md:mt-24">
-          <AboutCTA />
-        </div>
+        <SignatureEnding />
       </motion.div>
     </section>
   );

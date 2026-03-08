@@ -251,3 +251,10 @@ a {
   border-color: rgba(164, 108, 252, 0.5);
   animation-delay: 0.5s;
 }
+
+/* ─── About Impact Card ─────────────────────────────────────────────────── */
+.about-impact-card:hover .about-impact-detail {
+  max-height: 40px !important;
+  opacity: 1 !important;
+  margin-top: 6px !important;
+}

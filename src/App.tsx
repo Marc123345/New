@@ -148,7 +148,7 @@ function AppContent() {
         <EcosystemServices />
       </div>
 
-      <div id="about" className="relative" style={{ zIndex: 2 }}>
+      <div className="relative" style={{ zIndex: 2 }}>
         <Suspense fallback={<SectionLoader />}>
           <AboutStory />
         </Suspense>

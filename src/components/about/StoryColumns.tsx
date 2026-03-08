@@ -66,17 +66,17 @@ function FounderPortrait() {
   return (
     <motion.div
       ref={portraitRef}
-      className="relative w-full my-16 md:my-20"
+      className="relative w-full"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 1, ease: EASE_OUT_EXPO }}
     >
-      <div className="relative flex justify-center md:justify-start md:ml-[8%]">
+      <div className="relative flex justify-center">
         <div
           className="relative overflow-hidden group"
           style={{
-            maxWidth: '380px',
+            maxWidth: '340px',
             width: '100%',
             transform: 'rotate(-2deg)',
           }}
@@ -153,28 +153,48 @@ function FounderPortrait() {
             </span>
           </motion.div>
         </div>
-
-        <motion.div
-          className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2"
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
-          style={{
-            writingMode: 'vertical-rl',
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: '0.5rem',
-            fontWeight: 700,
-            letterSpacing: '0.35em',
-            textTransform: 'uppercase',
-            color: 'rgba(164,108,252,0.3)',
-            transform: 'translateY(-50%) rotate(180deg)',
-          }}
-        >
-          The human behind H2H
-        </motion.div>
       </div>
+
+      <motion.div
+        className="hidden md:block text-center mt-4"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
+        style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: '0.5rem',
+          fontWeight: 700,
+          letterSpacing: '0.35em',
+          textTransform: 'uppercase',
+          color: 'rgba(164,108,252,0.3)',
+        }}
+      >
+        The human behind H2H
+      </motion.div>
     </motion.div>
+  );
+}
+
+function ColumnHeader({ label, delay = 0 }: { label: string; delay?: number }) {
+  return (
+    <motion.span
+      className="block mb-8"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay, ease: EASE_OUT_EXPO }}
+      style={{
+        fontFamily: 'var(--font-stack-heading)',
+        fontSize: '0.75rem',
+        fontWeight: 700,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        color: 'var(--color-text-dark)',
+      }}
+    >
+      {label}
+    </motion.span>
   );
 }
 
@@ -182,7 +202,7 @@ export function StoryColumns() {
   return (
     <div className="w-full">
       <motion.div
-        className="mb-6"
+        className="mb-16 md:mb-20"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
@@ -221,80 +241,20 @@ export function StoryColumns() {
         </h3>
       </motion.div>
 
-      <FounderPortrait />
-
-      <div className="relative grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-0">
-        <div className="md:pr-12 lg:pr-16">
-          <motion.span
-            className="block mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-dark)',
-            }}
-          >
-            Your Partner
-          </motion.span>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 items-start">
+        <div className="md:col-span-4 order-2 md:order-1">
+          <ColumnHeader label="Your Partner" />
           {LEFT_ITEMS.map((item, i) => (
             <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.1} />
           ))}
         </div>
 
-        <div className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2" style={{ width: '1px' }}>
-          <motion.div
-            className="w-full h-full"
-            style={{ background: 'linear-gradient(180deg, transparent, rgba(164,108,252,0.25), transparent)', transformOrigin: 'top' }}
-            initial={{ scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 1.2, delay: 0.3, ease: EASE_OUT_EXPO }}
-          />
-          <motion.span
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.6, ease: EASE_OUT_EXPO }}
-            style={{
-              writingMode: 'vertical-rl',
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.5rem',
-              fontWeight: 700,
-              letterSpacing: '0.35em',
-              textTransform: 'uppercase',
-              color: 'rgba(164,108,252,0.35)',
-              transform: 'translateX(-50%) translateY(-50%) rotate(180deg)',
-            }}
-          >
-            From strategy to soul
-          </motion.span>
+        <div className="md:col-span-4 order-1 md:order-2 flex flex-col items-center">
+          <FounderPortrait />
         </div>
 
-        <div className="md:pl-12 lg:pl-16">
-          <motion.span
-            className="block mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-dark)',
-            }}
-          >
-            Structure & Soul
-          </motion.span>
+        <div className="md:col-span-4 order-3">
+          <ColumnHeader label="Structure & Soul" delay={0.15} />
           {RIGHT_ITEMS.map((item, i) => (
             <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.1} />
           ))}

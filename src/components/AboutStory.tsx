@@ -7,7 +7,8 @@ import {
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
 import { StoryColumns } from './about/StoryColumns';
-import { ShannonCarousel } from './about/ShannonCarousel';
+import { SignatureEnding } from './about/SignatureEnding';
+import { SpinningH2H } from './about/SpinningH2H';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -178,6 +179,54 @@ function AsymmetricHero() {
   );
 }
 
+function VideoBlock() {
+  return (
+    <motion.div
+      className="w-full mt-20 md:mt-28"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+    >
+      <div
+        className="relative overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
+        style={{
+          border: '2px solid var(--color-surface-dark)',
+          background: 'var(--color-background-light)',
+          boxShadow: 'var(--shadow-geometric)',
+          maxHeight: '420px',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-geometric)'; }}
+      >
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full object-cover"
+          style={{ display: 'block', maxHeight: '420px' }}
+          src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(180deg, rgba(14,11,31,0.4) 0%, transparent 30%),
+              linear-gradient(180deg, transparent 60%, rgba(14,11,31,0.8) 100%),
+              linear-gradient(90deg, rgba(14,11,31,0.3) 0%, transparent 30%)
+            `,
+          }}
+        />
+
+        <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex items-center gap-4">
+          <SpinningH2H />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function Divider() {
   return (
     <motion.div
@@ -241,11 +290,13 @@ export function AboutStory() {
       >
         <AsymmetricHero />
 
-        <ShannonCarousel />
+        <VideoBlock />
 
         <Divider />
 
         <StoryColumns />
+
+        <SignatureEnding />
       </motion.div>
     </section>
   );

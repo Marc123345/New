@@ -182,7 +182,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "var(--color-background-light)",
+                color: "#ffffff",
                 fontSize: "0.7rem",
                 fontWeight: 700,
                 fontFamily: "var(--font-stack-heading)",
@@ -216,7 +216,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 fontWeight: 700,
                 border: "2px solid var(--color-text-dark)",
                 background: hovered ? "var(--color-primary)" : "transparent",
-                color: hovered ? "var(--color-background-light)" : "var(--color-text-dark)",
+                color: hovered ? "#ffffff" : "var(--color-text-dark)",
                 cursor: "pointer",
                 transition: "background 0.25s ease, color 0.25s ease",
                 boxShadow: "var(--shadow-button)",
@@ -340,7 +340,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                     fontFamily: "var(--font-stack-heading)",
                     border: "1.5px solid var(--color-text-dark)",
                     background: activeCategory === cat ? "var(--color-primary)" : "transparent",
-                    color: activeCategory === cat ? "var(--color-background-light)" : "var(--color-text-dark)",
+                    color: activeCategory === cat ? "#ffffff" : "var(--color-text-dark)",
                     cursor: "pointer",
                     transition: "background 0.2s, color 0.2s",
                     boxShadow: activeCategory === cat ? "var(--shadow-button)" : "none",
@@ -387,7 +387,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                   textTransform: "uppercase",
                   fontFamily: "var(--font-stack-heading)",
                   background: "var(--color-primary)",
-                  color: "var(--color-background-light)",
+                  color: "#ffffff",
                   border: "2px solid var(--color-text-dark)",
                   cursor: "pointer",
                   boxShadow: "var(--shadow-button)",
@@ -624,7 +624,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
               background: hovered ? "var(--color-primary)" : "transparent",
               transition: "background 0.25s, color 0.25s",
             }}
-              className={hovered ? "text-[var(--color-background-light)]" : ""}
+              className={hovered ? "text-white" : ""}
             >
               <ArrowUpRight size={15} />
             </div>

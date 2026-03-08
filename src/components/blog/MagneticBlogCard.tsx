@@ -177,7 +177,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
               {post.author}
             </span>
             <div
-              className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-background-light)]"
+              className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-white"
               style={{
                 border: "1px solid var(--color-text-dark)",
                 color: "var(--color-text-dark)",

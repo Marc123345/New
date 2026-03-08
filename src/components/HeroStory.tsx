@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo, memo, lazy, Suspense } from 'react';
+import React, { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -60,7 +60,7 @@ const PhaseText = memo(({
   return (
     <motion.div
       className="absolute inset-0 flex flex-col justify-center"
-      style={{ opacity, y, scale, pointerEvents: 'none', willChange: 'transform, opacity' }}
+      style={{ opacity, y, scale, pointerEvents: 'none' }}
     >
       <p
         className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"
@@ -101,11 +101,11 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
     <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
       <motion.div
         className="absolute inset-y-0 left-0"
-        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG, willChange: 'width' }}
+        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG }}
       />
       <motion.div
         className="absolute top-1/2 -translate-y-1/2"
-        style={{ left: progressBarWidth, ...DOT_STYLE_BASE, willChange: 'left' }}
+        style={{ left: progressBarWidth, ...DOT_STYLE_BASE }}
       />
     </div>
     <div className="flex items-center gap-2">
@@ -119,20 +119,20 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
   </div>
 ));
 
-const PURPLE_OVERLAY = {
-  background: 'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
+const OVERLAY_DESKTOP = {
+  background: [
+    'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
+    'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
+    'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 40%)',
+  ].join(', '),
 } as const;
 
-const GRADIENT_OVERLAY_DESKTOP = {
-  background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
-} as const;
-
-const GRADIENT_OVERLAY_MOBILE = {
-  background: 'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
-} as const;
-
-const BOTTOM_FADE_STYLE = {
-  background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)',
+const OVERLAY_MOBILE = {
+  background: [
+    'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
+    'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
+    'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 40%)',
+  ].join(', '),
 } as const;
 
 const STICKY_BG = {
@@ -189,12 +189,7 @@ export function HeroStory() {
 
         <div
           className="absolute inset-0 pointer-events-none"
-          style={PURPLE_OVERLAY}
-        />
-
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={isMobile ? GRADIENT_OVERLAY_MOBILE : GRADIENT_OVERLAY_DESKTOP}
+          style={isMobile ? OVERLAY_MOBILE : OVERLAY_DESKTOP}
         />
 
         <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
@@ -213,11 +208,6 @@ export function HeroStory() {
         </div>
 
         <ProgressBar progressBarWidth={progressBarWidth} />
-
-        <div
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={BOTTOM_FADE_STYLE}
-        />
       </div>
     </div>
   );

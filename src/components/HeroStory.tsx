@@ -136,10 +136,7 @@ const OVERLAY_MOBILE = {
 } as const;
 
 const STICKY_BG = {
-  backgroundImage: `url('https://ik.imagekit.io/qcvroy8xpd/istockphoto-1401387054-612x612.jpg?updatedAt=1772992288758')`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
+  backgroundColor: '#020008',
   contain: 'strict' as const,
 } as const;
 

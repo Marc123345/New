@@ -1,37 +1,79 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { MotionValue, useMotionValueEvent } from 'framer-motion';
+import { worldPopulationData } from './worldPopulation';
 import { isMobileDevice } from '../../../hooks/useIsMobile';
 
 interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;
   isVisible?: boolean;
+  hideArcs?: boolean;
 }
 
-const ARC_COLORS = ['#a46cfc', '#ffffff', '#c084fc', '#b181fc', '#d8b4fe', '#8b5cf6'];
-
-function generateArcs(count: number) {
-  return Array.from({ length: count }, () => {
-    const c1 = ARC_COLORS[Math.floor(Math.random() * ARC_COLORS.length)];
-    const c2 = ARC_COLORS[Math.floor(Math.random() * ARC_COLORS.length)];
-    return {
-      startLat: (Math.random() - 0.5) * 180,
-      startLng: (Math.random() - 0.5) * 360,
-      endLat: (Math.random() - 0.5) * 180,
-      endLng: (Math.random() - 0.5) * 360,
-      color: [c1, c2],
-      dashLength: Math.random() * 0.6 + 0.2,
-      dashGap: Math.random() * 0.4 + 0.1,
-      animateTime: Math.random() * 4000 + 500,
-    };
-  });
-}
-
+const TOP_CITIES = worldPopulationData.slice(0, 12);
+const TOP_CITIES_MOBILE = worldPopulationData.slice(0, 6);
+const HEATMAP_CITIES = worldPopulationData.slice(0, 20);
+const HEATMAP_CITIES_MOBILE = worldPopulationData.slice(0, 10);
+const ARC_START = 0.15;
 const SCROLL_THRESHOLD = 0.05;
 const POV_TRANSITION_MS = 600;
 
-export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapperProps) {
+function getArcThreshold(progress: number, mobile: boolean): number {
+  if (progress < ARC_START) return 0;
+  const cities = mobile ? TOP_CITIES_MOBILE : TOP_CITIES;
+  return Math.min(
+    Math.floor(((progress - ARC_START) / (1 - ARC_START)) * cities.length),
+    cities.length - 1
+  );
+}
+
+const ARC_COLOR_PRIMARY = ['rgba(168,85,247,0.9)', 'rgba(192,132,252,0.6)'];
+const ARC_COLOR_SECONDARY = ['rgba(139,92,246,0.7)', 'rgba(167,139,250,0.4)'];
+const EMPTY_ARCS: object[] = [];
+
+const precomputedArcs = new Map<string, object[]>();
+function initArcsForSet(cities: typeof TOP_CITIES, prefix: string) {
+  const len = cities.length;
+  for (let threshold = 1; threshold <= len; threshold++) {
+    const arcsA: object[] = [];
+    const arcsB: object[] = [];
+    for (let i = 0; i < threshold; i++) {
+      arcsA.push({
+        startLat: cities[i].lat,
+        startLng: cities[i].lng,
+        endLat: cities[(i + 3) % len].lat,
+        endLng: cities[(i + 3) % len].lng,
+        color: ARC_COLOR_PRIMARY,
+      });
+      if (i < threshold - 1) {
+        arcsB.push({
+          startLat: cities[i].lat,
+          startLng: cities[i].lng,
+          endLat: cities[(i + 5) % len].lat,
+          endLng: cities[(i + 5) % len].lng,
+          color: ARC_COLOR_SECONDARY,
+        });
+      }
+    }
+    precomputedArcs.set(`${prefix}${threshold}-a`, arcsA);
+    precomputedArcs.set(`${prefix}${threshold}-ab`, [...arcsA, ...arcsB]);
+  }
+}
+initArcsForSet(TOP_CITIES, 'd-');
+initArcsForSet(TOP_CITIES_MOBILE, 'm-');
+
+function getArcs(progress: number, mobile: boolean): object[] {
+  const threshold = getArcThreshold(progress, mobile);
+  if (threshold === 0) return EMPTY_ARCS;
+  const prefix = mobile ? 'm-' : 'd-';
+  const key = progress > 0.5 ? `${prefix}${threshold}-ab` : `${prefix}${threshold}-a`;
+  return precomputedArcs.get(key) || EMPTY_ARCS;
+}
+
+export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = false }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
+  const lastArcThresholdRef = useRef<number>(-1);
+  const lastHalfRef = useRef<boolean>(false);
   const lastProgressRef = useRef<number>(0);
   const mobileRef = useRef(isMobileDevice());
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,21 +101,25 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
         globe
           .backgroundColor('rgba(0,0,0,0)')
           .showAtmosphere(true)
-          .atmosphereColor('rgba(164,108,252,0.25)')
+          .atmosphereColor('rgba(120,60,220,0.5)')
           .atmosphereAltitude(mobile ? 0.1 : 0.15)
           .width(w)
           .height(h);
 
-        const arcCount = mobile ? 12 : 20;
-        const arcsData = generateArcs(arcCount);
-
         globe
-          .arcsData(arcsData)
+          .heatmapPointLat('lat')
+          .heatmapPointLng('lng')
+          .heatmapPointWeight('pop')
+          .heatmapBandwidth(mobile ? 0.7 : 0.9)
+          .heatmapColorSaturation(mobile ? 2.2 : 2.8)
+          .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
           .arcColor('color')
-          .arcDashLength((d: any) => d.dashLength)
-          .arcDashGap((d: any) => d.dashGap)
-          .arcDashAnimateTime((d: any) => d.animateTime)
-          .arcStroke(mobile ? 0.6 : 0.8);
+          .arcDashLength(mobile ? 0.5 : 0.4)
+          .arcDashGap(mobile ? 0.3 : 0.2)
+          .arcDashAnimateTime(mobile ? 2000 : 1500)
+          .arcStroke(mobile ? 0.8 : 1.2);
+
+        globe.arcsData(EMPTY_ARCS);
 
         const controls = globe.controls();
         controls.autoRotate = true;
@@ -190,6 +236,16 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true }: GlobeWrapper
       const controls = globe.controls();
       if (controls) {
         controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + progress * (mobile ? 0.6 : 1.2);
+      }
+
+      if (!hideArcs) {
+        const newThreshold = getArcThreshold(progress, mobile);
+        const newHalf = progress > 0.5;
+        if (newThreshold !== lastArcThresholdRef.current || newHalf !== lastHalfRef.current) {
+          lastArcThresholdRef.current = newThreshold;
+          lastHalfRef.current = newHalf;
+          globe.arcsData(getArcs(progress, mobile));
+        }
       }
     });
   });

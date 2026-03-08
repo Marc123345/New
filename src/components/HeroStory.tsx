@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { useIsMobile } from '../hooks/useIsMobile';
+
 const GlobeWrapper = lazy(() =>
   import('./HeroStory/Globe/GlobeWrapper').then((m) => ({ default: m.GlobeWrapper }))
 );
@@ -145,6 +146,7 @@ export function HeroStory() {
   const [isVisible, setIsVisible] = useState(false);
   const [globeReady, setGlobeReady] = useState(false);
   const isMobile = useIsMobile();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
@@ -181,7 +183,7 @@ export function HeroStory() {
       >
         {globeReady && (
           <Suspense fallback={null}>
-            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
+            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} hideArcs={isMobile} />
           </Suspense>
         )}
 

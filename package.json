@@ -56,7 +56,6 @@
             "tailwind-merge": "*",
             "tailwindcss": "*",
             "three": "^0.183.2",
-            "unicornstudio-react": "^2.1.1",
             "vaul": "^1.1.2"
       },
       "devDependencies": {

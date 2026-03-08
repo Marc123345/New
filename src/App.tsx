@@ -76,6 +76,19 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#040608' }}
       >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/purple-nebula-and-glowing-cosmic-dust-in-outer-spa-2026-01-05-00-45-10-utc.jpg?updatedAt=1772993700397)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(0,0,0,0.65)' }}
+        />
         <div className="absolute inset-0">
           <ShootingStars count={22} />
         </div>

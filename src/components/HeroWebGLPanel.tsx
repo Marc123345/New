@@ -10,14 +10,26 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400",
   "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400",
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/712513/pexels-photo-712513.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/834863/pexels-photo-834863.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
 const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
-const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.6 : 2.0));
+const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
 const N = ALL_URLS.length;
 
-const BOUNDS_X = 14;
-const BOUNDS_Y = 9;
+const BOUNDS_X = 16;
+const BOUNDS_Y = 10;
 
 const CURSOR_SPHERE_R = 3.5;
 const CURSOR_SMOOTH = 12.0;
@@ -237,7 +249,7 @@ export function HeroWebGLPanel() {
     for (let i = 0; i < N; i++) {
       const r = radii[i];
       masses[i] = r * r;
-      spawnStart[i] = i * 0.06;
+      spawnStart[i] = i * 0.04;
 
       breathPhase[i] = Math.random() * Math.PI * 2;
       floatPhaseX[i] = Math.random() * Math.PI * 2;
@@ -253,10 +265,10 @@ export function HeroWebGLPanel() {
 
       depthFactor[i] = Math.random();
 
-      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const dist = 0.3 + Math.random() * 0.5;
-      homeX[i] = Math.cos(angle) * BOUNDS_X * dist * 0.72;
-      homeY[i] = Math.sin(angle) * BOUNDS_Y * dist * 0.72;
+      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+      const dist = 0.25 + Math.random() * 0.6;
+      homeX[i] = Math.cos(angle) * BOUNDS_X * dist * 0.78;
+      homeY[i] = Math.sin(angle) * BOUNDS_Y * dist * 0.78;
       px[i] = homeX[i] + (Math.random() - 0.5) * 2;
       py[i] = homeY[i] + (Math.random() - 0.5) * 2;
       pz[i] = (Math.random() - 0.5) * 4;

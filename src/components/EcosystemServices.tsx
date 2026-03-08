@@ -296,6 +296,21 @@ export function EcosystemServices() {
         </motion.div>
       </div>
 
+      <motion.p
+        className="relative z-10 mb-4 sm:mb-6 text-center"
+        style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: '0.7rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: '#ffffff',
+        }}
+        animate={{ opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        Tap a pillar to explore
+      </motion.p>
+
       {/* Orbit Interaction Area */}
       {/* ADDED: scale classes for perfect mobile view! */}
       <div
@@ -341,21 +356,6 @@ export function EcosystemServices() {
           </div>
         </div>
       </div>
-
-      <motion.p
-        className="relative z-10 mt-4 sm:mt-6 text-center"
-        style={{
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.7rem',
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.45)',
-        }}
-        animate={{ opacity: [0.35, 0.7, 0.35] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        Tap a pillar to explore
-      </motion.p>
 
       <PillarOverlay
         pillarIndex={selectedService}

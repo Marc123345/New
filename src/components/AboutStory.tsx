@@ -228,16 +228,19 @@ export function AboutStory() {
             className="lg:col-span-7 flex flex-col justify-center"
             variants={fadeUpItem}
           >
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
-              className="flex flex-col gap-10"
-            >
-              <div>
-                <span
+            <div className="flex flex-col gap-10">
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
+              >
+                <motion.span
                   className="inline-block mb-5"
+                  initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
+                  whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
                   style={{
                     fontSize: '0.55rem',
                     fontWeight: 700,
@@ -248,9 +251,13 @@ export function AboutStory() {
                   }}
                 >
                   Our Story
-                </span>
+                </motion.span>
 
-                <p
+                <motion.p
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT_EXPO }}
                   style={{
                     fontFamily: 'var(--font-stack-body)',
                     fontSize: 'clamp(1.08rem, 1.5vw, 1.2rem)',
@@ -260,10 +267,14 @@ export function AboutStory() {
                   }}
                 >
                   Perfect, polished campaigns are something that we take very seriously. But, people want more than that. They want personality. They want to see and hear brands that speak like humans and offer something meaningful.
-                </p>
+                </motion.p>
 
-                <p
+                <motion.p
                   className="relative pl-5"
+                  initial={{ opacity: 0, x: -16, borderLeftColor: 'rgba(164,108,252,0)' }}
+                  whileInView={{ opacity: 1, x: 0, borderLeftColor: 'rgba(164,108,252,0.5)' }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
                   style={{
                     fontFamily: 'var(--font-stack-body)',
                     fontSize: 'clamp(1.08rem, 1.5vw, 1.2rem)',
@@ -274,21 +285,30 @@ export function AboutStory() {
                   }}
                 >
                   H2H is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
 
               <motion.div
                 className="h-px"
                 style={{ background: 'linear-gradient(to right, rgba(164,108,252,0.35), transparent)', transformOrigin: 'left' }}
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, delay: 0.5, ease: EASE_OUT_EXPO }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 1.2, delay: 0.3, ease: EASE_OUT_EXPO }}
               />
 
-              <div>
-                <span
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+              >
+                <motion.span
                   className="inline-block mb-4"
+                  initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
+                  whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.6, delay: 0.1, ease: EASE_OUT_EXPO }}
                   style={{
                     fontSize: '0.55rem',
                     fontWeight: 700,
@@ -299,10 +319,14 @@ export function AboutStory() {
                   }}
                 >
                   Why H2H?
-                </span>
+                </motion.span>
 
-                <p
+                <motion.p
                   className="mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: EASE_OUT_EXPO }}
                   style={{
                     fontFamily: 'var(--font-stack-heading)',
                     fontSize: 'clamp(1.15rem, 1.8vw, 1.35rem)',
@@ -312,11 +336,16 @@ export function AboutStory() {
                   }}
                 >
                   Because we embed ourselves in your world.
-                </p>
+                </motion.p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div
-                    className="p-5 transition-all duration-300 hover:-translate-y-0.5"
+                  <motion.div
+                    className="p-5"
+                    initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    whileHover={{ y: -3, background: 'rgba(164,108,252,0.08)', borderColor: 'rgba(164,108,252,0.3)' }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.7, delay: 0.3, ease: EASE_OUT_EXPO }}
                     style={{
                       background: 'rgba(164,108,252,0.04)',
                       border: '1px solid rgba(164,108,252,0.15)',
@@ -346,10 +375,15 @@ export function AboutStory() {
                     >
                       When you work with H2H, you don't get an agency. You get a partner — a flexible, responsive extension of your team. Like a living, breathing part of your organization, we adapt to your rhythm, align with your goals, and help you scale with clarity and purpose.
                     </p>
-                  </div>
+                  </motion.div>
 
-                  <div
-                    className="p-5 transition-all duration-300 hover:-translate-y-0.5"
+                  <motion.div
+                    className="p-5"
+                    initial={{ opacity: 0, y: 30, scale: 0.96 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    whileHover={{ y: -3, background: 'rgba(164,108,252,0.08)', borderColor: 'rgba(164,108,252,0.3)' }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.7, delay: 0.45, ease: EASE_OUT_EXPO }}
                     style={{
                       background: 'rgba(164,108,252,0.04)',
                       border: '1px solid rgba(164,108,252,0.15)',
@@ -379,11 +413,11 @@ export function AboutStory() {
                     >
                       We're strategists, creatives, and storytellers who bring a mix of structure and soul. We combine insight with efficiency to help you build brand ecosystems that actually work — across every platform, every touchpoint, and every stage of growth.
                     </p>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
 
-            </motion.div>
+            </div>
           </motion.div>
         </motion.div>
 

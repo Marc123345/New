@@ -3,6 +3,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
 } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
@@ -10,24 +11,25 @@ import { StoryColumns } from './about/StoryColumns';
 import { SignatureEnding } from './about/SignatureEnding';
 import { SpinningH2H } from './about/SpinningH2H';
 
-const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
+// Consistent premium easing curve
+const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 function Eyebrow({ label }: { label: string }) {
   return (
     <motion.span
-      initial={{ opacity: 0, x: -12 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+      initial={{ opacity: 0, x: -16, filter: 'blur(4px)' }}
+      whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-10%' }}
+      transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
       style={{
         fontFamily: 'var(--font-stack-heading)',
-        fontSize: '0.6rem',
+        fontSize: '0.65rem',
         fontWeight: 700,
-        letterSpacing: '0.3em',
+        letterSpacing: '0.35em',
         textTransform: 'uppercase',
-        color: 'rgba(164,108,252,0.65)',
+        color: 'rgba(164,108,252,0.8)',
         display: 'block',
-        marginBottom: '24px',
+        marginBottom: '28px',
       }}
     >
       {label}
@@ -37,42 +39,46 @@ function Eyebrow({ label }: { label: string }) {
 
 function HeroBlock() {
   return (
-    <div className="flex flex-col items-start w-full">
+    <div className="flex flex-col items-start w-full mb-4">
       <Eyebrow label="About H2H" />
 
       <h2
         style={{
-          fontSize: 'clamp(2.5rem, 6.5vw, 5.5rem)',
+          fontSize: 'clamp(2.8rem, 7vw, 6rem)',
           fontFamily: 'var(--font-stack-heading)',
           color: 'var(--color-text-dark)',
-          lineHeight: 1.02,
+          lineHeight: 1.05,
           fontWeight: 800,
           textTransform: 'uppercase',
           letterSpacing: '-0.04em',
           margin: 0,
         }}
       >
-        <motion.span
-          className="block"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-        >
-          From Brand Voice
-        </motion.span>
-        <motion.span
-          className="block"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 1, delay: 0.1, ease: EASE_OUT_EXPO }}
-        >
-          <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
-            To Human
-          </span>{' '}
-          Connection
-        </motion.span>
+        <span className="block overflow-hidden pb-2">
+          <motion.span
+            className="block"
+            initial={{ y: '100%' }}
+            whileInView={{ y: '0%' }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+          >
+            From Brand Voice
+          </motion.span>
+        </span>
+        <span className="block overflow-hidden">
+          <motion.span
+            className="block"
+            initial={{ y: '100%' }}
+            whileInView={{ y: '0%' }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 1.2, delay: 0.15, ease: EASE_OUT_EXPO }}
+          >
+            <span style={{ color: 'transparent', WebkitTextStroke: '2px var(--color-surface-dark)' }}>
+              To Human
+            </span>{' '}
+            Connection
+          </motion.span>
+        </span>
       </h2>
     </div>
   );
@@ -80,17 +86,17 @@ function HeroBlock() {
 
 function NarrativeBlock() {
   return (
-    <div className="flex flex-col gap-8" style={{ maxWidth: '560px' }}>
+    <div className="flex flex-col gap-8" style={{ maxWidth: '600px' }}>
       <motion.p
-        initial={{ opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
+        initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
+        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        viewport={{ once: true, margin: '-10%' }}
+        transition={{ duration: 1, delay: 0.2, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(1.05rem, 1.4vw, 1.18rem)',
-          lineHeight: 1.85,
-          color: 'rgba(232,226,255,0.8)',
+          fontSize: 'clamp(1.1rem, 1.5vw, 1.25rem)',
+          lineHeight: 1.8,
+          color: 'rgba(232,226,255,0.85)',
           margin: 0,
         }}
       >
@@ -98,14 +104,14 @@ function NarrativeBlock() {
       </motion.p>
 
       <motion.p
-        initial={{ opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
+        initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
+        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        viewport={{ once: true, margin: '-10%' }}
+        transition={{ duration: 1, delay: 0.3, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(1.05rem, 1.4vw, 1.18rem)',
-          lineHeight: 1.85,
+          fontSize: 'clamp(1.1rem, 1.5vw, 1.25rem)',
+          lineHeight: 1.8,
           color: 'rgba(232,226,255,0.65)',
           margin: 0,
         }}
@@ -113,61 +119,67 @@ function NarrativeBlock() {
         Perfect, polished campaigns are something that we take very seriously. But people want more than that. They want personality. They want to see and hear brands that speak like humans.
       </motion.p>
 
-      <motion.p
-        className="relative pl-5"
-        initial={{ opacity: 0, x: -12 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.9, delay: 0.35, ease: EASE_OUT_EXPO }}
+      <motion.div
+        initial={{ opacity: 0, x: -20, filter: 'blur(6px)' }}
+        whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+        viewport={{ once: true, margin: '-10%' }}
+        transition={{ duration: 1, delay: 0.4, ease: EASE_OUT_EXPO }}
+        className="relative pl-6 py-2 mt-2"
         style={{
-          fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(1.05rem, 1.4vw, 1.18rem)',
-          lineHeight: 1.85,
-          color: 'rgba(255,255,255,0.95)',
-          fontWeight: 500,
           borderLeft: '2px solid rgba(164,108,252,0.5)',
-          margin: 0,
+          background: 'linear-gradient(90deg, rgba(164,108,252,0.05) 0%, transparent 100%)',
         }}
       >
-        <span
+        <p
           style={{
-            fontFamily: 'var(--font-stack-heading)',
-            fontWeight: 800,
-            letterSpacing: '0.02em',
-            color: 'var(--color-secondary)',
+            fontFamily: 'var(--font-stack-body)',
+            fontSize: 'clamp(1.1rem, 1.5vw, 1.25rem)',
+            lineHeight: 1.8,
+            color: 'rgba(255,255,255,0.95)',
+            fontWeight: 500,
+            margin: 0,
           }}
         >
-          H2H
-        </span>{' '}
-        is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
-      </motion.p>
+          <span
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontWeight: 800,
+              letterSpacing: '0.02em',
+              color: 'var(--color-secondary)',
+            }}
+          >
+            H2H
+          </span>{' '}
+          is a social-first agency built to help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.
+        </p>
+      </motion.div>
     </div>
   );
 }
 
 function AsymmetricHero() {
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-      <div className="lg:col-span-7 flex flex-col gap-12">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start">
+      <div className="lg:col-span-7 flex flex-col gap-10">
         <HeroBlock />
         <NarrativeBlock />
       </div>
 
-      <div className="lg:col-span-5 lg:mt-16">
-        <div className="lg:pl-6">
+      <div className="lg:col-span-5 lg:mt-24">
+        <div className="lg:pl-8">
           <motion.span
-            className="block mb-6"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            className="block mb-8"
+            initial={{ opacity: 0, filter: 'blur(4px)' }}
+            whileInView={{ opacity: 1, filter: 'blur(0px)' }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2, ease: EASE_OUT_EXPO }}
+            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
             style={{
               fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.55rem',
+              fontSize: '0.65rem',
               fontWeight: 700,
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
-              color: 'rgba(164,108,252,0.5)',
+              color: 'rgba(164,108,252,0.6)',
             }}
           >
             Impact
@@ -182,47 +194,53 @@ function AsymmetricHero() {
 function VideoBlock() {
   return (
     <motion.div
-      className="w-full mt-20 md:mt-28"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+      className="w-full mt-24 md:mt-32"
+      initial={{ opacity: 0, y: 60, filter: 'blur(10px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true, margin: '-15%' }}
+      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
     >
-      <div
-        className="relative overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
+      <motion.div
+        className="relative overflow-hidden cursor-pointer group"
+        whileHover={{ 
+          y: -8, 
+          x: -8,
+          boxShadow: 'var(--shadow-geometric-hover)' 
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
         style={{
-          border: '2px solid var(--color-surface-dark)',
+          border: '1px solid rgba(255,255,255,0.1)',
           background: 'var(--color-background-light)',
           boxShadow: 'var(--shadow-geometric)',
-          maxHeight: '420px',
+          maxHeight: '500px', // Slightly taller for more visual impact
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-geometric-hover)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-geometric)'; }}
       >
-        <video
+        <motion.video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full object-cover"
-          style={{ display: 'block', maxHeight: '420px' }}
+          className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          style={{ display: 'block', maxHeight: '500px' }}
           src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
         />
+        
+        {/* Gradients to ensure text/badges pop */}
         <div
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
           style={{
             background: `
-              linear-gradient(180deg, rgba(14,11,31,0.4) 0%, transparent 30%),
-              linear-gradient(180deg, transparent 60%, rgba(14,11,31,0.8) 100%),
-              linear-gradient(90deg, rgba(14,11,31,0.3) 0%, transparent 30%)
+              linear-gradient(180deg, rgba(14,11,31,0.2) 0%, transparent 20%),
+              linear-gradient(180deg, transparent 50%, rgba(14,11,31,0.9) 100%),
+              linear-gradient(90deg, rgba(14,11,31,0.4) 0%, transparent 40%)
             `,
           }}
         />
 
-        <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 flex items-center gap-4">
+        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 flex items-center gap-4 z-10">
           <SpinningH2H />
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -230,28 +248,39 @@ function VideoBlock() {
 function Divider() {
   return (
     <motion.div
-      className="w-full my-20 md:my-28"
-      initial={{ scaleX: 0 }}
-      whileInView={{ scaleX: 1 }}
+      className="w-full my-24 md:my-32 flex justify-center"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
-      style={{
-        height: '1px',
-        background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.2), rgba(164,108,252,0.2), transparent)',
-        transformOrigin: 'left',
-      }}
-    />
+      transition={{ duration: 1 }}
+    >
+      <motion.div
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.5, ease: EASE_OUT_EXPO }}
+        style={{
+          height: '1px',
+          width: '100%',
+          background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.4), transparent)',
+          transformOrigin: 'center',
+        }}
+      />
+    </motion.div>
   );
 }
 
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
+  
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
   });
 
-  const contentY = useTransform(scrollYProgress, [0, 1], ['2%', '-2%']);
+  // Adding spring physics to the parallax makes the whole section feel incredibly premium
+  const smoothScroll = useSpring(scrollYProgress, { damping: 30, stiffness: 100, mass: 1 });
+  const contentY = useTransform(smoothScroll, [0, 1], ['3%', '-3%']);
 
   return (
     <section

@@ -7,6 +7,7 @@ import {
   useInView,
 } from 'motion/react';
 import { ShootingStars } from './ShootingStars';
+import { getButtonHoverHandlers } from '../utils/buttonHover';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -92,7 +93,6 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 
   useEffect(() => {
     if (!isInView) return;
-    let start = 0;
     const duration = 1800;
     const startTime = performance.now();
 
@@ -100,8 +100,7 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 4);
-      start = Math.round(eased * value);
-      setDisplay(start);
+      setDisplay(Math.round(eased * value));
       if (progress < 1) requestAnimationFrame(tick);
     }
 
@@ -172,6 +171,137 @@ function StatsBar() {
   );
 }
 
+function StarburstIcon() {
+  return (
+    <motion.div
+      className="hidden md:flex items-center justify-center"
+      initial={{ opacity: 0, scale: 0.6, rotate: -45 }}
+      whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+    >
+      <motion.svg
+        width="100"
+        height="100"
+        viewBox="0 0 121 121"
+        fill="none"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+      >
+        <path
+          opacity="0.2"
+          d="M0 54.3207C0.346705 54.3523 0.693411 54.3838 1.04012 54.3838C15.5702 54.3838 30.1003 54.3838 44.6619 54.3838C44.9771 54.3838 45.2923 54.3838 45.5444 54.3838C34.765 43.6016 23.9857 32.8194 13.2378 22.0688C16.2951 19.0422 19.1003 16.2994 21.9685 13.462C32.5903 24.0865 43.3696 34.8687 54.4327 45.9346C54.4327 30.3919 54.4327 15.1959 54.4327 0C58.5301 0 62.5014 0 66.5673 0C66.5673 15.2275 66.5673 30.3603 66.5673 45.4617C77.3467 34.6795 88.1261 23.8973 98.8109 13.2097C101.868 16.2678 104.642 19.0422 107.479 21.8796C96.8567 32.5042 86.0774 43.2863 75.298 54.0685C75.3295 54.1631 75.3925 54.2577 75.4241 54.3523C90.5845 54.3523 105.777 54.3523 121 54.3523C121 58.4508 121 62.4231 121 66.5216C105.777 66.5216 90.6161 66.5216 75.3295 66.5216C86.235 77.4299 96.9828 88.1806 107.731 98.9312C104.768 101.832 101.994 104.575 99.1576 107.38C88.5358 96.7559 77.7564 85.9737 66.788 74.9708C66.7249 75.5698 66.6619 75.822 66.6619 76.0743C66.6619 90.7658 66.6619 105.457 66.6619 120.18C66.6619 120.464 66.7249 120.716 66.7249 121C62.6275 121 58.5301 121 54.4327 121C54.4642 120.653 54.4957 120.306 54.4957 119.96C54.4957 105.426 54.4957 90.8919 54.4957 76.358C54.4957 76.0427 54.4327 75.6959 54.4011 75.0023C43.3381 86.0052 32.5587 96.7874 21.937 107.412C19.1003 104.606 16.2951 101.863 13.2063 98.8366C23.9542 88.086 34.702 77.3353 45.4814 66.5531C45.2607 66.5531 44.9456 66.5531 44.6304 66.5531C30.1003 66.5531 15.5702 66.5531 1.04012 66.5531C0.693411 66.5531 0.346705 66.6162 0 66.6162C0 62.5177 0 58.4192 0 54.3207Z"
+          fill="var(--color-secondary)"
+        />
+      </motion.svg>
+    </motion.div>
+  );
+}
+
+function AboutCTA() {
+  const btnHover = getButtonHoverHandlers();
+
+  const scrollToContact = () => {
+    const el = document.getElementById('contact');
+    if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: 'smooth' });
+  };
+
+  return (
+    <motion.div
+      className="w-full"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+      style={{
+        border: '2px solid var(--color-text-dark)',
+        boxShadow: '8px 8px 0 var(--color-surface-dark)',
+        background: 'rgba(14,11,31,0.6)',
+        backdropFilter: 'blur(12px)',
+        padding: 'clamp(2rem, 5vw, 3.5rem)',
+      }}
+    >
+      <motion.h3
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT_EXPO }}
+        style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: 'clamp(2rem, 5vw, 4rem)',
+          fontWeight: 800,
+          lineHeight: 1.05,
+          letterSpacing: '-0.03em',
+          textTransform: 'uppercase',
+          color: 'var(--color-text-dark)',
+          marginBottom: 'clamp(2rem, 4vw, 3rem)',
+        }}
+      >
+        Let's Build Something{' '}
+        <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
+          Unforgettable
+        </span>
+      </motion.h3>
+
+      <div
+        className="flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-12"
+        style={{
+          borderTop: '1px solid rgba(232,226,255,0.12)',
+          paddingTop: 'clamp(1.5rem, 3vw, 2.5rem)',
+        }}
+      >
+        <StarburstIcon />
+
+        <div className="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.25, ease: EASE_OUT_EXPO }}
+            className="flex-1"
+            style={{
+              fontFamily: 'var(--font-stack-body)',
+              fontSize: 'clamp(0.95rem, 1.3vw, 1.1rem)',
+              lineHeight: 1.75,
+              color: 'rgba(232,226,255,0.7)',
+              margin: 0,
+            }}
+          >
+            Ready to make your brand impossible to ignore? We're strategists, creatives, and storytellers who turn ambition into momentum.
+          </motion.p>
+
+          <motion.button
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.35, ease: EASE_OUT_EXPO }}
+            onClick={scrollToContact}
+            className="flex-shrink-0"
+            style={{
+              padding: '16px 32px',
+              background: 'var(--color-text-dark)',
+              border: '2px solid var(--color-text-dark)',
+              color: 'var(--color-background-light)',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              fontFamily: 'var(--font-stack-heading)',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-button)',
+              transition: 'box-shadow 0.2s, transform 0.2s',
+              whiteSpace: 'nowrap',
+            }}
+            {...btnHover}
+          >
+            Start a Project
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function AboutStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -218,7 +348,6 @@ export function AboutStory() {
         className="relative w-full mx-auto flex flex-col items-center"
         style={{ y: contentParallax, maxWidth: '1300px', zIndex: 10 }}
       >
-        {/* Header */}
         <div className="flex flex-col items-center text-center mb-16 md:mb-24">
           <SectionBadge label="About Us" />
 
@@ -276,12 +405,10 @@ export function AboutStory() {
           </motion.p>
         </div>
 
-        {/* Stats Bar */}
         <div className="w-full mb-16 md:mb-24">
           <StatsBar />
         </div>
 
-        {/* Main Content: Video + Story */}
         <motion.div
           className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
           variants={staggerContainer}
@@ -512,6 +639,9 @@ export function AboutStory() {
           </motion.div>
         </motion.div>
 
+        <div className="w-full mt-16 md:mt-24">
+          <AboutCTA />
+        </div>
       </motion.div>
     </section>
   );

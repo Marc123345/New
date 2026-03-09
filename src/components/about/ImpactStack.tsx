@@ -46,7 +46,8 @@ function useCounterBatch(targets: number[], active: boolean) {
 
 export function ImpactStack() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-60px' });
+  // Changed from -60px to -10% for better responsive scroll triggering
+  const isInView = useInView(containerRef, { once: true, margin: '-10%' });
 
   const targets = STATS.map(s => s.value);
   const counters = useCounterBatch(targets, isInView);
@@ -56,17 +57,17 @@ export function ImpactStack() {
       {STATS.map((stat, i) => (
         <motion.div
           key={stat.label}
-          className="about-impact-card group relative"
+          className="about-impact-card group relative rounded-sm"
           initial={{ opacity: 0, x: 40, y: 10 }}
           whileInView={{ opacity: 1, x: 0, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
+          // Changed from -40px to -10% for consistent reveal
+          viewport={{ once: true, margin: '-10%' }}
           transition={{ duration: 0.8, delay: 0.12 * i, ease: EASE_OUT_EXPO }}
           whileHover={{ x: -4, transition: { duration: 0.25 } }}
           style={{
             padding: '20px 24px',
             background: 'rgba(164,108,252,0.03)',
             border: '1px solid rgba(164,108,252,0.1)',
-            borderRadius: '2px',
             cursor: 'default',
             position: 'relative',
             overflow: 'hidden',

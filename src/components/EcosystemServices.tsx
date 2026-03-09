@@ -273,7 +273,7 @@ export function EcosystemServices() {
               Services
             </span>
           </motion.div>
-          <h1
+          <h2
             className="leading-tight sm:leading-[0.9] tracking-tighter uppercase mb-6 sm:mb-8"
             style={{
               fontFamily: 'var(--font-stack-heading)',
@@ -292,7 +292,7 @@ export function EcosystemServices() {
             >
               Social Media Ecosystem.
             </span>
-          </h1>
+          </h2>
           <p
             className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-4"
             style={{ color: 'rgba(209,213,219,0.9)', lineHeight: 1.7, fontFamily: 'var(--font-stack-body)', fontWeight: 600 }}

@@ -86,7 +86,7 @@ export function ContactForm() {
           }}
         >
           <div style={{ marginBottom: "36px" }}>
-            <h3 style={{
+            <h2 style={{
               fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
               fontWeight: 700,
               color: "var(--color-text-dark)",
@@ -96,7 +96,7 @@ export function ContactForm() {
               fontFamily: "var(--font-stack-heading)",
             }}>
               Let's Build Your Company's Communication Strategy, That Feels Human
-            </h3>
+            </h2>
             <p style={{
               fontSize: "0.875rem",
               color: "var(--color-text-dark)",

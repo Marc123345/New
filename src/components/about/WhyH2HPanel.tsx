@@ -56,25 +56,25 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
 function FounderPortrait() {
   return (
     <motion.div
-      className="relative w-full max-w-[280px] mx-auto md:max-w-none"
+      className="relative w-full max-w-[280px] mx-auto lg:mx-0 lg:ml-auto"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 1, ease: EASE_OUT_EXPO }}
     >
-      <div className="relative flex justify-center">
+      <div className="relative flex justify-center lg:justify-end">
         <div
           className="relative overflow-hidden group"
           style={{
             width: '100%',
-            transform: 'rotate(-2deg)',
+            transform: 'rotate(2deg)',
             transition: 'transform 0.4s ease',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'rotate(0deg) translateY(-4px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'rotate(-2deg) translateY(0)';
+            e.currentTarget.style.transform = 'rotate(2deg) translateY(0)';
           }}
         >
           <div
@@ -153,7 +153,7 @@ function FounderPortrait() {
       </div>
 
       <motion.div
-        className="text-center mt-5"
+        className="text-center lg:text-right lg:pr-4 mt-5"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -217,61 +217,69 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         </h3>
       </motion.div>
 
-      <div className="flex flex-col md:grid md:grid-cols-12 gap-12 md:gap-8 lg:gap-12 items-start">
-        {/* On Mobile: Founder shows up first. On Desktop: Shows up in the middle. */}
-        <div className="md:col-span-4 flex justify-center md:order-2">
+      {/* FIXED HIERARCHY: Text lists on the left, Founder Portrait cleanly on the right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        
+        {/* Left Side: The Details (Spans 8 columns) */}
+        <div className="lg:col-span-8 order-2 lg:order-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+            <div>
+              <motion.span
+                className="block mb-6 md:mb-8"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+                style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-text-dark)',
+                  borderBottom: '1px solid rgba(164,108,252,0.2)',
+                  paddingBottom: '12px'
+                }}
+              >
+                Your Partner
+              </motion.span>
+              {LEFT_ITEMS.map((item, i) => (
+                <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.08} />
+              ))}
+            </div>
+
+            <div>
+              <motion.span
+                className="block mb-6 md:mb-8"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT_EXPO }}
+                style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-text-dark)',
+                  borderBottom: '1px solid rgba(164,108,252,0.2)',
+                  paddingBottom: '12px'
+                }}
+              >
+                Structure & Soul
+              </motion.span>
+              {RIGHT_ITEMS.map((item, i) => (
+                <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.08} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: The Founder (Spans 4 columns) */}
+        <div className="lg:col-span-4 order-1 lg:order-2">
           <FounderPortrait />
         </div>
 
-        <div className="md:col-span-4 md:order-1">
-          <motion.span
-            className="block mb-6 md:mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-dark)',
-              borderBottom: '1px solid rgba(164,108,252,0.2)',
-              paddingBottom: '12px'
-            }}
-          >
-            Your Partner
-          </motion.span>
-          {LEFT_ITEMS.map((item, i) => (
-            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.08} />
-          ))}
-        </div>
-
-        <div className="md:col-span-4 md:order-3">
-          <motion.span
-            className="block mb-6 md:mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT_EXPO }}
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-dark)',
-              borderBottom: '1px solid rgba(164,108,252,0.2)',
-              paddingBottom: '12px'
-            }}
-          >
-            Structure & Soul
-          </motion.span>
-          {RIGHT_ITEMS.map((item, i) => (
-            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.08} />
-          ))}
-        </div>
       </div>
     </div>
   );

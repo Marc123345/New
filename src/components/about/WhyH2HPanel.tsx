@@ -15,21 +15,35 @@ const RIGHT_ITEMS = [
   { tag: 'Story', text: 'People remember how you made them feel. We craft narratives that resonate, not just reach.' },
 ];
 
-function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: number }) {
+function StoryItem({
+  tag,
+  text,
+  delay,
+  isLast = false,
+}: {
+  tag: string;
+  text: string;
+  delay: number;
+  isLast?: boolean;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
-      style={{ marginBottom: '1.5rem' }}
+      style={{
+        paddingBottom: '1.5rem',
+        marginBottom: isLast ? 0 : '1.5rem',
+        borderBottom: isLast ? 'none' : '1px solid rgba(164,108,252,0.07)',
+      }}
     >
       <span
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.65rem',
+          fontSize: '0.6rem',
           fontWeight: 700,
-          letterSpacing: '0.22em',
+          letterSpacing: '0.25em',
           textTransform: 'uppercase',
           color: 'var(--color-secondary)',
           display: 'block',
@@ -41,9 +55,9 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
       <p
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
-          lineHeight: 1.75,
-          color: 'rgba(232,226,255,0.72)',
+          fontSize: 'clamp(0.88rem, 1.15vw, 0.97rem)',
+          lineHeight: 1.8,
+          color: 'rgba(232,226,255,0.68)',
           margin: 0,
         }}
       >
@@ -56,12 +70,28 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
 function ColumnLabel({ label, delay = 0 }: { label: string; delay?: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay, ease: EASE_OUT_EXPO }}
-      style={{ marginBottom: '1.75rem' }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        paddingBottom: '1rem',
+        marginBottom: '1.75rem',
+        borderBottom: '1px solid rgba(164,108,252,0.12)',
+      }}
     >
+      <div
+        style={{
+          width: '4px',
+          height: '4px',
+          borderRadius: '50%',
+          background: 'rgba(164,108,252,0.55)',
+          flexShrink: 0,
+        }}
+      />
       <span
         style={{
           fontFamily: 'var(--font-stack-heading)',
@@ -70,19 +100,10 @@ function ColumnLabel({ label, delay = 0 }: { label: string; delay?: number }) {
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
           color: 'rgba(164,108,252,0.5)',
-          display: 'block',
-          marginBottom: '6px',
         }}
       >
         {label}
       </span>
-      <div
-        style={{
-          width: '3rem',
-          height: '1px',
-          background: 'rgba(164,108,252,0.35)',
-        }}
-      />
     </motion.div>
   );
 }
@@ -94,111 +115,104 @@ function FounderPortrait() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-      style={{ width: '100%' }}
+      className="group"
+      style={{
+        width: '100%',
+        // Offset shadow creates a framing effect without clipping the image
+        boxShadow: '10px 10px 0 rgba(164,108,252,0.18)',
+        transition: 'box-shadow 0.4s ease',
+      }}
     >
       <div
-        className="group relative overflow-hidden"
         style={{
           width: '100%',
-          margin: '0 auto',
-          transform: 'rotate(-2deg)',
+          overflow: 'hidden',
+          position: 'relative',
+          border: '1.5px solid rgba(164,108,252,0.18)',
         }}
       >
         {/* Hover glow */}
         <div
-          className="absolute -inset-1 opacity-0 group-hover:opacity-100"
+          className="absolute -inset-1 opacity-0 group-hover:opacity-100 pointer-events-none"
           style={{
-            background: 'linear-gradient(135deg, rgba(164,108,252,0.15), transparent 60%)',
+            background: 'linear-gradient(135deg, rgba(164,108,252,0.08), transparent 60%)',
             transition: 'opacity 0.5s ease',
             zIndex: 1,
-            pointerEvents: 'none',
           }}
         />
 
-        <div
+        <img
+          src="https://ik.imagekit.io/qcvroy8xpd/image%201%20(1).png"
+          alt="Shannon, Founder of H2H"
+          loading="lazy"
+          decoding="async"
+          className="w-full block transition-transform duration-700 group-hover:scale-[1.03]"
           style={{
-            border: '2px solid var(--color-surface-dark)',
-            overflow: 'hidden',
-            position: 'relative',
+            aspectRatio: '3 / 4',
+            objectFit: 'cover',
+            objectPosition: 'center top',
           }}
+        />
+
+        {/* Gradient overlay */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              linear-gradient(180deg, rgba(14,11,31,0.08) 0%, transparent 25%),
+              linear-gradient(180deg, transparent 45%, rgba(14,11,31,0.94) 100%)
+            `,
+          }}
+        />
+
+        {/* Caption — consolidated inside the image */}
+        <div
+          className="absolute bottom-0 left-0 right-0"
+          style={{ padding: '1.5rem 1.25rem 1.25rem', zIndex: 2 }}
         >
-          <img
-            src="https://ik.imagekit.io/qcvroy8xpd/image%201%20(1).png"
-            alt="Shannon, Founder of H2H"
-            loading="lazy"
-            decoding="async"
-            className="w-full block"
+          <span
             style={{
-              aspectRatio: '3 / 4',
-              objectFit: 'cover',
-              objectPosition: 'center top',
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '0.48rem',
+              fontWeight: 700,
+              letterSpacing: '0.35em',
+              textTransform: 'uppercase',
+              color: 'rgba(164,108,252,0.55)',
+              display: 'block',
+              marginBottom: '6px',
             }}
-          />
-
-          {/* Gradient overlay */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `
-                linear-gradient(180deg, rgba(14,11,31,0.15) 0%, transparent 30%),
-                linear-gradient(180deg, transparent 55%, rgba(14,11,31,0.9) 100%)
-              `,
-            }}
-          />
-
-          {/* Caption over image */}
-          <div
-            className="absolute bottom-0 left-0 right-0 p-5"
-            style={{ zIndex: 2 }}
           >
-            <span
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'var(--color-secondary)',
-                display: 'block',
-                marginBottom: '4px',
-              }}
-            >
-              Founder
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(1rem, 1.4vw, 1.15rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
-                color: 'var(--color-text-dark)',
-                display: 'block',
-              }}
-            >
-              Shannon
-            </span>
-          </div>
+            The human behind H2H
+          </span>
+          <span
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '0.52rem',
+              fontWeight: 700,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: 'var(--color-secondary)',
+              display: 'block',
+              marginBottom: '5px',
+            }}
+          >
+            Founder
+          </span>
+          <span
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: 'clamp(1.05rem, 1.4vw, 1.25rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              color: 'var(--color-text-dark)',
+              display: 'block',
+            }}
+          >
+            Shannon
+          </span>
         </div>
       </div>
-
-      <motion.p
-        className="text-center mt-4"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
-        style={{
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.55rem',
-          fontWeight: 700,
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: 'rgba(164,108,252,0.35)',
-        }}
-      >
-        The human behind H2H
-      </motion.p>
     </motion.div>
   );
 }
@@ -206,72 +220,126 @@ function FounderPortrait() {
 export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
     <div className="w-full">
-      {/* Section heading — editorially constrained to 2/3 width on desktop */}
-      <motion.div
-        className="mb-12 md:mb-16 lg:max-w-[66%]"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: '0.62rem',
-            fontWeight: 700,
-            letterSpacing: '0.32em',
-            textTransform: 'uppercase',
-            color: 'rgba(164,108,252,0.7)',
-            display: 'block',
-            marginBottom: '16px',
-          }}
-        >
-          Why H2H
-        </span>
-        <h3
-          style={{
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(1.6rem, 3.2vw, 3rem)',
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: '-0.03em',
-            textTransform: 'uppercase',
-            color: 'var(--color-text-dark)',
-            margin: 0,
-          }}
-        >
-          Because we embed ourselves{' '}
-          <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
-            in your world.
-          </span>
-        </h3>
-      </motion.div>
 
-      {/* 3-column symmetric grid: text | portrait | text */}
+      {/* Heading — anchored to the left two columns, right column breathes */}
       <div
-        className="grid grid-cols-1 md:grid-cols-3 items-center"
+        className="grid grid-cols-1 md:grid-cols-3"
+        style={{ gap: 'clamp(2rem, 4vw, 4rem)', marginBottom: 'clamp(2.5rem, 4vw, 4rem)' }}
+      >
+        <motion.div
+          className="md:col-span-2"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '0.62rem',
+              fontWeight: 700,
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase',
+              color: 'rgba(164,108,252,0.7)',
+              display: 'block',
+              marginBottom: '16px',
+            }}
+          >
+            Why H2H
+          </span>
+          <h3
+            style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: 'clamp(1.6rem, 3.2vw, 3rem)',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.03em',
+              textTransform: 'uppercase',
+              color: 'var(--color-text-dark)',
+              margin: 0,
+            }}
+          >
+            Because we embed ourselves{' '}
+            <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
+              in your world.
+            </span>
+          </h3>
+        </motion.div>
+
+        {/* Right column intentionally empty in heading row —
+            creates visual anticipation / whitespace aligned with portrait below */}
+        <div className="hidden md:block" />
+      </div>
+
+      {/* Full-width separator between heading and content grid */}
+      <motion.div
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+        style={{
+          height: '1px',
+          background: 'linear-gradient(90deg, rgba(164,108,252,0.3) 0%, rgba(164,108,252,0.08) 65%, transparent 100%)',
+          transformOrigin: 'left',
+          marginBottom: 'clamp(2.5rem, 4vw, 4rem)',
+        }}
+      />
+
+      {/* 3-column content grid */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 items-start"
         style={{ gap: 'clamp(2rem, 4vw, 4rem)' }}
       >
-        {/* Left column — Your Partner */}
-        <div className="md:order-1">
+        {/* Left — Your Partner */}
+        <motion.div
+          className="md:order-1"
+          initial={{ opacity: 0, x: -16 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
+        >
           <ColumnLabel label="Your Partner" />
           {LEFT_ITEMS.map((item, i) => (
-            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.08} />
+            <StoryItem
+              key={item.tag}
+              tag={item.tag}
+              text={item.text}
+              delay={0.08 + i * 0.08}
+              isLast={i === LEFT_ITEMS.length - 1}
+            />
           ))}
-        </div>
+        </motion.div>
 
         {/* Centre — Founder portrait */}
-        <div className="md:order-2 flex justify-center">
+        <motion.div
+          className="md:order-2"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.9, delay: 0.1, ease: EASE_OUT_EXPO }}
+        >
           <FounderPortrait />
-        </div>
+        </motion.div>
 
-        {/* Right column — Structure & Soul */}
-        <div className="md:order-3">
+        {/* Right — Structure & Soul */}
+        <motion.div
+          className="md:order-3"
+          initial={{ opacity: 0, x: 16 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.7, delay: 0.1, ease: EASE_OUT_EXPO }}
+        >
           <ColumnLabel label="Structure & Soul" delay={0.1} />
           {RIGHT_ITEMS.map((item, i) => (
-            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.08} />
+            <StoryItem
+              key={item.tag}
+              tag={item.tag}
+              text={item.text}
+              delay={0.14 + i * 0.08}
+              isLast={i === RIGHT_ITEMS.length - 1}
+            />
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

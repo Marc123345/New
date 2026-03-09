@@ -1,10 +1,5 @@
-import { useRef, memo } from 'react';
-import {
-  motion,
-  useScroll,
-  useTransform,
-} from 'motion/react';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { memo } from 'react';
+import { motion } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
 import { WhyH2HPanel } from './about/WhyH2HPanel';
@@ -159,7 +154,7 @@ function NarrativeBlock() {
 const AboutPanel = memo(function AboutPanel() {
   return (
     <div className="w-full" style={{ contain: 'layout style' }}>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         <div className="lg:col-span-7 flex flex-col gap-8 md:gap-10">
           <HeroBlock />
           <NarrativeBlock />
@@ -204,7 +199,7 @@ function VideoBlock() {
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
     >
       <motion.div
-        className="relative overflow-hidden cursor-pointer group"
+        className="relative overflow-hidden cursor-pointer group rounded-sm"
         whileHover={{
           y: -8,
           x: -8,
@@ -247,18 +242,19 @@ function VideoBlock() {
   );
 }
 
-function MobileAbout() {
+export function AboutStory() {
   return (
-    <div
-      className="relative w-full"
+    <section
+      id="about"
+      className="relative w-full overflow-hidden"
       style={{
         background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
       }}
     >
+      {/* Universal Background Effects */}
       <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.08 }}>
         <SignalBackground />
       </div>
-
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -269,186 +265,23 @@ function MobileAbout() {
         }}
       />
 
-      <div
-        className="relative"
-        style={{
-          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2rem)',
-          zIndex: 10,
-        }}
-      >
-        <div className="mx-auto" style={{ maxWidth: '1300px' }}>
-          <AboutPanel />
-        </div>
-      </div>
+      {/* Main Content Container */}
+      <div className="relative mx-auto flex flex-col gap-24 lg:gap-40" 
+           style={{ 
+             maxWidth: '1300px', 
+             padding: 'clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 3rem)',
+             zIndex: 10 
+           }}>
+        
+        {/* Panel 1: Narrative & Video */}
+        <AboutPanel />
 
-      <div
-        className="relative"
-        style={{
-          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2rem)',
-          zIndex: 10,
-        }}
-      >
-        <div className="mx-auto" style={{ maxWidth: '1300px' }}>
-          <WhyH2HPanel />
-        </div>
-      </div>
+        {/* Panel 2: Why H2H / Structure & Soul */}
+        <WhyH2HPanel />
 
-      <div
-        className="relative"
-        style={{
-          padding: 'clamp(3rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2rem)',
-          zIndex: 10,
-        }}
-      >
-        <div className="relative mx-auto" style={{ maxWidth: '1300px' }}>
-          <SignatureEnding />
-        </div>
-      </div>
-    </div>
-  );
-}
+        {/* Panel 3: Signature Outro */}
+        <SignatureEnding />
 
-function DesktopSwipeTransition() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  });
-
-  const panel1X = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], ['0%', '0%', '-100%', '-100%']);
-  const panel1Opacity = useTransform(scrollYProgress, [0, 0.35, 0.6, 0.65], [1, 1, 0.3, 0]);
-  const panel1Scale = useTransform(scrollYProgress, [0, 0.35, 0.65], [1, 1, 0.96]);
-
-  const panel2X = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], ['100%', '100%', '0%', '0%']);
-  const panel2Opacity = useTransform(scrollYProgress, [0.3, 0.35, 0.65, 1], [0, 0, 1, 1]);
-  const panel2Scale = useTransform(scrollYProgress, [0.35, 0.65, 1], [0.96, 1, 1]);
-
-  const lineScaleX = useTransform(scrollYProgress, [0.3, 0.5, 0.7], [0, 1, 0]);
-  const lineOpacity = useTransform(scrollYProgress, [0.3, 0.45, 0.55, 0.7], [0, 1, 1, 0]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative"
-      style={{ height: '400vh' }}
-    >
-      <div
-        className="sticky top-0 left-0 w-full overflow-hidden"
-        style={{ height: '100vh', contain: 'layout paint' }}
-      >
-        <SignalBackground />
-
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `
-              radial-gradient(ellipse at 20% 30%, rgba(60, 20, 120, 0.14) 0%, transparent 55%),
-              radial-gradient(ellipse at 80% 70%, rgba(20, 10, 60, 0.16) 0%, transparent 50%)
-            `,
-          }}
-        />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `
-              linear-gradient(180deg, #06030f 0%, transparent 10%),
-              linear-gradient(0deg, #06030f 0%, transparent 10%)
-            `,
-          }}
-        />
-
-        <div className="relative h-full" style={{ zIndex: 10 }}>
-          <motion.div
-            className="absolute inset-0 flex items-center"
-            style={{
-              x: panel1X,
-              opacity: panel1Opacity,
-              scale: panel1Scale,
-              willChange: 'transform, opacity',
-            }}
-          >
-            <div
-              className="w-full mx-auto overflow-y-auto hide-scrollbar"
-              style={{
-                maxWidth: '1300px',
-                padding: 'clamp(2rem, 4vw, 4rem) clamp(1.5rem, 5vw, 3rem)',
-                maxHeight: '100vh',
-              }}
-            >
-              <AboutPanel />
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-            style={{
-              width: '1px',
-              height: '60vh',
-              background: 'linear-gradient(180deg, transparent, rgba(164,108,252,0.5), transparent)',
-              scaleX: lineScaleX,
-              opacity: lineOpacity,
-              transformOrigin: 'center',
-            }}
-          />
-
-          <motion.div
-            className="absolute inset-0 flex items-center"
-            style={{
-              x: panel2X,
-              opacity: panel2Opacity,
-              scale: panel2Scale,
-              willChange: 'transform, opacity',
-            }}
-          >
-            <div
-              className="w-full mx-auto overflow-y-auto hide-scrollbar"
-              style={{
-                maxWidth: '1300px',
-                padding: 'clamp(2rem, 4vw, 4rem) clamp(1.5rem, 5vw, 3rem)',
-                maxHeight: '100vh',
-              }}
-            >
-              <WhyH2HPanel />
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function AboutStory() {
-  const isMobile = useIsMobile();
-
-  if (isMobile) {
-    return (
-      <section id="about" className="relative w-full">
-        <MobileAbout />
-      </section>
-    );
-  }
-
-  return (
-    <section
-      id="about"
-      className="relative w-full"
-      style={{
-        background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
-      }}
-    >
-      <DesktopSwipeTransition />
-
-      <div
-        className="relative"
-        style={{
-          background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
-          padding: 'clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 3rem)',
-        }}
-      >
-        <div className="relative mx-auto" style={{ maxWidth: '1300px', zIndex: 10 }}>
-          <SignatureEnding />
-        </div>
       </div>
     </section>
   );

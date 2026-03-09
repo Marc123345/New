@@ -80,7 +80,7 @@ function HeroBlock() {
 
 function NarrativeBlock() {
   return (
-    <div className="flex flex-col gap-6 md:gap-8" style={{ maxWidth: '600px' }}>
+    <div className="flex flex-col gap-6 md:gap-8">
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -270,17 +270,17 @@ export function AboutStory() {
         }}
       />
 
-      <div className="relative mx-auto flex flex-col gap-24 lg:gap-40" 
-           style={{ 
-             maxWidth: '1300px', 
-             padding: 'clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 3rem)',
-             zIndex: 10 
-           }}>
-        
-        <AboutPanel />
-        <WhyH2HPanel />
-        <SignatureEnding />
-
+      {/* Outer: same horizontal padding as hero/nav (px-4 md:px-8 lg:px-12) */}
+      <div
+        className="relative z-10 px-4 md:px-8 lg:px-12"
+        style={{ paddingTop: 'clamp(4rem, 8vw, 8rem)', paddingBottom: 'clamp(4rem, 8vw, 8rem)' }}
+      >
+        {/* Inner: same max-width as hero (max-w-8xl) so left edges align */}
+        <div className="max-w-8xl mx-auto flex flex-col gap-20 lg:gap-32">
+          <AboutPanel />
+          <WhyH2HPanel />
+          <SignatureEnding />
+        </div>
       </div>
     </section>
   );

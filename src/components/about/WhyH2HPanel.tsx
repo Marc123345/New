@@ -175,9 +175,10 @@ function FounderPortrait() {
 
 export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
-    <div className="w-full">
+    // FIX 1: Added explicit mt-16 md:mt-24 to force clearance from the section above
+    <div className="w-full mt-16 md:mt-24">
       <motion.div
-        className="mb-10 md:mb-16"
+        className="mb-12 md:mb-20"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-10%' }}
@@ -186,7 +187,7 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         <span
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: '0.6rem',
+            fontSize: '0.65rem',
             fontWeight: 700,
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
@@ -202,7 +203,10 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
             fontFamily: 'var(--font-stack-heading)',
             fontSize: 'clamp(1.4rem, 2.5vw, 2.2rem)',
             fontWeight: 800,
-            lineHeight: 1.15,
+            // FIX 2: Increased line-height and added padding so the text-stroke cannot visually clip
+            lineHeight: 1.35, 
+            paddingTop: '4px',
+            paddingBottom: '4px',
             letterSpacing: '-0.02em',
             textTransform: 'uppercase',
             color: 'var(--color-text-dark)',
@@ -217,10 +221,9 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         </h3>
       </motion.div>
 
-      {/* FIXED HIERARCHY: Text lists on the left, Founder Portrait cleanly on the right */}
+      {/* Text lists on the left, Founder Portrait cleanly on the right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         
-        {/* Left Side: The Details (Spans 8 columns) */}
         <div className="lg:col-span-8 order-2 lg:order-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
             <div>
@@ -275,7 +278,6 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
           </div>
         </div>
 
-        {/* Right Side: The Founder (Spans 4 columns) */}
         <div className="lg:col-span-4 order-1 lg:order-2">
           <FounderPortrait />
         </div>

@@ -1,12 +1,14 @@
 import { useState, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
-import { ImpactStack } from './about/ImpactStack';
 import { WhyH2HPanel } from './about/WhyH2HPanel';
 import { SignatureEnding } from './about/SignatureEnding';
 import { SpinningH2H } from './about/SpinningH2H';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+const STORY_VIDEO_URL =
+  'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4';
 
 type Panel = 'about' | 'why';
 
@@ -78,7 +80,7 @@ function PanelSwitcher({
 
 function HeroBlock() {
   return (
-    <div className="flex flex-col items-start w-full mb-4">
+    <div className="flex flex-col items-start w-full mb-10 md:mb-14">
       <motion.span
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
@@ -139,7 +141,7 @@ function HeroBlock() {
 
 function NarrativeBlock() {
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-6 md:gap-8" style={{ maxWidth: '720px' }}>
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -233,7 +235,7 @@ function VideoBlock() {
           playsInline
           className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           style={{ display: 'block', maxHeight: '500px' }}
-          src="https://ik.imagekit.io/qcvroy8xpd/astronauts-dance-on-surface-of-the-alien-planet-hu-2026-01-28-04-20-47-utc.mp4?updatedAt=1771949799426"
+          src={STORY_VIDEO_URL}
         />
 
         <div
@@ -259,38 +261,7 @@ const AboutPanel = memo(function AboutPanel() {
   return (
     <div className="w-full">
       <HeroBlock />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mt-12 md:mt-16 lg:mt-20">
-        <NarrativeBlock />
-
-        <div>
-          <motion.div
-            className="mb-7"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
-            style={{
-              paddingBottom: '14px',
-              borderBottom: '1px solid rgba(164,108,252,0.15)',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'rgba(164,108,252,0.6)',
-              }}
-            >
-              Impact
-            </span>
-          </motion.div>
-          <ImpactStack />
-        </div>
-      </div>
-
+      <NarrativeBlock />
       <VideoBlock />
     </div>
   );
@@ -300,10 +271,6 @@ const AboutPanel = memo(function AboutPanel() {
 
 export function AboutStory() {
   const [active, setActive] = useState<Panel>('about');
-
-  const handleChange = (next: Panel) => {
-    if (next !== active) setActive(next);
-  };
 
   return (
     <section
@@ -332,10 +299,8 @@ export function AboutStory() {
       >
         <div className="max-w-8xl mx-auto">
 
-          {/* Tab switcher */}
-          <PanelSwitcher active={active} onChange={handleChange} />
+          <PanelSwitcher active={active} onChange={setActive} />
 
-          {/* Animated panel swap */}
           <AnimatePresence mode="wait">
             {active === 'about' ? (
               <motion.div

@@ -3,21 +3,18 @@ import { motion } from 'motion/react';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+const FOUNDER_VIDEO_URL =
+  'https://ik.imagekit.io/qcvroy8xpd/IMG_9186%20(1).mp4';
+
 const PARTNER_ITEMS = [
   { tag: 'Embedded', text: 'We don\'t deliver from the outside. We embed ourselves in your world, learning your rhythm and your audience.' },
   { tag: 'Responsive', text: 'Markets shift fast. We move with you, adapting strategy in real time without losing the thread.' },
   { tag: 'Aligned', text: 'Your goals become ours. Every piece of content, every campaign, every decision maps back to what matters to you.' },
 ];
 
-const SOUL_ITEMS = [
-  { tag: 'Insight', text: 'Data tells us where to look. Intuition tells us what to do with it. We bring both.' },
-  { tag: 'Systems', text: 'We build ecosystems, not one-offs. Every touchpoint connects to create compounding brand momentum.' },
-  { tag: 'Story', text: 'People remember how you made them feel. We craft narratives that resonate, not just reach.' },
-];
-
 function WhyHeadingBlock() {
   return (
-    <div className="flex flex-col items-start w-full mb-4">
+    <div className="flex flex-col items-start w-full mb-10 md:mb-14">
       <motion.span
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
@@ -78,7 +75,7 @@ function WhyHeadingBlock() {
 
 function PartnerBlock() {
   return (
-    <div className="flex flex-col gap-6 md:gap-8">
+    <div className="flex flex-col gap-6 md:gap-8" style={{ maxWidth: '720px' }}>
       {PARTNER_ITEMS.map((item, i) => (
         <motion.div
           key={item.tag}
@@ -117,87 +114,6 @@ function PartnerBlock() {
   );
 }
 
-function SoulBlock() {
-  return (
-    <div>
-      <motion.div
-        className="mb-7"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
-        style={{
-          paddingBottom: '14px',
-          borderBottom: '1px solid rgba(164,108,252,0.15)',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: '0.65rem',
-            fontWeight: 700,
-            letterSpacing: '0.3em',
-            textTransform: 'uppercase',
-            color: 'rgba(164,108,252,0.6)',
-          }}
-        >
-          Structure &amp; Soul
-        </span>
-      </motion.div>
-
-      <div className="flex flex-col gap-4">
-        {SOUL_ITEMS.map((item, i) => (
-          <motion.div
-            key={item.tag}
-            initial={{ opacity: 0, x: 40, y: 10 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.12 * i, ease: EASE_OUT_EXPO }}
-            className="group relative"
-            style={{
-              padding: '24px',
-              background: 'rgba(164,108,252,0.03)',
-              border: '1px solid rgba(164,108,252,0.1)',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100"
-              style={{
-                background: 'linear-gradient(135deg, rgba(164,108,252,0.06) 0%, transparent 60%)',
-                transition: 'opacity 0.35s ease',
-              }}
-            />
-            <div className="relative flex flex-col gap-2">
-              <span
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: '0.85rem',
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-secondary)',
-                }}
-              >
-                {item.tag}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-stack-body)',
-                  fontSize: '0.85rem',
-                  color: 'rgba(232,226,255,0.65)',
-                  lineHeight: 1.6,
-                }}
-              >
-                {item.text}
-              </span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function FounderVideoBlock() {
   return (
     <motion.div
@@ -224,7 +140,7 @@ function FounderVideoBlock() {
           playsInline
           className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           style={{ display: 'block', maxHeight: '500px' }}
-          src="https://ik.imagekit.io/qcvroy8xpd/Video_Generation_With_Earth.mp4?updatedAt=1772722343425"
+          src={FOUNDER_VIDEO_URL}
         />
 
         <div
@@ -281,12 +197,7 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
     <div className="w-full">
       <WhyHeadingBlock />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mt-12 md:mt-16 lg:mt-20">
-        <PartnerBlock />
-        <SoulBlock />
-      </div>
-
+      <PartnerBlock />
       <FounderVideoBlock />
     </div>
   );

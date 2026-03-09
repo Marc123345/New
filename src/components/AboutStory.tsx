@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
 import { WhyH2HPanel } from './about/WhyH2HPanel';
 import { SignatureEnding } from './about/SignatureEnding';
-import { SpinningH2H } from './about/SpinningH2H';
+import { HologramVideoBlock } from './about/HologramVideoBlock';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -210,51 +210,7 @@ function NarrativeBlock() {
 }
 
 function VideoBlock() {
-  return (
-    <motion.div
-      className="w-full mt-16 md:mt-24 lg:mt-32"
-      initial={{ opacity: 0, y: 60 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, delay: 0.3, ease: EASE_OUT_EXPO }}
-    >
-      <motion.div
-        className="relative overflow-hidden cursor-pointer group rounded-sm"
-        whileHover={{ y: -8, x: -8, boxShadow: 'var(--shadow-geometric-hover)' }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{
-          border: '1px solid rgba(255,255,255,0.1)',
-          background: 'var(--color-background-light)',
-          boxShadow: 'var(--shadow-geometric)',
-          maxHeight: '500px',
-        }}
-      >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          style={{ display: 'block', maxHeight: '500px' }}
-          src={STORY_VIDEO_URL}
-        />
-
-        <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
-          style={{
-            background: `
-              linear-gradient(180deg, rgba(14,11,31,0.2) 0%, transparent 20%),
-              linear-gradient(180deg, transparent 50%, rgba(14,11,31,0.9) 100%),
-              linear-gradient(90deg, rgba(14,11,31,0.4) 0%, transparent 40%)
-            `,
-          }}
-        />
-
-        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 flex items-center gap-4 z-10">
-          <SpinningH2H />
-        </div>
-      </motion.div>
-    </motion.div>
-  );
+  return <HologramVideoBlock src={STORY_VIDEO_URL} label="Hear Our Story" />;
 }
 
 const AboutPanel = memo(function AboutPanel() {

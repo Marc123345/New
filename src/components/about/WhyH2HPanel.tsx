@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { motion } from 'motion/react';
+import { HologramVideoBlock } from './HologramVideoBlock';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -115,82 +116,7 @@ function PartnerBlock() {
 }
 
 function FounderVideoBlock() {
-  return (
-    <motion.div
-      className="w-full mt-16 md:mt-24 lg:mt-32"
-      initial={{ opacity: 0, y: 60 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, delay: 0.3, ease: EASE_OUT_EXPO }}
-    >
-      <motion.div
-        className="relative overflow-hidden cursor-pointer group rounded-sm"
-        whileHover={{ y: -8, x: -8, boxShadow: 'var(--shadow-geometric-hover)' }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{
-          border: '1px solid rgba(255,255,255,0.1)',
-          background: 'var(--color-background-light)',
-          boxShadow: 'var(--shadow-geometric)',
-          maxHeight: '500px',
-        }}
-      >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          style={{ display: 'block', maxHeight: '500px' }}
-          src={FOUNDER_VIDEO_URL}
-        />
-
-        <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
-          style={{
-            background: `
-              linear-gradient(180deg, rgba(14,11,31,0.2) 0%, transparent 20%),
-              linear-gradient(180deg, transparent 50%, rgba(14,11,31,0.9) 100%),
-              linear-gradient(90deg, rgba(14,11,31,0.4) 0%, transparent 40%)
-            `,
-          }}
-        />
-
-        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-10">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.6 }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'rgba(164,108,252,0.7)',
-                display: 'block',
-                marginBottom: '6px',
-              }}
-            >
-              Meet the Founder
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(1rem, 1.5vw, 1.4rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                color: 'var(--color-text-dark)',
-                display: 'block',
-              }}
-            >
-              Shannon
-            </span>
-          </motion.div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
+  return <HologramVideoBlock src={FOUNDER_VIDEO_URL} label="Meet the Founder" sublabel="Shannon" />;
 }
 
 export const WhyH2HPanel = memo(function WhyH2HPanel() {

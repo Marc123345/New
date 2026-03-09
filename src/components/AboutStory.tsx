@@ -153,7 +153,8 @@ function NarrativeBlock() {
 
 const AboutPanel = memo(function AboutPanel() {
   return (
-    <div className="w-full" style={{ contain: 'layout style' }}>
+    // FIX: Removed style={{ contain: 'layout style' }} from this wrapper!
+    <div className="w-full">
       <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         <div className="lg:col-span-7 flex flex-col gap-8 md:gap-10">
           <HeroBlock />
@@ -251,7 +252,6 @@ export function AboutStory() {
         background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
       }}
     >
-      {/* Universal Background Effects */}
       <div className="absolute inset-0 pointer-events-none" style={{ opacity: 0.08 }}>
         <SignalBackground />
       </div>
@@ -265,7 +265,6 @@ export function AboutStory() {
         }}
       />
 
-      {/* Main Content Container */}
       <div className="relative mx-auto flex flex-col gap-24 lg:gap-40" 
            style={{ 
              maxWidth: '1300px', 
@@ -273,13 +272,8 @@ export function AboutStory() {
              zIndex: 10 
            }}>
         
-        {/* Panel 1: Narrative & Video */}
         <AboutPanel />
-
-        {/* Panel 2: Why H2H / Structure & Soul */}
         <WhyH2HPanel />
-
-        {/* Panel 3: Signature Outro */}
         <SignatureEnding />
 
       </div>

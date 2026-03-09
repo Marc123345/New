@@ -18,14 +18,16 @@ export function SignatureEnding() {
         style={{ background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.4), transparent)', transformOrigin: 'center' }}
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
+        // Updated to percentage margin for consistent responsive triggering
+        viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 1, ease: EASE_OUT_EXPO }}
       />
 
       <motion.h3
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
+        // Updated from -40px to -10%
+        viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
         className="px-4"
         style={{
@@ -50,7 +52,8 @@ export function SignatureEnding() {
         className="relative mt-8 md:mt-10 inline-flex items-center gap-3 cursor-pointer group"
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        // Added margin here as well so the button animates in slightly after the text
+        viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 0.7, delay: 0.2, ease: EASE_OUT_EXPO }}
         onClick={scrollToContact}
       >
@@ -101,7 +104,8 @@ export function SignatureEnding() {
         style={{ background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.2), transparent)', transformOrigin: 'center' }}
         initial={{ scaleX: 0, opacity: 0 }}
         whileInView={{ scaleX: 1, opacity: 1 }}
-        viewport={{ once: true }}
+        // Updated to percentage margin
+        viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 1.2, delay: 0.4, ease: EASE_OUT_EXPO }}
       />
     </div>

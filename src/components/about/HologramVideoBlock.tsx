@@ -532,37 +532,13 @@ export const HologramVideoBlock = memo(function HologramVideoBlock({ src, label,
             </motion.div>
           )}
 
-          {/* Pause overlay on hover when playing */}
+          {/* Hover dim overlay when playing */}
           {playing && hovering && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'rgba(14,11,31,0.3)',
-                zIndex: 5,
-              }}
-            >
-              <div
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  background: 'rgba(164,108,252,0.1)',
-                  border: '1px solid rgba(164,108,252,0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Pause size={20} stroke="rgba(164,108,252,0.9)" strokeWidth={1.5} />
-              </div>
-            </motion.div>
+              style={{ position: 'absolute', inset: 0, background: 'rgba(14,11,31,0.2)', zIndex: 5, pointerEvents: 'none' }}
+            />
           )}
 
           {/* Playing: waveform bar + status */}
@@ -646,6 +622,89 @@ export const HologramVideoBlock = memo(function HologramVideoBlock({ src, label,
             </div>
           )}
         </div>
+
+        {/* Persistent play / stop control bar */}
+        {bootPhase >= 3 && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 12,
+              padding: '10px 16px',
+              background: 'rgba(14,11,31,0.7)',
+              border: '1px solid rgba(164,108,252,0.15)',
+              borderRadius: 4,
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            {/* Left: label + waveform when playing */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {playing ? (
+                <>
+                  <motion.div
+                    style={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}
+                  >
+                    {[...Array(5)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        style={{ width: 2, background: 'rgba(164,108,252,0.6)', borderRadius: 1 }}
+                        animate={{ height: [3, 8 + i * 2, 3] }}
+                        transition={{ duration: 0.45 + i * 0.1, repeat: Infinity, delay: i * 0.07 }}
+                      />
+                    ))}
+                  </motion.div>
+                  <span style={{ color: 'rgba(164,108,252,0.5)', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'monospace' }}>
+                    Holographic Feed Active
+                  </span>
+                </>
+              ) : (
+                <span style={{ color: 'rgba(164,108,252,0.35)', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'monospace' }}>
+                  {videoReady ? 'Ready' : 'Acquiring Signal...'}
+                </span>
+              )}
+            </div>
+
+            {/* Right: Play / Stop button */}
+            <motion.button
+              onClick={handleToggle}
+              disabled={!videoReady && !playing}
+              whileHover={videoReady || playing ? { scale: 1.04 } : {}}
+              whileTap={videoReady || playing ? { scale: 0.94 } : {}}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '7px 16px',
+                background: playing ? 'rgba(164,108,252,0.08)' : 'rgba(164,108,252,0.12)',
+                border: `1px solid ${playing ? 'rgba(164,108,252,0.3)' : 'rgba(164,108,252,0.4)'}`,
+                borderRadius: 2,
+                cursor: videoReady || playing ? 'pointer' : 'default',
+                color: 'rgba(164,108,252,0.9)',
+                fontFamily: 'monospace',
+                fontSize: '0.55rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                opacity: !videoReady && !playing ? 0.4 : 1,
+              }}
+            >
+              {playing ? (
+                <>
+                  <Pause size={12} strokeWidth={2} />
+                  Stop
+                </>
+              ) : (
+                <>
+                  <Play size={12} fill="rgba(164,108,252,0.7)" strokeWidth={0} />
+                  Play
+                </>
+              )}
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* Bottom glow */}
         <motion.div

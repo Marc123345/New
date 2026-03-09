@@ -549,7 +549,7 @@ export function ArcSlider() {
                 color: "var(--color-secondary)",
               }}
             >
-              Our Capabilities
+              Other Services We Offer
             </span>
           </div>
           <h2
@@ -560,7 +560,7 @@ export function ArcSlider() {
               color: "var(--color-text-dark, #111)",
             }}
           >
-            Services
+            Our Capabilities
           </h2>
         </div>
 

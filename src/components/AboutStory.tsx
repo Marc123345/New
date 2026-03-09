@@ -115,7 +115,7 @@ function NarrativeBlock() {
           margin: 0,
         }}
       >
-        Perfect, polished campaigns are something that we take very seriously. But people want more than that. They want personality. They want to see and hear brands that speak like humans.
+        Perfect, polished campaigns are something that we take very seriously. But, people want more than that. They want personality. They want to see and hear brands that speak like humans and offer something meaningful.
       </motion.p>
 
       <motion.div

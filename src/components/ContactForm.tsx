@@ -87,22 +87,24 @@ export function ContactForm() {
         >
           <div style={{ marginBottom: "36px" }}>
             <h3 style={{
-              fontSize: "clamp(1.5rem, 2vw, 2rem)",
+              fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
               fontWeight: 700,
               color: "var(--color-text-dark)",
-              marginBottom: "8px",
-              letterSpacing: "-0.01em",
+              marginBottom: "12px",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.2,
               fontFamily: "var(--font-stack-heading)",
             }}>
-              Start a Project
+              Let's Build Your Company's Communication Strategy, That Feels Human
             </h3>
             <p style={{
               fontSize: "0.875rem",
               color: "var(--color-text-dark)",
-              opacity: 0.75,
+              opacity: 0.5,
+              lineHeight: 1.6,
               fontFamily: "var(--font-stack-heading)",
             }}>
-              Share your vision — we'll handle the rest.
+              We'd love to hear more about your brand, your goals, and how we can help you connect more meaningfully with your audience.
             </p>
           </div>
 

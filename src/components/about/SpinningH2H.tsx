@@ -8,7 +8,8 @@ export function SpinningH2H() {
       className="hidden md:flex items-center justify-center flex-shrink-0"
       initial={{ opacity: 0, scale: 0.6 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: '-40px' }}
+      // Updated from -40px to -10% to sync with the rest of the About section
+      viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
     >
       <motion.div

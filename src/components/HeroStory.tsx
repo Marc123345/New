@@ -6,25 +6,25 @@ const phases = [
   {
     subtitle: 'The World Is Connected',
     title: 'But connection\nis not enough.',
-    description: 'Billions of people online. Infinite content. Yet most brands still struggle to be heard — let alone felt.',
+    description: 'At H2H, we help companies show up online with a voice that feels real, relatable, and worth listening to.',
     range: [0, 0.1, 0.22, 0.28] as [number, number, number, number],
   },
   {
     subtitle: 'The Digital Era',
     title: 'Brands went\ndigital. Fast.',
-    description: 'Social media, paid ads, automation. The tools multiplied. But somewhere along the way, the human voice got lost.',
+    description: "In today's crowded digital world, connection is currency. Your audience wants honesty, personality, and purpose.",
     range: [0.22, 0.32, 0.45, 0.52] as [number, number, number, number],
   },
   {
     subtitle: 'The AI Era',
     title: 'More content.\nLess connection.',
-    description: "AI accelerated everything — except authenticity. People don't want more noise. They want brands that speak like humans.",
+    description: "We help you deliver all three — through strategy, storytelling, and content that actually resonates.",
     range: [0.48, 0.56, 0.68, 0.76] as [number, number, number, number],
   },
   {
     subtitle: 'The H2H Difference',
     title: 'Human to\nHuman.',
-    description: 'We help brands grow by making their digital presence feel more human — thoughtful, strategic, and real.',
+    description: "Whether you're a startup or a global brand, we'll help you cut through the noise and build a social presence that connects on a human level.",
     range: [0.72, 0.8, 1, 1] as [number, number, number, number],
   },
 ];

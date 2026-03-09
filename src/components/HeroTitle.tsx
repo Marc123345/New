@@ -59,8 +59,9 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
               textShadow: '0 2px 20px rgba(0,0,0,0.5)',
             }}
           >
-            From <span className="outline-text">B2B</span>{' '}
-            to <span className="outline-text">H2H</span>
+            From <span className="outline-text">Business2Business</span>
+            <br className="hidden sm:block" />
+            {' '}to <span className="outline-text">Human2Human</span>
             <br className="hidden sm:block" />
             {' '}Build a Brand People
             <br className="hidden sm:block" />
@@ -79,7 +80,7 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
               textShadow: '0 1px 10px rgba(0,0,0,0.4)',
             }}
           >
-            People don't only want to connect with brands anymore;
+            People don't only want to connect with brands anymore,
             they connect with the people behind them.
           </motion.p>
 

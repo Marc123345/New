@@ -247,8 +247,14 @@ export function EcosystemServices() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
         >
+          <p
+            className="text-xs sm:text-sm uppercase tracking-[0.3em] font-bold mb-4 sm:mb-6"
+            style={{ color: 'rgba(164,108,252,0.85)', fontFamily: 'var(--font-stack-heading)' }}
+          >
+            Services
+          </p>
           <h1
-            className="leading-tight sm:leading-[0.9] tracking-tighter uppercase mb-12 sm:mb-16"
+            className="leading-tight sm:leading-[0.9] tracking-tighter uppercase mb-6 sm:mb-8"
             style={{
               fontFamily: 'var(--font-stack-heading)',
               fontSize: 'clamp(2rem, 8vw, 9rem)',
@@ -257,16 +263,47 @@ export function EcosystemServices() {
               WebkitTextStroke: '1.5px #ffffff',
             }}
           >
-            Three Pillars. <br className="hidden sm:block" />
+            The 3-Pillar <br className="hidden sm:block" />
             <span
               style={{
                 color: 'transparent',
                 WebkitTextStroke: '1.5px var(--color-secondary)',
               }}
             >
-              One Ecosystem.
+              Social Media Ecosystem.
             </span>
           </h1>
+          <p
+            className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-4 sm:mb-5"
+            style={{
+              color: 'rgba(209,213,219,0.9)',
+              lineHeight: 1.7,
+              fontFamily: 'var(--font-stack-body)',
+              fontWeight: 600,
+            }}
+          >
+            Built for real connection. Designed for measurable growth.
+          </p>
+          <p
+            className="text-sm sm:text-base max-w-2xl mx-auto mb-3"
+            style={{
+              color: 'rgba(209,213,219,0.65)',
+              lineHeight: 1.8,
+              fontFamily: 'var(--font-stack-body)',
+            }}
+          >
+            We don't see social media as a channel, we see it as a living ecosystem. One that, when structured strategically, turns visibility into trust, and trust into action.
+          </p>
+          <p
+            className="text-sm sm:text-base max-w-2xl mx-auto mb-12 sm:mb-16"
+            style={{
+              color: 'rgba(209,213,219,0.65)',
+              lineHeight: 1.8,
+              fontFamily: 'var(--font-stack-body)',
+            }}
+          >
+            That's why we built the 3-Pillar Social Media Ecosystem — a framework designed to humanize your brand across three key layers: your company, your leadership, and your people.
+          </p>
         </motion.div>
       </div>
 
@@ -321,6 +358,41 @@ export function EcosystemServices() {
         onClose={() => setSelectedService(null)}
         onNavigate={setSelectedService}
       />
+
+      {/* Why the 3-Pillar System Works */}
+      <motion.div
+        className="relative z-10 w-full text-center px-5 sm:px-8 mt-8 sm:mt-12 pb-4"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div
+          className="mx-auto"
+          style={{
+            maxWidth: '680px',
+            borderTop: '1px solid rgba(164,108,252,0.2)',
+            paddingTop: '2.5rem',
+          }}
+        >
+          <p
+            className="text-[0.6rem] sm:text-xs uppercase tracking-[0.3em] font-bold mb-4"
+            style={{ color: 'rgba(164,108,252,0.7)', fontFamily: 'var(--font-stack-heading)' }}
+          >
+            Why the 3-Pillar System Works
+          </p>
+          <p
+            className="text-sm sm:text-base md:text-lg"
+            style={{
+              color: 'rgba(209,213,219,0.6)',
+              lineHeight: 1.8,
+              fontFamily: 'var(--font-stack-body)',
+            }}
+          >
+            This living ecosystem is designed to strengthen brand presence, build executive visibility, empower employees to share the company narrative, and drive real business results. By activating all three pillars, you create a brand that speaks with one voice — powered by many humans.
+          </p>
+        </div>
+      </motion.div>
     </section>
   );
 }

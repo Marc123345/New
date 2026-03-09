@@ -619,7 +619,7 @@ export function ArcSlider() {
               color: "var(--color-secondary, #9B59F5)",
             }}
           >
-            Our Capabilities
+            Other Services We Offer
           </span>
           <h2
             className="tracking-tight font-bold"
@@ -629,7 +629,7 @@ export function ArcSlider() {
               color: "var(--color-text-dark, #111)",
             }}
           >
-            Services
+            Our Capabilities
           </h2>
         </div>
 

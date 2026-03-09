@@ -5,9 +5,9 @@ import { X, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { PILLARS } from '../../constants/ecosystem';
 
 const PILLAR_ACCENTS = [
-  { from: '#0c4a6e', to: '#0284c7', light: 'rgba(14,165,233,0.14)', border: 'rgba(56,189,248,0.3)', dot: '#38bdf8' },
-  { from: '#065f46', to: '#059669', light: 'rgba(16,185,129,0.14)', border: 'rgba(52,211,153,0.3)', dot: '#34d399' },
-  { from: '#78350f', to: '#d97706', light: 'rgba(245,158,11,0.14)', border: 'rgba(251,191,36,0.3)', dot: '#fbbf24' },
+  { from: '#291e56', to: '#7B2FF2', light: 'rgba(123,47,242,0.14)', border: 'rgba(123,47,242,0.35)', dot: '#7B2FF2' },
+  { from: '#3b2470', to: '#a46cfc', light: 'rgba(164,108,252,0.14)', border: 'rgba(164,108,252,0.35)', dot: '#a46cfc' },
+  { from: '#4a2d8a', to: '#b181fc', light: 'rgba(177,129,252,0.14)', border: 'rgba(177,129,252,0.35)', dot: '#b181fc' },
 ];
 
 interface PillarOverlayProps {
@@ -65,7 +65,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 md:p-12"
-          style={{ background: 'rgba(4, 6, 8, 0.88)', backdropFilter: 'blur(8px)', zIndex: 9999 }}
+          style={{ background: 'rgba(4, 6, 8, 0.7)', backdropFilter: 'blur(8px)', zIndex: 9999 }}
         >
           {/* Clickable backdrop to close */}
           <div className="absolute inset-0 cursor-pointer" onClick={onClose} aria-label="Close modal background" />
@@ -151,7 +151,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none pr-12 sm:pr-8">
                     {displayService?.title}
                   </h2>
-                  <p className="text-base sm:text-lg md:text-xl text-white/70 leading-relaxed max-w-2xl">
+                  <p className="text-base sm:text-lg md:text-xl text-white/80 leading-relaxed max-w-2xl">
                     {displayService?.description}
                   </p>
                 </motion.div>
@@ -186,7 +186,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                         style={{ background: `radial-gradient(circle at center, ${accent.light} 0%, transparent 70%)` }}
                       />
                       <div className="relative z-10 text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: accent.dot }}>{s.value}</div>
-                      <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/50 mt-2">{s.label}</div>
+                      <div className="relative z-10 text-[10px] sm:text-xs uppercase tracking-wider text-white/70 mt-2">{s.label}</div>
                     </div>
                   ))}
                 </motion.div>
@@ -199,7 +199,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                   transition={{ duration: 0.4, delay: 0.2 }}
                   className="space-y-4 sm:space-y-6"
                 >
-                  <h4 className="text-xs uppercase tracking-widest text-white/40 font-semibold pl-1">What We Deliver</h4>
+                  <h4 className="text-xs uppercase tracking-widest text-white/60 font-semibold pl-1">What We Deliver</h4>
                   <div className="grid md:grid-cols-2 gap-3 sm:gap-4">
                     {displayService?.whatWeDo?.map((item: string, i: number) => (
                       <div
@@ -229,7 +229,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
                     className="p-5 sm:p-6 bg-[#0e1117] text-center rounded-lg relative z-10"
                     style={{ border: `1px solid ${accent.border}` }}
                   >
-                    <p className="text-white/70 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
+                    <p className="text-white/80 italic text-sm sm:text-base">"{displayService.closingNote}"</p>
                   </motion.div>
                 )}
               </div>

@@ -11,7 +11,7 @@ export function H2HLogo({ height = 60, className, style }: H2HLogoProps) {
   return (
     <img
       src={logoSrc}
-      alt="H2H Digital Logo"
+      alt="H2H Social Logo"
       className={className}
       style={{ height, width: "auto", flexShrink: 0, objectFit: "contain", ...style }}
     />

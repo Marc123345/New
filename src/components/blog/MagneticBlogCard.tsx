@@ -123,10 +123,13 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           <div className="absolute top-4 left-4">
             <span
-              className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.2em] bg-[var(--color-background-light)] text-[var(--color-primary)]"
+              className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.2em]"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                border: "1px solid var(--color-text-dark)",
+                background: "rgba(0,0,0,0.65)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "#ffffff",
               }}
             >
               {post.category}
@@ -136,7 +139,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
 
         <div className="p-5 sm:p-6" style={{ position: "relative", zIndex: 3 }}>
           <div
-            className="flex items-center gap-3 mb-4 text-[11px] tracking-wider uppercase opacity-50"
+            className="flex items-center gap-3 mb-4 text-[11px] tracking-wider uppercase opacity-65"
             style={{ fontFamily: "var(--font-stack-heading)" }}
           >
             <span>{post.date}</span>
@@ -157,7 +160,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           </h3>
 
           <p
-            className="text-sm leading-relaxed opacity-70 mb-5 line-clamp-2"
+            className="text-sm leading-relaxed opacity-80 mb-5 line-clamp-2"
             style={{ fontFamily: "var(--font-stack-body)" }}
           >
             {post.excerpt}
@@ -168,13 +171,13 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             style={{ borderTop: "1px solid rgba(232,226,255,0.12)" }}
           >
             <span
-              className="text-[11px] tracking-wider uppercase opacity-50"
+              className="text-[11px] tracking-wider uppercase opacity-65"
               style={{ fontFamily: "var(--font-stack-heading)" }}
             >
               {post.author}
             </span>
             <div
-              className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-background-light)]"
+              className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-white"
               style={{
                 border: "1px solid var(--color-text-dark)",
                 color: "var(--color-text-dark)",

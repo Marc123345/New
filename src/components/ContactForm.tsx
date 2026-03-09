@@ -87,24 +87,22 @@ export function ContactForm() {
         >
           <div style={{ marginBottom: "36px" }}>
             <h3 style={{
-              fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
+              fontSize: "clamp(1.5rem, 2vw, 2rem)",
               fontWeight: 700,
               color: "var(--color-text-dark)",
-              marginBottom: "12px",
-              letterSpacing: "-0.02em",
-              lineHeight: 1.2,
+              marginBottom: "8px",
+              letterSpacing: "-0.01em",
               fontFamily: "var(--font-stack-heading)",
             }}>
-              Let's Build Your Company's Communication Strategy, That Feels Human
+              Start a Project
             </h3>
             <p style={{
               fontSize: "0.875rem",
               color: "var(--color-text-dark)",
-              opacity: 0.5,
-              lineHeight: 1.6,
+              opacity: 0.75,
               fontFamily: "var(--font-stack-heading)",
             }}>
-              We'd love to hear more about your brand, your goals, and how we can help you connect more meaningfully with your audience.
+              Share your vision — we'll handle the rest.
             </p>
           </div>
 
@@ -148,7 +146,7 @@ export function ContactForm() {
                 </div>
                 <div style={{
                   color: "var(--color-text-dark)",
-                  opacity: 0.45,
+                  opacity: 0.75,
                   fontSize: "0.875rem",
                   fontFamily: "var(--font-stack-heading)",
                 }}>
@@ -188,7 +186,7 @@ export function ContactForm() {
                           position: "absolute",
                           left: "13px",
                           color: "var(--color-text-dark)",
-                          opacity: 0.4,
+                          opacity: 0.6,
                           pointerEvents: "none",
                         }}
                       />
@@ -244,7 +242,7 @@ export function ContactForm() {
                         left: "13px",
                         top: "15px",
                         color: "var(--color-text-dark)",
-                        opacity: 0.4,
+                        opacity: 0.6,
                         pointerEvents: "none",
                       }}
                     />
@@ -335,7 +333,7 @@ export function ContactForm() {
                   textAlign: "center",
                   fontSize: "0.75rem",
                   color: "var(--color-text-dark)",
-                  opacity: 0.3,
+                  opacity: 0.6,
                   marginTop: "4px",
                   fontFamily: "var(--font-stack-heading)",
                   letterSpacing: "0.05em",
@@ -362,7 +360,7 @@ export function ContactForm() {
         .contact-grid input::placeholder,
         .contact-grid textarea::placeholder {
           color: var(--color-text-dark);
-          opacity: 0.3;
+          opacity: 0.5;
         }
       `}</style>
     </section>

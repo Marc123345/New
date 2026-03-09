@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="inline-block px-8 py-4 border-2 cursor-pointer transition-all duration-200 uppercase bg-[var(--color-primary)] text-[var(--color-background-light)] border-[var(--color-text-dark)]"
+              className="inline-block px-8 py-4 border-2 cursor-pointer transition-all duration-200 uppercase bg-[var(--color-primary)] text-white border-[var(--color-text-dark)]"
               style={{
                 fontFamily: 'var(--font-stack-heading)',
                 boxShadow: 'var(--shadow-button)',

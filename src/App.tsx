@@ -1,6 +1,5 @@
-import React, { Suspense, lazy, useState, useCallback } from "react";
+import React, { Suspense, lazy } from "react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Loader } from "./components/Loader";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Navigation } from "./components/Navigation";
@@ -77,6 +76,19 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#040608' }}
       >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/purple-nebula-and-glowing-cosmic-dust-in-outer-spa-2026-01-05-00-45-10-utc.jpg?updatedAt=1772993700397)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(0,0,0,0.65)' }}
+        />
         <div className="absolute inset-0">
           <ShootingStars count={22} />
         </div>
@@ -136,7 +148,7 @@ function AppContent() {
         <EcosystemServices />
       </div>
 
-      <div id="about" className="relative" style={{ zIndex: 2 }}>
+      <div className="relative" style={{ zIndex: 2 }}>
         <Suspense fallback={<SectionLoader />}>
           <AboutStory />
         </Suspense>
@@ -168,21 +180,9 @@ function AppContent() {
 }
 
 export default function App() {
-  const [loaded, setLoaded] = useState(false);
-  const handleLoaderComplete = useCallback(() => setLoaded(true), []);
-
   return (
     <ErrorBoundary>
-      <Loader onComplete={handleLoaderComplete} />
-      <div
-        style={{
-          opacity: loaded ? 1 : 0,
-          transition: 'opacity 0.5s ease',
-          pointerEvents: loaded ? 'all' : 'none',
-        }}
-      >
-        <AppContent />
-      </div>
+      <AppContent />
     </ErrorBoundary>
   );
 }

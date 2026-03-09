@@ -153,22 +153,27 @@ function NarrativeBlock() {
 
 const AboutPanel = memo(function AboutPanel() {
   return (
-    // FIX: Removed style={{ contain: 'layout style' }} from this wrapper!
     <div className="w-full">
-      <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-        <div className="lg:col-span-7 flex flex-col gap-8 md:gap-10">
-          <HeroBlock />
-          <NarrativeBlock />
-        </div>
+      {/* Full-width headline — owns the full visual band */}
+      <HeroBlock />
 
-        <div className="lg:col-span-5 lg:mt-24">
-          <div className="lg:pl-8">
-            <motion.span
-              className="block mb-8"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
+      {/* Balanced two-column below: narrative (left) | impact metrics (right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mt-12 md:mt-16 lg:mt-20">
+        <NarrativeBlock />
+
+        <div>
+          <motion.div
+            className="mb-7"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
+            style={{
+              paddingBottom: '14px',
+              borderBottom: '1px solid rgba(164,108,252,0.15)',
+            }}
+          >
+            <span
               style={{
                 fontFamily: 'var(--font-stack-heading)',
                 fontSize: '0.65rem',
@@ -179,9 +184,9 @@ const AboutPanel = memo(function AboutPanel() {
               }}
             >
               Impact
-            </motion.span>
-            <ImpactStack />
-          </div>
+            </span>
+          </motion.div>
+          <ImpactStack />
         </div>
       </div>
 

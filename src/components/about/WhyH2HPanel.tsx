@@ -78,9 +78,9 @@ function ColumnLabel({ label, delay = 0 }: { label: string; delay?: number }) {
       </span>
       <div
         style={{
-          width: '2rem',
+          width: '3rem',
           height: '1px',
-          background: 'rgba(164,108,252,0.3)',
+          background: 'rgba(164,108,252,0.35)',
         }}
       />
     </motion.div>
@@ -100,7 +100,6 @@ function FounderPortrait() {
         className="group relative overflow-hidden"
         style={{
           width: '100%',
-          maxWidth: '320px',
           margin: '0 auto',
           transform: 'rotate(-2deg)',
         }}
@@ -207,9 +206,9 @@ function FounderPortrait() {
 export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
     <div className="w-full">
-      {/* Section heading */}
+      {/* Section heading — editorially constrained to 2/3 width on desktop */}
       <motion.div
-        className="mb-10 md:mb-14"
+        className="mb-12 md:mb-16 lg:max-w-[66%]"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}

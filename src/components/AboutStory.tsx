@@ -1,5 +1,5 @@
-import { memo } from 'react';
-import { motion } from 'motion/react';
+import { useState, memo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { SignalBackground } from './about/SignalBackground';
 import { ImpactStack } from './about/ImpactStack';
 import { WhyH2HPanel } from './about/WhyH2HPanel';
@@ -8,33 +8,94 @@ import { SpinningH2H } from './about/SpinningH2H';
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-function Eyebrow({ label }: { label: string }) {
+type Panel = 'about' | 'why';
+
+// ─── Tab Switcher ─────────────────────────────────────────────────────────────
+
+const TABS: { id: Panel; label: string }[] = [
+  { id: 'about', label: 'About H2H' },
+  { id: 'why',   label: 'Why H2H'   },
+];
+
+function PanelSwitcher({
+  active,
+  onChange,
+}: {
+  active: Panel;
+  onChange: (p: Panel) => void;
+}) {
   return (
-    <motion.span
-      initial={{ opacity: 0, x: -16 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
-      transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
-      style={{
-        fontFamily: 'var(--font-stack-heading)',
-        fontSize: '0.65rem',
-        fontWeight: 700,
-        letterSpacing: '0.35em',
-        textTransform: 'uppercase',
-        color: 'rgba(164,108,252,0.8)',
-        display: 'block',
-        marginBottom: '28px',
-      }}
+    <div
+      className="flex items-end mb-12 md:mb-16"
+      style={{ borderBottom: '1px solid rgba(164,108,252,0.12)' }}
     >
-      {label}
-    </motion.span>
+      {TABS.map((tab) => {
+        const isActive = active === tab.id;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onChange(tab.id)}
+            style={{
+              position: 'relative',
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: isActive ? 'var(--color-text-dark)' : 'rgba(232,226,255,0.28)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0 0 18px 0',
+              marginRight: '2.5rem',
+              transition: 'color 0.3s ease',
+            }}
+          >
+            {tab.label}
+            {isActive && (
+              <motion.div
+                layoutId="tab-indicator"
+                style={{
+                  position: 'absolute',
+                  bottom: '-1px',
+                  left: 0,
+                  right: 0,
+                  height: '2px',
+                  background: 'var(--color-secondary)',
+                  borderRadius: '1px',
+                }}
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
   );
 }
+
+// ─── About Panel ──────────────────────────────────────────────────────────────
 
 function HeroBlock() {
   return (
     <div className="flex flex-col items-start w-full mb-4">
-      <Eyebrow label="About H2H" />
+      <motion.span
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
+        style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: '0.65rem',
+          fontWeight: 700,
+          letterSpacing: '0.35em',
+          textTransform: 'uppercase',
+          color: 'rgba(164,108,252,0.8)',
+          display: 'block',
+          marginBottom: '28px',
+        }}
+      >
+        About H2H
+      </motion.span>
 
       <h2
         style={{
@@ -52,8 +113,7 @@ function HeroBlock() {
           <motion.span
             className="block"
             initial={{ y: '100%' }}
-            whileInView={{ y: '0%' }}
-            viewport={{ once: true, margin: '-10%' }}
+            animate={{ y: '0%' }}
             transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
           >
             From Brand Voice
@@ -63,8 +123,7 @@ function HeroBlock() {
           <motion.span
             className="block"
             initial={{ y: '100%' }}
-            whileInView={{ y: '0%' }}
-            viewport={{ once: true, margin: '-10%' }}
+            animate={{ y: '0%' }}
             transition={{ duration: 1.2, delay: 0.15, ease: EASE_OUT_EXPO }}
           >
             <span style={{ color: 'transparent', WebkitTextStroke: '2px var(--color-surface-dark)' }}>
@@ -83,8 +142,7 @@ function NarrativeBlock() {
     <div className="flex flex-col gap-6 md:gap-8">
       <motion.p
         initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-10%' }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.2, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-body)',
@@ -99,8 +157,7 @@ function NarrativeBlock() {
 
       <motion.p
         initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-10%' }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.3, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-body)',
@@ -115,8 +172,7 @@ function NarrativeBlock() {
 
       <motion.div
         initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: '-10%' }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, delay: 0.4, ease: EASE_OUT_EXPO }}
         className="relative pl-5 md:pl-6 py-2 mt-2"
         style={{
@@ -151,66 +207,17 @@ function NarrativeBlock() {
   );
 }
 
-const AboutPanel = memo(function AboutPanel() {
-  return (
-    <div className="w-full">
-      {/* Full-width headline — owns the full visual band */}
-      <HeroBlock />
-
-      {/* Balanced two-column below: narrative (left) | impact metrics (right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mt-12 md:mt-16 lg:mt-20">
-        <NarrativeBlock />
-
-        <div>
-          <motion.div
-            className="mb-7"
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
-            style={{
-              paddingBottom: '14px',
-              borderBottom: '1px solid rgba(164,108,252,0.15)',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'rgba(164,108,252,0.6)',
-              }}
-            >
-              Impact
-            </span>
-          </motion.div>
-          <ImpactStack />
-        </div>
-      </div>
-
-      <VideoBlock />
-    </div>
-  );
-});
-
 function VideoBlock() {
   return (
     <motion.div
       className="w-full mt-16 md:mt-24 lg:mt-32"
       initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-15%' }}
-      transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.2, delay: 0.3, ease: EASE_OUT_EXPO }}
     >
       <motion.div
         className="relative overflow-hidden cursor-pointer group rounded-sm"
-        whileHover={{
-          y: -8,
-          x: -8,
-          boxShadow: 'var(--shadow-geometric-hover)',
-        }}
+        whileHover={{ y: -8, x: -8, boxShadow: 'var(--shadow-geometric-hover)' }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         style={{
           border: '1px solid rgba(255,255,255,0.1)',
@@ -248,7 +255,56 @@ function VideoBlock() {
   );
 }
 
+const AboutPanel = memo(function AboutPanel() {
+  return (
+    <div className="w-full">
+      <HeroBlock />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mt-12 md:mt-16 lg:mt-20">
+        <NarrativeBlock />
+
+        <div>
+          <motion.div
+            className="mb-7"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT_EXPO }}
+            style={{
+              paddingBottom: '14px',
+              borderBottom: '1px solid rgba(164,108,252,0.15)',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                letterSpacing: '0.3em',
+                textTransform: 'uppercase',
+                color: 'rgba(164,108,252,0.6)',
+              }}
+            >
+              Impact
+            </span>
+          </motion.div>
+          <ImpactStack />
+        </div>
+      </div>
+
+      <VideoBlock />
+    </div>
+  );
+});
+
+// ─── About Story (root) ───────────────────────────────────────────────────────
+
 export function AboutStory() {
+  const [active, setActive] = useState<Panel>('about');
+
+  const handleChange = (next: Panel) => {
+    if (next !== active) setActive(next);
+  };
+
   return (
     <section
       id="about"
@@ -270,15 +326,40 @@ export function AboutStory() {
         }}
       />
 
-      {/* Outer: same horizontal padding as hero/nav (px-4 md:px-8 lg:px-12) */}
       <div
         className="relative z-10 px-4 md:px-8 lg:px-12"
         style={{ paddingTop: 'clamp(4rem, 8vw, 8rem)', paddingBottom: 'clamp(4rem, 8vw, 8rem)' }}
       >
-        {/* Inner: same max-width as hero (max-w-8xl) so left edges align */}
-        <div className="max-w-8xl mx-auto flex flex-col gap-20 lg:gap-32">
-          <AboutPanel />
-          <WhyH2HPanel />
+        <div className="max-w-8xl mx-auto">
+
+          {/* Tab switcher */}
+          <PanelSwitcher active={active} onChange={handleChange} />
+
+          {/* Animated panel swap */}
+          <AnimatePresence mode="wait">
+            {active === 'about' ? (
+              <motion.div
+                key="about"
+                initial={{ opacity: 0, x: -24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 24 }}
+                transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+              >
+                <AboutPanel />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="why"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+              >
+                <WhyH2HPanel />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <SignatureEnding />
         </div>
       </div>

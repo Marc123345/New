@@ -18,11 +18,11 @@ const RIGHT_ITEMS = [
 function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
+      viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
-      className="mb-5 last:mb-0 md:mb-6"
+      className="mb-6 last:mb-0 md:mb-8"
     >
       <span
         style={{
@@ -33,7 +33,7 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
           textTransform: 'uppercase',
           color: 'var(--color-secondary)',
           display: 'block',
-          marginBottom: '6px',
+          marginBottom: '8px',
         }}
       >
         {tag}
@@ -56,19 +56,25 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
 function FounderPortrait() {
   return (
     <motion.div
-      className="relative"
+      className="relative w-full max-w-[280px] mx-auto md:max-w-none"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
+      viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 1, ease: EASE_OUT_EXPO }}
     >
       <div className="relative flex justify-center">
         <div
           className="relative overflow-hidden group"
           style={{
-            maxWidth: '280px',
             width: '100%',
             transform: 'rotate(-2deg)',
+            transition: 'transform 0.4s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'rotate(0deg) translateY(-4px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'rotate(-2deg) translateY(0)';
           }}
         >
           <div
@@ -86,6 +92,7 @@ function FounderPortrait() {
               border: '2px solid var(--color-surface-dark)',
               overflow: 'hidden',
               position: 'relative',
+              borderRadius: '4px',
             }}
           >
             <img
@@ -93,7 +100,7 @@ function FounderPortrait() {
               alt="Shannon, Founder of H2H"
               loading="lazy"
               decoding="async"
-              className="w-full block"
+              className="w-full block transition-transform duration-700 group-hover:scale-105"
               style={{
                 aspectRatio: '3 / 4',
                 objectFit: 'cover',
@@ -113,7 +120,7 @@ function FounderPortrait() {
           </div>
 
           <div
-            className="absolute bottom-0 left-0 right-0 p-4"
+            className="absolute bottom-0 left-0 right-0 p-5"
             style={{ zIndex: 2 }}
           >
             <span
@@ -125,7 +132,7 @@ function FounderPortrait() {
                 textTransform: 'uppercase',
                 color: 'var(--color-secondary)',
                 display: 'block',
-                marginBottom: '3px',
+                marginBottom: '4px',
               }}
             >
               Founder
@@ -133,7 +140,7 @@ function FounderPortrait() {
             <span
               style={{
                 fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(0.9rem, 1.3vw, 1.1rem)',
+                fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
                 fontWeight: 800,
                 letterSpacing: '-0.01em',
                 color: 'var(--color-text-dark)',
@@ -146,7 +153,7 @@ function FounderPortrait() {
       </div>
 
       <motion.div
-        className="text-center mt-3"
+        className="text-center mt-5"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -157,7 +164,7 @@ function FounderPortrait() {
           fontWeight: 700,
           letterSpacing: '0.35em',
           textTransform: 'uppercase',
-          color: 'rgba(164,108,252,0.3)',
+          color: 'rgba(164,108,252,0.4)',
         }}
       >
         The human behind H2H
@@ -168,12 +175,12 @@ function FounderPortrait() {
 
 export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
-    <div className="w-full" style={{ contain: 'layout style' }}>
+    <div className="w-full">
       <motion.div
-        className="mb-8 md:mb-14"
+        className="mb-10 md:mb-16"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
+        viewport={{ once: true, margin: '-10%' }}
         transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
       >
         <span
@@ -185,7 +192,7 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
             textTransform: 'uppercase',
             color: 'rgba(164,108,252,0.7)',
             display: 'block',
-            marginBottom: '14px',
+            marginBottom: '16px',
           }}
         >
           Why H2H
@@ -193,13 +200,14 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         <h3
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(1.2rem, 2.2vw, 1.8rem)',
+            fontSize: 'clamp(1.4rem, 2.5vw, 2.2rem)',
             fontWeight: 800,
             lineHeight: 1.15,
             letterSpacing: '-0.02em',
             textTransform: 'uppercase',
             color: 'var(--color-text-dark)',
             margin: 0,
+            maxWidth: '800px'
           }}
         >
           Because we embed ourselves{' '}
@@ -209,14 +217,15 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         </h3>
       </motion.div>
 
-      <div className="flex flex-col md:grid md:grid-cols-12 gap-8 md:gap-6 items-start">
+      <div className="flex flex-col md:grid md:grid-cols-12 gap-12 md:gap-8 lg:gap-12 items-start">
+        {/* On Mobile: Founder shows up first. On Desktop: Shows up in the middle. */}
         <div className="md:col-span-4 flex justify-center md:order-2">
           <FounderPortrait />
         </div>
 
         <div className="md:col-span-4 md:order-1">
           <motion.span
-            className="block mb-5 md:mb-6"
+            className="block mb-6 md:mb-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -228,6 +237,8 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: 'var(--color-text-dark)',
+              borderBottom: '1px solid rgba(164,108,252,0.2)',
+              paddingBottom: '12px'
             }}
           >
             Your Partner
@@ -239,7 +250,7 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
 
         <div className="md:col-span-4 md:order-3">
           <motion.span
-            className="block mb-5 md:mb-6"
+            className="block mb-6 md:mb-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -251,6 +262,8 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: 'var(--color-text-dark)',
+              borderBottom: '1px solid rgba(164,108,252,0.2)',
+              paddingBottom: '12px'
             }}
           >
             Structure & Soul

@@ -92,11 +92,13 @@ export const SignalBackground = memo(function SignalBackground() {
     <div
       ref={containerRef}
       className="absolute inset-0 pointer-events-none"
-      style={{ opacity: 0.12, contain: 'strict' }}
+      // Removed "contain: strict" to prevent clipping in standard flow
+      style={{ opacity: 0.12 }}
     >
       <svg
         ref={svgRef}
-        className="w-full h-full"
+        // Added block display to prevent inline layout bugs
+        className="w-full h-full block"
         preserveAspectRatio="none"
       >
         {Array.from({ length: LINE_COUNT }, (_, i) => (

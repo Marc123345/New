@@ -18,18 +18,18 @@ const RIGHT_ITEMS = [
 function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
+      viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.7, delay, ease: EASE_OUT_EXPO }}
-      className="mb-6 last:mb-0 md:mb-8"
+      style={{ marginBottom: '1.5rem' }}
     >
       <span
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.55rem',
+          fontSize: '0.65rem',
           fontWeight: 700,
-          letterSpacing: '0.25em',
+          letterSpacing: '0.22em',
           textTransform: 'uppercase',
           color: 'var(--color-secondary)',
           display: 'block',
@@ -41,8 +41,8 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
       <p
         style={{
           fontFamily: 'var(--font-stack-body)',
-          fontSize: 'clamp(0.85rem, 1.1vw, 0.95rem)',
-          lineHeight: 1.7,
+          fontSize: 'clamp(0.9rem, 1.2vw, 1rem)',
+          lineHeight: 1.75,
           color: 'rgba(232,226,255,0.72)',
           margin: 0,
         }}
@@ -53,72 +53,102 @@ function StoryItem({ tag, text, delay }: { tag: string; text: string; delay: num
   );
 }
 
+function ColumnLabel({ label, delay = 0 }: { label: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay, ease: EASE_OUT_EXPO }}
+      style={{ marginBottom: '1.75rem' }}
+    >
+      <span
+        style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: '0.6rem',
+          fontWeight: 700,
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase',
+          color: 'rgba(164,108,252,0.5)',
+          display: 'block',
+          marginBottom: '6px',
+        }}
+      >
+        {label}
+      </span>
+      <div
+        style={{
+          width: '2rem',
+          height: '1px',
+          background: 'rgba(164,108,252,0.3)',
+        }}
+      />
+    </motion.div>
+  );
+}
+
 function FounderPortrait() {
   return (
     <motion.div
-      className="relative w-full max-w-[280px] mx-auto lg:mx-0 lg:ml-auto"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
+      viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 1, ease: EASE_OUT_EXPO }}
+      style={{ width: '100%' }}
     >
-      <div className="relative flex justify-center lg:justify-end">
+      <div
+        className="group relative overflow-hidden"
+        style={{
+          width: '100%',
+          maxWidth: '320px',
+          margin: '0 auto',
+          transform: 'rotate(-2deg)',
+        }}
+      >
+        {/* Hover glow */}
         <div
-          className="relative overflow-hidden group"
+          className="absolute -inset-1 opacity-0 group-hover:opacity-100"
           style={{
-            width: '100%',
-            transform: 'rotate(2deg)',
-            transition: 'transform 0.4s ease',
+            background: 'linear-gradient(135deg, rgba(164,108,252,0.15), transparent 60%)',
+            transition: 'opacity 0.5s ease',
+            zIndex: 1,
+            pointerEvents: 'none',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'rotate(0deg) translateY(-4px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'rotate(2deg) translateY(0)';
+        />
+
+        <div
+          style={{
+            border: '2px solid var(--color-surface-dark)',
+            overflow: 'hidden',
+            position: 'relative',
           }}
         >
-          <div
-            className="absolute -inset-1 opacity-0 group-hover:opacity-100"
+          <img
+            src="https://ik.imagekit.io/qcvroy8xpd/image%201%20(1).png"
+            alt="Shannon, Founder of H2H"
+            loading="lazy"
+            decoding="async"
+            className="w-full block"
             style={{
-              background: 'linear-gradient(135deg, rgba(164,108,252,0.15), transparent 60%)',
-              transition: 'opacity 0.5s ease',
-              zIndex: 1,
-              pointerEvents: 'none',
+              aspectRatio: '3 / 4',
+              objectFit: 'cover',
+              objectPosition: 'center top',
             }}
           />
 
+          {/* Gradient overlay */}
           <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              border: '2px solid var(--color-surface-dark)',
-              overflow: 'hidden',
-              position: 'relative',
-              borderRadius: '4px',
+              background: `
+                linear-gradient(180deg, rgba(14,11,31,0.15) 0%, transparent 30%),
+                linear-gradient(180deg, transparent 55%, rgba(14,11,31,0.9) 100%)
+              `,
             }}
-          >
-            <img
-              src="https://ik.imagekit.io/qcvroy8xpd/image%201%20(1).png"
-              alt="Shannon, Founder of H2H"
-              loading="lazy"
-              decoding="async"
-              className="w-full block transition-transform duration-700 group-hover:scale-105"
-              style={{
-                aspectRatio: '3 / 4',
-                objectFit: 'cover',
-                objectPosition: 'center top',
-              }}
-            />
+          />
 
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `
-                  linear-gradient(180deg, rgba(14,11,31,0.15) 0%, transparent 30%),
-                  linear-gradient(180deg, transparent 55%, rgba(14,11,31,0.85) 100%)
-                `,
-              }}
-            />
-          </div>
-
+          {/* Caption over image */}
           <div
             className="absolute bottom-0 left-0 right-0 p-5"
             style={{ zIndex: 2 }}
@@ -126,7 +156,7 @@ function FounderPortrait() {
             <span
               style={{
                 fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.5rem',
+                fontSize: '0.55rem',
                 fontWeight: 700,
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
@@ -140,10 +170,11 @@ function FounderPortrait() {
             <span
               style={{
                 fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
+                fontSize: 'clamp(1rem, 1.4vw, 1.15rem)',
                 fontWeight: 800,
                 letterSpacing: '-0.01em',
                 color: 'var(--color-text-dark)',
+                display: 'block',
               }}
             >
               Shannon
@@ -152,44 +183,44 @@ function FounderPortrait() {
         </div>
       </div>
 
-      <motion.div
-        className="text-center lg:text-right lg:pr-4 mt-5"
+      <motion.p
+        className="text-center mt-4"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
         style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.45rem',
+          fontSize: '0.55rem',
           fontWeight: 700,
-          letterSpacing: '0.35em',
+          letterSpacing: '0.3em',
           textTransform: 'uppercase',
-          color: 'rgba(164,108,252,0.4)',
+          color: 'rgba(164,108,252,0.35)',
         }}
       >
         The human behind H2H
-      </motion.div>
+      </motion.p>
     </motion.div>
   );
 }
 
 export const WhyH2HPanel = memo(function WhyH2HPanel() {
   return (
-    // FIX 1: Added explicit mt-16 md:mt-24 to force clearance from the section above
-    <div className="w-full mt-16 md:mt-24">
+    <div className="w-full">
+      {/* Section heading */}
       <motion.div
-        className="mb-12 md:mb-20"
+        className="mb-10 md:mb-14"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-10%' }}
+        viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
       >
         <span
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: '0.65rem',
+            fontSize: '0.62rem',
             fontWeight: 700,
-            letterSpacing: '0.3em',
+            letterSpacing: '0.32em',
             textTransform: 'uppercase',
             color: 'rgba(164,108,252,0.7)',
             display: 'block',
@@ -201,87 +232,47 @@ export const WhyH2HPanel = memo(function WhyH2HPanel() {
         <h3
           style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(1.4rem, 2.5vw, 2.2rem)',
+            fontSize: 'clamp(1.6rem, 3.2vw, 3rem)',
             fontWeight: 800,
-            // FIX 2: Increased line-height and added padding so the text-stroke cannot visually clip
-            lineHeight: 1.35, 
-            paddingTop: '4px',
-            paddingBottom: '4px',
-            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+            letterSpacing: '-0.03em',
             textTransform: 'uppercase',
             color: 'var(--color-text-dark)',
             margin: 0,
-            maxWidth: '800px'
           }}
         >
           Because we embed ourselves{' '}
-          <span style={{ color: 'transparent', WebkitTextStroke: '1px var(--color-surface-dark)' }}>
+          <span style={{ color: 'transparent', WebkitTextStroke: '1.5px var(--color-surface-dark)' }}>
             in your world.
           </span>
         </h3>
       </motion.div>
 
-      {/* Text lists on the left, Founder Portrait cleanly on the right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-        
-        <div className="lg:col-span-8 order-2 lg:order-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-            <div>
-              <motion.span
-                className="block mb-6 md:mb-8"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-text-dark)',
-                  borderBottom: '1px solid rgba(164,108,252,0.2)',
-                  paddingBottom: '12px'
-                }}
-              >
-                Your Partner
-              </motion.span>
-              {LEFT_ITEMS.map((item, i) => (
-                <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.08} />
-              ))}
-            </div>
-
-            <div>
-              <motion.span
-                className="block mb-6 md:mb-8"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT_EXPO }}
-                style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: 'var(--color-text-dark)',
-                  borderBottom: '1px solid rgba(164,108,252,0.2)',
-                  paddingBottom: '12px'
-                }}
-              >
-                Structure & Soul
-              </motion.span>
-              {RIGHT_ITEMS.map((item, i) => (
-                <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.08} />
-              ))}
-            </div>
-          </div>
+      {/* 3-column symmetric grid: text | portrait | text */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 items-center"
+        style={{ gap: 'clamp(2rem, 4vw, 4rem)' }}
+      >
+        {/* Left column — Your Partner */}
+        <div className="md:order-1">
+          <ColumnLabel label="Your Partner" />
+          {LEFT_ITEMS.map((item, i) => (
+            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.1 + i * 0.08} />
+          ))}
         </div>
 
-        <div className="lg:col-span-4 order-1 lg:order-2">
+        {/* Centre — Founder portrait */}
+        <div className="md:order-2 flex justify-center">
           <FounderPortrait />
         </div>
 
+        {/* Right column — Structure & Soul */}
+        <div className="md:order-3">
+          <ColumnLabel label="Structure & Soul" delay={0.1} />
+          {RIGHT_ITEMS.map((item, i) => (
+            <StoryItem key={item.tag} tag={item.tag} text={item.text} delay={0.15 + i * 0.08} />
+          ))}
+        </div>
       </div>
     </div>
   );

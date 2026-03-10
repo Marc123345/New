@@ -33,6 +33,7 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
   const angle = baseAngle + orbitAngle;
   const x = Math.cos(angle) * ORBIT_RADIUS;
   const y = Math.sin(angle) * ORBIT_RADIUS;
+  const label = `0${index + 1}`;
 
   return (
     <div
@@ -46,30 +47,64 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
       <button
         type="button"
         onClick={() => onSelect(index)}
-        className="group relative flex items-center justify-center p-3 focus:outline-none cursor-pointer"
+        className="group relative flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer"
         aria-label={`Select ${item.subtitle}`}
       >
+        {/* Circle with number */}
         <div
-          className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+          className="relative z-10 w-14 h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
           style={{
             background: 'linear-gradient(135deg, var(--color-primary), rgba(164,108,252,0.4))',
             border: '2px solid var(--color-secondary)',
             boxShadow: '0 0 24px rgba(164,108,252,0.35), inset 0 0 12px rgba(164,108,252,0.15)',
           }}
         >
-          <div style={{ color: '#ffffff' }}>{item.icon}</div>
+          <span style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: '1.15rem',
+            fontWeight: 900,
+            color: '#ffffff',
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+          }}>
+            {label}
+          </span>
         </div>
-        <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 whitespace-nowrap">
-          <span
-            className="text-xs uppercase tracking-[0.2em] px-3 py-1 block rounded-sm"
-            style={{
-              fontFamily: 'var(--font-stack-heading)',
-              color: '#ffffff',
-              background: 'rgba(41,30,86,0.95)',
-              border: '1px solid var(--color-secondary)',
-            }}
-          >
-            {item.subtitle}
+
+        {/* Always-visible tooltip */}
+        <div
+          style={{
+            background: 'rgba(41,30,86,0.95)',
+            border: '1px solid rgba(164,108,252,0.5)',
+            borderRadius: 2,
+            padding: '4px 10px',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 0 12px rgba(164,108,252,0.15)',
+          }}
+        >
+          <span style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: '0.5rem',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: '#ffffff',
+            display: 'block',
+            textAlign: 'center',
+          }}>
+            {item.title}
+          </span>
+          <span style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: '0.42rem',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'rgba(164,108,252,0.85)',
+            display: 'block',
+            textAlign: 'center',
+            marginTop: 2,
+          }}>
+            Click to explore →
           </span>
         </div>
       </button>
@@ -178,9 +213,8 @@ const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
-  const [isHoveringOrbit, setIsHoveringOrbit] = useState(false);
   const isMobile = useIsMobile();
-  const orbitAngle = useOrbitAngle(isHoveringOrbit);
+  const orbitAngle = useOrbitAngle(false);
   const visiblePlanets = useMemo(() => isMobile ? PLANET_IMAGES.slice(0, 3) : PLANET_IMAGES, [isMobile]);
 
   return (
@@ -333,8 +367,6 @@ export function EcosystemServices() {
       {/* ADDED: scale classes for perfect mobile view! */}
       <div
         className="relative z-20 flex items-center justify-center scale-[0.6] sm:scale-75 md:scale-100 transition-transform duration-500"
-        onMouseEnter={() => setIsHoveringOrbit(true)}
-        onMouseLeave={() => setIsHoveringOrbit(false)}
         style={{ width: ORBIT_DIAMETER + 120, height: ORBIT_DIAMETER + 120 }}
       >
         <div

@@ -80,11 +80,10 @@ function AppContent() {
         <div className="absolute inset-0" style={{ zIndex: 0 }}>
           <UnicornScene
             projectId="US9XVS5BHKCmCNH60lQg"
-            width="1440px"
-            height="900px"
+            width="100%"
+            height="100%"
             scale={1}
-            dpi={1.5}
-            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.3/dist/unicornStudio.umd.js"
+            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.3/dist/unicornStudio.umd.js"
           />
         </div>
 

@@ -33,11 +33,11 @@ function FloatingParticles() {
     resize();
     window.addEventListener('resize', resize);
 
-    const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number; pulse: number; speed: number }[] = [];
+    const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number; pulse: number; speed: number; colorIndex: number }[] = [];
     const w = () => canvas.offsetWidth;
     const h = () => canvas.offsetHeight;
 
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 100; i++) {
       particles.push({
         x: Math.random() * w(),
         y: Math.random() * h(),
@@ -47,6 +47,7 @@ function FloatingParticles() {
         alpha: 0.1 + Math.random() * 0.5,
         pulse: Math.random() * Math.PI * 2,
         speed: 0.02 + Math.random() * 0.03,
+        colorIndex: i % 2, // 0 = purple, 1 = cyan
       });
     }
 
@@ -63,15 +64,35 @@ function FloatingParticles() {
         if (p.x > w() + 10) p.x = -10;
 
         const a = p.alpha * (0.5 + 0.5 * Math.sin(p.pulse));
+        const color = p.colorIndex === 0
+          ? `rgba(164,108,252,${a})`
+          : `rgba(80,220,255,${a})`;
+        const glowColor = p.colorIndex === 0
+          ? `rgba(164,108,252,${a * 0.1})`
+          : `rgba(80,220,255,${a * 0.1})`;
+
+        // Upward streak for large particles
+        if (p.size > 1.5) {
+          const streakLen = 6 * Math.abs(p.vy);
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x, p.y + streakLen);
+          ctx.strokeStyle = p.colorIndex === 0
+            ? `rgba(164,108,252,${a * 0.3})`
+            : `rgba(80,220,255,${a * 0.3})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(164, 108, 252, ${a})`;
+        ctx.fillStyle = color;
         ctx.fill();
 
         if (p.size > 1) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(164, 108, 252, ${a * 0.1})`;
+          ctx.fillStyle = glowColor;
           ctx.fill();
         }
       }
@@ -81,16 +102,32 @@ function FloatingParticles() {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 80) {
+          if (dist < 100) {
+            const grad = ctx.createLinearGradient(
+              particles[i].x, particles[i].y,
+              particles[j].x, particles[j].y
+            );
+            grad.addColorStop(0, `rgba(164,108,252,${0.06 * (1 - dist / 100)})`);
+            grad.addColorStop(1, `rgba(80,220,255,${0.06 * (1 - dist / 100)})`);
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(164, 108, 252, ${0.06 * (1 - dist / 80)})`;
+            ctx.strokeStyle = grad;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
       }
+
+      // Radial gradient overlay
+      const cw = w();
+      const ch = h();
+      const radGrad = ctx.createRadialGradient(cw / 2, ch / 2, 0, cw / 2, ch / 2, Math.max(cw, ch) * 0.7);
+      radGrad.addColorStop(0, 'rgba(60,20,140,0.15)');
+      radGrad.addColorStop(0.5, 'rgba(20,60,100,0.08)');
+      radGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = radGrad;
+      ctx.fillRect(0, 0, cw, ch);
 
       animRef.current = requestAnimationFrame(draw);
     };
@@ -113,9 +150,10 @@ function FloatingParticles() {
 function HoloHUD({ playing }: { playing: boolean }) {
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-      <svg style={{ position: 'absolute', top: 12, left: 12, width: 40, height: 40, opacity: 0.4 }}>
+      {/* Top-left corner bracket */}
+      <svg style={{ position: 'absolute', top: 12, left: 12, width: 60, height: 60, opacity: 0.7 }}>
         <motion.path
-          d="M0,10 L10,0 L30,0 L40,10"
+          d="M0,15 L15,0 L45,0 L60,15"
           stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
@@ -124,7 +162,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
           transition={{ duration: 1, delay: 0.3 }}
         />
         <motion.path
-          d="M0,30 L10,40 L30,40 L40,30"
+          d="M0,45 L15,60 L45,60 L60,45"
           stroke="rgba(164,108,252,0.3)"
           strokeWidth="1"
           fill="none"
@@ -132,11 +170,34 @@ function HoloHUD({ playing }: { playing: boolean }) {
           animate={{ pathLength: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
         />
+        {/* Inner bracket at half scale */}
+        <motion.path
+          d="M8,20 L20,8 L40,8 L52,20"
+          stroke="rgba(80,220,255,0.3)"
+          strokeWidth="0.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.7 }}
+        />
+        <motion.path
+          d="M8,40 L20,52 L40,52 L52,40"
+          stroke="rgba(80,220,255,0.2)"
+          strokeWidth="0.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.9 }}
+        />
+        {/* Animated dashes */}
+        <line x1="0" y1="20" x2="25" y2="20" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
+        <line x1="20" y1="0" x2="20" y2="25" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
       </svg>
 
-      <svg style={{ position: 'absolute', top: 12, right: 12, width: 40, height: 40, opacity: 0.4 }}>
+      {/* Top-right corner bracket */}
+      <svg style={{ position: 'absolute', top: 12, right: 12, width: 60, height: 60, opacity: 0.7 }}>
         <motion.path
-          d="M40,10 L30,0 L10,0 L0,10"
+          d="M60,15 L45,0 L15,0 L0,15"
           stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
@@ -145,7 +206,7 @@ function HoloHUD({ playing }: { playing: boolean }) {
           transition={{ duration: 1, delay: 0.3 }}
         />
         <motion.path
-          d="M40,30 L30,40 L10,40 L0,30"
+          d="M60,45 L45,60 L15,60 L0,45"
           stroke="rgba(164,108,252,0.3)"
           strokeWidth="1"
           fill="none"
@@ -153,11 +214,34 @@ function HoloHUD({ playing }: { playing: boolean }) {
           animate={{ pathLength: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
         />
+        {/* Inner bracket at half scale */}
+        <motion.path
+          d="M52,20 L40,8 L20,8 L8,20"
+          stroke="rgba(80,220,255,0.3)"
+          strokeWidth="0.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.7 }}
+        />
+        <motion.path
+          d="M52,40 L40,52 L20,52 L8,40"
+          stroke="rgba(80,220,255,0.2)"
+          strokeWidth="0.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.9 }}
+        />
+        {/* Animated dashes */}
+        <line x1="60" y1="20" x2="35" y2="20" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
+        <line x1="40" y1="0" x2="40" y2="25" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
       </svg>
 
-      <svg style={{ position: 'absolute', bottom: 12, left: 12, width: 40, height: 40, opacity: 0.4 }}>
+      {/* Bottom-left corner bracket */}
+      <svg style={{ position: 'absolute', bottom: 12, left: 12, width: 60, height: 60, opacity: 0.7 }}>
         <motion.path
-          d="M0,30 L10,40 L30,40 L40,30"
+          d="M0,45 L15,60 L45,60 L60,45"
           stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
@@ -165,11 +249,25 @@ function HoloHUD({ playing }: { playing: boolean }) {
           animate={{ pathLength: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
         />
+        {/* Inner bracket */}
+        <motion.path
+          d="M8,40 L20,52 L40,52 L52,40"
+          stroke="rgba(80,220,255,0.3)"
+          strokeWidth="0.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.8 }}
+        />
+        {/* Animated dashes */}
+        <line x1="0" y1="40" x2="25" y2="40" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
+        <line x1="20" y1="60" x2="20" y2="35" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
       </svg>
 
-      <svg style={{ position: 'absolute', bottom: 12, right: 12, width: 40, height: 40, opacity: 0.4 }}>
+      {/* Bottom-right corner bracket */}
+      <svg style={{ position: 'absolute', bottom: 12, right: 12, width: 60, height: 60, opacity: 0.7 }}>
         <motion.path
-          d="M40,30 L30,40 L10,40 L0,30"
+          d="M60,45 L45,60 L15,60 L0,45"
           stroke="rgba(164,108,252,0.5)"
           strokeWidth="1"
           fill="none"
@@ -177,6 +275,19 @@ function HoloHUD({ playing }: { playing: boolean }) {
           animate={{ pathLength: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
         />
+        {/* Inner bracket */}
+        <motion.path
+          d="M52,40 L40,52 L20,52 L8,40"
+          stroke="rgba(80,220,255,0.3)"
+          strokeWidth="0.5"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.8 }}
+        />
+        {/* Animated dashes */}
+        <line x1="60" y1="40" x2="35" y2="40" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
+        <line x1="40" y1="60" x2="40" y2="35" stroke="rgba(164,108,252,0.2)" strokeWidth="0.5" />
       </svg>
 
       {playing && (
@@ -304,7 +415,9 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
 
       ctx.clearRect(0, 0, vw, vh);
 
-      const chromaShift = Math.sin(chromaPhase) * 2;
+      // Chromatic aberration — increased shift to 5
+      const chromaShift = Math.sin(chromaPhase) * 5;
+
       ctx.save();
       ctx.globalAlpha = 0.3;
       ctx.globalCompositeOperation = 'screen';
@@ -320,6 +433,15 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
       ctx.globalAlpha = 0.2;
       ctx.globalCompositeOperation = 'screen';
       ctx.drawImage(video, -chromaShift * 0.7, 0, vw, vh);
+      ctx.restore();
+
+      // CYAN channel
+      ctx.save();
+      ctx.globalAlpha = 0.2;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.drawImage(video, -chromaShift * 0.5, chromaShift * 0.3, vw, vh);
+      ctx.fillStyle = 'rgba(0,200,255,0.08)';
+      ctx.fillRect(0, 0, vw, vh);
       ctx.restore();
 
       ctx.save();
@@ -346,41 +468,71 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
       ctx.fillRect(0, 0, vw, vh);
       ctx.restore();
 
+      // Scan lines — increased intensity, cyan every 4th line
       ctx.save();
       ctx.globalCompositeOperation = 'overlay';
-      const intensity = 0.03 + 0.02 * Math.sin(t * 0.05);
+      const intensity = 0.07 + 0.04 * Math.sin(t * 0.05);
       for (let y = 0; y < vh; y += 2) {
-        const lineAlpha = y % 4 === 0 ? intensity * 1.5 : intensity;
-        ctx.fillStyle = `rgba(164, 108, 252, ${lineAlpha})`;
+        if (y % 8 === 0) {
+          // Every 4th line (every 8px since step is 2) — cyan
+          const lineAlpha = intensity * 1.5;
+          ctx.fillStyle = `rgba(80,220,255,${lineAlpha})`;
+        } else {
+          const lineAlpha = y % 4 === 0 ? intensity * 1.5 : intensity;
+          ctx.fillStyle = `rgba(164, 108, 252, ${lineAlpha})`;
+        }
         ctx.fillRect(0, y, vw, 1);
       }
       ctx.restore();
 
       scanY = (scanY + 1.2) % vh;
       scanY2 = (scanY2 + 0.7) % vh;
+      const scanY3 = (t * 2.5) % vh;
 
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      const drawScan = (sy: number, w: number, a: number) => {
-        const sg = ctx.createLinearGradient(0, sy - w, 0, sy + w);
-        sg.addColorStop(0, 'rgba(164, 108, 252, 0)');
-        sg.addColorStop(0.3, `rgba(177, 129, 252, ${a * 0.4})`);
-        sg.addColorStop(0.5, `rgba(164, 108, 252, ${a})`);
-        sg.addColorStop(0.7, `rgba(177, 129, 252, ${a * 0.4})`);
-        sg.addColorStop(1, 'rgba(164, 108, 252, 0)');
+      const drawScan = (sy: number, bw: number, a: number, rgb: string) => {
+        const sg = ctx.createLinearGradient(0, sy - bw, 0, sy + bw);
+        sg.addColorStop(0, `rgba(${rgb}, 0)`);
+        sg.addColorStop(0.3, `rgba(${rgb}, ${a * 0.4})`);
+        sg.addColorStop(0.5, `rgba(${rgb}, ${a})`);
+        sg.addColorStop(0.7, `rgba(${rgb}, ${a * 0.4})`);
+        sg.addColorStop(1, `rgba(${rgb}, 0)`);
         ctx.fillStyle = sg;
-        ctx.fillRect(0, sy - w, vw, w * 2);
+        ctx.fillRect(0, sy - bw, vw, bw * 2);
       };
-      drawScan(scanY, 25, 0.1);
-      drawScan(scanY2, 15, 0.05);
+      drawScan(scanY, 25, 0.18, '164,108,252');
+      drawScan(scanY2, 15, 0.10, '164,108,252');
+      // Third fast cyan scan
+      const sg3 = ctx.createLinearGradient(0, scanY3 - 15, 0, scanY3 + 15);
+      sg3.addColorStop(0, 'rgba(80,220,255,0)');
+      sg3.addColorStop(0.3, `rgba(80,220,255,${0.08 * 0.4})`);
+      sg3.addColorStop(0.5, 'rgba(80,220,255,0.08)');
+      sg3.addColorStop(0.7, `rgba(80,220,255,${0.08 * 0.4})`);
+      sg3.addColorStop(1, 'rgba(80,220,255,0)');
+      ctx.fillStyle = sg3;
+      ctx.fillRect(0, scanY3 - 15, vw, 30);
       ctx.restore();
 
-      if (Math.random() > 0.94) {
+      // Iridescent shimmer bar sweeping top-to-bottom every 4 seconds
+      const shimmerY = (t * 0.5) % vh;
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const shimmerGrad = ctx.createLinearGradient(0, shimmerY - 6, 0, shimmerY + 6);
+      shimmerGrad.addColorStop(0, 'rgba(164,108,252,0)');
+      shimmerGrad.addColorStop(0.5, 'rgba(164,108,252,0.12)');
+      shimmerGrad.addColorStop(1, 'rgba(164,108,252,0)');
+      ctx.fillStyle = shimmerGrad;
+      ctx.fillRect(0, shimmerY - 6, vw, 12);
+      ctx.restore();
+
+      // Glitch — increased frequency and max shift
+      if (Math.random() > 0.90) {
         const glitchCount = 1 + Math.floor(Math.random() * 3);
         for (let g = 0; g < glitchCount; g++) {
           const gy = Math.random() * vh;
           const gh = 1 + Math.random() * 8;
-          const shift = (Math.random() - 0.5) * 20;
+          const shift = (Math.random() - 0.5) * 30;
           ctx.save();
           ctx.globalAlpha = 0.5 + Math.random() * 0.4;
           try {
@@ -440,7 +592,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
             transition={{ duration: 0.5 }}
             onClick={onClose}
             className="fixed inset-0"
-            style={{ zIndex: 9999, background: 'rgba(14,11,31,0.97)', backdropFilter: 'blur(30px)' }}
+            style={{ zIndex: 9999, background: 'rgba(6,4,20,0.98)', backdropFilter: 'blur(30px)' }}
           >
             <FloatingParticles />
           </motion.div>
@@ -491,13 +643,14 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                 style={{ position: 'relative' }}
                 animate={playing ? {
                   boxShadow: [
-                    '0 0 40px rgba(164, 108, 252, 0.08), 0 0 80px rgba(130, 80, 220, 0.04)',
-                    '0 0 60px rgba(164, 108, 252, 0.12), 0 0 120px rgba(130, 80, 220, 0.06)',
-                    '0 0 40px rgba(164, 108, 252, 0.08), 0 0 80px rgba(130, 80, 220, 0.04)',
+                    '0 0 40px rgba(164,108,252,0.08), 0 0 80px rgba(130,80,220,0.04)',
+                    '0 0 60px rgba(164,108,252,0.12), 0 0 120px rgba(130,80,220,0.06)',
+                    '0 0 40px rgba(164,108,252,0.08), 0 0 80px rgba(130,80,220,0.04)',
                   ],
                 } : {}}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
+                {/* Animated border frame — cycles through purple/cyan/pink */}
                 <motion.div
                   style={{
                     position: 'absolute',
@@ -505,22 +658,28 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                     borderRadius: 4,
                     pointerEvents: 'none',
                     zIndex: 2,
+                    border: '1px solid rgba(164,108,252,0.15)',
                   }}
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: 1,
                     borderColor: playing
-                      ? ['rgba(164, 108, 252, 0.25)', 'rgba(164, 108, 252, 0.4)', 'rgba(164, 108, 252, 0.25)']
-                      : 'rgba(164, 108, 252, 0.15)',
+                      ? [
+                          'rgba(164,108,252,0.4)',
+                          'rgba(80,220,255,0.5)',
+                          'rgba(255,80,200,0.4)',
+                          'rgba(164,108,252,0.4)',
+                        ]
+                      : 'rgba(164,108,252,0.15)',
                     boxShadow: playing
                       ? [
-                          '0 0 20px rgba(164, 108, 252, 0.06), inset 0 0 20px rgba(164, 108, 252, 0.02)',
-                          '0 0 40px rgba(164, 108, 252, 0.1), inset 0 0 30px rgba(164, 108, 252, 0.04)',
-                          '0 0 20px rgba(164, 108, 252, 0.06), inset 0 0 20px rgba(164, 108, 252, 0.02)',
+                          '0 0 40px rgba(164,108,252,0.2), 0 0 80px rgba(80,220,255,0.1), inset 0 0 30px rgba(164,108,252,0.05)',
+                          '0 0 60px rgba(80,220,255,0.25), 0 0 120px rgba(164,108,252,0.15), inset 0 0 50px rgba(80,220,255,0.08)',
+                          '0 0 40px rgba(164,108,252,0.2), 0 0 80px rgba(80,220,255,0.1), inset 0 0 30px rgba(164,108,252,0.05)',
                         ]
-                      : '0 0 20px rgba(164, 108, 252, 0.06)',
+                      : '0 0 20px rgba(164,108,252,0.06)',
                   }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 />
 
                 <div
@@ -576,7 +735,9 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                       {bootPhase < 3 && (
                         <motion.div
                           style={{
-                            color: 'rgba(164, 108, 252, 0.5)',
+                            color: bootPhase === 1
+                              ? 'rgba(80,220,255,0.7)'
+                              : 'rgba(164,108,252,0.5)',
                             fontSize: '0.55rem',
                             letterSpacing: '0.2em',
                             fontFamily: 'monospace',
@@ -612,7 +773,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                                 position: 'absolute',
                                 inset: 0,
                                 borderRadius: '50%',
-                                border: '1.5px solid rgba(164, 108, 252, 0.25)',
+                                border: '1.5px solid rgba(164,108,252,0.5)',
                               }}
                               animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
                               transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -651,14 +812,33 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                               transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
                             />
 
+                            {/* Fourth ring cycling purple/cyan */}
+                            <motion.div
+                              style={{
+                                position: 'absolute',
+                                inset: -38,
+                                borderRadius: '50%',
+                                border: '0.5px solid rgba(164,108,252,0.04)',
+                              }}
+                              animate={{
+                                rotate: -360,
+                                borderColor: [
+                                  'rgba(164,108,252,0.15)',
+                                  'rgba(80,220,255,0.15)',
+                                  'rgba(164,108,252,0.15)',
+                                ],
+                              }}
+                              transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+                            />
+
                             <svg width="130" height="130" style={{ position: 'absolute', inset: 0 }}>
                               <motion.circle
                                 cx="65"
                                 cy="65"
                                 r="60"
                                 fill="none"
-                                stroke="rgba(164, 108, 252, 0.3)"
-                                strokeWidth="1"
+                                stroke="rgba(164,108,252,0.6)"
+                                strokeWidth="1.5"
                                 strokeDasharray="8 12"
                                 initial={{ rotate: 0 }}
                                 animate={{ rotate: 360 }}
@@ -672,7 +852,7 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                                 width: 60,
                                 height: 60,
                                 borderRadius: '50%',
-                                background: 'radial-gradient(circle, rgba(164, 108, 252, 0.08) 0%, transparent 70%)',
+                                background: 'radial-gradient(circle, rgba(164,108,252,0.15) 0%, rgba(80,220,255,0.05) 50%, transparent 70%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -682,8 +862,8 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                             >
                               <Play
                                 size={28}
-                                fill="rgba(164, 108, 252, 0.5)"
-                                stroke="rgba(164, 108, 252, 0.8)"
+                                fill="rgba(164,108,252,0.8)"
+                                stroke="rgba(80,220,255,0.9)"
                                 strokeWidth={1.5}
                                 style={{ marginLeft: 3 }}
                               />
@@ -695,11 +875,13 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
                             style={{
-                              color: 'rgba(164, 108, 252, 0.6)',
                               fontSize: '0.65rem',
                               letterSpacing: '0.3em',
                               textTransform: 'uppercase',
                               fontFamily: 'monospace',
+                              background: 'linear-gradient(90deg, rgba(164,108,252,0.9), rgba(80,220,255,0.9))',
+                              WebkitBackgroundClip: 'text',
+                              color: 'transparent',
                             }}
                           >
                             {videoReady ? '[ ENGAGE HOLOGRAM ]' : '[ ACQUIRING SIGNAL... ]'}
@@ -759,42 +941,45 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
                   )}
                 </div>
 
+                {/* Ground projection glow */}
                 <motion.div
                   style={{
                     position: 'absolute',
                     bottom: -2,
-                    left: '5%',
-                    right: '5%',
-                    height: 50,
-                    background: 'radial-gradient(ellipse at center, rgba(164, 108, 252, 0.1) 0%, transparent 70%)',
+                    left: '0%',
+                    right: '0%',
+                    height: 80,
+                    background: 'radial-gradient(ellipse at center, rgba(164,108,252,0.25) 0%, rgba(80,220,255,0.12) 40%, transparent 70%)',
                     filter: 'blur(12px)',
                     pointerEvents: 'none',
                   }}
-                  animate={{ opacity: [0.3, 0.7, 0.3], scaleX: [0.9, 1.05, 0.9] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={{ opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.1, 0.8] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                 />
 
+                {/* Left side accent line */}
                 <motion.div
                   style={{
                     position: 'absolute',
                     top: '50%',
                     left: -30,
-                    width: 1,
+                    width: 2,
                     height: 60,
-                    background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.15), transparent)',
+                    background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.3), transparent)',
                     pointerEvents: 'none',
                   }}
                   animate={{ height: [40, 80, 40], opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                 />
+                {/* Right side accent line */}
                 <motion.div
                   style={{
                     position: 'absolute',
                     top: '50%',
                     right: -30,
-                    width: 1,
+                    width: 2,
                     height: 60,
-                    background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.15), transparent)',
+                    background: 'linear-gradient(to bottom, transparent, rgba(80,220,255,0.2), transparent)',
                     pointerEvents: 'none',
                   }}
                   animate={{ height: [40, 80, 40], opacity: [0.3, 0.6, 0.3] }}

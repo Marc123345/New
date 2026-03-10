@@ -96,15 +96,17 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
           </span>
           <span style={{
             fontFamily: 'var(--font-stack-heading)',
-            fontSize: '0.42rem',
-            letterSpacing: '0.12em',
+            fontSize: '0.48rem',
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: 'rgba(164,108,252,0.85)',
+            color: '#a46cfc',
             display: 'block',
             textAlign: 'center',
-            marginTop: 2,
+            marginTop: 3,
+            fontWeight: 700,
+            textShadow: '0 0 8px rgba(164,108,252,0.8)',
           }}>
-            Click to explore →
+            ✦ Click to explore
           </span>
         </div>
       </button>

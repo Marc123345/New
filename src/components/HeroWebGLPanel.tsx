@@ -401,31 +401,13 @@ export function HeroWebGLPanel() {
       mouseActive = true;
     };
 
-    let justEntered = false;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      updateMouse(e.clientX, e.clientY);
-      // Teleport sphere to cursor on first move after entering so there is
-      // no velocity spike from the sphere rushing in from -9999.
-      if (justEntered) {
-        sphereX = targetCx; sphereY = targetCy;
-        prevSphereX = targetCx; prevSphereY = targetCy;
-        sphereVx = 0; sphereVy = 0;
-        justEntered = false;
-      }
-    };
-    const handleMouseEnter = () => {
-      mouseActive = true;
-      displacementStrength = 1.0;
-      justEntered = true;
-    };
+    const handleMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches[0]) updateMouse(e.touches[0].clientX, e.touches[0].clientY);
     };
-    const handleMouseLeave = () => { mouseActive = false; justEntered = false; };
+    const handleMouseLeave = () => { mouseActive = false; };
 
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseenter", handleMouseEnter);
+    window.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("touchmove", handleTouchMove, { passive: true });
     container.addEventListener("mouseleave", handleMouseLeave);
 
@@ -481,11 +463,8 @@ export function HeroWebGLPanel() {
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
-      // Snap to 1 immediately on mouse enter (set in handleMouseEnter),
-      // then fade out slowly once the cursor leaves.
-      if (!mouseActive) {
-        displacementStrength *= Math.exp(-2.5 * dt);
-      }
+      const targetDisp = mouseActive ? 1.0 : 0.0;
+      displacementStrength += (targetDisp - displacementStrength) * (1 - Math.exp(-3.5 * dt));
 
       for (let i = 0; i < N; i++) {
         if (spawned[i]) continue;
@@ -699,7 +678,7 @@ export function HeroWebGLPanel() {
         displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
         displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.013, sphereVy * 0.013);
         displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.08 + 1.2, 3.0);
+          displacementStrength * Math.min(cursorSpeed * 0.08 + 0.5, 3.0);
         displacementMaterial.uniforms.uTime.value = time;
 
         renderer.setRenderTarget(renderTarget);
@@ -740,8 +719,7 @@ export function HeroWebGLPanel() {
 
     return () => {
       visObserver.disconnect();
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseenter", handleMouseEnter);
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibility);
       container.removeEventListener("touchmove", handleTouchMove);

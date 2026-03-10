@@ -9,7 +9,7 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { UnicornHero } from "./components/UnicornHero";
+import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
@@ -107,7 +107,7 @@ function AppContent() {
                   boxShadow: '0 0 120px rgba(90,40,200,0.18), 0 0 60px rgba(164,108,252,0.08)',
                 }}
               >
-                <UnicornHero />
+                <HeroWebGLPanel />
               </div>
             </HeroTitle>
           </div>

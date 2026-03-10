@@ -10,6 +10,7 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
+import { UnicornHero } from "./components/UnicornHero";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -94,12 +95,18 @@ function AppContent() {
                 className="hero-webgl-container relative mx-auto w-full overflow-hidden"
                 style={{
                   height: 'clamp(480px, 60vh, 800px)',
-                  background: 'transparent',
                   borderRadius: 2,
                   boxShadow: '0 0 120px rgba(90,40,200,0.18), 0 0 60px rgba(164,108,252,0.08)',
                 }}
               >
-                <HeroWebGLPanel />
+                {/* UnicornScene background */}
+                <div className="absolute inset-0" style={{ zIndex: 0 }}>
+                  <UnicornHero />
+                </div>
+                {/* Three.js cubes on top */}
+                <div className="absolute inset-0" style={{ zIndex: 1 }}>
+                  <HeroWebGLPanel />
+                </div>
               </div>
             </HeroTitle>
           </div>

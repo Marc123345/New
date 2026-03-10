@@ -25,15 +25,15 @@ const PEOPLE_IMAGES = [
 ];
 
 const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
-const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
+const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 3.0 : 2.3));
 const N = ALL_URLS.length;
 
-const BOUNDS_X = 16;
-const BOUNDS_Y = 10;
+const BOUNDS_X = 20;
+const BOUNDS_Y = 13;
 
-const CURSOR_SPHERE_R = 4.2;
+const CURSOR_SPHERE_R = 5.5;
 const CURSOR_SMOOTH = 16.0;
-const CURSOR_FIELD_R = 13.0;
+const CURSOR_FIELD_R = 16.0;
 
 const SPRING_HOME = 0.06;
 const FRICTION = 0.965;
@@ -157,22 +157,22 @@ void main() {
   float velMag = length(vel);
 
   // Lens bulge: push pixels outward + velocity drag
-  vec2 lensPush = dir * falloffSq * uStrength * 0.016;
-  vec2 velDrag  = vel * falloff * 0.012 * smoothstep(0.0, 0.6, velMag);
+  vec2 lensPush = dir * falloffSq * uStrength * 0.028;
+  vec2 velDrag  = vel * falloff * 0.022 * smoothstep(0.0, 0.4, velMag);
   vec2 displacement = lensPush + velDrag;
 
   // Ambient organic wave — keeps the scene alive even when cursor is still
-  float wStrength = uStrength * 0.0012;
+  float wStrength = uStrength * 0.0022;
   vec2 wave = vec2(
-    sin(uv.y * 14.0 + uTime * 0.55) * wStrength,
-    cos(uv.x * 11.0 + uTime * 0.42) * wStrength
+    sin(uv.y * 10.0 + uTime * 0.45) * wStrength + sin(uv.y * 22.0 + uTime * 1.1) * wStrength * 0.4,
+    cos(uv.x * 8.0  + uTime * 0.38) * wStrength + cos(uv.x * 18.0 + uTime * 0.9) * wStrength * 0.4
   );
   displacement += wave;
 
   // Chromatic aberration — R/G/B sampled at progressively different offsets
-  vec2 r = texture2D(uScene, uv + displacement * 1.14).rg;
+  vec2 r = texture2D(uScene, uv + displacement * 1.28).rg;
   float g = texture2D(uScene, uv + displacement        ).g;
-  vec2 b = texture2D(uScene, uv + displacement * 0.88  ).ba;
+  vec2 b = texture2D(uScene, uv + displacement * 0.76  ).ba;
 
   gl_FragColor = vec4(r.x, g, b.x, b.y);
 }`;
@@ -216,7 +216,7 @@ export function HeroWebGLPanel() {
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },
-          uRadius: { value: 0.24 },
+          uRadius: { value: 0.32 },
           uStrength: { value: 0.0 },
           uVelocity: { value: new THREE.Vector2(0, 0) },
           uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
@@ -237,7 +237,7 @@ export function HeroWebGLPanel() {
         const s = r * 2;
         geoCache.set(key, [
           new THREE.BoxGeometry(s, s, s, 1, 1, 1),
-          new THREE.BoxGeometry(s * 1.10, s * 1.10, s * 1.10),
+          new THREE.BoxGeometry(s * 1.12, s * 1.12, s * 1.12),
         ]);
       }
       return geoCache.get(key)!;
@@ -699,7 +699,7 @@ export function HeroWebGLPanel() {
         displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
         displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.013, sphereVy * 0.013);
         displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.08 + 1.2, 3.0);
+          displacementStrength * Math.min(cursorSpeed * 0.10 + 1.5, 4.5);
         displacementMaterial.uniforms.uTime.value = time;
 
         renderer.setRenderTarget(renderTarget);

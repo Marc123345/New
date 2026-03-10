@@ -31,9 +31,9 @@ const N = ALL_URLS.length;
 const BOUNDS_X = 16;
 const BOUNDS_Y = 10;
 
-const CURSOR_SPHERE_R = 3.5;
-const CURSOR_SMOOTH = 12.0;
-const CURSOR_FIELD_R = 10.0;
+const CURSOR_SPHERE_R = 4.2;
+const CURSOR_SMOOTH = 16.0;
+const CURSOR_FIELD_R = 13.0;
 
 const SPRING_HOME = 0.06;
 const FRICTION = 0.965;
@@ -139,21 +139,41 @@ uniform float uRadius;
 uniform float uStrength;
 uniform vec2 uVelocity;
 uniform vec2 uResolution;
+uniform float uTime;
 varying vec2 vUv;
 void main() {
   vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
   vec2 uv = vUv;
+
+  // Radial lens distortion centred on cursor
   vec2 diff = (uv - uMouse) * aspect;
   float dist = length(diff);
   float falloff = smoothstep(uRadius, 0.0, dist);
+  float falloffSq = falloff * falloff;
   vec2 dir = normalize(diff + 0.0001);
+
+  // Velocity drag — streaks the scene in the direction of movement
   vec2 vel = uVelocity * aspect;
   float velMag = length(vel);
-  vec2 displacement = dir * falloff * uStrength * 0.008;
-  displacement += vel * falloff * 0.005 * min(velMag * 2.0, 1.0);
-  vec2 r = texture2D(uScene, uv + displacement * 1.05).rg;
-  float g = texture2D(uScene, uv + displacement).g;
-  vec2 b = texture2D(uScene, uv + displacement * 0.96).ba;
+
+  // Lens bulge: push pixels outward + velocity drag
+  vec2 lensPush = dir * falloffSq * uStrength * 0.016;
+  vec2 velDrag  = vel * falloff * 0.012 * smoothstep(0.0, 0.6, velMag);
+  vec2 displacement = lensPush + velDrag;
+
+  // Ambient organic wave — keeps the scene alive even when cursor is still
+  float wStrength = uStrength * 0.0012;
+  vec2 wave = vec2(
+    sin(uv.y * 14.0 + uTime * 0.55) * wStrength,
+    cos(uv.x * 11.0 + uTime * 0.42) * wStrength
+  );
+  displacement += wave;
+
+  // Chromatic aberration — R/G/B sampled at progressively different offsets
+  vec2 r = texture2D(uScene, uv + displacement * 1.14).rg;
+  float g = texture2D(uScene, uv + displacement        ).g;
+  vec2 b = texture2D(uScene, uv + displacement * 0.88  ).ba;
+
   gl_FragColor = vec4(r.x, g, b.x, b.y);
 }`;
 
@@ -196,10 +216,11 @@ export function HeroWebGLPanel() {
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },
-          uRadius: { value: 0.18 },
+          uRadius: { value: 0.24 },
           uStrength: { value: 0.0 },
           uVelocity: { value: new THREE.Vector2(0, 0) },
           uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
+          uTime: { value: 0.0 },
         },
       });
       displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
@@ -655,9 +676,10 @@ export function HeroWebGLPanel() {
       if (!mobile && displacementMaterial && renderTarget && displacementScene && displacementCamera) {
         const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
         displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
-        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
+        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.013, sphereVy * 0.013);
         displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
+          displacementStrength * Math.min(cursorSpeed * 0.08 + 0.5, 3.0);
+        displacementMaterial.uniforms.uTime.value = time;
 
         renderer.setRenderTarget(renderTarget);
         renderer.render(scene, camera);

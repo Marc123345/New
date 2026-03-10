@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { brandLogos } from "../lib/brandLogos";
 import { isMobileDevice } from "../hooks/useIsMobile";
 
-// ... [Keep your PEOPLE_IMAGES and ALL_URLS definitions here] ...
 const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
   "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400",
@@ -13,21 +12,31 @@ const PEOPLE_IMAGES = [
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
   "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400",
   "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/712513/pexels-photo-712513.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/834863/pexels-photo-834863.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-const ALL_URLS = [...PEOPLE_IMAGES]; // Add brandLogos back if imported
+// Re-added the brandLogos!
+const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
 const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
 const N = ALL_URLS.length;
 
 const BOUNDS_X = 16;
 const BOUNDS_Y = 10;
 
-// TWEAKED: Slightly larger, softer cursor field for a "pushing water" feel
+// Lushion-style physics tweaks
 const CURSOR_SPHERE_R = 4.0;
-const CURSOR_SMOOTH = 8.0; 
+const CURSOR_SMOOTH = 8.0;
 const CURSOR_FIELD_R = 12.0;
 
-// TWEAKED: Heavier physics for a more premium, grounded feel
 const SPRING_HOME = 0.04;
 const FRICTION = 0.95;
 const MAX_SPEED = 30.0;
@@ -52,7 +61,7 @@ void main() {
   gl_Position = projectionMatrix * vp;
 }`;
 
-// TWEAKED: Added SDF for rounded corners, deeper shadows, and softer specularity
+// Lushion-style rounded corners via SDF and softer glass lighting
 const CUBE_FRAG = `
 uniform sampler2D uMap;
 uniform float uHover;
@@ -62,34 +71,27 @@ varying vec3 vViewDir;
 varying vec2 vUv;
 varying float vFresnel;
 
-// Function to create rounded corners (Signed Distance Field)
 float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius) {
     return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
 }
 
 void main() {
-  // Center UVs for SDF calculation (-1.0 to 1.0)
   vec2 centeredUv = vUv * 2.0 - 1.0;
-  float edgeDist = roundedBoxSDF(centeredUv, vec2(1.0), 0.25); // 0.25 is the border-radius
+  float edgeDist = roundedBoxSDF(centeredUv, vec2(1.0), 0.25);
   
-  // Smoothly clip the corners to create soft shapes
   if(edgeDist > 0.0) discard;
 
   vec4 tex = texture2D(uMap, vUv);
   
-  // Premium lighting setup
   vec3 L = normalize(vec3(0.5, 0.8, 1.0));
   float diff = max(dot(vNormal, L), 0.0) * 0.4;
   vec3 H = normalize(L + vViewDir);
   
-  // Softer, wider specular highlight for a glassy look
   float spec = pow(max(dot(vNormal, H), 0.0), 60.0) * (0.6 + uHover * 0.4);
   
-  // Deepen ambient colors slightly
   vec3 ambient = tex.rgb * 0.55;
   vec3 lit = tex.rgb * diff;
   
-  // Enhanced rim lighting (Fresnel)
   vec3 glassRim = vec3(0.9, 0.95, 1.0) * vFresnel * (0.25 + uHover * 0.35);
   
   vec3 final = ambient + lit + vec3(spec * 0.8) + glassRim;
@@ -113,7 +115,6 @@ uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 void main() {
-  // Thicker glow for the "shell" aura
   float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.5);
   float glow = fr * (0.15 + uHover * 0.35);
   gl_FragColor = vec4(vec3(0.9, 0.95, 1.0) * glow, glow * 0.6);
@@ -126,7 +127,7 @@ void main() {
   gl_Position = vec4(position.xy, 0.0, 1.0);
 }`;
 
-// TWEAKED: Enhanced Chromatic Aberration and fluid pulling effect
+// Lushion-style liquid drag with chromatic aberration (RGB split)
 const DISPLACEMENT_FRAG = `
 uniform sampler2D uScene;
 uniform vec2 uMouse;
@@ -141,17 +142,14 @@ void main() {
   vec2 diff = (uv - uMouse) * aspect;
   float dist = length(diff);
   
-  // Smoother falloff for a more organic liquid feel
   float falloff = smoothstep(uRadius * 1.5, 0.0, dist);
   vec2 dir = normalize(diff + 0.0001);
   vec2 vel = uVelocity * aspect;
   float velMag = length(vel);
   
-  // Combine pulling and pushing displacement
   vec2 displacement = dir * falloff * uStrength * 0.012;
   displacement += vel * falloff * 0.008 * min(velMag * 2.5, 1.0);
   
-  // Pronounced RGB split (Chromatic Aberration) based on displacement velocity
   float rgbSpread = length(displacement) * 2.5;
   
   vec2 rUv = uv + displacement * (1.0 + rgbSpread);
@@ -204,7 +202,7 @@ export function HeroWebGLPanel() {
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },
-          uRadius: { value: 0.25 }, // TWEAKED: Wider liquid ripple
+          uRadius: { value: 0.25 },
           uStrength: { value: 0.0 },
           uVelocity: { value: new THREE.Vector2(0, 0) },
           uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
@@ -222,7 +220,6 @@ export function HeroWebGLPanel() {
       const key = Math.round(r * 10);
       if (!geoCache.has(key)) {
         const s = r * 2;
-        // Keep the boxes, the shader now handles the rounded visual corners!
         geoCache.set(key, [
           new THREE.BoxGeometry(s, s, s, 1, 1, 1),
           new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07),
@@ -231,8 +228,6 @@ export function HeroWebGLPanel() {
       return geoCache.get(key)!;
     };
 
-    // ... [Keep ALL your physics variables and arrays exactly as they were here] ...
-    // Note: To keep the snippet concise, I've left the math arrays intact as you had them.
     const px = new Float32Array(N);
     const py = new Float32Array(N);
     const pz = new Float32Array(N);
@@ -346,7 +341,7 @@ export function HeroWebGLPanel() {
           uHover: { value: 0 },
           uDepth: { value: depthFactor[i] },
         },
-        transparent: true, // IMPORTANT: Needed for the discard/SDF to blend correctly
+        transparent: true, // Needed for SDF discard!
       });
       cubeMaterials.push(cubeMat);
       inner.add(new THREE.Mesh(cubeGeo, cubeMat));
@@ -366,7 +361,6 @@ export function HeroWebGLPanel() {
       inner.add(new THREE.Mesh(shellGeo, shellMat));
     }
 
-    // ... [Keep Mouse Events and Intersection Observer Here exactly as they were] ...
     let targetCx = -9999, targetCy = -9999;
     let sphereX = -9999, sphereY = -9999;
     let prevSphereX = -9999, prevSphereY = -9999;
@@ -418,7 +412,6 @@ export function HeroWebGLPanel() {
     let time = 0;
     const clock = new THREE.Clock();
 
-    // ... [Keep animate() loop exactly as you had it, the math logic is excellent] ...
     const animate = () => {
       if (hidden) {
         animating = false;
@@ -607,7 +600,7 @@ export function HeroWebGLPanel() {
       for (let i = 0; i < N; i++) {
         jellyVelX[i] += (jellyTargetX[i] - jellyScaleX[i]) * JELLY_SPRING * dt;
         jellyVelY[i] += (jellyTargetY[i] - jellyScaleY[i]) * JELLY_SPRING * dt;
-        jellyVelZ[i] += (jellyTargetZ[i] - jellyTargetZ[i]) * JELLY_SPRING * dt;
+        jellyVelZ[i] += (jellyTargetZ[i] - jellyScaleZ[i]) * JELLY_SPRING * dt;
 
         const decay = Math.exp(-JELLY_DAMPING * dt);
         jellyVelX[i] *= decay;
@@ -686,7 +679,7 @@ export function HeroWebGLPanel() {
       hidden = document.hidden;
       if (!hidden && !animating) {
         animating = true;
-        clock.getDelta();
+        clock.getDelta(); // discard accumulated delta while hidden
         animId = requestAnimationFrame(animate);
       }
     };

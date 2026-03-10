@@ -10,7 +10,7 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { UnicornHero } from "./components/UnicornHero";
+import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -74,14 +74,25 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{
-          backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: '#040608',
-        }}
+        style={{ background: '#040608' }}
       >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/purple-nebula-and-glowing-cosmic-dust-in-outer-spa-2026-01-05-00-45-10-utc.jpg?updatedAt=1772993700397)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(0,0,0,0.65)' }}
+        />
+        <div className="absolute inset-0">
+          <ShootingStars count={22} />
+        </div>
+
         <div
           className="relative z-10 px-4 md:px-8 lg:px-12"
           style={{
@@ -92,21 +103,20 @@ function AppContent() {
           <div className="max-w-8xl mx-auto">
             <HeroTitle>
               <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden"
+                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
                 style={{
-                  height: 'clamp(480px, 60vh, 800px)',
-                  borderRadius: 2,
-                  boxShadow: '0 0 120px rgba(90,40,200,0.18), 0 0 60px rgba(164,108,252,0.08)',
+                  background: 'transparent',
+                  border: '2px solid rgba(255,255,255,0.18)',
+                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
-                {/* UnicornScene background */}
-                <div className="absolute inset-0" style={{ zIndex: 0 }}>
-                  <UnicornHero />
-                </div>
-                {/* Three.js cubes on top */}
-                <div className="absolute inset-0" style={{ zIndex: 1 }}>
-                  <HeroWebGLPanel />
-                </div>
+                <HeroWebGLPanel />
               </div>
             </HeroTitle>
           </div>
@@ -138,7 +148,7 @@ function AppContent() {
         <EcosystemServices />
       </div>
 
-      <div className="relative" style={{ zIndex: 2 }}>
+      <div id="about" className="relative" style={{ zIndex: 2 }}>
         <Suspense fallback={<SectionLoader />}>
           <AboutStory />
         </Suspense>

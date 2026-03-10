@@ -25,15 +25,15 @@ const PEOPLE_IMAGES = [
 ];
 
 const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
-const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 3.0 : 2.3));
+const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
 const N = ALL_URLS.length;
 
-const BOUNDS_X = 20;
-const BOUNDS_Y = 13;
+const BOUNDS_X = 16;
+const BOUNDS_Y = 10;
 
-const CURSOR_SPHERE_R = 5.5;
-const CURSOR_SMOOTH = 16.0;
-const CURSOR_FIELD_R = 16.0;
+const CURSOR_SPHERE_R = 3.5;
+const CURSOR_SMOOTH = 12.0;
+const CURSOR_FIELD_R = 10.0;
 
 const SPRING_HOME = 0.06;
 const FRICTION = 0.965;
@@ -68,31 +68,15 @@ varying vec2 vUv;
 varying float vFresnel;
 void main() {
   vec4 tex = texture2D(uMap, vUv);
-
-  // Key light — cooler, slightly top-left
-  vec3 L = normalize(vec3(0.4, 0.65, 1.0));
-  float diff = max(dot(vNormal, L), 0.0) * 0.22;
-
-  // Specular — sharp, tinted toward purple-white
+  vec3 L = normalize(vec3(0.3, 0.6, 1.0));
+  float diff = max(dot(vNormal, L), 0.0) * 0.35;
   vec3 H = normalize(L + vViewDir);
-  float specRaw = pow(max(dot(vNormal, H), 0.0), 140.0);
-  vec3 specColor = mix(vec3(0.55, 0.35, 1.0), vec3(1.0, 1.0, 1.0), specRaw) * specRaw * (0.9 + uHover * 0.7);
-
-  // Darker, more glass-like base
-  vec3 ambient = tex.rgb * 0.48;
-  vec3 diffuse = tex.rgb * diff;
-
-  // Iridescent fresnel rim: purple → cyan based on angle
-  float fr = pow(vFresnel, 2.2);
-  vec3 rimPurple = vec3(0.52, 0.18, 1.0);
-  vec3 rimCyan   = vec3(0.15, 0.85, 1.0);
-  vec3 rim = mix(rimPurple, rimCyan, fr) * fr * (0.45 + uHover * 0.55);
-
-  // Subtle inner color tint toward deep violet
-  vec3 tint = vec3(0.08, 0.04, 0.18) * (1.0 - fr) * 0.6;
-
-  vec3 final = ambient + diffuse + specColor + rim + tint;
-  float fog = mix(1.0, 0.45, uDepth);
+  float spec = pow(max(dot(vNormal, H), 0.0), 90.0) * (0.5 + uHover * 0.5);
+  vec3 ambient = tex.rgb * 0.62;
+  vec3 lit = tex.rgb * diff;
+  vec3 glassRim = vec3(1.0) * vFresnel * (0.18 + uHover * 0.22);
+  vec3 final = ambient + lit + vec3(spec * 0.7) + glassRim;
+  float fog = mix(1.0, 0.55, uDepth);
   gl_FragColor = vec4(final * fog, 1.0);
 }`;
 
@@ -111,18 +95,9 @@ uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 void main() {
-  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.8);
-
-  // Iridescent shell: deep purple → vivid cyan → magenta highlights
-  vec3 colA = vec3(0.48, 0.12, 1.0);   // deep purple
-  vec3 colB = vec3(0.08, 0.75, 1.0);   // cyan
-  vec3 colC = vec3(0.9,  0.25, 1.0);   // magenta-purple
-
-  vec3 iriColor = mix(colA, colB, fr * fr);
-  iriColor = mix(iriColor, colC, sin(fr * 3.14159) * 0.35);
-
-  float glow = fr * (0.28 + uHover * 0.52);
-  gl_FragColor = vec4(iriColor * glow, glow * 0.65);
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.5);
+  float glow = fr * (0.12 + uHover * 0.25);
+  gl_FragColor = vec4(vec3(0.85, 0.90, 1.0) * glow, glow * 0.45);
 }`;
 
 const DISPLACEMENT_VERT = `
@@ -139,41 +114,21 @@ uniform float uRadius;
 uniform float uStrength;
 uniform vec2 uVelocity;
 uniform vec2 uResolution;
-uniform float uTime;
 varying vec2 vUv;
 void main() {
   vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
   vec2 uv = vUv;
-
-  // Radial lens distortion centred on cursor
   vec2 diff = (uv - uMouse) * aspect;
   float dist = length(diff);
   float falloff = smoothstep(uRadius, 0.0, dist);
-  float falloffSq = falloff * falloff;
   vec2 dir = normalize(diff + 0.0001);
-
-  // Velocity drag — streaks the scene in the direction of movement
   vec2 vel = uVelocity * aspect;
   float velMag = length(vel);
-
-  // Lens bulge: push pixels outward + velocity drag
-  vec2 lensPush = dir * falloffSq * uStrength * 0.028;
-  vec2 velDrag  = vel * falloff * 0.022 * smoothstep(0.0, 0.4, velMag);
-  vec2 displacement = lensPush + velDrag;
-
-  // Ambient organic wave — keeps the scene alive even when cursor is still
-  float wStrength = uStrength * 0.0022;
-  vec2 wave = vec2(
-    sin(uv.y * 10.0 + uTime * 0.45) * wStrength + sin(uv.y * 22.0 + uTime * 1.1) * wStrength * 0.4,
-    cos(uv.x * 8.0  + uTime * 0.38) * wStrength + cos(uv.x * 18.0 + uTime * 0.9) * wStrength * 0.4
-  );
-  displacement += wave;
-
-  // Chromatic aberration — R/G/B sampled at progressively different offsets
-  vec2 r = texture2D(uScene, uv + displacement * 1.28).rg;
-  float g = texture2D(uScene, uv + displacement        ).g;
-  vec2 b = texture2D(uScene, uv + displacement * 0.76  ).ba;
-
+  vec2 displacement = dir * falloff * uStrength * 0.008;
+  displacement += vel * falloff * 0.005 * min(velMag * 2.0, 1.0);
+  vec2 r = texture2D(uScene, uv + displacement * 1.05).rg;
+  float g = texture2D(uScene, uv + displacement).g;
+  vec2 b = texture2D(uScene, uv + displacement * 0.96).ba;
   gl_FragColor = vec4(r.x, g, b.x, b.y);
 }`;
 
@@ -206,8 +161,7 @@ export function HeroWebGLPanel() {
     if (!mobile) {
       renderTarget = new THREE.WebGLRenderTarget(
         container.clientWidth * maxDpr,
-        container.clientHeight * maxDpr,
-        { format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }
+        container.clientHeight * maxDpr
       );
       displacementScene = new THREE.Scene();
       displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -217,11 +171,10 @@ export function HeroWebGLPanel() {
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },
-          uRadius: { value: 0.32 },
+          uRadius: { value: 0.18 },
           uStrength: { value: 0.0 },
           uVelocity: { value: new THREE.Vector2(0, 0) },
           uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
-          uTime: { value: 0.0 },
         },
       });
       displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
@@ -238,7 +191,7 @@ export function HeroWebGLPanel() {
         const s = r * 2;
         geoCache.set(key, [
           new THREE.BoxGeometry(s, s, s, 1, 1, 1),
-          new THREE.BoxGeometry(s * 1.12, s * 1.12, s * 1.12),
+          new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07),
         ]);
       }
       return geoCache.get(key)!;
@@ -402,31 +355,13 @@ export function HeroWebGLPanel() {
       mouseActive = true;
     };
 
-    let justEntered = false;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      updateMouse(e.clientX, e.clientY);
-      // Teleport sphere to cursor on first move after entering so there is
-      // no velocity spike from the sphere rushing in from -9999.
-      if (justEntered) {
-        sphereX = targetCx; sphereY = targetCy;
-        prevSphereX = targetCx; prevSphereY = targetCy;
-        sphereVx = 0; sphereVy = 0;
-        justEntered = false;
-      }
-    };
-    const handleMouseEnter = () => {
-      mouseActive = true;
-      displacementStrength = 1.0;
-      justEntered = true;
-    };
+    const handleMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches[0]) updateMouse(e.touches[0].clientX, e.touches[0].clientY);
     };
-    const handleMouseLeave = () => { mouseActive = false; justEntered = false; };
+    const handleMouseLeave = () => { mouseActive = false; };
 
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseenter", handleMouseEnter);
+    window.addEventListener("mousemove", handleMouseMove);
     container.addEventListener("touchmove", handleTouchMove, { passive: true });
     container.addEventListener("mouseleave", handleMouseLeave);
 
@@ -482,11 +417,8 @@ export function HeroWebGLPanel() {
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
-      // Snap to 1 immediately on mouse enter (set in handleMouseEnter),
-      // then fade out slowly once the cursor leaves.
-      if (!mouseActive) {
-        displacementStrength *= Math.exp(-2.5 * dt);
-      }
+      const targetDisp = mouseActive ? 1.0 : 0.0;
+      displacementStrength += (targetDisp - displacementStrength) * (1 - Math.exp(-3.5 * dt));
 
       for (let i = 0; i < N; i++) {
         if (spawned[i]) continue;
@@ -698,10 +630,9 @@ export function HeroWebGLPanel() {
       if (!mobile && displacementMaterial && renderTarget && displacementScene && displacementCamera) {
         const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
         displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
-        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.013, sphereVy * 0.013);
+        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
         displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.10 + 1.5, 4.5);
-        displacementMaterial.uniforms.uTime.value = time;
+          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
 
         renderer.setRenderTarget(renderTarget);
         renderer.render(scene, camera);
@@ -741,8 +672,7 @@ export function HeroWebGLPanel() {
 
     return () => {
       visObserver.disconnect();
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseenter", handleMouseEnter);
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibility);
       container.removeEventListener("touchmove", handleTouchMove);

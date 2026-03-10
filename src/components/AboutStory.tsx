@@ -354,7 +354,7 @@ export function AboutStory() {
         {/* UnicornStudio background */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           <UnicornScene
-            projectId="mF5BBrA2ZBWxhUKOq6Wk"
+            projectId="kbwZfsjqtRBrcs4q2dd0"
             width={`${dims.w}px`}
             height={`${dims.h}px`}
             scale={1}

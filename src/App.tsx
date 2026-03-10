@@ -79,7 +79,7 @@ function AppContent() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/purple-nebula-and-glowing-cosmic-dust-in-outer-spa-2026-01-05-00-45-10-utc.jpg?updatedAt=1772993700397)',
+            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',

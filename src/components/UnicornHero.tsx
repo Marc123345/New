@@ -23,7 +23,7 @@ export function UnicornHero() {
       style={{ width: '100%', height: '100%', overflow: 'hidden', display: 'block' }}
     >
       <UnicornScene
-        projectId="US9XVS5BHKCmCNH60lQg"
+        projectId="wKZHVdHAggr0hWNmPEtf"
         width={`${dims.w}px`}
         height={`${dims.h}px`}
         scale={1}

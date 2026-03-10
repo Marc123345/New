@@ -25,15 +25,15 @@ const PEOPLE_IMAGES = [
 ];
 
 const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
-const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 3.0 : 2.3));
+const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
 const N = ALL_URLS.length;
 
-const BOUNDS_X = 20;
-const BOUNDS_Y = 13;
+const BOUNDS_X = 16;
+const BOUNDS_Y = 10;
 
-const CURSOR_SPHERE_R = 5.5;
+const CURSOR_SPHERE_R = 4.2;
 const CURSOR_SMOOTH = 16.0;
-const CURSOR_FIELD_R = 16.0;
+const CURSOR_FIELD_R = 13.0;
 
 const SPRING_HOME = 0.06;
 const FRICTION = 0.965;
@@ -125,6 +125,58 @@ void main() {
   gl_FragColor = vec4(iriColor * glow, glow * 0.65);
 }`;
 
+const DISPLACEMENT_VERT = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}`;
+
+const DISPLACEMENT_FRAG = `
+uniform sampler2D uScene;
+uniform vec2 uMouse;
+uniform float uRadius;
+uniform float uStrength;
+uniform vec2 uVelocity;
+uniform vec2 uResolution;
+uniform float uTime;
+varying vec2 vUv;
+void main() {
+  vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+  vec2 uv = vUv;
+
+  // Radial lens distortion centred on cursor
+  vec2 diff = (uv - uMouse) * aspect;
+  float dist = length(diff);
+  float falloff = smoothstep(uRadius, 0.0, dist);
+  float falloffSq = falloff * falloff;
+  vec2 dir = normalize(diff + 0.0001);
+
+  // Velocity drag — streaks the scene in the direction of movement
+  vec2 vel = uVelocity * aspect;
+  float velMag = length(vel);
+
+  // Lens bulge: push pixels outward + velocity drag
+  vec2 lensPush = dir * falloffSq * uStrength * 0.016;
+  vec2 velDrag  = vel * falloff * 0.012 * smoothstep(0.0, 0.6, velMag);
+  vec2 displacement = lensPush + velDrag;
+
+  // Ambient organic wave — keeps the scene alive even when cursor is still
+  float wStrength = uStrength * 0.0012;
+  vec2 wave = vec2(
+    sin(uv.y * 14.0 + uTime * 0.55) * wStrength,
+    cos(uv.x * 11.0 + uTime * 0.42) * wStrength
+  );
+  displacement += wave;
+
+  // Chromatic aberration — R/G/B sampled at progressively different offsets
+  vec2 r = texture2D(uScene, uv + displacement * 1.14).rg;
+  float g = texture2D(uScene, uv + displacement        ).g;
+  vec2 b = texture2D(uScene, uv + displacement * 0.88  ).ba;
+
+  gl_FragColor = vec4(r.x, g, b.x, b.y);
+}`;
+
 export function HeroWebGLPanel() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -145,6 +197,35 @@ export function HeroWebGLPanel() {
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
+    let renderTarget: THREE.WebGLRenderTarget | null = null;
+    let displacementScene: THREE.Scene | null = null;
+    let displacementCamera: THREE.OrthographicCamera | null = null;
+    let displacementMaterial: THREE.ShaderMaterial | null = null;
+    let displacementQuad: THREE.Mesh | null = null;
+
+    if (!mobile) {
+      renderTarget = new THREE.WebGLRenderTarget(
+        container.clientWidth * maxDpr,
+        container.clientHeight * maxDpr
+      );
+      displacementScene = new THREE.Scene();
+      displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      displacementMaterial = new THREE.ShaderMaterial({
+        vertexShader: DISPLACEMENT_VERT,
+        fragmentShader: DISPLACEMENT_FRAG,
+        uniforms: {
+          uScene: { value: renderTarget.texture },
+          uMouse: { value: new THREE.Vector2(-1, -1) },
+          uRadius: { value: 0.24 },
+          uStrength: { value: 0.0 },
+          uVelocity: { value: new THREE.Vector2(0, 0) },
+          uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
+          uTime: { value: 0.0 },
+        },
+      });
+      displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
+      displacementScene.add(displacementQuad);
+    }
 
     const mainGroup = new THREE.Group();
     scene.add(mainGroup);
@@ -156,7 +237,7 @@ export function HeroWebGLPanel() {
         const s = r * 2;
         geoCache.set(key, [
           new THREE.BoxGeometry(s, s, s, 1, 1, 1),
-          new THREE.BoxGeometry(s * 1.12, s * 1.12, s * 1.12),
+          new THREE.BoxGeometry(s * 1.10, s * 1.10, s * 1.10),
         ]);
       }
       return geoCache.get(key)!;
@@ -299,6 +380,8 @@ export function HeroWebGLPanel() {
     let prevSphereX = -9999, prevSphereY = -9999;
     let sphereVx = 0, sphereVy = 0;
     let mouseActive = false;
+    let mouseNdcX = 0, mouseNdcY = 0;
+    let displacementStrength = 0;
 
     const raycaster = new THREE.Raycaster();
     const mouse2D = new THREE.Vector2();
@@ -313,6 +396,8 @@ export function HeroWebGLPanel() {
       raycaster.ray.intersectPlane(planeZ, hitPt);
       targetCx = hitPt.x;
       targetCy = hitPt.y;
+      mouseNdcX = (clientX - rect.left) / rect.width;
+      mouseNdcY = 1.0 - (clientY - rect.top) / rect.height;
       mouseActive = true;
     };
 
@@ -331,6 +416,7 @@ export function HeroWebGLPanel() {
     };
     const handleMouseEnter = () => {
       mouseActive = true;
+      displacementStrength = 1.0;
       justEntered = true;
     };
     const handleTouchMove = (e: TouchEvent) => {
@@ -394,6 +480,12 @@ export function HeroWebGLPanel() {
       tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-2.5 * dt));
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
+
+      // Snap to 1 immediately on mouse enter (set in handleMouseEnter),
+      // then fade out slowly once the cursor leaves.
+      if (!mouseActive) {
+        displacementStrength *= Math.exp(-2.5 * dt);
+      }
 
       for (let i = 0; i < N; i++) {
         if (spawned[i]) continue;
@@ -602,7 +694,21 @@ export function HeroWebGLPanel() {
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
 
-      renderer.render(scene, camera);
+      if (!mobile && displacementMaterial && renderTarget && displacementScene && displacementCamera) {
+        const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
+        displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
+        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.013, sphereVy * 0.013);
+        displacementMaterial.uniforms.uStrength.value =
+          displacementStrength * Math.min(cursorSpeed * 0.08 + 1.2, 3.0);
+        displacementMaterial.uniforms.uTime.value = time;
+
+        renderer.setRenderTarget(renderTarget);
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(null);
+        renderer.render(displacementScene, displacementCamera);
+      } else {
+        renderer.render(scene, camera);
+      }
     };
 
     const handleVisibility = () => {
@@ -625,7 +731,10 @@ export function HeroWebGLPanel() {
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-
+      if (renderTarget && displacementMaterial) {
+        renderTarget.setSize(w * maxDpr, h * maxDpr);
+        displacementMaterial.uniforms.uResolution.value.set(w, h);
+      }
     };
     window.addEventListener("resize", handleResize);
 
@@ -639,6 +748,9 @@ export function HeroWebGLPanel() {
       container.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animId);
 
+      if (renderTarget) renderTarget.dispose();
+      if (displacementMaterial) displacementMaterial.dispose();
+      if (displacementQuad) displacementQuad.geometry.dispose();
       loadedTextures.forEach((t) => t.dispose());
       geoCache.forEach(([g1, g2]) => {
         g1.dispose();

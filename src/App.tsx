@@ -9,7 +9,7 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
+import UnicornScene from "unicornstudio-react";
 import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
@@ -116,7 +116,14 @@ function AppContent() {
                   e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
-                <HeroWebGLPanel />
+                <UnicornScene
+                  projectId="US9XVS5BHKCmCNH60lQg"
+                  width="1440px"
+                  height="900px"
+                  scale={1}
+                  dpi={1.5}
+                  sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.3/dist/unicornStudio.umd.js"
+                />
               </div>
             </HeroTitle>
           </div>

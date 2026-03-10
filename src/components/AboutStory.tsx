@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'motion/react';
-import { SignalBackground } from './about/SignalBackground';
+import UnicornScene from 'unicornstudio-react';
 
 // ─── Narrative beats ──────────────────────────────────────────────────────────
 
@@ -320,6 +320,21 @@ function Beat4({ progress }: { progress: MotionValue<number> }) {
 
 export function AboutStory() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 1440, h: 900 });
+
+  useEffect(() => {
+    const el = stickyRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentRect.width);
+      const h = Math.round(entry.contentRect.height);
+      if (w > 0 && h > 0) setDims({ w, h });
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
@@ -334,16 +349,26 @@ export function AboutStory() {
   return (
     <div ref={sectionRef} id="about" style={{ height: '550vh', position: 'relative' }}>
       {/* ── Sticky viewport ── */}
-      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+      <div ref={stickyRef} style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-        {/* Backgrounds */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(160deg, #06030f 0%, #0e0820 30%, #080318 70%, #030108 100%)',
-        }} />
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.07, pointerEvents: 'none' }}>
-          <SignalBackground />
+        {/* UnicornStudio background */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <UnicornScene
+            projectId="mF5BBrA2ZBWxhUKOq6Wk"
+            width={`${dims.w}px`}
+            height={`${dims.h}px`}
+            scale={1}
+            dpi={Math.min(window.devicePixelRatio, 2)}
+            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.3/dist/unicornStudio.umd.js"
+            lazyLoad={false}
+          />
         </div>
+
+        {/* Dark overlay so text stays legible */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 1,
+          background: 'rgba(4,2,12,0.55)',
+        }} />
 
         {/* Moving gradient blob */}
         <motion.div
@@ -352,12 +377,13 @@ export function AboutStory() {
             width: '60vw',
             height: '60vw',
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(90,30,200,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(90,30,200,0.10) 0%, transparent 70%)',
             filter: 'blur(60px)',
             pointerEvents: 'none',
             left: blobX,
             top: blobY,
             transform: 'translate(-50%, -50%)',
+            zIndex: 1,
           }}
         />
 
@@ -380,6 +406,7 @@ export function AboutStory() {
           padding: `clamp(4rem, 8vh, 6rem) ${contentPadding}`,
           display: 'flex',
           alignItems: 'stretch',
+          zIndex: 2,
         }}>
           <div style={{
             position: 'relative',

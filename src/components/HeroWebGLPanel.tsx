@@ -206,7 +206,8 @@ export function HeroWebGLPanel() {
     if (!mobile) {
       renderTarget = new THREE.WebGLRenderTarget(
         container.clientWidth * maxDpr,
-        container.clientHeight * maxDpr
+        container.clientHeight * maxDpr,
+        { format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }
       );
       displacementScene = new THREE.Scene();
       displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);

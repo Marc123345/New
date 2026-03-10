@@ -11,7 +11,6 @@ import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import UnicornScene from "unicornstudio-react";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -77,21 +76,16 @@ function AppContent() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: '#040608' }}
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/purple-nebula-and-glowing-cosmic-dust-in-outer-spa-2026-01-05-00-45-10-utc.jpg?updatedAt=1772993700397)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.65)' }}
-        />
-        <div className="absolute inset-0">
-          <ShootingStars count={22} />
+        {/* UnicornScene fills the full hero section */}
+        <div className="absolute inset-0" style={{ zIndex: 0 }}>
+          <UnicornScene
+            projectId="US9XVS5BHKCmCNH60lQg"
+            width="1440px"
+            height="900px"
+            scale={1}
+            dpi={1.5}
+            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.3/dist/unicornStudio.umd.js"
+          />
         </div>
 
         <div
@@ -117,21 +111,7 @@ function AppContent() {
                   e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
-                {/* UnicornScene background */}
-                <div className="absolute inset-0" style={{ zIndex: 0 }}>
-                  <UnicornScene
-                    projectId="US9XVS5BHKCmCNH60lQg"
-                    width="1440px"
-                    height="900px"
-                    scale={1}
-                    dpi={1.5}
-                    sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.3/dist/unicornStudio.umd.js"
-                  />
-                </div>
-                {/* Cubes on top */}
-                <div className="absolute inset-0" style={{ zIndex: 1 }}>
-                  <HeroWebGLPanel />
-                </div>
+                <HeroWebGLPanel />
               </div>
             </HeroTitle>
           </div>

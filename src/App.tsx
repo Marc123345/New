@@ -103,17 +103,11 @@ function AppContent() {
           <div className="max-w-8xl mx-auto">
             <HeroTitle>
               <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
+                className="hero-webgl-container relative mx-auto w-full overflow-hidden"
                 style={{
                   background: 'transparent',
-                  border: '2px solid rgba(255,255,255,0.18)',
-                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
+                  borderRadius: 2,
+                  boxShadow: '0 0 120px rgba(90,40,200,0.18), 0 0 60px rgba(164,108,252,0.08)',
                 }}
               >
                 <HeroWebGLPanel />

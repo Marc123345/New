@@ -68,15 +68,31 @@ varying vec2 vUv;
 varying float vFresnel;
 void main() {
   vec4 tex = texture2D(uMap, vUv);
-  vec3 L = normalize(vec3(0.3, 0.6, 1.0));
-  float diff = max(dot(vNormal, L), 0.0) * 0.35;
+
+  // Key light — cooler, slightly top-left
+  vec3 L = normalize(vec3(0.4, 0.65, 1.0));
+  float diff = max(dot(vNormal, L), 0.0) * 0.22;
+
+  // Specular — sharp, tinted toward purple-white
   vec3 H = normalize(L + vViewDir);
-  float spec = pow(max(dot(vNormal, H), 0.0), 90.0) * (0.5 + uHover * 0.5);
-  vec3 ambient = tex.rgb * 0.62;
-  vec3 lit = tex.rgb * diff;
-  vec3 glassRim = vec3(1.0) * vFresnel * (0.18 + uHover * 0.22);
-  vec3 final = ambient + lit + vec3(spec * 0.7) + glassRim;
-  float fog = mix(1.0, 0.55, uDepth);
+  float specRaw = pow(max(dot(vNormal, H), 0.0), 140.0);
+  vec3 specColor = mix(vec3(0.55, 0.35, 1.0), vec3(1.0, 1.0, 1.0), specRaw) * specRaw * (0.9 + uHover * 0.7);
+
+  // Darker, more glass-like base
+  vec3 ambient = tex.rgb * 0.48;
+  vec3 diffuse = tex.rgb * diff;
+
+  // Iridescent fresnel rim: purple → cyan based on angle
+  float fr = pow(vFresnel, 2.2);
+  vec3 rimPurple = vec3(0.52, 0.18, 1.0);
+  vec3 rimCyan   = vec3(0.15, 0.85, 1.0);
+  vec3 rim = mix(rimPurple, rimCyan, fr) * fr * (0.45 + uHover * 0.55);
+
+  // Subtle inner color tint toward deep violet
+  vec3 tint = vec3(0.08, 0.04, 0.18) * (1.0 - fr) * 0.6;
+
+  vec3 final = ambient + diffuse + specColor + rim + tint;
+  float fog = mix(1.0, 0.45, uDepth);
   gl_FragColor = vec4(final * fog, 1.0);
 }`;
 
@@ -95,9 +111,18 @@ uniform float uHover;
 varying vec3 vNormal;
 varying vec3 vViewDir;
 void main() {
-  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 3.5);
-  float glow = fr * (0.12 + uHover * 0.25);
-  gl_FragColor = vec4(vec3(0.85, 0.90, 1.0) * glow, glow * 0.45);
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.8);
+
+  // Iridescent shell: deep purple → vivid cyan → magenta highlights
+  vec3 colA = vec3(0.48, 0.12, 1.0);   // deep purple
+  vec3 colB = vec3(0.08, 0.75, 1.0);   // cyan
+  vec3 colC = vec3(0.9,  0.25, 1.0);   // magenta-purple
+
+  vec3 iriColor = mix(colA, colB, fr * fr);
+  iriColor = mix(iriColor, colC, sin(fr * 3.14159) * 0.35);
+
+  float glow = fr * (0.28 + uHover * 0.52);
+  gl_FragColor = vec4(iriColor * glow, glow * 0.65);
 }`;
 
 const DISPLACEMENT_VERT = `
@@ -191,7 +216,7 @@ export function HeroWebGLPanel() {
         const s = r * 2;
         geoCache.set(key, [
           new THREE.BoxGeometry(s, s, s, 1, 1, 1),
-          new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07),
+          new THREE.BoxGeometry(s * 1.10, s * 1.10, s * 1.10),
         ]);
       }
       return geoCache.get(key)!;

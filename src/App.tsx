@@ -74,20 +74,17 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#040608' }}
+        style={{
+          backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#040608',
+        }}
       >
         <div
           className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.65)' }}
+          style={{ background: 'rgba(0,0,0,0.42)' }}
         />
         <div className="absolute inset-0">
           <ShootingStars count={22} />

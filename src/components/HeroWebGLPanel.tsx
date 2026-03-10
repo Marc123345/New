@@ -402,12 +402,14 @@ export function HeroWebGLPanel() {
     };
 
     const handleMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
+    const handleMouseEnter = () => { mouseActive = true; displacementStrength = 1.0; };
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches[0]) updateMouse(e.touches[0].clientX, e.touches[0].clientY);
     };
     const handleMouseLeave = () => { mouseActive = false; };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseenter", handleMouseEnter);
     container.addEventListener("touchmove", handleTouchMove, { passive: true });
     container.addEventListener("mouseleave", handleMouseLeave);
 
@@ -463,8 +465,11 @@ export function HeroWebGLPanel() {
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
-      const targetDisp = mouseActive ? 1.0 : 0.0;
-      displacementStrength += (targetDisp - displacementStrength) * (1 - Math.exp(-3.5 * dt));
+      // Snap to 1 immediately on mouse enter (set in handleMouseEnter),
+      // then fade out slowly once the cursor leaves.
+      if (!mouseActive) {
+        displacementStrength *= Math.exp(-2.5 * dt);
+      }
 
       for (let i = 0; i < N; i++) {
         if (spawned[i]) continue;
@@ -719,7 +724,8 @@ export function HeroWebGLPanel() {
 
     return () => {
       visObserver.disconnect();
-      window.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseenter", handleMouseEnter);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("visibilitychange", handleVisibility);
       container.removeEventListener("touchmove", handleTouchMove);

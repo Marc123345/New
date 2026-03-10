@@ -10,7 +10,7 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { ShootingStars } from "./components/ShootingStars";
+import { UnicornHero } from "./components/UnicornHero";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -83,14 +83,6 @@ function AppContent() {
         }}
       >
         <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.42)' }}
-        />
-        <div className="absolute inset-0">
-          <ShootingStars count={22} />
-        </div>
-
-        <div
           className="relative z-10 px-4 md:px-8 lg:px-12"
           style={{
             paddingTop: 'var(--space-8x)',
@@ -102,12 +94,19 @@ function AppContent() {
               <div
                 className="hero-webgl-container relative mx-auto w-full overflow-hidden"
                 style={{
-                  background: 'transparent',
+                  height: 'clamp(480px, 60vh, 800px)',
                   borderRadius: 2,
                   boxShadow: '0 0 120px rgba(90,40,200,0.18), 0 0 60px rgba(164,108,252,0.08)',
                 }}
               >
-                <HeroWebGLPanel />
+                {/* UnicornScene background */}
+                <div className="absolute inset-0" style={{ zIndex: 0 }}>
+                  <UnicornHero />
+                </div>
+                {/* Three.js cubes on top */}
+                <div className="absolute inset-0" style={{ zIndex: 1 }}>
+                  <HeroWebGLPanel />
+                </div>
               </div>
             </HeroTitle>
           </div>

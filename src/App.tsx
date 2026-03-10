@@ -81,27 +81,21 @@ function AppContent() {
           backgroundColor: '#040608',
         }}
       >
+        {/* WebGL cubes fill the whole hero, transparent bg lets image show through */}
+        <div className="absolute inset-0" style={{ zIndex: 1 }}>
+          <HeroWebGLPanel />
+        </div>
+
         <div
-          className="relative z-10 px-4 md:px-8 lg:px-12"
+          className="relative px-4 md:px-8 lg:px-12"
           style={{
             paddingTop: 'var(--space-8x)',
             paddingBottom: 'var(--space-8x)',
+            zIndex: 2,
           }}
         >
           <div className="max-w-8xl mx-auto">
-            <HeroTitle>
-              <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden"
-                style={{
-                  height: 'clamp(480px, 60vh, 800px)',
-                  background: 'transparent',
-                  borderRadius: 2,
-                  boxShadow: '0 0 120px rgba(90,40,200,0.18), 0 0 60px rgba(164,108,252,0.08)',
-                }}
-              >
-                <HeroWebGLPanel />
-              </div>
-            </HeroTitle>
+            <HeroTitle />
           </div>
         </div>
 

@@ -9,9 +9,9 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
+import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { ShootingStars } from "./components/ShootingStars";
 
-// Lazy loaded components
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
 );
@@ -64,6 +64,7 @@ const Section = ({
 );
 
 function AppContent() {
+
   return (
     <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
@@ -100,7 +101,24 @@ function AppContent() {
           }}
         >
           <div className="max-w-8xl mx-auto">
-            <HeroTitle />
+            <HeroTitle>
+              <div
+                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
+                style={{
+                  background: 'transparent',
+                  border: '2px solid rgba(255,255,255,0.18)',
+                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
+                }}
+              >
+                <HeroWebGLPanel />
+              </div>
+            </HeroTitle>
           </div>
         </div>
 
@@ -127,10 +145,7 @@ function AppContent() {
       <HeroStory />
 
       <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
-        {/* FIX: Added Suspense boundary around lazy component */}
-        <Suspense fallback={<SectionLoader />}>
-          <EcosystemServices />
-        </Suspense>
+        <EcosystemServices />
       </div>
 
       <div id="about" className="relative" style={{ zIndex: 2 }}>
@@ -140,17 +155,11 @@ function AppContent() {
       </div>
 
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
-        {/* FIX: Added Suspense boundary around lazy component */}
-        <Suspense fallback={<SectionLoader />}>
-          <ArcSlider />
-        </Suspense>
+        <ArcSlider />
       </Section>
 
       <Section id="testimonials" className="bg-[var(--color-background-light)]">
-        {/* FIX: Added Suspense boundary around lazy component */}
-        <Suspense fallback={<SectionLoader />}>
-          <Testimonials />
-        </Suspense>
+        <Testimonials />
       </Section>
 
       <div id="blog">

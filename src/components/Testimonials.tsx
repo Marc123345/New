@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "motion/react";
-import { GlobeWrapper } from "./HeroStory/Globe/GlobeWrapper";
 
 const CONTACTS = [
   {
@@ -146,9 +145,8 @@ export function Testimonials() {
               </p>
             </div>
 
-            <div className="relative w-[340px] h-[340px] flex-shrink-0">
-              {/* SVG rings */}
-              <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
+            <div className="relative w-[340px] h-[340px] flex-shrink-0 flex items-center justify-center">
+              <div className="absolute inset-0 w-full h-full">
                 <svg
                   viewBox="0 0 380 380"
                   fill="none"
@@ -190,10 +188,10 @@ export function Testimonials() {
                 </svg>
               </div>
 
-              {/* 3D Globe */}
-              <div className="absolute inset-[24px] rounded-full overflow-hidden">
-                <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={true} />
-              </div>
+              <GlobeMap
+                scrollProgress={scrollYProgress}
+                activeIndex={activeIndex}
+              />
             </div>
 
             <div className="z-10 relative text-center mb-4">
@@ -318,6 +316,55 @@ export function Testimonials() {
   );
 }
 
+function GlobeMap({
+  scrollProgress,
+  activeIndex,
+}: {
+  scrollProgress: MotionValue<number>;
+  activeIndex: number;
+}) {
+  const active = CONTACTS[activeIndex];
+
+  return (
+    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
+      <motion.div
+        className="relative w-full h-full"
+        animate={{
+          x: active.mapView.x,
+          y: active.mapView.y,
+          scale: active.mapView.scale,
+        }}
+        transition={{
+          duration: 1.2,
+          ease: [0.625, 0.05, 0, 1],
+        }}
+      >
+        <img
+          src="https://cdn.prod.website-files.com/68a5787bba0829184628bd51/68b6b0d7f637ee0f1ff47780_BASE.avif"
+          alt="World Map Base"
+          className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
+        />
+
+        {CONTACTS.map((contact, i) => {
+          const isActive = i === activeIndex;
+          return (
+            <div
+              key={contact.id}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${contact.dot.x}%`,
+                top: `${contact.dot.y}%`,
+                zIndex: 10,
+              }}
+            >
+              <div className={`globe-dot${isActive ? " globe-dot--active" : ""}`} />
+            </div>
+          );
+        })}
+      </motion.div>
+    </div>
+  );
+}
 
 function TestimonialCard({
   contact,

@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, useMotionValue, useTransform } from 'motion/react';
+import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { Laptop3D } from './Laptop3D';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
-const LAPTOP_URL = 'https://ik.imagekit.io/qcvroy8xpd/download.png';
 
 const PLANET_IMAGES = [
   { src: 'https://ik.imagekit.io/qcvroy8xpd/jupiter.jpg', size: 260, top: '5%', left: '68%', duration: 18, delay: 0 },
@@ -141,75 +141,6 @@ function useOrbitAngle(paused: boolean) {
   return angle;
 }
 
-function LaptopCenter() {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useTransform(mouseY, [-150, 150], [12, -12]);
-  const rotateY = useTransform(mouseX, [-150, 150], [-12, 12]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    mouseX.set(e.clientX - cx);
-    mouseY.set(e.clientY - cy);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
-  return (
-    <motion.div
-      className="relative flex items-center justify-center w-full h-full"
-      style={{ perspective: 800 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      <motion.div
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
-        }}
-        transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-      >
-        <motion.div
-          animate={{ y: [0, -14, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <img
-            src={LAPTOP_URL}
-            alt="Website at the center of everything"
-            className="w-[180px] sm:w-[240px] md:w-[340px] h-auto"
-            style={{
-              filter: 'drop-shadow(0 0 32px rgba(164,108,252,0.55)) drop-shadow(0 24px 48px rgba(0,0,0,0.8))',
-              userSelect: 'none',
-              pointerEvents: 'none',
-            }}
-            draggable={false}
-          />
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 'clamp(180px, 26vw, 380px)',
-          height: 'clamp(25px, 4vw, 60px)',
-          bottom: '-10%',
-          left: '50%',
-          translateX: '-50%',
-          background: 'radial-gradient(ellipse, rgba(164,108,252,0.25) 0%, transparent 70%)',
-          filter: 'blur(12px)',
-        }}
-        animate={{ scaleX: [1, 0.85, 1], opacity: [0.6, 0.35, 0.6] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      />
-    </motion.div>
-  );
-}
 
 const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
@@ -390,7 +321,9 @@ export function EcosystemServices() {
 
           {/* Center Laptop */}
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
-            <LaptopCenter />
+            <div style={{ width: ORBIT_DIAMETER, height: ORBIT_DIAMETER }}>
+              <Laptop3D />
+            </div>
           </div>
 
           {/* Orbiting Nodes */}

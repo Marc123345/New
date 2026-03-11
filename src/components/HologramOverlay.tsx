@@ -521,56 +521,42 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop — click anywhere to close */}
-          <motion.div
-            key="holo-backdrop"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            onClick={onClose}
-            className="fixed inset-0"
-            style={{ zIndex: 9998, background: 'rgba(4,2,16,0.98)', backdropFilter: 'blur(8px)', cursor: 'pointer' }}
-          >
-            <SpaceBackground />
-          </motion.div>
+        <motion.div
+          key="holo-backdrop"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          onClick={onClose}
+          className="fixed inset-0 flex flex-col items-center justify-center"
+          style={{ zIndex: 9999, background: 'rgba(4,2,16,0.98)', backdropFilter: 'blur(8px)' }}
+        >
+          <SpaceBackground />
 
-          {/* Close button — fixed top-right, always reachable */}
-          <motion.button
-            key="holo-close"
-            onClick={onClose}
-            aria-label="Close"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              position: 'fixed', top: 20, right: 20, zIndex: 10001,
-              width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(164,108,252,0.10)', border: '1px solid rgba(164,108,252,0.4)',
-              borderRadius: 4, color: 'rgba(200,160,255,0.9)', cursor: 'pointer',
-              boxShadow: '0 0 16px rgba(164,108,252,0.2)',
-            }}
-            whileHover={{ background: 'rgba(164,108,252,0.22)', borderColor: 'rgba(164,108,252,0.8)', boxShadow: '0 0 28px rgba(164,108,252,0.4)', scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-          >
-            <X size={18} strokeWidth={2} />
-          </motion.button>
-
-          {/* Content panel — centered, does NOT stop propagation so backdrop still closes on click */}
+          {/* Content — stops propagation so clicks here don't close the overlay */}
           <motion.div
             key="holo-content"
             initial={{ opacity: 0, scale: 0.8, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: 30 }}
             transition={{ type: 'spring', stiffness: 180, damping: 22, mass: 0.9 }}
-            className="fixed inset-0 flex flex-col items-center justify-center"
-            style={{ zIndex: 9999, pointerEvents: 'none' }}
-          >
-          <div
-            style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'all' }}
+            style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             onClick={(e) => e.stopPropagation()}
             onMouseMove={handleMouseMove}
           >
+            {/* Close button */}
+            <motion.button
+              onClick={onClose}
+              aria-label="Close"
+              style={{
+                position: 'absolute', top: -44, right: 0,
+                width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(164,108,252,0.04)', border: '1px solid rgba(164,108,252,0.25)',
+                borderRadius: 2, color: 'rgba(164,108,252,0.7)', cursor: 'pointer', zIndex: 10,
+              }}
+              whileHover={{ background: 'rgba(164,108,252,0.12)', borderColor: 'rgba(164,108,252,0.6)', color: 'rgba(180,130,255,1)', boxShadow: '0 0 20px rgba(164,108,252,0.3)' }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <X size={16} strokeWidth={2} />
+            </motion.button>
 
             {/* ── Globe ── */}
             <motion.div
@@ -771,9 +757,8 @@ export function HologramOverlay({ isOpen, onClose, title = 'Meet the Founder', v
             >
               {title}
             </motion.p>
-          </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );

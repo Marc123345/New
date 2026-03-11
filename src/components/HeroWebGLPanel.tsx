@@ -199,6 +199,9 @@ export function HeroWebGLPanel() {
       displacementMaterial = new THREE.ShaderMaterial({
         vertexShader: DISPLACEMENT_VERT,
         fragmentShader: DISPLACEMENT_FRAG,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },
@@ -659,20 +662,7 @@ export function HeroWebGLPanel() {
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
 
-      if (!mobile && displacementMaterial && renderTarget && displacementScene && displacementCamera) {
-        const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
-        displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
-        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
-        displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
-
-        renderer.setRenderTarget(renderTarget);
-        renderer.render(scene, camera);
-        renderer.setRenderTarget(null);
-        renderer.render(displacementScene, displacementCamera);
-      } else {
-        renderer.render(scene, camera);
-      }
+      renderer.render(scene, camera);
     };
 
     const handleVisibility = () => {
@@ -732,5 +722,18 @@ export function HeroWebGLPanel() {
     };
   }, []);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  // FIX: Added the image directly to the container style as a cover background
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full"
+      style={{
+        backgroundImage: "url('https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "transparent",
+      }}
+    />
+  );
 }

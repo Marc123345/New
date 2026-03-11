@@ -12,6 +12,7 @@ import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { ShootingStars } from "./components/ShootingStars";
 
+// Lazy loaded components
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
 );
@@ -64,7 +65,6 @@ const Section = ({
 );
 
 function AppContent() {
-
   return (
     <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
@@ -105,7 +105,10 @@ function AppContent() {
               <div
                 className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
                 style={{
-                  background: 'transparent',
+                  backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
                   border: '2px solid rgba(255,255,255,0.18)',
                   boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
                 }}
@@ -145,7 +148,10 @@ function AppContent() {
       <HeroStory />
 
       <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
-        <EcosystemServices />
+        {/* FIX: Added Suspense boundary around lazy component */}
+        <Suspense fallback={<SectionLoader />}>
+          <EcosystemServices />
+        </Suspense>
       </div>
 
       <div id="about" className="relative" style={{ zIndex: 2 }}>
@@ -155,11 +161,17 @@ function AppContent() {
       </div>
 
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
-        <ArcSlider />
+        {/* FIX: Added Suspense boundary around lazy component */}
+        <Suspense fallback={<SectionLoader />}>
+          <ArcSlider />
+        </Suspense>
       </Section>
 
       <Section id="testimonials" className="bg-[var(--color-background-light)]">
-        <Testimonials />
+        {/* FIX: Added Suspense boundary around lazy component */}
+        <Suspense fallback={<SectionLoader />}>
+          <Testimonials />
+        </Suspense>
       </Section>
 
       <div id="blog">

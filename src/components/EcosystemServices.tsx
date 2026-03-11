@@ -3,7 +3,6 @@ import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { Laptop3D } from './Laptop3D';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
 
@@ -319,11 +318,22 @@ export function EcosystemServices() {
             />
           </div>
 
-          {/* Center Laptop */}
-          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
-            <div style={{ width: ORBIT_DIAMETER, height: ORBIT_DIAMETER }}>
-              <Laptop3D />
-            </div>
+          {/* Center floating image */}
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <motion.img
+              src="https://ik.imagekit.io/qcvroy8xpd/unnamed%20(2)%201.png?updatedAt=1773188163565"
+              alt="H2H ecosystem"
+              animate={{ y: [0, -18, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                width: 'clamp(160px, 22vw, 320px)',
+                height: 'auto',
+                filter: 'drop-shadow(0 0 32px rgba(164,108,252,0.55)) drop-shadow(0 24px 48px rgba(0,0,0,0.7))',
+                userSelect: 'none',
+                pointerEvents: 'none',
+              }}
+              draggable={false}
+            />
           </div>
 
           {/* Orbiting Nodes */}

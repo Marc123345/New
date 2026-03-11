@@ -9,7 +9,6 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
 import { ShootingStars } from "./components/ShootingStars";
 
 // Lazy loaded components
@@ -101,27 +100,7 @@ function AppContent() {
           }}
         >
           <div className="max-w-8xl mx-auto">
-            <HeroTitle>
-              <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
-                style={{
-                  backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  border: '2px solid rgba(255,255,255,0.18)',
-                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
-                }}
-              >
-                <HeroWebGLPanel />
-              </div>
-            </HeroTitle>
+            <HeroTitle />
           </div>
         </div>
 

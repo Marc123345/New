@@ -199,6 +199,9 @@ export function HeroWebGLPanel() {
       displacementMaterial = new THREE.ShaderMaterial({
         vertexShader: DISPLACEMENT_VERT,
         fragmentShader: DISPLACEMENT_FRAG,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
         uniforms: {
           uScene: { value: renderTarget.texture },
           uMouse: { value: new THREE.Vector2(-1, -1) },

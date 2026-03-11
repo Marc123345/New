@@ -105,7 +105,10 @@ function AppContent() {
               <div
                 className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
                 style={{
-                  background: 'transparent',
+                  backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
                   border: '2px solid rgba(255,255,255,0.18)',
                   boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
                 }}

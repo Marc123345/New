@@ -722,5 +722,18 @@ export function HeroWebGLPanel() {
     };
   }, []);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  // FIX: Added the image directly to the container style as a cover background
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full"
+      style={{
+        backgroundImage: "url('https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "transparent",
+      }}
+    />
+  );
 }

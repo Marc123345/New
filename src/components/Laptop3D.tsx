@@ -1,17 +1,11 @@
 import * as THREE from 'three'
-import { Suspense, useRef, useMemo } from 'react'
-import { useState } from 'react'
+import { Suspense, useEffect, useRef, useMemo, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Environment, ContactShadows, useTexture } from '@react-three/drei'
 import { useSpring } from '@react-spring/core'
-import { animated } from '@react-spring/three'
+import { a as three } from '@react-spring/three'
 
 const IMAGE_URL = 'https://ik.imagekit.io/qcvroy8xpd/unnamed%20(2)%201.png'
-
-const SILVER = '#b0b2be'
-const DARK_CHASSIS = '#a0a2ae'
-const KEYBOARD = '#14141f'
-const TRACKPAD_COLOR = '#9496a4'
 
 // ── Scanline-reveal shader ─────────────────────────────────────────────────
 const VERT = /* glsl */ `
@@ -21,47 +15,33 @@ const VERT = /* glsl */ `
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `
-
 const FRAG = /* glsl */ `
   uniform sampler2D map;
-  uniform float reveal;   // 0 → 1  (scan progress)
+  uniform float reveal;
   uniform float time;
   varying vec2 vUv;
-
   void main() {
-    // In Three.js planes uv.y=0 is bottom, 1 is top — we reveal top→bottom
     float revealY = 1.0 - vUv.y;
     if (revealY > reveal) discard;
-
     vec4 color = texture2D(map, vUv);
-
-    // Glowing scan-line edge
     float distToEdge = abs(revealY - reveal);
-    float scanGlow = smoothstep(0.055, 0.0, distToEdge);
+    float scanGlow = smoothstep(0.06, 0.0, distToEdge);
     color.rgb += scanGlow * vec3(0.64, 0.42, 0.99) * 3.0;
-    color.rgb += scanGlow * vec3(1.0, 1.0, 1.0) * 1.2;
-
-    // Subtle horizontal scan-lines across the whole image
-    float lines = sin(vUv.y * 280.0 * 3.14159) * 0.5 + 0.5;
-    color.rgb *= 0.88 + lines * 0.12;
-
-    // Chromatic aberration at the edge
-    float ca = scanGlow * 0.012;
+    color.rgb += scanGlow * vec3(1.0, 1.0, 1.0) * 1.0;
+    float ca = scanGlow * 0.014;
     float rSample = texture2D(map, vUv + vec2(ca, 0.0)).r;
     float bSample = texture2D(map, vUv - vec2(ca, 0.0)).b;
-    color.r = mix(color.r, rSample, scanGlow * 0.6);
-    color.b = mix(color.b, bSample, scanGlow * 0.6);
-
-    // Vignette
+    color.r = mix(color.r, rSample, scanGlow * 0.7);
+    color.b = mix(color.b, bSample, scanGlow * 0.7);
+    float lines = sin(vUv.y * 280.0 * 3.14159) * 0.5 + 0.5;
+    color.rgb *= 0.88 + lines * 0.12;
     vec2 uvc = vUv * 2.0 - 1.0;
-    float vignette = 1.0 - dot(uvc, uvc) * 0.22;
-    color.rgb *= vignette;
-
+    color.rgb *= 1.0 - dot(uvc, uvc) * 0.2;
     gl_FragColor = color;
   }
 `
 
-// ── Screen with animated reveal ────────────────────────────────────────────
+// ── Screen with animated scan-reveal ──────────────────────────────────────
 function LaptopScreen({ open }: { open: boolean }) {
   const texture = useTexture(IMAGE_URL)
   texture.flipY = true
@@ -69,15 +49,12 @@ function LaptopScreen({ open }: { open: boolean }) {
   const revealRef = useRef(0)
   const timeRef = useRef(0)
   const wasOpenRef = useRef(false)
+  const glowLightRef = useRef<THREE.PointLight>(null)
 
-  const material = useMemo(
+  const scanMat = useMemo(
     () =>
       new THREE.ShaderMaterial({
-        uniforms: {
-          map: { value: texture },
-          reveal: { value: 0 },
-          time: { value: 0 },
-        },
+        uniforms: { map: { value: texture }, reveal: { value: 0 }, time: { value: 0 } },
         vertexShader: VERT,
         fragmentShader: FRAG,
         transparent: true,
@@ -99,8 +76,6 @@ function LaptopScreen({ open }: { open: boolean }) {
     [],
   )
 
-  const glowLightRef = useRef<THREE.PointLight>(null)
-
   useFrame((_, delta) => {
     if (open && !wasOpenRef.current) {
       revealRef.current = 0
@@ -113,149 +88,144 @@ function LaptopScreen({ open }: { open: boolean }) {
     }
     if (open) {
       timeRef.current += delta
-      // First 0.4s: lid is still opening — delay screen boot slightly
-      const screenTime = Math.max(0, timeRef.current - 0.35)
-      revealRef.current = Math.min(screenTime / 1.4, 1)
+      const screenTime = Math.max(0, timeRef.current - 0.4)
+      revealRef.current = Math.min(screenTime / 1.3, 1)
     }
-
-    material.uniforms.reveal.value = revealRef.current
-    material.uniforms.time.value = timeRef.current
-
-    // Glow halo fades in alongside reveal
+    scanMat.uniforms.reveal.value = revealRef.current
+    scanMat.uniforms.time.value = timeRef.current
     glowMat.opacity = open ? revealRef.current * 0.22 : 0
-
-    // Screen point light
     if (glowLightRef.current) {
-      glowLightRef.current.intensity = open ? revealRef.current * 2.2 : 0
+      glowLightRef.current.intensity = open ? revealRef.current * 2.4 : 0
     }
   })
 
   return (
     <>
-      {/* Screen image with scan-reveal shader */}
+      {/* Black screen backing */}
       <mesh position={[0, 0.051, 0.96]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[2.42, 1.56]} />
-        <primitive object={material} attach="material" />
+        <meshStandardMaterial color="#060612" roughness={0.05} />
       </mesh>
-
-      {/* Glow halo behind image */}
-      <mesh position={[0, 0.047, 0.96]} rotation-x={-Math.PI / 2}>
+      {/* Scan-reveal image */}
+      <mesh position={[0, 0.052, 0.96]} rotation-x={-Math.PI / 2}>
+        <planeGeometry args={[2.42, 1.56]} />
+        <primitive object={scanMat} attach="material" />
+      </mesh>
+      {/* Glow halo */}
+      <mesh position={[0, 0.048, 0.96]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[2.62, 1.74]} />
         <primitive object={glowMat} attach="material" />
       </mesh>
-
-      {/* Point light that illuminates scene from screen */}
-      <pointLight
-        ref={glowLightRef}
-        position={[0, 0.4, 0.85]}
-        color="#a46cfc"
-        intensity={0}
-        distance={4}
-        decay={2}
-      />
+      <pointLight ref={glowLightRef} position={[0, 0.4, 0.85]} color="#a46cfc" intensity={0} distance={4} decay={2} />
     </>
   )
 }
 
-// ── Full laptop model ──────────────────────────────────────────────────────
-function LaptopModel({ open }: { open: boolean }) {
-  const groupRef = useRef<THREE.Group>(null)
+// ── Procedural MacBook model (same animation as original) ──────────────────
+function Model({ open, hinge }: { open: boolean; hinge: any }) {
+  const group = useRef<THREE.Group>(null)
+  const [hovered, setHovered] = useState(false)
+  useEffect(() => void (document.body.style.cursor = hovered ? 'pointer' : 'auto'), [hovered])
 
-  const { lidAngle } = useSpring({
-    lidAngle: open ? -1.78 : 0.08,
-    config: { mass: 1.2, tension: 150, friction: 28 },
+  // Exact same useFrame as the original codesandbox
+  useFrame((state) => {
+    if (!group.current) return
+    const t = state.clock.getElapsedTime()
+    group.current.rotation.x = THREE.MathUtils.lerp(
+      group.current.rotation.x,
+      open ? Math.cos(t / 10) / 10 + 0.25 : 0,
+      0.1,
+    )
+    group.current.rotation.y = THREE.MathUtils.lerp(
+      group.current.rotation.y,
+      open ? Math.sin(t / 10) / 4 : 0,
+      0.1,
+    )
+    group.current.rotation.z = THREE.MathUtils.lerp(
+      group.current.rotation.z,
+      open ? Math.sin(t / 10) / 10 : 0,
+      0.1,
+    )
+    group.current.position.y = THREE.MathUtils.lerp(
+      group.current.position.y,
+      open ? (-2 + Math.sin(t)) / 3 : -4.3,
+      0.1,
+    )
   })
 
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return
-    const t = clock.getElapsedTime()
-    if (open) {
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(
-        groupRef.current.rotation.y,
-        Math.sin(t / 9) * 0.28,
-        0.04,
-      )
-      groupRef.current.position.y = THREE.MathUtils.lerp(
-        groupRef.current.position.y,
-        0.25 + Math.sin(t * 0.85) * 0.18,
-        0.04,
-      )
-    } else {
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.07)
-      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, 0, 0.07)
-    }
-  })
+  // ── Procedural geometry matching the GLB proportions ──
+  const SILVER = '#b2b4c0'
+  const DARK   = '#0e0e1a'
+  const KEYS   = '#141420'
 
   return (
-    <group ref={groupRef}>
+    <group
+      ref={group}
+      onPointerOver={(e) => { e.stopPropagation(); setHovered(true) }}
+      onPointerOut={() => setHovered(false)}
+    >
+      {/* ── LID (hinge-animated) ── */}
+      {/* hinge goes 1.575 → -0.425 same as original */}
+      <three.group rotation-x={hinge} position={[0, -0.04, 0.41]}>
+        <group position={[0, 2.96, -0.13]} rotation={[Math.PI / 2, 0, 0]}>
+          {/* Lid outer shell */}
+          <mesh>
+            <boxGeometry args={[5.8, 0.14, 4.1]} />
+            <meshPhysicalMaterial color={SILVER} metalness={0.92} roughness={0.08} />
+          </mesh>
+          {/* Bezel inner */}
+          <mesh position={[0, 0.076, 0]}>
+            <boxGeometry args={[5.6, 0.01, 3.85]} />
+            <meshStandardMaterial color={DARK} roughness={0.9} />
+          </mesh>
+          {/* Logo on back */}
+          <mesh position={[0, -0.076, 0]}>
+            <boxGeometry args={[0.55, 0.006, 0.55]} />
+            <meshPhysicalMaterial
+              color="#d0d2de"
+              metalness={0.98}
+              roughness={0.04}
+              emissive={open ? new THREE.Color(0.55, 0.35, 1.0) : new THREE.Color(0.02, 0.02, 0.04)}
+              emissiveIntensity={open ? 1.6 : 0.06}
+            />
+          </mesh>
+          {/* Screen contents (image + scanline reveal) */}
+          {/* Screen lives in this group's local space. This group has rotation [π/2, 0, 0]
+              so the lid faces the camera when the hinge opens. */}
+          <LaptopScreen open={open} />
+        </group>
+      </three.group>
 
-      {/* ── BASE ── */}
-      <mesh castShadow receiveShadow position={[0, 0, 0]}>
-        <boxGeometry args={[3.0, 0.11, 2.0]} />
-        <meshPhysicalMaterial color={SILVER} metalness={0.92} roughness={0.08} />
+      {/* ── KEYBOARD (base top) ── */}
+      <mesh position={[1.79, 0, 3.45]}>
+        <boxGeometry args={[5.6, 0.1, 3.6]} />
+        <meshPhysicalMaterial color={SILVER} metalness={0.9} roughness={0.1} />
+      </mesh>
+      {/* Key recess */}
+      <mesh position={[1.79, 0.052, 3.0]}>
+        <boxGeometry args={[5.0, 0.01, 2.6]} />
+        <meshStandardMaterial color={KEYS} roughness={0.85} />
       </mesh>
 
-      <mesh position={[0, -0.062, 0]}>
-        <boxGeometry args={[2.95, 0.01, 1.95]} />
-        <meshPhysicalMaterial color={DARK_CHASSIS} metalness={0.85} roughness={0.12} />
-      </mesh>
-
-      <mesh position={[0, 0.057, -0.18]}>
-        <boxGeometry args={[2.45, 0.006, 1.35]} />
-        <meshStandardMaterial color={KEYBOARD} roughness={0.85} metalness={0.15} />
-      </mesh>
-
-      <mesh position={[0, 0.057, 0.72]}>
-        <boxGeometry args={[0.78, 0.006, 0.48]} />
-        <meshPhysicalMaterial color={TRACKPAD_COLOR} metalness={0.72} roughness={0.18} />
-      </mesh>
-
-      <mesh position={[-1.2, 0.057, -0.1]}>
-        <boxGeometry args={[0.12, 0.004, 0.55]} />
-        <meshStandardMaterial color="#0e0e1c" roughness={0.95} />
-      </mesh>
-      <mesh position={[1.2, 0.057, -0.1]}>
-        <boxGeometry args={[0.12, 0.004, 0.55]} />
-        <meshStandardMaterial color="#0e0e1c" roughness={0.95} />
-      </mesh>
-
-      {/* ── LID ── pivot at (0, 0.055, -1.0) */}
-      <animated.group position={[0, 0.055, -1.0]} rotation-x={lidAngle}>
-
-        {/* Outer shell */}
-        <mesh castShadow position={[0, 0, 1.0]}>
-          <boxGeometry args={[3.0, 0.09, 2.0]} />
+      {/* ── TRACKPAD + BASE ── */}
+      <group position={[0, -0.1, 3.39]}>
+        {/* Main base body */}
+        <mesh>
+          <boxGeometry args={[5.8, 0.22, 4.1]} />
           <meshPhysicalMaterial color={SILVER} metalness={0.92} roughness={0.08} />
         </mesh>
-
-        {/* Bezel border */}
-        <mesh position={[0, 0.047, 0.96]}>
-          <boxGeometry args={[2.82, 0.005, 1.82]} />
-          <meshStandardMaterial color="#0a0a18" roughness={0.9} metalness={0.1} />
+        {/* Trackpad */}
+        <mesh position={[0, 0.115, 0.8]}>
+          <boxGeometry args={[1.5, 0.01, 1.0]} />
+          <meshPhysicalMaterial color="#9898a8" metalness={0.72} roughness={0.18} />
         </mesh>
+      </group>
 
-        {/* Logo on back */}
-        <mesh position={[0, -0.047, 0.96]}>
-          <boxGeometry args={[0.28, 0.003, 0.28]} />
-          <meshPhysicalMaterial
-            color="#d0d2de"
-            metalness={0.98}
-            roughness={0.04}
-            emissive={open ? new THREE.Color(0.55, 0.35, 1.0) : new THREE.Color(0.02, 0.02, 0.04)}
-            emissiveIntensity={open ? 1.4 : 0.05}
-          />
-        </mesh>
-
-        {/* Black screen backing (visible when closed) */}
-        <mesh position={[0, 0.049, 0.96]} rotation-x={-Math.PI / 2}>
-          <planeGeometry args={[2.42, 1.56]} />
-          <meshStandardMaterial color="#060612" roughness={0.05} />
-        </mesh>
-
-        {/* Scanline-reveal screen (image + animation) */}
-        <LaptopScreen open={open} />
-
-      </animated.group>
+      {/* ── TOUCHBAR ── */}
+      <mesh position={[0, -0.03, 1.2]}>
+        <boxGeometry args={[4.2, 0.06, 0.25]} />
+        <meshStandardMaterial color={DARK} roughness={0.4} emissive={open ? new THREE.Color(0.2, 0.1, 0.5) : new THREE.Color(0, 0, 0)} emissiveIntensity={0.8} />
+      </mesh>
     </group>
   )
 }
@@ -263,37 +233,37 @@ function LaptopModel({ open }: { open: boolean }) {
 // ── Canvas wrapper ─────────────────────────────────────────────────────────
 export function Laptop3D() {
   const [open, setOpen] = useState(false)
+  // Same spring as original: interpolates 0→1
+  const props = useSpring({ open: Number(open), config: { mass: 1, tension: 180, friction: 30 } })
 
   return (
-    <div style={{ width: '100%', height: '100%', cursor: 'pointer' }}>
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 2.2, 7.5], fov: 28 }} shadows>
-        <ambientLight intensity={0.55} color="#e0d8ff" />
-        <spotLight
-          position={[5, 8, 6]}
-          angle={0.18}
-          penumbra={0.9}
-          intensity={1.4}
-          castShadow
-          shadow-mapSize={[1024, 1024]}
+    <div style={{ width: '100%', height: '100%' }}>
+      {/* Same camera as original */}
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0, -30], fov: 35 }}>
+        {/* Same point light as original, purple tint when open */}
+        <three.pointLight
+          position={[10, 10, 10]}
+          intensity={1.5}
+          color={props.open.to([0, 1], ['#e8e0ff', '#a46cfc'])}
         />
-        <pointLight position={[-4, 4, -4]} intensity={0.5} color="#a46cfc" />
-        <pointLight position={[4, 2, 6]} intensity={0.3} color="#e8e0ff" />
+        <ambientLight intensity={0.4} color="#e0d8ff" />
 
         <Suspense fallback={null}>
-          <group onClick={(e) => { e.stopPropagation(); setOpen((o) => !o) }}>
-            <LaptopModel open={open} />
+          {/* Same: rotate group by π around Y so model faces camera */}
+          <group
+            rotation={[0, Math.PI, 0]}
+            onClick={(e) => { e.stopPropagation(); setOpen((o) => !o) }}
+          >
+            <Model
+              open={open}
+              hinge={props.open.to([0, 1], [1.575, -0.425])}
+            />
           </group>
           <Environment preset="city" />
         </Suspense>
 
-        <ContactShadows
-          position={[0, -0.62, 0]}
-          opacity={0.45}
-          scale={10}
-          blur={2.5}
-          far={3}
-          color="#291e56"
-        />
+        {/* Same contact shadows as original */}
+        <ContactShadows position={[0, -4.5, 0]} opacity={0.4} scale={20} blur={1.75} far={4.5} />
       </Canvas>
     </div>
   )

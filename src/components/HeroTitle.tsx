@@ -95,6 +95,22 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
               Meet the Founder
             </HeroButton>
           </motion.div>
+
+          {/* FIX: Added the image block here */}
+          <motion.div
+            {...fadeInUp}
+            transition={{ ...fadeInUp.transition, delay: 0.45 }}
+            className="mt-10 max-w-2xl"
+          >
+            <img 
+              src="https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610" 
+              alt="Hero Illustration" 
+              className="w-full h-auto rounded-xl border-2 border-[rgba(255,255,255,0.18)]"
+              style={{
+                boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+              }}
+            />
+          </motion.div>
         </header>
       </div>
 

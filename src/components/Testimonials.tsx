@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
-import { motion, useScroll, useTransform, MotionValue, useMotionValue } from "motion/react";
+import { motion, useScroll, useTransform, MotionValue } from "motion/react";
 
-const GlobeWrapper = lazy(() =>
-  import('./HeroStory/Globe/GlobeWrapper').then((m) => ({ default: m.GlobeWrapper }))
+const TestimonialsGlobe = lazy(() =>
+  import('./testimonials/TestimonialsGlobe').then((m) => ({ default: m.TestimonialsGlobe }))
 );
 
 const CONTACTS = [
@@ -318,12 +318,10 @@ export function Testimonials() {
 }
 
 function GlobeMap() {
-  const staticProgress = useMotionValue(0.5);
-
   return (
     <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
       <Suspense fallback={null}>
-        <GlobeWrapper scrollYProgress={staticProgress} isVisible={true} hideArcs={false} />
+        <TestimonialsGlobe />
       </Suspense>
     </div>
   );

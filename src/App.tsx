@@ -79,7 +79,7 @@ function AppContent() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/unnamed%20(1).jpg?updatedAt=1773162585610)',
+            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/eyecatching-starry-night-sky-banner-universe-experience_1017-50621.avif)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',

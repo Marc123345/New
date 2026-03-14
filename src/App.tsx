@@ -47,7 +47,7 @@ function HeroUnicorn() {
   }, []);
 
   return (
-    <div ref={containerRef} className="absolute inset-0" style={{ zIndex: 0 }}>
+    <div ref={containerRef} className="absolute inset-0" style={{ zIndex: 0, pointerEvents: 'none' }}>
       <UnicornScene
         projectId="zePXIpCcN69AcXLL5Mvg"
         width={`${dims.w}px`}
@@ -151,7 +151,7 @@ function AppContent() {
                 {/* UnicornScene background — dimensions measured from container */}
                 <HeroUnicorn />
                 {/* Cubes — absolute inset-0 so the div has proper dimensions for the Three.js canvas */}
-                <div className="absolute inset-0" style={{ zIndex: 1 }}>
+                <div className="absolute inset-0" style={{ zIndex: 10, isolation: 'isolate', transform: 'translateZ(0)' }}>
                   <HeroWebGLPanel />
                 </div>
               </div>

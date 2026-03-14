@@ -1,5 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "motion/react";
+
+const GlobeWrapper = lazy(() =>
+  import('./HeroStory/Globe/GlobeWrapper').then((m) => ({ default: m.GlobeWrapper }))
+);
 
 const CONTACTS = [
   {
@@ -76,12 +80,15 @@ const CONTACTS = [
 
 export function Testimonials() {
   const containerRef = useRef(null);
+  const globePanelRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [globeVisible, setGlobeVisible] = useState(false);
+  const [globeReady, setGlobeReady] = useState(false);
 
   useEffect(() => {
     const unsubscribe = scrollYProgress.on("change", (latest) => {
@@ -93,6 +100,21 @@ export function Testimonials() {
     });
     return unsubscribe;
   }, [scrollYProgress]);
+
+  useEffect(() => {
+    const el = globePanelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.isIntersecting;
+        setGlobeVisible(visible);
+        if (visible) setGlobeReady(true);
+      },
+      { threshold: 0, rootMargin: '200px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div ref={containerRef} className="relative h-[300vh] bg-[#13082A]">
@@ -128,13 +150,24 @@ export function Testimonials() {
         <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">
           {/* LEFT: Globe Panel — desktop only */}
           <div
-            className="hidden lg:flex w-[400px] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0 bg-[#1A1040]"
+            ref={globePanelRef}
+            className="hidden lg:flex w-[400px] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0 bg-[#1A1040] overflow-hidden"
             style={{
               border: "4px solid var(--color-secondary)",
               boxShadow: "var(--shadow-geometric)",
             }}
           >
-            <div className="text-center z-10 mt-4">
+            {globeReady && (
+              <Suspense fallback={null}>
+                <GlobeWrapper
+                  scrollYProgress={scrollYProgress}
+                  isVisible={globeVisible}
+                  hideArcs={false}
+                />
+              </Suspense>
+            )}
+
+            <div className="text-center z-10 mt-4 relative">
               <p
                 className="text-lg leading-tight"
                 style={{ fontFamily: "var(--font-stack-heading)" }}
@@ -143,55 +176,6 @@ export function Testimonials() {
                 <br />
                 Across Africa
               </p>
-            </div>
-
-            <div className="relative w-[340px] h-[340px] flex-shrink-0 flex items-center justify-center">
-              <div className="absolute inset-0 w-full h-full">
-                <svg
-                  viewBox="0 0 380 380"
-                  fill="none"
-                  className="w-full h-full animate-[spin_60s_linear_infinite]"
-                >
-                  <circle
-                    cx="190"
-                    cy="190"
-                    r="189"
-                    stroke="white"
-                    strokeWidth="1"
-                    strokeDasharray="2 10"
-                    opacity="0.2"
-                  />
-                </svg>
-
-                <svg
-                  viewBox="0 0 380 380"
-                  className="absolute inset-0 w-full h-full -rotate-90"
-                >
-                  <motion.circle
-                    cx="190"
-                    cy="190"
-                    r="184.5"
-                    stroke="rgba(232,226,255,0.12)"
-                    strokeWidth="11"
-                    fill="none"
-                    style={{ pathLength: scrollYProgress }}
-                  />
-                  <motion.circle
-                    cx="190"
-                    cy="190"
-                    r="184.5"
-                    stroke="var(--color-secondary)"
-                    strokeWidth="3"
-                    fill="none"
-                    style={{ pathLength: scrollYProgress }}
-                  />
-                </svg>
-              </div>
-
-              <GlobeMap
-                scrollProgress={scrollYProgress}
-                activeIndex={activeIndex}
-              />
             </div>
 
             <div className="z-10 relative text-center mb-4">
@@ -312,56 +296,6 @@ export function Testimonials() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function GlobeMap({
-  scrollProgress,
-  activeIndex,
-}: {
-  scrollProgress: MotionValue<number>;
-  activeIndex: number;
-}) {
-  const active = CONTACTS[activeIndex];
-
-  return (
-    <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040] border border-[var(--color-primary)]/20">
-      <motion.div
-        className="relative w-full h-full"
-        animate={{
-          x: active.mapView.x,
-          y: active.mapView.y,
-          scale: active.mapView.scale,
-        }}
-        transition={{
-          duration: 1.2,
-          ease: [0.625, 0.05, 0, 1],
-        }}
-      >
-        <img
-          src="https://cdn.prod.website-files.com/68a5787bba0829184628bd51/68b6b0d7f637ee0f1ff47780_BASE.avif"
-          alt="World Map Base"
-          className="absolute top-0 left-0 w-full h-full object-cover opacity-50 grayscale"
-        />
-
-        {CONTACTS.map((contact, i) => {
-          const isActive = i === activeIndex;
-          return (
-            <div
-              key={contact.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{
-                left: `${contact.dot.x}%`,
-                top: `${contact.dot.y}%`,
-                zIndex: 10,
-              }}
-            >
-              <div className={`globe-dot${isActive ? " globe-dot--active" : ""}`} />
-            </div>
-          );
-        })}
-      </motion.div>
     </div>
   );
 }

@@ -26,6 +26,7 @@ export function Navigation() {
   const location = useLocation();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isNavigatingRef = useRef(false);
 
   const isHomePage = location.pathname === "/";
 
@@ -48,23 +49,29 @@ export function Navigation() {
 
   useEffect(() => {
     if (isOpen) {
+      isNavigatingRef.current = false;
       scrollYRef.current = window.scrollY;
       document.body.style.overflow = "hidden";
       timerRef.current = setTimeout(() => setMounted(true), 50);
     } else {
       setMounted(false);
       document.body.style.overflow = "";
-      window.scrollTo(0, scrollYRef.current);
+      // Only restore scroll when closing without navigation (e.g. Escape / close button)
+      if (!isNavigatingRef.current) {
+        window.scrollTo(0, scrollYRef.current);
+      }
+      isNavigatingRef.current = false;
     }
     return () => {
       document.body.style.overflow = "";
       if (timerRef.current) clearTimeout(timerRef.current);
-      if (navTimerRef.current) clearTimeout(navTimerRef.current);
+      // Do NOT clear navTimerRef here — it must survive the menu close
     };
   }, [isOpen]);
 
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+    isNavigatingRef.current = true;
     setIsOpen(false);
 
     // Cancel any pending nav timeout from a previous click

@@ -153,6 +153,7 @@ export function HeroStory() {
   useEffect(() => {
     const el = stickyRef.current;
     if (!el) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visible = entry.isIntersecting;

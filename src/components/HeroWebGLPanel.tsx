@@ -1,442 +1,736 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { brandLogos } from "../lib/brandLogos";
 import { isMobileDevice } from "../hooks/useIsMobile";
 
-const BALL_COLORS = [
-  0xa78bfa, 0x8b5cf6, 0xc4b5fd,
-  0x7c3aed, 0x6d28d9, 0xddd6fe,
-  0xede9fe, 0xf5f3ff, 0x4c1d95,
-  0xe0e7ff, 0xc7d2fe, 0xffffff,
-  0x312e81, 0x4338ca, 0x1e1b4b,
+const PEOPLE_IMAGES = [
+  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/712513/pexels-photo-712513.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/834863/pexels-photo-834863.jpeg?auto=compress&cs=tinysrgb&w=400",
 ];
 
-interface Ball {
-  mesh: THREE.Mesh;
-  vx: number;
-  vy: number;
-  radius: number;
-  mass: number;
-  x: number;
-  y: number;
-  spawnT: number;
-  spawnDelay: number;
-}
+// Re-added the brandLogos!
+const ALL_URLS = [...PEOPLE_IMAGES, ...brandLogos];
+const RADII = ALL_URLS.map((_, i) => (i < PEOPLE_IMAGES.length ? 2.2 : 1.7));
+const N = ALL_URLS.length;
 
-const SPHERE_VERT = `
+const BOUNDS_X = 16;
+const BOUNDS_Y = 10;
+
+// Lushion-style physics tweaks
+const CURSOR_SPHERE_R = 4.0;
+const CURSOR_SMOOTH = 8.0;
+const CURSOR_FIELD_R = 12.0;
+
+const SPRING_HOME = 0.04;
+const FRICTION = 0.95;
+const MAX_SPEED = 30.0;
+const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
+
+const JELLY_SPRING = 12.0;
+const JELLY_DAMPING = 4.5;
+
+const CUBE_VERT = `
 varying vec3 vNormal;
-varying vec3 vViewPos;
+varying vec3 vViewDir;
+varying vec2 vUv;
+varying float vFresnel;
+void main() {
+  vUv = uv;
+  vec4 wp = modelMatrix * vec4(position, 1.0);
+  vec4 vp = viewMatrix * wp;
+  vViewDir = normalize(-vp.xyz);
+  vNormal = normalize(normalMatrix * normal);
+  // Smoother fresnel curve
+  vFresnel = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 4.0);
+  gl_Position = projectionMatrix * vp;
+}`;
+
+// Lushion-style rounded corners via SDF and softer glass lighting
+const CUBE_FRAG = `
+uniform sampler2D uMap;
+uniform float uHover;
+uniform float uDepth;
+varying vec3 vNormal;
+varying vec3 vViewDir;
+varying vec2 vUv;
+varying float vFresnel;
+
+float roundedBoxSDF(vec2 CenterPosition, vec2 Size, float Radius) {
+    return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
+}
 
 void main() {
-  vec4 viewPos = modelViewMatrix * vec4(position, 1.0);
-  vViewPos = viewPos.xyz;
-  vNormal  = normalize(normalMatrix * normal);
-  gl_Position = projectionMatrix * viewPos;
-}
-`;
+  vec2 centeredUv = vUv * 2.0 - 1.0;
+  float edgeDist = roundedBoxSDF(centeredUv, vec2(1.0), 0.25);
+  
+  if(edgeDist > 0.0) discard;
 
-const SPHERE_FRAG = `
-uniform vec3  uColor;
-uniform float uRoughness;
-uniform float uMetalness;
-uniform float uSpawnT;
+  vec4 tex = texture2D(uMap, vUv);
+  
+  vec3 L = normalize(vec3(0.5, 0.8, 1.0));
+  float diff = max(dot(vNormal, L), 0.0) * 0.4;
+  vec3 H = normalize(L + vViewDir);
+  
+  float spec = pow(max(dot(vNormal, H), 0.0), 60.0) * (0.6 + uHover * 0.4);
+  
+  vec3 ambient = tex.rgb * 0.55;
+  vec3 lit = tex.rgb * diff;
+  
+  vec3 glassRim = vec3(0.9, 0.95, 1.0) * vFresnel * (0.25 + uHover * 0.35);
+  
+  vec3 final = ambient + lit + vec3(spec * 0.8) + glassRim;
+  float fog = mix(1.0, 0.4, uDepth);
+  
+  gl_FragColor = vec4(final * fog, 1.0);
+}`;
 
+const SHELL_VERT = `
 varying vec3 vNormal;
-varying vec3 vViewPos;
-
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-  return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}
-
-float GGX(vec3 N, vec3 H, float r) {
-  float a = r * r;
-  float a2 = a * a;
-  float d = max(dot(N, H), 0.0);
-  float denom = d * d * (a2 - 1.0) + 1.0;
-  return a2 / (3.14159 * denom * denom);
-}
-
-float smithG(float NdV, float r) {
-  float k = (r + 1.0) * (r + 1.0) / 8.0;
-  return NdV / (NdV * (1.0 - k) + k);
-}
-
+varying vec3 vViewDir;
 void main() {
-  vec3 N = normalize(vNormal);
-  vec3 V = normalize(-vViewPos);
+  vec4 vp = viewMatrix * modelMatrix * vec4(position, 1.0);
+  vViewDir = normalize(-vp.xyz);
+  vNormal = normalize(normalMatrix * normal);
+  gl_Position = projectionMatrix * vp;
+}`;
 
-  vec3 L1 = normalize(vec3(1.4, 2.0, 2.5));
-  vec3 L2 = normalize(vec3(-1.8, 0.4, 1.0));
-  vec3 L3 = normalize(vec3(0.0, -1.0, 1.5));
+const SHELL_FRAG = `
+uniform float uHover;
+varying vec3 vNormal;
+varying vec3 vViewDir;
+void main() {
+  float fr = pow(1.0 - max(dot(vNormal, vViewDir), 0.0), 2.5);
+  float glow = fr * (0.15 + uHover * 0.35);
+  gl_FragColor = vec4(vec3(0.9, 0.95, 1.0) * glow, glow * 0.6);
+}`;
 
-  vec3 F0 = mix(vec3(0.04), uColor, uMetalness);
+const DISPLACEMENT_VERT = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}`;
 
-  float NdV = max(dot(N, V), 0.0);
-
-  vec3 color = vec3(0.0);
-
-  // Light 1 - warm key
-  {
-    vec3 H = normalize(V + L1);
-    float NdL = max(dot(N, L1), 0.0);
-    float D = GGX(N, H, uRoughness);
-    float G = smithG(NdV, uRoughness) * smithG(NdL, uRoughness);
-    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-    vec3 spec = (D * G * F) / max(4.0 * NdV * NdL, 0.001);
-    vec3 kD = (1.0 - F) * (1.0 - uMetalness);
-    color += (kD * uColor / 3.14159 + spec) * NdL * vec3(1.0, 0.96, 0.88) * 3.0;
-  }
-
-  // Light 2 - cool fill
-  {
-    vec3 H = normalize(V + L2);
-    float NdL = max(dot(N, L2), 0.0);
-    float D = GGX(N, H, uRoughness);
-    float G = smithG(NdV, uRoughness) * smithG(NdL, uRoughness);
-    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-    vec3 spec = (D * G * F) / max(4.0 * NdV * NdL, 0.001);
-    color += spec * NdL * vec3(0.5, 0.6, 1.0) * 1.4;
-  }
-
-  // Light 3 - bounce/under
-  {
-    float NdL = max(dot(N, L3), 0.0);
-    color += uColor * NdL * vec3(0.3, 0.25, 0.6) * 0.35;
-  }
-
-  // Ambient
-  color += uColor * 0.04;
-
-  // Rim
-  float rim = pow(1.0 - NdV, 4.0);
-  color += rim * mix(vec3(0.6, 0.5, 1.0), vec3(1.0), uMetalness) * 0.5;
-
-  // Spawn scale
-  color *= uSpawnT;
-
-  gl_FragColor = vec4(color, uSpawnT);
-}
-`;
+// Lushion-style liquid drag with chromatic aberration (RGB split)
+const DISPLACEMENT_FRAG = `
+uniform sampler2D uScene;
+uniform vec2 uMouse;
+uniform float uRadius;
+uniform float uStrength;
+uniform vec2 uVelocity;
+uniform vec2 uResolution;
+varying vec2 vUv;
+void main() {
+  vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+  vec2 uv = vUv;
+  vec2 diff = (uv - uMouse) * aspect;
+  float dist = length(diff);
+  
+  float falloff = smoothstep(uRadius * 1.5, 0.0, dist);
+  vec2 dir = normalize(diff + 0.0001);
+  vec2 vel = uVelocity * aspect;
+  float velMag = length(vel);
+  
+  vec2 displacement = dir * falloff * uStrength * 0.012;
+  displacement += vel * falloff * 0.008 * min(velMag * 2.5, 1.0);
+  
+  float rgbSpread = length(displacement) * 2.5;
+  
+  vec2 rUv = uv + displacement * (1.0 + rgbSpread);
+  vec2 gUv = uv + displacement;
+  vec2 bUv = uv + displacement * (1.0 - rgbSpread);
+  
+  float r = texture2D(uScene, rUv).r;
+  float g = texture2D(uScene, gUv).g;
+  vec2 ba = texture2D(uScene, bUv).ba;
+  
+  gl_FragColor = vec4(r, g, ba.x, ba.y);
+}`;
 
 export function HeroWebGLPanel() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 0, 36);
 
     const mobile = isMobileDevice();
-    const W = el.clientWidth;
-    const H = el.clientHeight;
-    const dpr = mobile ? 1 : Math.min(window.devicePixelRatio, 2);
-
-    // ── Renderer ────────────────────────────────────────────────────────────
-    const renderer = new THREE.WebGLRenderer({
-      antialias: !mobile,
-      alpha: true,
-      powerPreference: mobile ? "low-power" : "high-performance",
-    });
-    renderer.setSize(W, H);
-    renderer.setPixelRatio(dpr);
+    const maxDpr = mobile ? 1 : Math.min(window.devicePixelRatio, 2);
+    const renderer = new THREE.WebGLRenderer({ antialias: !mobile, alpha: true, powerPreference: mobile ? "low-power" : "high-performance" });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(maxDpr);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
-    el.appendChild(renderer.domElement);
+    container.appendChild(renderer.domElement);
 
-    // ── Camera / scene ───────────────────────────────────────────────────
-    const scene = new THREE.Scene();
-    const FOV = 38;
-    const camera = new THREE.PerspectiveCamera(FOV, W / H, 0.1, 300);
-    camera.position.set(0, 0, 55);
+    let renderTarget: THREE.WebGLRenderTarget | null = null;
+    let displacementScene: THREE.Scene | null = null;
+    let displacementCamera: THREE.OrthographicCamera | null = null;
+    let displacementMaterial: THREE.ShaderMaterial | null = null;
+    let displacementQuad: THREE.Mesh | null = null;
 
-    // World bounds at z=0 plane (camera distance = 55)
-    const halfW = () => Math.tan((FOV * Math.PI) / 360) * 55;
-    const halfH = () => halfW() / (el.clientWidth / el.clientHeight);
-
-    // ── Balls ────────────────────────────────────────────────────────────
-    const BALL_COUNT = mobile ? 16 : 30;
-    const balls: Ball[] = [];
-
-    for (let i = 0; i < BALL_COUNT; i++) {
-      const radius = 1.2 + Math.random() * 2.0;
-      const mass = radius * radius;
-      const colorHex = BALL_COLORS[i % BALL_COLORS.length];
-      const roughness = 0.06 + Math.random() * 0.20;
-      const metalness = 0.25 + Math.random() * 0.65;
-
-      const mat = new THREE.ShaderMaterial({
-        vertexShader: SPHERE_VERT,
-        fragmentShader: SPHERE_FRAG,
+    if (!mobile) {
+      renderTarget = new THREE.WebGLRenderTarget(
+        container.clientWidth * maxDpr,
+        container.clientHeight * maxDpr
+      );
+      displacementScene = new THREE.Scene();
+      displacementCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      displacementMaterial = new THREE.ShaderMaterial({
+        vertexShader: DISPLACEMENT_VERT,
+        fragmentShader: DISPLACEMENT_FRAG,
         uniforms: {
-          uColor:     { value: new THREE.Color(colorHex) },
-          uRoughness: { value: roughness },
-          uMetalness: { value: metalness },
-          uSpawnT:    { value: 0.0 },
+          uScene: { value: renderTarget.texture },
+          uMouse: { value: new THREE.Vector2(-1, -1) },
+          uRadius: { value: 0.25 },
+          uStrength: { value: 0.0 },
+          uVelocity: { value: new THREE.Vector2(0, 0) },
+          uResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
         },
-        transparent: true,
       });
-
-      const segs = mobile ? 28 : 52;
-      const geo  = new THREE.SphereGeometry(radius, segs, segs);
-      const mesh = new THREE.Mesh(geo, mat);
-      scene.add(mesh);
-
-      // Spawn from top, staggered
-      const bx = (Math.random() - 0.5) * halfW() * 1.6;
-      const by = halfH() + radius + Math.random() * halfH() * 2;
-
-      mesh.position.set(bx, by, 0);
-
-      balls.push({
-        mesh,
-        radius,
-        mass,
-        vx: (Math.random() - 0.5) * 3,
-        vy: -1 - Math.random() * 2,
-        x: bx,
-        y: by,
-        spawnT: 0,
-        spawnDelay: i * 0.07,
-      });
+      displacementQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), displacementMaterial);
+      displacementScene.add(displacementQuad);
     }
 
-    // ── Mouse / touch tracking ──────────────────────────────────────────
-    const mouse3D  = new THREE.Vector2(99999, 99999);
-    const mouseVel = new THREE.Vector2(0, 0);
-    let   lastMouseX = 99999;
-    let   lastMouseY = 99999;
-    let   mouseInside = false;
+    const mainGroup = new THREE.Group();
+    scene.add(mainGroup);
 
-    const toWorld = (cx: number, cy: number) => {
-      const rect = el.getBoundingClientRect();
-      const nx = (cx - rect.left) / rect.width;
-      const ny = (cy - rect.top)  / rect.height;
-      return new THREE.Vector2(
-        (nx * 2 - 1) * halfW(),
-        -(ny * 2 - 1) * halfH(),
+    const geoCache = new Map<number, [THREE.BoxGeometry, THREE.BoxGeometry]>();
+    const getGeos = (r: number) => {
+      const key = Math.round(r * 10);
+      if (!geoCache.has(key)) {
+        const s = r * 2;
+        geoCache.set(key, [
+          new THREE.BoxGeometry(s, s, s, 1, 1, 1),
+          new THREE.BoxGeometry(s * 1.07, s * 1.07, s * 1.07),
+        ]);
+      }
+      return geoCache.get(key)!;
+    };
+
+    const px = new Float32Array(N);
+    const py = new Float32Array(N);
+    const pz = new Float32Array(N);
+    const vx = new Float32Array(N);
+    const vy = new Float32Array(N);
+    const vz = new Float32Array(N);
+    const radii = new Float32Array(RADII);
+    const masses = new Float32Array(N);
+
+    const jellyScaleX = new Float32Array(N).fill(1);
+    const jellyScaleY = new Float32Array(N).fill(1);
+    const jellyScaleZ = new Float32Array(N).fill(1);
+    const jellyVelX = new Float32Array(N);
+    const jellyVelY = new Float32Array(N);
+    const jellyVelZ = new Float32Array(N);
+    const jellyTargetX = new Float32Array(N).fill(1);
+    const jellyTargetY = new Float32Array(N).fill(1);
+    const jellyTargetZ = new Float32Array(N).fill(1);
+
+    const breathPhase = new Float32Array(N);
+    const floatPhaseX = new Float32Array(N);
+    const floatPhaseY = new Float32Array(N);
+    const floatPhaseZ = new Float32Array(N);
+    const floatSpeedX = new Float32Array(N);
+    const floatSpeedY = new Float32Array(N);
+    const floatSpeedZ = new Float32Array(N);
+
+    const homeX = new Float32Array(N);
+    const homeY = new Float32Array(N);
+
+    const rotVelX = new Float32Array(N);
+    const rotVelY = new Float32Array(N);
+    const baseRotX = new Float32Array(N);
+    const baseRotY = new Float32Array(N);
+    const baseRotZ = new Float32Array(N);
+    const depthFactor = new Float32Array(N);
+
+    const hoverAmount = new Float32Array(N);
+    const spawned = new Uint8Array(N);
+    const spawnStart = new Float32Array(N);
+
+    const meshes: THREE.Group[] = [];
+    const innerGroups: THREE.Group[] = [];
+    const cubeMaterials: THREE.ShaderMaterial[] = [];
+    const shellMaterials: THREE.ShaderMaterial[] = [];
+    const loadedTextures: THREE.Texture[] = [];
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.setCrossOrigin("anonymous");
+
+    for (let i = 0; i < N; i++) {
+      const r = radii[i];
+      masses[i] = r * r;
+      spawnStart[i] = i * 0.04;
+
+      breathPhase[i] = Math.random() * Math.PI * 2;
+      floatPhaseX[i] = Math.random() * Math.PI * 2;
+      floatPhaseY[i] = Math.random() * Math.PI * 2;
+      floatPhaseZ[i] = Math.random() * Math.PI * 2;
+      floatSpeedX[i] = 0.04 + Math.random() * 0.06;
+      floatSpeedY[i] = 0.03 + Math.random() * 0.05;
+      floatSpeedZ[i] = 0.025 + Math.random() * 0.04;
+
+      baseRotX[i] = (Math.random() - 0.5) * 0.025;
+      baseRotY[i] = (Math.random() - 0.5) * 0.025;
+      baseRotZ[i] = (Math.random() - 0.5) * 0.012;
+
+      depthFactor[i] = Math.random();
+
+      const angle = (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+      const dist = 0.25 + Math.random() * 0.6;
+      homeX[i] = Math.cos(angle) * BOUNDS_X * dist * 0.78;
+      homeY[i] = Math.sin(angle) * BOUNDS_Y * dist * 0.78;
+      px[i] = homeX[i] + (Math.random() - 0.5) * 2;
+      py[i] = homeY[i] + (Math.random() - 0.5) * 2;
+      pz[i] = (Math.random() - 0.5) * 4;
+
+      const group = new THREE.Group();
+      const inner = new THREE.Group();
+      group.add(inner);
+      group.position.set(px[i], py[i], pz[i]);
+      group.scale.setScalar(0);
+      mainGroup.add(group);
+      meshes.push(group);
+      innerGroups.push(inner);
+
+      inner.rotation.set(
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2
       );
+
+      const [cubeGeo, shellGeo] = getGeos(r);
+
+      const tex = textureLoader.load(
+        ALL_URLS[i],
+        (t) => {
+          t.colorSpace = THREE.SRGBColorSpace;
+          t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+          t.needsUpdate = true;
+        },
+        undefined,
+        () => {}
+      );
+      loadedTextures.push(tex);
+
+      const cubeMat = new THREE.ShaderMaterial({
+        vertexShader: CUBE_VERT,
+        fragmentShader: CUBE_FRAG,
+        uniforms: {
+          uMap: { value: tex },
+          uHover: { value: 0 },
+          uDepth: { value: depthFactor[i] },
+        },
+        transparent: true, // Needed for SDF discard!
+      });
+      cubeMaterials.push(cubeMat);
+      inner.add(new THREE.Mesh(cubeGeo, cubeMat));
+
+      const shellMat = new THREE.ShaderMaterial({
+        vertexShader: SHELL_VERT,
+        fragmentShader: SHELL_FRAG,
+        uniforms: {
+          uHover: { value: 0 },
+        },
+        transparent: true,
+        side: THREE.BackSide,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      shellMaterials.push(shellMat);
+      inner.add(new THREE.Mesh(shellGeo, shellMat));
+    }
+
+    let targetCx = -9999, targetCy = -9999;
+    let sphereX = -9999, sphereY = -9999;
+    let prevSphereX = -9999, prevSphereY = -9999;
+    let sphereVx = 0, sphereVy = 0;
+    let mouseActive = false;
+    let mouseNdcX = 0, mouseNdcY = 0;
+    let displacementStrength = 0;
+
+    const raycaster = new THREE.Raycaster();
+    const mouse2D = new THREE.Vector2();
+    const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const hitPt = new THREE.Vector3();
+
+    const updateMouse = (clientX: number, clientY: number) => {
+      const rect = container.getBoundingClientRect();
+      mouse2D.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      mouse2D.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse2D, camera);
+      raycaster.ray.intersectPlane(planeZ, hitPt);
+      targetCx = hitPt.x;
+      targetCy = hitPt.y;
+      mouseNdcX = (clientX - rect.left) / rect.width;
+      mouseNdcY = 1.0 - (clientY - rect.top) / rect.height;
+      mouseActive = true;
     };
 
-    const onMouseMove = (e: MouseEvent) => {
-      const w = toWorld(e.clientX, e.clientY);
-      mouseVel.set(w.x - lastMouseX, w.y - lastMouseY);
-      mouse3D.copy(w);
-      lastMouseX = w.x;
-      lastMouseY = w.y;
-      mouseInside = true;
+    const handleMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches[0]) updateMouse(e.touches[0].clientX, e.touches[0].clientY);
     };
-    const onMouseLeave = () => {
-      mouseInside = false;
-      mouse3D.set(99999, 99999);
-      mouseVel.set(0, 0);
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (!e.touches[0]) return;
-      const w = toWorld(e.touches[0].clientX, e.touches[0].clientY);
-      mouseVel.set(w.x - lastMouseX, w.y - lastMouseY);
-      mouse3D.copy(w);
-      lastMouseX = w.x;
-      lastMouseY = w.y;
-      mouseInside = true;
-    };
+    const handleMouseLeave = () => { mouseActive = false; };
 
-    el.addEventListener("mousemove",  onMouseMove);
-    el.addEventListener("mouseleave", onMouseLeave);
-    el.addEventListener("touchmove",  onTouchMove,  { passive: true });
-    el.addEventListener("touchend",   onMouseLeave);
+    window.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("touchmove", handleTouchMove, { passive: true });
+    container.addEventListener("mouseleave", handleMouseLeave);
 
-    // ── Physics constants ───────────────────────────────────────────────
-    const GRAVITY       = -22;
-    const FRICTION      = 0.985;
-    const FLOOR_BOUNCE  = 0.28;
-    const WALL_BOUNCE   = 0.35;
-    const MOUSE_RADIUS  = 7.0;
-    const MOUSE_ATTRACT = 28.0;
-    const MOUSE_VEL_XFER = 0.55;
-    const COLLIDE_DAMP  = 0.68;
-    const MAX_SPEED     = 30;
-    const SUBSTEPS      = 3;
-
-    const startTime = performance.now();
-    let lastTime = performance.now();
+    let hidden = document.hidden;
+    let offscreen = false;
     let animId: number;
+    let animating = false;
 
-    function simulate(dt: number) {
-      const sub_dt = dt / SUBSTEPS;
-      const hw = halfW();
-      const hh = halfH();
+    const visObserver = new IntersectionObserver(
+      ([entry]) => { offscreen = !entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    visObserver.observe(container);
 
-      for (let step = 0; step < SUBSTEPS; step++) {
-        const n = balls.length;
+    let tiltX = 0, tiltY = 0;
+    let time = 0;
+    const clock = new THREE.Clock();
 
-        for (let i = 0; i < n; i++) {
-          const b = balls[i];
-          if (b.spawnT < 1) continue;
+    const animate = () => {
+      if (hidden) {
+        animating = false;
+        return;
+      }
+      animId = requestAnimationFrame(animate);
 
-          // Gravity
-          b.vy += GRAVITY * sub_dt;
+      if (offscreen) {
+        clock.getDelta();
+        return;
+      }
 
-          // Mouse interaction – attract toward cursor + transfer cursor velocity
-          if (mouseInside) {
-            const dx = mouse3D.x - b.x;
-            const dy = mouse3D.y - b.y;
-            const dist2 = dx * dx + dy * dy;
-            const dist  = Math.sqrt(dist2) + 0.001;
-            if (dist < MOUSE_RADIUS) {
-              const t = 1 - dist / MOUSE_RADIUS;
-              const smoothT = t * t * (3 - 2 * t);
-              const force = smoothT * MOUSE_ATTRACT;
-              b.vx += (dx / dist) * force * sub_dt;
-              b.vy += (dy / dist) * force * sub_dt;
-              // Transfer cursor velocity
-              b.vx += mouseVel.x * smoothT * MOUSE_VEL_XFER;
-              b.vy += mouseVel.y * smoothT * MOUSE_VEL_XFER;
-            }
+      const rawDelta = clock.getDelta();
+      const dt = Math.min(rawDelta, 0.05);
+      time += dt;
+
+      if (mouseActive) {
+        const sf = 1 - Math.exp(-CURSOR_SMOOTH * dt);
+        sphereX += (targetCx - sphereX) * sf;
+        sphereY += (targetCy - sphereY) * sf;
+      } else {
+        sphereX += (-9999 - sphereX) * 0.015;
+        sphereY += (-9999 - sphereY) * 0.015;
+      }
+
+      sphereVx = (sphereX - prevSphereX) / Math.max(dt, 0.004);
+      sphereVy = (sphereY - prevSphereY) / Math.max(dt, 0.004);
+      prevSphereX = sphereX;
+      prevSphereY = sphereY;
+
+      const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.04 : 0;
+      const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.035 : 0;
+      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-2.5 * dt));
+      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-2.5 * dt));
+      mainGroup.rotation.y = tiltX;
+      mainGroup.rotation.x = tiltY;
+
+      const targetDisp = mouseActive ? 1.0 : 0.0;
+      displacementStrength += (targetDisp - displacementStrength) * (1 - Math.exp(-3.5 * dt));
+
+      for (let i = 0; i < N; i++) {
+        if (spawned[i]) continue;
+        const elapsed = time - spawnStart[i];
+        if (elapsed < 0) continue;
+        const t = Math.min(elapsed / 1.4, 1);
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const overshoot = 1.0 + 0.12 * Math.sin(elapsed * 5) * Math.exp(-elapsed * 2.5);
+        meshes[i].scale.setScalar(Math.max(ease * overshoot, 0));
+        if (t >= 1) {
+          meshes[i].scale.setScalar(1);
+          spawned[i] = 1;
+        }
+      }
+
+      const SUB = mobile ? 3 : 8;
+      const subDt = dt / SUB;
+      const sphereSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
+
+      for (let s = 0; s < SUB; s++) {
+        for (let i = 0; i < N; i++) {
+          const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * 0.08;
+          const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * 0.06;
+
+          const dx = (homeX[i] + floatOffX) - px[i];
+          const dy = (homeY[i] + floatOffY) - py[i];
+          const dz = -pz[i];
+
+          vx[i] += dx * SPRING_HOME * subDt;
+          vy[i] += dy * SPRING_HOME * subDt;
+          vz[i] += dz * SPRING_HOME * 0.25 * subDt;
+
+          const frictionPow = Math.pow(FRICTION, subDt * 60);
+          vx[i] *= frictionPow;
+          vy[i] *= frictionPow;
+          vz[i] *= frictionPow;
+
+          const spd2 = vx[i] * vx[i] + vy[i] * vy[i] + vz[i] * vz[i];
+          if (spd2 > MAX_SPEED_SQ) {
+            const sc = Math.sqrt(MAX_SPEED_SQ / spd2);
+            vx[i] *= sc; vy[i] *= sc; vz[i] *= sc;
           }
 
-          // Friction
-          b.vx *= Math.pow(FRICTION, sub_dt * 60);
-          b.vy *= Math.pow(FRICTION, sub_dt * 60);
+          px[i] += vx[i] * subDt;
+          py[i] += vy[i] * subDt;
+          pz[i] += vz[i] * subDt;
 
-          // Speed cap
-          const sp = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
-          if (sp > MAX_SPEED) {
-            b.vx = (b.vx / sp) * MAX_SPEED;
-            b.vy = (b.vy / sp) * MAX_SPEED;
-          }
-
-          b.x += b.vx * sub_dt;
-          b.y += b.vy * sub_dt;
-
-          // Floor
-          const floor = -hh + b.radius;
-          if (b.y < floor) {
-            b.y  = floor;
-            b.vy = Math.abs(b.vy) * FLOOR_BOUNCE;
-            b.vx *= 0.88;
-          }
-
-          // Ceiling
-          const ceil = hh - b.radius;
-          if (b.y > ceil) {
-            b.y  = ceil;
-            b.vy = -Math.abs(b.vy) * WALL_BOUNCE;
-          }
-
-          // Left / right walls
-          const left  = -hw + b.radius;
-          const right =  hw - b.radius;
-          if (b.x < left)  { b.x = left;  b.vx =  Math.abs(b.vx) * WALL_BOUNCE; }
-          if (b.x > right) { b.x = right; b.vx = -Math.abs(b.vx) * WALL_BOUNCE; }
+          const r = radii[i];
+          const mX = BOUNDS_X - r, mY = BOUNDS_Y - r, mZ = 3.5;
+          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.35; }
+          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.35; }
+          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.35; }
+          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.35; }
+          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.35; }
+          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.35; }
         }
 
-        // Ball-ball collisions
-        for (let i = 0; i < n; i++) {
-          const a = balls[i];
-          if (a.spawnT < 1) continue;
+        for (let i = 0; i < N; i++) {
+          for (let j = i + 1; j < N; j++) {
+            const ddx = px[j] - px[i];
+            const ddy = py[j] - py[i];
+            const ddz = pz[j] - pz[i];
+            const distSq = ddx * ddx + ddy * ddy + ddz * ddz;
+            const minD = (radii[i] + radii[j]) * 1.02;
+            if (distSq >= minD * minD || distSq < 0.0001) continue;
 
-          for (let j = i + 1; j < n; j++) {
-            const b = balls[j];
-            if (b.spawnT < 1) continue;
+            const dist = Math.sqrt(distSq);
+            const nx = ddx / dist, ny = ddy / dist, nz = ddz / dist;
+            const overlap = minD - dist;
+            const mA = masses[i], mB = masses[j], mT = mA + mB;
 
-            const dx  = a.x - b.x;
-            const dy  = a.y - b.y;
-            const d2  = dx * dx + dy * dy;
-            const min = a.radius + b.radius;
+            px[i] -= nx * overlap * 0.5 * (mB / mT);
+            py[i] -= ny * overlap * 0.5 * (mB / mT);
+            pz[i] -= nz * overlap * 0.5 * (mB / mT);
+            px[j] += nx * overlap * 0.5 * (mA / mT);
+            py[j] += ny * overlap * 0.5 * (mA / mT);
+            pz[j] += nz * overlap * 0.5 * (mA / mT);
 
-            if (d2 < min * min && d2 > 0.0001) {
-              const d     = Math.sqrt(d2);
-              const pen   = (min - d) / d;
-              const invM  = 1 / (a.mass + b.mass);
-              const wa    = b.mass * invM;
-              const wb    = a.mass * invM;
+            const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
+            if (rvn > 0) continue;
+            const imp = (-(1 + 0.55) * rvn) / mT;
+            vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
+            vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
 
-              // Separate
-              a.x += dx * pen * wa;
-              a.y += dy * pen * wa;
-              b.x -= dx * pen * wb;
-              b.y -= dy * pen * wb;
+            const impact = Math.abs(rvn);
+            if (impact > 0.4) {
+              const amt = Math.min(impact * 0.05, 0.3);
+              jellyTargetX[i] = 1 - Math.abs(nx) * amt;
+              jellyTargetY[i] = 1 - Math.abs(ny) * amt;
+              jellyTargetZ[i] = 1 - Math.abs(nz) * amt;
+              jellyTargetX[j] = 1 - Math.abs(nx) * amt;
+              jellyTargetY[j] = 1 - Math.abs(ny) * amt;
+              jellyTargetZ[j] = 1 - Math.abs(nz) * amt;
+            }
+          }
+        }
 
-              // Impulse along collision normal
-              const nx  = dx / d;
-              const ny  = dy / d;
-              const dvx = a.vx - b.vx;
-              const dvy = a.vy - b.vy;
-              const dvn = dvx * nx + dvy * ny;
+        if (mouseActive && sphereX > -999) {
+          for (let i = 0; i < N; i++) {
+            const ddx = px[i] - sphereX;
+            const ddy = py[i] - sphereY;
+            const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+            const contactDist = CURSOR_SPHERE_R + radii[i];
 
-              if (dvn < 0) {
-                const imp = dvn * COLLIDE_DAMP;
-                a.vx -= imp * wa * nx;
-                a.vy -= imp * wa * ny;
-                b.vx += imp * wb * nx;
-                b.vy += imp * wb * ny;
+            if (dist < contactDist && dist > 0.001) {
+              const nx = ddx / dist, ny = ddy / dist;
+              const overlap = contactDist - dist;
+
+              px[i] += nx * overlap;
+              py[i] += ny * overlap;
+
+              const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
+              if (relVn < 0) {
+                const impulseMag = -(1 + 0.7) * relVn;
+                vx[i] += nx * impulseMag;
+                vy[i] += ny * impulseMag;
+              }
+
+              const sweepFactor = Math.min(sphereSpeed * 0.012, 1.0);
+              vx[i] += sphereVx * sweepFactor * subDt * 60;
+              vy[i] += sphereVy * sweepFactor * subDt * 60;
+
+              const squishAmt = Math.min(overlap / contactDist * 0.45, 0.28);
+              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.6;
+              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.6;
+              jellyTargetZ[i] = 1 - squishAmt * 0.35;
+            }
+
+            if (dist < CURSOR_FIELD_R && dist > contactDist) {
+              const nx = ddx / dist, ny = ddy / dist;
+              const t = (dist - contactDist) / (CURSOR_FIELD_R - contactDist);
+              const falloff = (1 - t) * (1 - t);
+              const pushStr = 12.0 * falloff * (1 + sphereSpeed * 0.035) * subDt;
+              vx[i] += nx * pushStr;
+              vy[i] += ny * pushStr;
+
+              if (sphereSpeed > 2.0) {
+                const sweepStr = sphereSpeed * 0.0025 * falloff * subDt * 60;
+                vx[i] += sphereVx * sweepStr;
+                vy[i] += sphereVy * sweepStr;
               }
             }
           }
         }
+      }
 
-        // Write to meshes
-        for (const b of balls) {
-          b.mesh.position.set(b.x, b.y, 0);
+      for (let i = 0; i < N; i++) {
+        jellyVelX[i] += (jellyTargetX[i] - jellyScaleX[i]) * JELLY_SPRING * dt;
+        jellyVelY[i] += (jellyTargetY[i] - jellyScaleY[i]) * JELLY_SPRING * dt;
+        jellyVelZ[i] += (jellyTargetZ[i] - jellyScaleZ[i]) * JELLY_SPRING * dt;
+
+        const decay = Math.exp(-JELLY_DAMPING * dt);
+        jellyVelX[i] *= decay;
+        jellyVelY[i] *= decay;
+        jellyVelZ[i] *= decay;
+
+        jellyScaleX[i] += jellyVelX[i] * dt;
+        jellyScaleY[i] += jellyVelY[i] * dt;
+        jellyScaleZ[i] += jellyVelZ[i] * dt;
+
+        const recover = 1 - Math.exp(-2.5 * dt);
+        jellyTargetX[i] += (1 - jellyTargetX[i]) * recover;
+        jellyTargetY[i] += (1 - jellyTargetY[i]) * recover;
+        jellyTargetZ[i] += (1 - jellyTargetZ[i]) * recover;
+      }
+
+      for (let i = 0; i < N; i++) {
+        if (!spawned[i]) {
+          meshes[i].position.set(px[i], py[i], pz[i]);
+          continue;
         }
+
+        const zFloat = Math.sin(time * floatSpeedZ[i] + floatPhaseZ[i]) * 0.12;
+        meshes[i].position.set(px[i], py[i], pz[i] + zFloat);
+
+        const breath = 1 + Math.sin(time * 0.5 + breathPhase[i]) * 0.004;
+        meshes[i].scale.set(
+          jellyScaleX[i] * breath,
+          jellyScaleY[i] * breath,
+          jellyScaleZ[i] * breath
+        );
+
+        const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
+        const targetRotVelX = baseRotX[i] + vy[i] * 0.12;
+        const targetRotVelY = baseRotY[i] - vx[i] * 0.12;
+        const rLerp = 1 - Math.exp(-5 * dt);
+        rotVelX[i] += (targetRotVelX - rotVelX[i]) * rLerp;
+        rotVelY[i] += (targetRotVelY - rotVelY[i]) * rLerp;
+
+        const speedMult = 1 + Math.min(speed * 0.05, 1.0) * 8.0;
+        innerGroups[i].rotation.x += rotVelX[i] * dt * speedMult;
+        innerGroups[i].rotation.y += rotVelY[i] * dt * speedMult;
+        innerGroups[i].rotation.z += baseRotZ[i] * dt;
+
+        let targetHover = 0;
+        if (mouseActive && sphereX > -999) {
+          const hDx = px[i] - sphereX;
+          const hDy = py[i] - sphereY;
+          const hDist = Math.sqrt(hDx * hDx + hDy * hDy);
+          if (hDist < CURSOR_FIELD_R * 0.6) {
+            targetHover = 1 - hDist / (CURSOR_FIELD_R * 0.6);
+          }
+        }
+        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.exp(-4 * dt));
+        cubeMaterials[i].uniforms.uHover.value = hoverAmount[i];
+        shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
-    }
 
-    function animate() {
-      animId = requestAnimationFrame(animate);
-      const now     = performance.now();
-      const dt      = Math.min((now - lastTime) / 1000, 0.05);
-      const elapsed = (now - startTime) / 1000;
-      lastTime = now;
+      if (!mobile && displacementMaterial && renderTarget && displacementScene && displacementCamera) {
+        const cursorSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
+        displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
+        displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
+        displacementMaterial.uniforms.uStrength.value =
+          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
 
-      for (const b of balls) {
-        const t = Math.min(Math.max((elapsed - b.spawnDelay) / 0.5, 0), 1);
-        b.spawnT = t * t * (3 - 2 * t);
-        const mat = b.mesh.material as THREE.ShaderMaterial;
-        mat.uniforms.uSpawnT.value = b.spawnT;
-        b.mesh.scale.setScalar(b.spawnT);
+        renderer.setRenderTarget(renderTarget);
+        renderer.render(scene, camera);
+        renderer.setRenderTarget(null);
+        renderer.render(displacementScene, displacementCamera);
+      } else {
+        renderer.render(scene, camera);
       }
+    };
 
-      // Reset mouse velocity each frame (only meaningful for 1 frame)
-      mouseVel.set(0, 0);
+    const handleVisibility = () => {
+      hidden = document.hidden;
+      if (!hidden && !animating) {
+        animating = true;
+        clock.getDelta(); // discard accumulated delta while hidden
+        animId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
-      simulate(dt);
-      renderer.render(scene, camera);
-    }
+    animating = true;
+    animId = requestAnimationFrame(animate);
 
-    animate();
-
-    // ── Resize ───────────────────────────────────────────────────────────
-    const onResize = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      renderer.setSize(w, h);
+    const handleResize = () => {
+      if (!container) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      if (renderTarget && displacementMaterial) {
+        renderTarget.setSize(w * maxDpr, h * maxDpr);
+        displacementMaterial.uniforms.uResolution.value.set(w, h);
+      }
     };
-    const ro = new ResizeObserver(onResize);
-    ro.observe(el);
+    window.addEventListener("resize", handleResize);
 
     return () => {
+      visObserver.disconnect();
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animId);
-      ro.disconnect();
-      el.removeEventListener("mousemove",  onMouseMove);
-      el.removeEventListener("mouseleave", onMouseLeave);
-      el.removeEventListener("touchmove",  onTouchMove);
-      el.removeEventListener("touchend",   onMouseLeave);
-      for (const b of balls) {
-        b.mesh.geometry.dispose();
-        (b.mesh.material as THREE.ShaderMaterial).dispose();
-      }
+
+      if (renderTarget) renderTarget.dispose();
+      if (displacementMaterial) displacementMaterial.dispose();
+      if (displacementQuad) displacementQuad.geometry.dispose();
+      loadedTextures.forEach((t) => t.dispose());
+      geoCache.forEach(([g1, g2]) => {
+        g1.dispose();
+        g2.dispose();
+      });
+      scene.traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((m) => m.dispose());
+        }
+      });
       renderer.dispose();
-      if (renderer.domElement.parentNode === el) {
-        el.removeChild(renderer.domElement);
+      if (renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
       }
     };
   }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      style={{ width: "100%", height: "100%", display: "block" }}
-    />
-  );
+  return <div ref={containerRef} className="w-full h-full" />;
 }

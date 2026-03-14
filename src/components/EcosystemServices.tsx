@@ -3,7 +3,6 @@ import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { Laptop3D } from './Laptop3D';
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
 
@@ -319,11 +318,86 @@ export function EcosystemServices() {
             />
           </div>
 
-          {/* Center Laptop */}
-          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
-            <div style={{ width: ORBIT_DIAMETER, height: ORBIT_DIAMETER }}>
-              <Laptop3D />
-            </div>
+          {/* Center: CSS Laptop Mockup */}
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <motion.div
+              animate={{ y: [0, -14, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ filter: 'drop-shadow(0 24px 48px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(164,108,252,0.4))', userSelect: 'none' }}
+            >
+              {/* Lid / Screen */}
+              <div style={{
+                width: 220,
+                background: 'linear-gradient(160deg, #1a1030 0%, #0d0820 100%)',
+                borderRadius: '10px 10px 2px 2px',
+                border: '2px solid rgba(164,108,252,0.55)',
+                padding: '8px 8px 6px 8px',
+                boxShadow: '0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08)',
+                position: 'relative',
+              }}>
+                {/* Screen image */}
+                <div style={{
+                  background: '#050310',
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  border: '1px solid rgba(164,108,252,0.3)',
+                  boxShadow: '0 0 20px rgba(164,108,252,0.25) inset',
+                }}>
+                  <img
+                    src="https://ik.imagekit.io/qcvroy8xpd/unnamed%20(2)%201.png?updatedAt=1773188163565"
+                    alt="H2H"
+                    draggable={false}
+                    style={{ width: '100%', height: 'auto', display: 'block' }}
+                  />
+                </div>
+                {/* Screen glow overlay */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '10px 10px 2px 2px',
+                  background: 'linear-gradient(135deg, rgba(164,108,252,0.06) 0%, transparent 50%)',
+                  pointerEvents: 'none',
+                }} />
+                {/* Webcam dot */}
+                <div style={{
+                  position: 'absolute', top: 3, left: '50%', transform: 'translateX(-50%)',
+                  width: 4, height: 4, borderRadius: '50%',
+                  background: 'rgba(164,108,252,0.5)',
+                  boxShadow: '0 0 6px rgba(164,108,252,0.8)',
+                }} />
+              </div>
+
+              {/* Hinge strip */}
+              <div style={{
+                width: 220,
+                height: 5,
+                background: 'linear-gradient(to bottom, rgba(164,108,252,0.4), rgba(80,40,140,0.6))',
+                borderLeft: '2px solid rgba(164,108,252,0.4)',
+                borderRight: '2px solid rgba(164,108,252,0.4)',
+              }} />
+
+              {/* Base / Keyboard */}
+              <div style={{
+                width: 236,
+                marginLeft: -8,
+                height: 24,
+                background: 'linear-gradient(to bottom, #1c1035, #110c28)',
+                border: '2px solid rgba(164,108,252,0.45)',
+                borderTop: 'none',
+                borderRadius: '0 0 8px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+              }}>
+                {/* Trackpad */}
+                <div style={{
+                  width: 56,
+                  height: 12,
+                  background: 'rgba(164,108,252,0.08)',
+                  border: '1px solid rgba(164,108,252,0.25)',
+                  borderRadius: 3,
+                }} />
+              </div>
+            </motion.div>
           </div>
 
           {/* Orbiting Nodes */}

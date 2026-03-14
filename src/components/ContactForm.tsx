@@ -93,6 +93,23 @@ export function ContactForm() {
           }}
         >
           <div style={{ marginBottom: "36px" }}>
+            <div style={{
+              display: 'inline-block',
+              alignSelf: 'flex-start',
+              marginBottom: '1.5rem',
+              padding: '6px 16px',
+              border: '2px solid var(--color-secondary)',
+              boxShadow: '4px 4px 0 var(--color-secondary)',
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: '0.6rem',
+                fontWeight: 700,
+                letterSpacing: '0.3em',
+                textTransform: 'uppercase' as const,
+                color: 'var(--color-secondary)',
+              }}>Contact Us</span>
+            </div>
             <h2 style={{
               fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
               fontWeight: 700,

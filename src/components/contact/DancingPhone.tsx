@@ -165,9 +165,12 @@ export function DancingPhone() {
 
     let t = 0;
     const clock = new THREE.Clock();
+    let rafId = 0;
+    let isVisible = false;
 
     function animate() {
-      const raf = requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
+      if (!isVisible) return;
       const dt = clock.getDelta();
       t += dt;
 
@@ -190,10 +193,18 @@ export function DancingPhone() {
       });
 
       renderer.render(scene, camera);
-      return raf;
     }
 
-    const rafId = animate();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) clock.getDelta(); // reset delta to avoid jump on resume
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+
+    animate();
 
     const handleResize = () => {
       if (!el) return;
@@ -207,6 +218,7 @@ export function DancingPhone() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       renderer.dispose();
       if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);

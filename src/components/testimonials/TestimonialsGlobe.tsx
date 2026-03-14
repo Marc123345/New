@@ -72,12 +72,27 @@ function disposeThreeScene(globe: any) {
   } catch (_) {}
 }
 
-export function TestimonialsGlobe() {
+export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
   const destroyedRef = useRef(false);
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const arcTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Pause/resume globe when visibility changes
+  useEffect(() => {
+    const globe = globeRef.current;
+    if (!globe) return;
+    const controls = globe.controls?.();
+    if (controls) controls.autoRotate = isVisible;
+    const renderer = globe.renderer?.();
+    if (!renderer) return;
+    if (isVisible) {
+      renderer.setAnimationLoop(() => globe.renderer().render(globe.scene(), globe.camera()));
+    } else {
+      renderer.setAnimationLoop(null);
+    }
+  }, [isVisible]);
 
   useEffect(() => {
     if (!containerRef.current) return;

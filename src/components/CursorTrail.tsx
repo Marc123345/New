@@ -224,7 +224,7 @@ export function CursorTrail() {
       if (!isHidden) rafId = requestAnimationFrame(tick);
     };
 
-    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
     window.addEventListener("mouseleave", onMouseLeave);
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibilityChange);

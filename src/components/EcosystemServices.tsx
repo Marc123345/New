@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
@@ -22,26 +22,18 @@ const ORBIT_DURATION = 18000;
 interface OrbitNodeProps {
   item: typeof PILLARS[number];
   index: number;
-  total: number;
   onSelect: (index: number) => void;
-  orbitAngle: number;
+  containerRef: (el: HTMLDivElement | null) => void;
 }
 
-const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps) => {
-  const baseAngle = (index / total) * 2 * Math.PI;
-  const angle = baseAngle + orbitAngle;
-  const x = Math.cos(angle) * ORBIT_RADIUS;
-  const y = Math.sin(angle) * ORBIT_RADIUS;
+const OrbitNode = memo(({ item, index, onSelect, containerRef }: OrbitNodeProps) => {
   const label = `0${index + 1}`;
 
   return (
     <div
+      ref={containerRef}
       className="absolute z-30"
-      style={{
-        left: '50%',
-        top: '50%',
-        transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-      }}
+      style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
     >
       <button
         type="button"
@@ -111,43 +103,51 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
       </button>
     </div>
   );
-};
-
-function useOrbitAngle(paused: boolean) {
-  const angleRef = useRef(0);
-  const lastTimeRef = useRef<number | null>(null);
-  const [angle, setAngle] = useState(0);
-  const rafRef = useRef<number>(0);
-
-  useEffect(() => {
-    const step = (now: number) => {
-      if (!paused) {
-        if (lastTimeRef.current !== null) {
-          const delta = now - lastTimeRef.current;
-          angleRef.current += (delta / ORBIT_DURATION) * 2 * Math.PI;
-          setAngle(angleRef.current);
-        }
-        lastTimeRef.current = now;
-      } else {
-        lastTimeRef.current = null;
-      }
-      rafRef.current = requestAnimationFrame(step);
-    };
-    rafRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [paused]);
-
-  return angle;
-}
-
+});
 
 const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const isMobile = useIsMobile();
-  const orbitAngle = useOrbitAngle(false);
   const visiblePlanets = useMemo(() => isMobile ? PLANET_IMAGES.slice(0, 3) : PLANET_IMAGES, [isMobile]);
+
+  // Single RAF — updates orbit node positions via DOM (no React state updates per frame)
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
+  const orbitAngleRef = useRef(0);
+  const lastTimeRef = useRef<number | null>(null);
+  const rafRef = useRef(0);
+
+  const nodeRefCallbacks = useMemo(
+    () => PILLARS.map((_, i) => (el: HTMLDivElement | null) => { nodeRefs.current[i] = el; }),
+    []
+  );
+
+  useEffect(() => {
+    const tick = (now: number) => {
+      if (lastTimeRef.current !== null) {
+        orbitAngleRef.current += ((now - lastTimeRef.current) / ORBIT_DURATION) * 2 * Math.PI;
+      }
+      lastTimeRef.current = now;
+
+      const angle = orbitAngleRef.current;
+      const total = PILLARS.length;
+      nodeRefs.current.forEach((el, index) => {
+        if (!el) return;
+        const a = (index / total) * 2 * Math.PI + angle;
+        const x = Math.cos(a) * ORBIT_RADIUS;
+        const y = Math.sin(a) * ORBIT_RADIUS;
+        el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+      });
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const handleSelect = useCallback((i: number) => setSelectedService(i), []);
+  const handleClose = useCallback(() => setSelectedService(null), []);
 
   return (
     <section
@@ -407,9 +407,8 @@ export function EcosystemServices() {
                 key={i}
                 item={pillar}
                 index={i}
-                total={PILLARS.length}
-                onSelect={setSelectedService}
-                orbitAngle={orbitAngle}
+                onSelect={handleSelect}
+                containerRef={nodeRefCallbacks[i]}
               />
             ))}
           </div>
@@ -418,8 +417,8 @@ export function EcosystemServices() {
 
       <PillarOverlay
         pillarIndex={selectedService}
-        onClose={() => setSelectedService(null)}
-        onNavigate={setSelectedService}
+        onClose={handleClose}
+        onNavigate={handleSelect}
       />
 
       {/* Why the 3-Pillar System Works */}

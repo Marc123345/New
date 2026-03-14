@@ -8,39 +8,43 @@ const ARC_COLORS = [
   ['rgba(139,92,246,0.95)', 'rgba(167,139,250,0.8)'],
   ['rgba(216,180,254,1)', 'rgba(192,132,252,0.85)'],
 ];
+const EMPTY_ARCS: object[] = [];
+const EMPTY_POINTS: object[] = [];
 
-const ARCS = CITIES.flatMap((city, i) => {
+const ARC_START_DELAY = 2200;
+const ARC_BUILD_INTERVAL = 220;
+
+function buildArcs(threshold: number, tier: 'a' | 'ab' | 'abc'): object[] {
   const len = CITIES.length;
-  return [
-    {
-      startLat: city.lat,
-      startLng: city.lng,
-      endLat: CITIES[(i + 2) % len].lat,
-      endLng: CITIES[(i + 2) % len].lng,
+  const arcsA: object[] = [];
+  const arcsB: object[] = [];
+  const arcsC: object[] = [];
+  for (let i = 0; i < threshold; i++) {
+    arcsA.push({
+      startLat: CITIES[i].lat, startLng: CITIES[i].lng,
+      endLat: CITIES[(i + 2) % len].lat, endLng: CITIES[(i + 2) % len].lng,
       color: ARC_COLORS[0],
-    },
-    {
-      startLat: city.lat,
-      startLng: city.lng,
-      endLat: CITIES[(i + 5) % len].lat,
-      endLng: CITIES[(i + 5) % len].lng,
+    });
+    arcsB.push({
+      startLat: CITIES[i].lat, startLng: CITIES[i].lng,
+      endLat: CITIES[(i + 4) % len].lat, endLng: CITIES[(i + 4) % len].lng,
       color: ARC_COLORS[1],
-    },
-    ...(i % 2 === 0 ? [{
-      startLat: city.lat,
-      startLng: city.lng,
-      endLat: CITIES[(i + 9) % len].lat,
-      endLng: CITIES[(i + 9) % len].lng,
-      color: ARC_COLORS[2],
-    }] : []),
-  ];
-});
+    });
+    if (i % 2 === 0) {
+      arcsC.push({
+        startLat: CITIES[i].lat, startLng: CITIES[i].lng,
+        endLat: CITIES[(i + 7) % len].lat, endLng: CITIES[(i + 7) % len].lng,
+        color: ARC_COLORS[2],
+      });
+    }
+  }
+  if (tier === 'a') return arcsA;
+  if (tier === 'ab') return [...arcsA, ...arcsB];
+  return [...arcsA, ...arcsB, ...arcsC];
+}
 
 const POINTS = CITIES.map((c) => ({
-  lat: c.lat,
-  lng: c.lng,
-  size: 0.6,
-  color: 'rgba(216,180,254,0.95)',
+  lat: c.lat, lng: c.lng, size: 0.6, color: 'rgba(216,180,254,0.95)',
 }));
 
 function disposeThreeScene(globe: any) {
@@ -73,6 +77,7 @@ export function TestimonialsGlobe() {
   const globeRef = useRef<any>(null);
   const destroyedRef = useRef(false);
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const arcTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -92,7 +97,7 @@ export function TestimonialsGlobe() {
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
         .atmosphereColor('rgba(140,80,230,0.7)')
-        .atmosphereAltitude(0.25)
+        .atmosphereAltitude(0.18)
         .width(w)
         .height(h);
 
@@ -108,8 +113,8 @@ export function TestimonialsGlobe() {
         .arcDashGap(0.1)
         .arcDashAnimateTime(1400)
         .arcStroke(mobile ? 1.5 : 2.0)
-        .arcsTransitionDuration(1200)
-        .arcsData(ARCS);
+        .arcsTransitionDuration(400)
+        .arcsData(EMPTY_ARCS);
 
       globe
         .pointLat('lat')
@@ -118,11 +123,11 @@ export function TestimonialsGlobe() {
         .pointAltitude(0.01)
         .pointRadius('size')
         .pointsMerge(true)
-        .pointsData(POINTS);
+        .pointsData(EMPTY_POINTS);
 
       const controls = globe.controls();
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.6;
+      controls.autoRotateSpeed = 0.5;
       controls.enableZoom = false;
       controls.enablePan = false;
       controls.enableRotate = false;
@@ -135,10 +140,36 @@ export function TestimonialsGlobe() {
       }
 
       globe.globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg');
+
+      const maxThreshold = CITIES.length;
+      const timers: ReturnType<typeof setTimeout>[] = [];
+
+      const t0 = setTimeout(() => {
+        if (destroyedRef.current || !globeRef.current) return;
+        globeRef.current.pointsData(POINTS);
+      }, ARC_START_DELAY - 200);
+      timers.push(t0);
+
+      for (let threshold = 1; threshold <= maxThreshold; threshold++) {
+        const delay = ARC_START_DELAY + (threshold - 1) * ARC_BUILD_INTERVAL;
+        const snap = threshold;
+        const t = setTimeout(() => {
+          if (destroyedRef.current || !globeRef.current) return;
+          const tier: 'a' | 'ab' | 'abc' =
+            snap > maxThreshold * 0.6 ? 'abc' :
+            snap > maxThreshold * 0.3 ? 'ab' : 'a';
+          globeRef.current.arcsData(buildArcs(snap, tier));
+        }, delay);
+        timers.push(t);
+      }
+
+      arcTimersRef.current = timers;
     });
 
     return () => {
       destroyedRef.current = true;
+      arcTimersRef.current.forEach(clearTimeout);
+      arcTimersRef.current = [];
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       if (globeRef.current) {
         disposeThreeScene(globeRef.current);

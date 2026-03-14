@@ -121,8 +121,8 @@ function AppContent() {
                 <div className="absolute inset-0" style={{ zIndex: 0 }}>
                   <UnicornScene
                     projectId="zePXIpCcN69AcXLL5Mvg"
-                    width="100%"
-                    height="100%"
+                    width="1512px"
+                    height="945px"
                     scale={1}
                     dpi={1.5}
                     sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"

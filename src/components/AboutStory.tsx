@@ -148,15 +148,21 @@ function ChapterGlyph({ progress }: { progress: MotionValue<number> }) {
 
 // ─── Individual beats ─────────────────────────────────────────────────────────
 
-const EYEBROW: React.CSSProperties = {
+const EYEBROW_TEXT: React.CSSProperties = {
   fontFamily: 'var(--font-stack-heading)',
   fontSize: '0.6rem',
   fontWeight: 700,
-  letterSpacing: '0.38em',
+  letterSpacing: '0.3em',
   textTransform: 'uppercase',
-  color: 'rgba(164,108,252,0.85)',
-  display: 'block',
+  color: 'var(--color-secondary)',
+};
+
+const EYEBROW_BOX: React.CSSProperties = {
+  display: 'inline-block',
   marginBottom: '1.5rem',
+  padding: '6px 16px',
+  border: '2px solid var(--color-secondary)',
+  boxShadow: '4px 4px 0 var(--color-secondary)',
 };
 
 const H2_STYLE: React.CSSProperties = {
@@ -199,7 +205,7 @@ function Beat0({ progress }: { progress: MotionValue<number> }) {
   const { opacity, y } = useBeat(progress, 0);
   return (
     <motion.div style={{ opacity, y, position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'inherit' }}>
-      <span style={EYEBROW}>About H2H</span>
+      <div style={EYEBROW_BOX}><span style={EYEBROW_TEXT}>About H2H</span></div>
       <h2 style={H2_STYLE}>
         <span style={{ display: 'block' }}>From Brand Voice</span>
         <span style={{ display: 'block' }}>
@@ -262,7 +268,7 @@ function Beat3({ progress }: { progress: MotionValue<number> }) {
   const { opacity, y } = useBeat(progress, 3);
   return (
     <motion.div style={{ opacity, y, position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'inherit' }}>
-      <span style={EYEBROW}>Why H2H</span>
+      <div style={EYEBROW_BOX}><span style={EYEBROW_TEXT}>Why H2H</span></div>
       <h2 style={H2_STYLE}>
         <span style={{ display: 'block' }}>Because we</span>
         <span style={{ display: 'block' }}>

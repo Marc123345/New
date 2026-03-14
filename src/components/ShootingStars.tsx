@@ -45,7 +45,7 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
   }, [twinkleCount]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
       <style>{`
         @keyframes shootingStar {
           0% {

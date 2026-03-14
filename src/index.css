@@ -18,7 +18,7 @@
   --space-6x: 48px;
   --space-8x: 64px;
   --space-12x: 96px;
-  --space-16x: 64px;
+  --space-16x: 128px;
 
   --shadow-geometric: 10px 10px 0 var(--color-secondary);
   --shadow-geometric-hover: 14px 14px 0 var(--color-surface-dark);

@@ -25,6 +25,7 @@ export function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isHomePage = location.pathname === "/";
 
@@ -58,6 +59,7 @@ export function Navigation() {
     return () => {
       document.body.style.overflow = "";
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (navTimerRef.current) clearTimeout(navTimerRef.current);
     };
   }, [isOpen]);
 
@@ -65,13 +67,16 @@ export function Navigation() {
     e.preventDefault();
     setIsOpen(false);
 
+    // Cancel any pending nav timeout from a previous click
+    if (navTimerRef.current) clearTimeout(navTimerRef.current);
+
     if (href.startsWith("/")) {
-      setTimeout(() => navigate(href), 400);
+      navTimerRef.current = setTimeout(() => navigate(href), 400);
       return;
     }
 
     if (!isHomePage) {
-      setTimeout(() => {
+      navTimerRef.current = setTimeout(() => {
         navigate("/");
         setTimeout(() => {
           const el = document.getElementById(href.substring(1));
@@ -81,7 +86,7 @@ export function Navigation() {
       return;
     }
 
-    setTimeout(() => {
+    navTimerRef.current = setTimeout(() => {
       const el = document.getElementById(href.substring(1));
       if (el) window.scrollTo({ top: el.offsetTop - 120, behavior: "smooth" });
     }, 450);

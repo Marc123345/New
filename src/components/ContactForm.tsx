@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Mail, User, MessageSquare, Send } from "lucide-react";
 import { DancingPhone } from "./contact/DancingPhone";
@@ -6,13 +6,20 @@ import { DancingPhone } from "./contact/DancingPhone";
 export function ContactForm() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setStatus("success");
-    setTimeout(() => {
+    resetTimerRef.current = setTimeout(() => {
       setFormData({ name: "", email: "", message: "" });
       setStatus("idle");
     }, 3000);

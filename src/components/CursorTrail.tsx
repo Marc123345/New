@@ -225,14 +225,14 @@ export function CursorTrail() {
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
-    window.addEventListener("mouseleave", onMouseLeave);
-    window.addEventListener("resize", onResize);
+    document.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("resize", onResize, { passive: true });
     document.addEventListener("visibilitychange", onVisibilityChange);
     rafId = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseleave", onMouseLeave);
+      document.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       cancelAnimationFrame(rafId);

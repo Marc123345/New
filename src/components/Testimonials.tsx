@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
+import { isMobileDevice } from "../hooks/useIsMobile";
 
 const GlobeWrapper = lazy(() =>
   import("./HeroStory/Globe/GlobeWrapper").then((m) => ({ default: m.GlobeWrapper }))
@@ -63,8 +64,8 @@ const CONTACTS = [
   },
 ];
 
-// Card variants — direction: 1=forward, -1=backward
-const cardVariants = {
+// Desktop card variants — vertical flip with rotateX
+const cardVariantsDesktop = {
   enter: (dir: number) => ({
     opacity: 0,
     y: dir > 0 ? 56 : -56,
@@ -87,6 +88,17 @@ const cardVariants = {
   }),
 };
 
+// Mobile card variants — horizontal slide only (no 3D transforms — cheaper on mobile GPU)
+const cardVariantsMobile = {
+  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 50 : -50 }),
+  center: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
+  exit: (dir: number) => ({
+    opacity: 0,
+    x: dir > 0 ? -50 : 50,
+    transition: { duration: 0.22, ease: [0.55, 0, 1, 0.45] },
+  }),
+};
+
 export function Testimonials() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -94,6 +106,8 @@ export function Testimonials() {
   const [globeLoaded, setGlobeLoaded] = useState(false);
   const activeIndexRef = useRef(0);
   const directionRef = useRef(1);
+  const isMobile = useRef(isMobileDevice());
+  const touchStartX = useRef<number | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -110,7 +124,7 @@ export function Testimonials() {
     }
   });
 
-  // Lazy-load globe on first visibility; pause/resume on intersection
+  // Lazy-load globe on first visibility; never load on mobile (WebGL hidden but still runs)
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -118,13 +132,31 @@ export function Testimonials() {
       ([entry]) => {
         const visible = entry.isIntersecting;
         setGlobeVisible(visible);
-        if (visible) setGlobeLoaded(true);
+        if (visible && !isMobile.current) setGlobeLoaded(true);
       },
       { threshold: 0.05 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // Touch swipe — navigate cards without needing to scroll 300vh
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(delta) < 40) return;
+    const newDir = delta < 0 ? 1 : -1;
+    const newIdx = Math.max(0, Math.min(CONTACTS.length - 1, activeIndexRef.current + newDir));
+    if (newIdx !== activeIndexRef.current) {
+      directionRef.current = newDir;
+      activeIndexRef.current = newIdx;
+      setActiveIndex(newIdx);
+    }
+  };
 
   const contact = CONTACTS[activeIndex];
 
@@ -135,10 +167,10 @@ export function Testimonials() {
           0%,100% { box-shadow: 0 0 0 0 rgba(164,108,252,0); }
           50%      { box-shadow: 0 0 18px 4px rgba(164,108,252,0.4); }
         }
-        .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; will-change: box-shadow; }
+        .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; }
       `}</style>
 
-      <div ref={containerRef} className="relative h-[300vh] bg-[#13082A]">
+      <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#13082A]">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0">
 
           <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
@@ -208,16 +240,18 @@ export function Testimonials() {
             <div
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
               style={{ border: "1px solid rgba(255,255,255,0.15)", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(360px, 60vh, 600px)" }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
               <div
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"
-                style={{ perspective: "1000px" }}
+                style={{ perspective: isMobile.current ? undefined : "1000px" }}
               >
                 <AnimatePresence custom={directionRef.current} mode="popLayout">
                   <motion.div
                     key={contact.id}
                     custom={directionRef.current}
-                    variants={cardVariants}
+                    variants={isMobile.current ? cardVariantsMobile : cardVariantsDesktop}
                     initial="enter"
                     animate="center"
                     exit="exit"

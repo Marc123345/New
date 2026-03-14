@@ -35,17 +35,17 @@ const BOUNDS_Y = 10;
 // Lushion-style physics tweaks
 const CURSOR_SPHERE_R = 5.0;
 const CURSOR_SMOOTH = 16.0;
-const CURSOR_FIELD_R = 20.0;
+const CURSOR_FIELD_R = 22.0;
 
-const SPRING_HOME = 0.03;
-const FRICTION = 0.94;
-const MAX_SPEED = 45.0;
+const SPRING_HOME = 0.022;      // softer spring = more floaty, bigger displaced swing
+const FRICTION = 0.925;         // quicker settle after scatter
+const MAX_SPEED = 60.0;         // more explosive max speed
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
 
-const JELLY_SPRING = 22.0;
-const JELLY_DAMPING = 3.8;
+const JELLY_SPRING = 32.0;      // snappier squish/stretch
+const JELLY_DAMPING = 2.8;      // less damping = satisfying wobble oscillation
 
-const CURSOR_ATTRACT_R = 12.0;  // attraction zone radius (inside FIELD, outside SPHERE)
+const CURSOR_ATTRACT_R = 13.0;  // attraction zone radius (inside FIELD, outside SPHERE)
 
 const CUBE_VERT = `
 varying vec3 vNormal;
@@ -502,12 +502,12 @@ export function HeroWebGLPanel() {
 
           const r = radii[i];
           const mX = BOUNDS_X - r, mY = BOUNDS_Y - r, mZ = 3.5;
-          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.35; }
-          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.35; }
-          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.35; }
-          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.35; }
-          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.35; }
-          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.35; }
+          if (px[i] > mX) { px[i] = mX; vx[i] *= -0.55; }
+          else if (px[i] < -mX) { px[i] = -mX; vx[i] *= -0.55; }
+          if (py[i] > mY) { py[i] = mY; vy[i] *= -0.55; }
+          else if (py[i] < -mY) { py[i] = -mY; vy[i] *= -0.55; }
+          if (pz[i] > mZ) { pz[i] = mZ; vz[i] *= -0.55; }
+          else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.55; }
         }
 
         for (let i = 0; i < N; i++) {
@@ -533,13 +533,13 @@ export function HeroWebGLPanel() {
 
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny + (vz[i] - vz[j]) * nz;
             if (rvn > 0) continue;
-            const imp = (-(1 + 0.55) * rvn) / mT;
+            const imp = (-(1 + 0.78) * rvn) / mT;  // bouncier restitution
             vx[i] += nx * imp * mB; vy[i] += ny * imp * mB; vz[i] += nz * imp * mB;
             vx[j] -= nx * imp * mA; vy[j] -= ny * imp * mA; vz[j] -= nz * imp * mA;
 
             const impact = Math.abs(rvn);
-            if (impact > 0.4) {
-              const amt = Math.min(impact * 0.05, 0.3);
+            if (impact > 0.3) {
+              const amt = Math.min(impact * 0.07, 0.45);  // more dramatic squish
               jellyTargetX[i] = 1 - Math.abs(nx) * amt;
               jellyTargetY[i] = 1 - Math.abs(ny) * amt;
               jellyTargetZ[i] = 1 - Math.abs(nz) * amt;
@@ -568,21 +568,27 @@ export function HeroWebGLPanel() {
 
               const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
               if (relVn < 0) {
-                const impulseMag = -(1 + 0.85) * relVn;
+                const impulseMag = -(1 + 0.92) * relVn;  // very bouncy off cursor
                 vx[i] += nx * impulseMag;
                 vy[i] += ny * impulseMag;
               }
 
               // Sweep impulse on fast movement
-              const sweepFactor = Math.min(sphereSpeed * 0.018, 1.4);
+              const sweepFactor = Math.min(sphereSpeed * 0.026, 1.8);
               vx[i] += sphereVx * sweepFactor * subDt * 60;
               vy[i] += sphereVy * sweepFactor * subDt * 60;
 
-              // Jelly squish
-              const squishAmt = Math.min(overlap / contactDist * 0.55, 0.35);
-              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.7;
-              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.7;
-              jellyTargetZ[i] = 1 - squishAmt * 0.5;
+              // Tangential spin kick — makes cubes spin when brushed sideways
+              const tanX = -ny, tanY = nx;
+              const tanVel = (sphereVx * tanX + sphereVy * tanY) * 0.15;
+              vx[i] += tanX * tanVel;
+              vy[i] += tanY * tanVel;
+
+              // Jelly squish — more dramatic
+              const squishAmt = Math.min(overlap / contactDist * 0.75, 0.5);
+              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.8;
+              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.8;
+              jellyTargetZ[i] = 1 - squishAmt * 0.6;
             }
 
             // Field zone: attract when slow, scatter when fast (Lushion signature)
@@ -596,19 +602,19 @@ export function HeroWebGLPanel() {
               if (speedBlend < 0.85 && dist < CURSOR_ATTRACT_R) {
                 const tA = (dist - contactDist) / (CURSOR_ATTRACT_R - contactDist);
                 const attractFalloff = (1 - tA) * (1 - tA);
-                const attractStr = 9.0 * attractFalloff * (1 - speedBlend) * subDt;
+                const attractStr = 14.0 * attractFalloff * (1 - speedBlend) * subDt;
                 vx[i] -= nx * attractStr; // toward cursor (invert direction)
                 vy[i] -= ny * attractStr;
               }
 
               // Scatter when cursor moves fast
               if (speedBlend > 0.15) {
-                const scatterStr = 28.0 * falloff * speedBlend * subDt;
+                const scatterStr = 38.0 * falloff * speedBlend * subDt;
                 vx[i] += nx * scatterStr; // away from cursor
                 vy[i] += ny * scatterStr;
 
                 // Sweep in direction of cursor movement
-                const sweepStr = sphereSpeed * 0.005 * falloff * speedBlend * subDt * 60;
+                const sweepStr = sphereSpeed * 0.007 * falloff * speedBlend * subDt * 60;
                 vx[i] += sphereVx * sweepStr;
                 vy[i] += sphereVy * sweepStr;
               }
@@ -654,13 +660,13 @@ export function HeroWebGLPanel() {
         );
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        const targetRotVelX = baseRotX[i] + vy[i] * 0.12;
-        const targetRotVelY = baseRotY[i] - vx[i] * 0.12;
-        const rLerp = 1 - Math.exp(-5 * dt);
+        const targetRotVelX = baseRotX[i] + vy[i] * 0.22;   // more spin from velocity
+        const targetRotVelY = baseRotY[i] - vx[i] * 0.22;
+        const rLerp = 1 - Math.exp(-8 * dt);                  // faster rotation response
         rotVelX[i] += (targetRotVelX - rotVelX[i]) * rLerp;
         rotVelY[i] += (targetRotVelY - rotVelY[i]) * rLerp;
 
-        const speedMult = 1 + Math.min(speed * 0.05, 1.0) * 8.0;
+        const speedMult = 1 + Math.min(speed * 0.055, 1.0) * 16.0; // more dramatic spin at speed
         innerGroups[i].rotation.x += rotVelX[i] * dt * speedMult;
         innerGroups[i].rotation.y += rotVelY[i] * dt * speedMult;
         innerGroups[i].rotation.z += baseRotZ[i] * dt;

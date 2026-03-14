@@ -170,9 +170,9 @@ export function EcosystemServices() {
           </video>
         )}
 
-        {visiblePlanets.map((planet, i) => (
+        {visiblePlanets.map((planet) => (
           <motion.div
-            key={i}
+            key={planet.src}
             className="absolute rounded-full overflow-hidden"
             style={{
               width: planet.size,

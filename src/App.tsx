@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from "react";
+import UnicornScene from "unicornstudio-react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
@@ -116,7 +117,21 @@ function AppContent() {
                   e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
-                <HeroWebGLPanel />
+                {/* UnicornScene background — sits behind the cubes */}
+                <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+                  <UnicornScene
+                    projectId="zePXIpCcN69AcXLL5Mvg"
+                    width="100%"
+                    height="100%"
+                    scale={1}
+                    dpi={1.5}
+                    sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+                  />
+                </div>
+                {/* Cubes on top */}
+                <div className="relative" style={{ zIndex: 1 }}>
+                  <HeroWebGLPanel />
+                </div>
               </div>
             </HeroTitle>
           </div>

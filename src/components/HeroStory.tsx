@@ -1,7 +1,6 @@
 import { useRef, memo } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'motion/react';
 import { useIsMobile } from '../hooks/useIsMobile';
-import UnicornScene from 'unicornstudio-react';
 
 const phases = [
   {
@@ -126,7 +125,7 @@ const BOTTOM_FADE_STYLE = {
 } as const;
 
 const STICKY_BG = {
-  background: '#000',
+  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
 } as const;
 
 export function HeroStory() {
@@ -152,17 +151,6 @@ export function HeroStory() {
         className="sticky top-0 h-screen w-full overflow-hidden"
         style={STICKY_BG}
       >
-        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-          <UnicornScene
-            projectId="US9XVS5BHKCmCNH60lQg"
-            width="100%"
-            height="100%"
-            scale={1}
-            dpi={1.5}
-            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
-          />
-        </div>
-
         <div
           className="absolute inset-0 pointer-events-none"
           style={isMobile ? GRADIENT_OVERLAY_MOBILE : GRADIENT_OVERLAY_DESKTOP}

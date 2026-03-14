@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import UnicornScene from "unicornstudio-react";
 import { brandLogos } from "../lib/brandLogos";
 import { isMobileDevice } from "../hooks/useIsMobile";
 
@@ -732,5 +733,19 @@ export function HeroWebGLPanel() {
     };
   }, []);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return (
+    <div className="relative w-full h-full">
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+        <UnicornScene
+          projectId="US9XVS5BHKCmCNH60lQg"
+          width="100%"
+          height="100%"
+          scale={1}
+          dpi={1.5}
+          sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+        />
+      </div>
+      <div ref={containerRef} className="absolute inset-0 w-full h-full" />
+    </div>
+  );
 }

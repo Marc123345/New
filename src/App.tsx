@@ -3,14 +3,11 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Navigation } from "./components/Navigation";
-import { HeroTitle } from "./components/HeroTitle";
 import { ScrollReveal } from "./components/ScrollReveal";
 import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -74,7 +71,6 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#040608' }}
       >
         <div
           className="absolute inset-0"
@@ -85,42 +81,6 @@ function AppContent() {
             backgroundRepeat: 'no-repeat',
           }}
         />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.65)' }}
-        />
-        <div className="absolute inset-0">
-          <ShootingStars count={22} />
-        </div>
-
-        <div
-          className="relative z-10 px-4 md:px-8 lg:px-12"
-          style={{
-            paddingTop: 'var(--space-8x)',
-            paddingBottom: 'var(--space-8x)',
-          }}
-        >
-          <div className="max-w-8xl mx-auto">
-            <HeroTitle>
-              <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
-                style={{
-                  background: 'transparent',
-                  border: '2px solid rgba(255,255,255,0.18)',
-                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
-                }}
-              >
-                <HeroWebGLPanel />
-              </div>
-            </HeroTitle>
-          </div>
-        </div>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span

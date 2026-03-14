@@ -4,24 +4,24 @@ import { brandLogos } from "../lib/brandLogos";
 import { isMobileDevice } from "../hooks/useIsMobile";
 
 const PEOPLE_IMAGES = [
-  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/712513/pexels-photo-712513.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400",
-  "https://images.pexels.com/photos/834863/pexels-photo-834863.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/712513/pexels-photo-712513.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=200",
+  "https://images.pexels.com/photos/834863/pexels-photo-834863.jpeg?auto=compress&cs=tinysrgb&w=200",
 ];
 
 // Re-added the brandLogos!
@@ -177,7 +177,7 @@ export function HeroWebGLPanel() {
     camera.position.set(0, 0, 36);
 
     const mobile = isMobileDevice();
-    const maxDpr = mobile ? 1 : Math.min(window.devicePixelRatio, 2);
+    const maxDpr = mobile ? 1 : Math.min(window.devicePixelRatio, 1.5);
     const renderer = new THREE.WebGLRenderer({ antialias: !mobile, alpha: true, powerPreference: mobile ? "low-power" : "high-performance" });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(maxDpr);
@@ -395,7 +395,7 @@ export function HeroWebGLPanel() {
     };
     const handleMouseLeave = () => { mouseActive = false; };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     container.addEventListener("touchmove", handleTouchMove, { passive: true });
     container.addEventListener("mouseleave", handleMouseLeave);
 
@@ -473,6 +473,11 @@ export function HeroWebGLPanel() {
       const sphereSpeed = Math.sqrt(sphereVx * sphereVx + sphereVy * sphereVy);
 
       for (let s = 0; s < SUB; s++) {
+        // Hoist per-substep constants out of the inner loop
+        const frictionPow = Math.pow(FRICTION, subDt * 60);
+        const springDt = SPRING_HOME * subDt;
+        const springDtZ = springDt * 0.25;
+
         for (let i = 0; i < N; i++) {
           const floatOffX = Math.sin(time * floatSpeedX[i] + floatPhaseX[i]) * 0.08;
           const floatOffY = Math.sin(time * floatSpeedY[i] + floatPhaseY[i]) * 0.06;
@@ -481,11 +486,10 @@ export function HeroWebGLPanel() {
           const dy = (homeY[i] + floatOffY) - py[i];
           const dz = -pz[i];
 
-          vx[i] += dx * SPRING_HOME * subDt;
-          vy[i] += dy * SPRING_HOME * subDt;
-          vz[i] += dz * SPRING_HOME * 0.25 * subDt;
+          vx[i] += dx * springDt;
+          vy[i] += dy * springDt;
+          vz[i] += dz * springDtZ;
 
-          const frictionPow = Math.pow(FRICTION, subDt * 60);
           vx[i] *= frictionPow;
           vy[i] *= frictionPow;
           vz[i] *= frictionPow;
@@ -510,7 +514,7 @@ export function HeroWebGLPanel() {
           else if (pz[i] < -mZ) { pz[i] = -mZ; vz[i] *= -0.55; }
         }
 
-        for (let i = 0; i < N; i++) {
+        if (!mobile) for (let i = 0; i < N; i++) {
           for (let j = i + 1; j < N; j++) {
             const ddx = px[j] - px[i];
             const ddy = py[j] - py[i];
@@ -623,25 +627,32 @@ export function HeroWebGLPanel() {
         }
       }
 
-      for (let i = 0; i < N; i++) {
-        jellyVelX[i] += (jellyTargetX[i] - jellyScaleX[i]) * JELLY_SPRING * dt;
-        jellyVelY[i] += (jellyTargetY[i] - jellyScaleY[i]) * JELLY_SPRING * dt;
-        jellyVelZ[i] += (jellyTargetZ[i] - jellyScaleZ[i]) * JELLY_SPRING * dt;
+      // Hoist per-frame jelly constants
+      const jellySpringDt = JELLY_SPRING * dt;
+      const jellyDecay = Math.exp(-JELLY_DAMPING * dt);
+      const jellyRecover = 1 - Math.exp(-2.5 * dt);
 
-        const decay = Math.exp(-JELLY_DAMPING * dt);
-        jellyVelX[i] *= decay;
-        jellyVelY[i] *= decay;
-        jellyVelZ[i] *= decay;
+      for (let i = 0; i < N; i++) {
+        jellyVelX[i] += (jellyTargetX[i] - jellyScaleX[i]) * jellySpringDt;
+        jellyVelY[i] += (jellyTargetY[i] - jellyScaleY[i]) * jellySpringDt;
+        jellyVelZ[i] += (jellyTargetZ[i] - jellyScaleZ[i]) * jellySpringDt;
+
+        jellyVelX[i] *= jellyDecay;
+        jellyVelY[i] *= jellyDecay;
+        jellyVelZ[i] *= jellyDecay;
 
         jellyScaleX[i] += jellyVelX[i] * dt;
         jellyScaleY[i] += jellyVelY[i] * dt;
         jellyScaleZ[i] += jellyVelZ[i] * dt;
 
-        const recover = 1 - Math.exp(-2.5 * dt);
-        jellyTargetX[i] += (1 - jellyTargetX[i]) * recover;
-        jellyTargetY[i] += (1 - jellyTargetY[i]) * recover;
-        jellyTargetZ[i] += (1 - jellyTargetZ[i]) * recover;
+        jellyTargetX[i] += (1 - jellyTargetX[i]) * jellyRecover;
+        jellyTargetY[i] += (1 - jellyTargetY[i]) * jellyRecover;
+        jellyTargetZ[i] += (1 - jellyTargetZ[i]) * jellyRecover;
       }
+
+      // Hoist per-frame render constants
+      const hoverLerp = 1 - Math.exp(-4 * dt);
+      const rLerp = 1 - Math.exp(-8 * dt);
 
       for (let i = 0; i < N; i++) {
         if (!spawned[i]) {
@@ -660,9 +671,8 @@ export function HeroWebGLPanel() {
         );
 
         const speed = Math.sqrt(vx[i] * vx[i] + vy[i] * vy[i]);
-        const targetRotVelX = baseRotX[i] + vy[i] * 0.22;   // more spin from velocity
+        const targetRotVelX = baseRotX[i] + vy[i] * 0.22;
         const targetRotVelY = baseRotY[i] - vx[i] * 0.22;
-        const rLerp = 1 - Math.exp(-8 * dt);                  // faster rotation response
         rotVelX[i] += (targetRotVelX - rotVelX[i]) * rLerp;
         rotVelY[i] += (targetRotVelY - rotVelY[i]) * rLerp;
 
@@ -680,7 +690,7 @@ export function HeroWebGLPanel() {
             targetHover = 1 - hDist / (CURSOR_FIELD_R * 0.6);
           }
         }
-        hoverAmount[i] += (targetHover - hoverAmount[i]) * (1 - Math.exp(-4 * dt));
+        hoverAmount[i] += (targetHover - hoverAmount[i]) * hoverLerp;
         cubeMaterials[i].uniforms.uHover.value = hoverAmount[i];
         shellMaterials[i].uniforms.uHover.value = hoverAmount[i];
       }
@@ -726,7 +736,7 @@ export function HeroWebGLPanel() {
         displacementMaterial.uniforms.uResolution.value.set(w, h);
       }
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
       visObserver.disconnect();

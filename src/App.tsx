@@ -105,9 +105,10 @@ function AppContent() {
               <div
                 className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
                 style={{
-                  background: 'transparent',
-                  border: '2px solid rgba(255,255,255,0.18)',
+                  background: 'rgba(4,4,12,0.72)',
+                  border: '1px solid rgba(255,255,255,0.10)',
                   boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
+                  borderRadius: '4px',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';

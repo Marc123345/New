@@ -117,8 +117,8 @@ function AppContent() {
                   e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
-                {/* UnicornScene background — sits behind the cubes */}
-                <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+                {/* UnicornScene background */}
+                <div className="absolute inset-0" style={{ zIndex: 0 }}>
                   <UnicornScene
                     projectId="zePXIpCcN69AcXLL5Mvg"
                     width="100%"
@@ -128,8 +128,8 @@ function AppContent() {
                     sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
                   />
                 </div>
-                {/* Cubes on top */}
-                <div className="relative" style={{ zIndex: 1 }}>
+                {/* Cubes — absolute inset-0 so the div has proper dimensions for the Three.js canvas */}
+                <div className="absolute inset-0" style={{ zIndex: 1 }}>
                   <HeroWebGLPanel />
                 </div>
               </div>

@@ -58,6 +58,7 @@
             "tailwind-merge": "*",
             "tailwindcss": "*",
             "three": "^0.183.2",
+            "three-mesh-bvh": "^0.8.0",
             "unicornstudio-react": "^2.1.1",
             "vaul": "^1.1.2"
       },

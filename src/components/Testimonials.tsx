@@ -157,15 +157,61 @@ export function Testimonials() {
               boxShadow: "var(--shadow-geometric)",
             }}
           >
-            {globeReady && (
-              <Suspense fallback={null}>
-                <GlobeWrapper
-                  scrollYProgress={scrollYProgress}
-                  isVisible={globeVisible}
-                  hideArcs={false}
-                />
-              </Suspense>
-            )}
+            <div className="relative w-[340px] h-[340px] flex-shrink-0 flex items-center justify-center">
+              <div className="absolute inset-0 w-full h-full">
+                <svg
+                  viewBox="0 0 380 380"
+                  fill="none"
+                  className="w-full h-full animate-[spin_60s_linear_infinite]"
+                >
+                  <circle
+                    cx="190"
+                    cy="190"
+                    r="189"
+                    stroke="white"
+                    strokeWidth="1"
+                    strokeDasharray="2 10"
+                    opacity="0.2"
+                  />
+                </svg>
+
+                <svg
+                  viewBox="0 0 380 380"
+                  className="absolute inset-0 w-full h-full -rotate-90"
+                >
+                  <motion.circle
+                    cx="190"
+                    cy="190"
+                    r="184.5"
+                    stroke="rgba(232,226,255,0.12)"
+                    strokeWidth="11"
+                    fill="none"
+                    style={{ pathLength: scrollYProgress }}
+                  />
+                  <motion.circle
+                    cx="190"
+                    cy="190"
+                    r="184.5"
+                    stroke="var(--color-secondary)"
+                    strokeWidth="3"
+                    fill="none"
+                    style={{ pathLength: scrollYProgress }}
+                  />
+                </svg>
+              </div>
+
+              <div className="absolute inset-[24px] rounded-full overflow-hidden">
+                {globeReady && (
+                  <Suspense fallback={null}>
+                    <GlobeWrapper
+                      scrollYProgress={scrollYProgress}
+                      isVisible={globeVisible}
+                      hideArcs={false}
+                    />
+                  </Suspense>
+                )}
+              </div>
+            </div>
 
             <div className="text-center z-10 mt-4 relative">
               <p

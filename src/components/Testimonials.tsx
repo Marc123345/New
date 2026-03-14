@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
 
-const TestimonialsGlobe = lazy(() =>
-  import('./testimonials/TestimonialsGlobe').then((m) => ({ default: m.TestimonialsGlobe }))
+const GlobeWrapper = lazy(() =>
+  import("./HeroStory/Globe/GlobeWrapper").then((m) => ({ default: m.GlobeWrapper }))
 );
 
 const CONTACTS = [
@@ -184,11 +184,14 @@ export function Testimonials() {
                   </svg>
                 </div>
 
-                {/* Globe — lazy loaded, paused when off-screen */}
+                {/* Globe — same as HeroStory, lazy loaded, paused when off-screen */}
                 <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040]">
                   {globeLoaded && (
                     <Suspense fallback={null}>
-                      <TestimonialsGlobe isVisible={globeVisible} />
+                      <GlobeWrapper
+                        scrollYProgress={scrollYProgress}
+                        isVisible={globeVisible}
+                      />
                     </Suspense>
                   )}
                 </div>

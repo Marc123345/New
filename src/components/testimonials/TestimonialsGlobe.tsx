@@ -1,50 +1,90 @@
 import { useEffect, useRef } from 'react';
-import { worldPopulationData } from '../HeroStory/Globe/worldPopulation';
 import { isMobileDevice } from '../../hooks/useIsMobile';
 
-const CITIES = worldPopulationData;
-const ARC_COLORS = [
-  ['rgba(192,132,252,1)', 'rgba(168,85,247,0.85)'],
-  ['rgba(139,92,246,0.95)', 'rgba(167,139,250,0.8)'],
-  ['rgba(216,180,254,1)', 'rgba(192,132,252,0.85)'],
+// The 5 testimonial cities + key African hubs for the network
+const TESTIMONIAL_CITIES = [
+  { lat: 6.5244,   lng: 3.3792,   name: 'Lagos' },
+  { lat: 5.6037,   lng: -0.1870,  name: 'Accra' },
+  { lat: -1.2921,  lng: 36.8219,  name: 'Nairobi' },
+  { lat: -26.2041, lng: 28.0473,  name: 'Johannesburg' },
+  { lat: 14.7167,  lng: -17.4677, name: 'Dakar' },
 ];
-const EMPTY_ARCS: object[] = [];
-const EMPTY_POINTS: object[] = [];
 
-const ARC_START_DELAY = 2200;
-const ARC_BUILD_INTERVAL = 220;
+const HUB_CITIES = [
+  { lat: 30.0444,  lng: 31.2357,  name: 'Cairo' },
+  { lat: -4.4419,  lng: 15.2663,  name: 'Kinshasa' },
+  { lat: -33.9249, lng: 18.4241,  name: 'Cape Town' },
+  { lat: 9.0320,   lng: 38.7469,  name: 'Addis Ababa' },
+  { lat: 33.5731,  lng: -7.5898,  name: 'Casablanca' },
+  { lat: 5.3484,   lng: -4.0232,  name: 'Abidjan' },
+  { lat: -6.7924,  lng: 39.2083,  name: 'Dar es Salaam' },
+  { lat: 12.3714,  lng: -1.5197,  name: 'Ouagadougou' },
+];
 
-function buildArcs(threshold: number, tier: 'a' | 'ab' | 'abc'): object[] {
-  const len = CITIES.length;
-  const arcsA: object[] = [];
-  const arcsB: object[] = [];
-  const arcsC: object[] = [];
-  for (let i = 0; i < threshold; i++) {
-    arcsA.push({
-      startLat: CITIES[i].lat, startLng: CITIES[i].lng,
-      endLat: CITIES[(i + 2) % len].lat, endLng: CITIES[(i + 2) % len].lng,
-      color: ARC_COLORS[0],
-    });
-    arcsB.push({
-      startLat: CITIES[i].lat, startLng: CITIES[i].lng,
-      endLat: CITIES[(i + 4) % len].lat, endLng: CITIES[(i + 4) % len].lng,
-      color: ARC_COLORS[1],
-    });
-    if (i % 2 === 0) {
-      arcsC.push({
-        startLat: CITIES[i].lat, startLng: CITIES[i].lng,
-        endLat: CITIES[(i + 7) % len].lat, endLng: CITIES[(i + 7) % len].lng,
-        color: ARC_COLORS[2],
-      });
-    }
-  }
-  if (tier === 'a') return arcsA;
-  if (tier === 'ab') return [...arcsA, ...arcsB];
-  return [...arcsA, ...arcsB, ...arcsC];
+const ALL_CITIES = [...TESTIMONIAL_CITIES, ...HUB_CITIES];
+
+const ARC_COLORS = {
+  testimonial: ['rgba(216,180,254,1)', 'rgba(192,132,252,0.9)'],   // bright purple — hero connections
+  hub:         ['rgba(139,92,246,0.85)', 'rgba(167,139,250,0.7)'], // mid purple
+  secondary:   ['rgba(192,132,252,0.6)', 'rgba(139,92,246,0.4)'],  // soft purple
+};
+
+// Explicit arcs: testimonial cities connected to each other + nearby hubs
+const ARC_DEFINITIONS = [
+  // Testimonial ↔ Testimonial (cross-continent hero arcs)
+  { from: 'Lagos',        to: 'Accra',         color: ARC_COLORS.testimonial },
+  { from: 'Lagos',        to: 'Nairobi',        color: ARC_COLORS.testimonial },
+  { from: 'Lagos',        to: 'Johannesburg',   color: ARC_COLORS.testimonial },
+  { from: 'Dakar',        to: 'Lagos',          color: ARC_COLORS.testimonial },
+  { from: 'Dakar',        to: 'Accra',          color: ARC_COLORS.testimonial },
+  { from: 'Nairobi',      to: 'Johannesburg',   color: ARC_COLORS.testimonial },
+  { from: 'Accra',        to: 'Nairobi',        color: ARC_COLORS.testimonial },
+  { from: 'Dakar',        to: 'Nairobi',        color: ARC_COLORS.testimonial },
+  { from: 'Johannesburg', to: 'Dakar',          color: ARC_COLORS.testimonial },
+
+  // Testimonial → Hubs (regional network arcs)
+  { from: 'Lagos',        to: 'Abidjan',        color: ARC_COLORS.hub },
+  { from: 'Lagos',        to: 'Kinshasa',       color: ARC_COLORS.hub },
+  { from: 'Lagos',        to: 'Cairo',          color: ARC_COLORS.hub },
+  { from: 'Accra',        to: 'Abidjan',        color: ARC_COLORS.hub },
+  { from: 'Dakar',        to: 'Casablanca',     color: ARC_COLORS.hub },
+  { from: 'Dakar',        to: 'Abidjan',        color: ARC_COLORS.hub },
+  { from: 'Nairobi',      to: 'Addis Ababa',    color: ARC_COLORS.hub },
+  { from: 'Nairobi',      to: 'Dar es Salaam',  color: ARC_COLORS.hub },
+  { from: 'Nairobi',      to: 'Cairo',          color: ARC_COLORS.hub },
+  { from: 'Johannesburg', to: 'Cape Town',      color: ARC_COLORS.hub },
+  { from: 'Johannesburg', to: 'Kinshasa',       color: ARC_COLORS.hub },
+  { from: 'Johannesburg', to: 'Dar es Salaam',  color: ARC_COLORS.hub },
+
+  // Hub ↔ Hub (continent backbone)
+  { from: 'Cairo',        to: 'Casablanca',     color: ARC_COLORS.secondary },
+  { from: 'Cairo',        to: 'Addis Ababa',    color: ARC_COLORS.secondary },
+  { from: 'Kinshasa',     to: 'Dar es Salaam',  color: ARC_COLORS.secondary },
+  { from: 'Cape Town',    to: 'Dar es Salaam',  color: ARC_COLORS.secondary },
+  { from: 'Casablanca',   to: 'Abidjan',        color: ARC_COLORS.secondary },
+  { from: 'Ouagadougou',  to: 'Lagos',          color: ARC_COLORS.secondary },
+  { from: 'Ouagadougou',  to: 'Dakar',          color: ARC_COLORS.secondary },
+];
+
+function buildArcData() {
+  const cityMap = new Map(ALL_CITIES.map((c) => [c.name, c]));
+  return ARC_DEFINITIONS.map((arc) => {
+    const from = cityMap.get(arc.from)!;
+    const to = cityMap.get(arc.to)!;
+    return {
+      startLat: from.lat, startLng: from.lng,
+      endLat: to.lat, endLng: to.lng,
+      color: arc.color,
+    };
+  });
 }
 
-const POINTS = CITIES.map((c) => ({
-  lat: c.lat, lng: c.lng, size: 0.6, color: 'rgba(216,180,254,0.95)',
+const ALL_ARCS = buildArcData();
+
+const POINTS = ALL_CITIES.map((c, i) => ({
+  lat: c.lat, lng: c.lng,
+  size: i < TESTIMONIAL_CITIES.length ? 0.9 : 0.55,
+  color: i < TESTIMONIAL_CITIES.length ? 'rgba(216,180,254,1)' : 'rgba(192,132,252,0.7)',
 }));
 
 function disposeThreeScene(globe: any) {
@@ -117,37 +157,33 @@ export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
         .height(h);
 
       globe
-        .heatmapPointLat('lat')
-        .heatmapPointLng('lng')
-        .heatmapPointWeight('pop')
-        .heatmapBandwidth(1.0)
-        .heatmapColorSaturation(3.2)
-        .heatmapsData([CITIES])
         .arcColor('color')
-        .arcDashLength(0.5)
-        .arcDashGap(0.1)
-        .arcDashAnimateTime(1400)
-        .arcStroke(mobile ? 1.5 : 2.0)
-        .arcsTransitionDuration(400)
-        .arcsData(EMPTY_ARCS);
+        .arcDashLength(0.45)
+        .arcDashGap(0.08)
+        .arcDashAnimateTime(1600)
+        .arcStroke(mobile ? 1.2 : 1.8)
+        .arcAltitude(0.25)
+        .arcsTransitionDuration(600)
+        .arcsData([]);
 
       globe
         .pointLat('lat')
         .pointLng('lng')
         .pointColor('color')
-        .pointAltitude(0.01)
+        .pointAltitude(0.012)
         .pointRadius('size')
-        .pointsMerge(true)
-        .pointsData(EMPTY_POINTS);
+        .pointsMerge(false)
+        .pointsData([]);
 
       const controls = globe.controls();
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.5;
+      controls.autoRotateSpeed = 0.4;
       controls.enableZoom = false;
       controls.enablePan = false;
       controls.enableRotate = false;
 
-      globe.pointOfView({ lat: 0, lng: 20, altitude: 1.6 });
+      // Center on Africa
+      globe.pointOfView({ lat: 5, lng: 20, altitude: 1.8 });
 
       const renderer = globe.renderer?.();
       if (renderer) {
@@ -156,27 +192,37 @@ export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
 
       globe.globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg');
 
-      const maxThreshold = CITIES.length;
       const timers: ReturnType<typeof setTimeout>[] = [];
 
+      // Show points quickly
       const t0 = setTimeout(() => {
         if (destroyedRef.current || !globeRef.current) return;
         globeRef.current.pointsData(POINTS);
-      }, ARC_START_DELAY - 200);
+      }, 800);
       timers.push(t0);
 
-      for (let threshold = 1; threshold <= maxThreshold; threshold++) {
-        const delay = ARC_START_DELAY + (threshold - 1) * ARC_BUILD_INTERVAL;
-        const snap = threshold;
-        const t = setTimeout(() => {
-          if (destroyedRef.current || !globeRef.current) return;
-          const tier: 'a' | 'ab' | 'abc' =
-            snap > maxThreshold * 0.6 ? 'abc' :
-            snap > maxThreshold * 0.3 ? 'ab' : 'a';
-          globeRef.current.arcsData(buildArcs(snap, tier));
-        }, delay);
-        timers.push(t);
-      }
+      // Reveal arcs in 3 waves: testimonial arcs first, then hubs, then backbone
+      const testimonialArcs = ALL_ARCS.slice(0, 9);
+      const hubArcs = ALL_ARCS.slice(0, 22);
+      const allArcs = ALL_ARCS;
+
+      const t1 = setTimeout(() => {
+        if (destroyedRef.current || !globeRef.current) return;
+        globeRef.current.arcsData(testimonialArcs);
+      }, 1200);
+      timers.push(t1);
+
+      const t2 = setTimeout(() => {
+        if (destroyedRef.current || !globeRef.current) return;
+        globeRef.current.arcsData(hubArcs);
+      }, 2400);
+      timers.push(t2);
+
+      const t3 = setTimeout(() => {
+        if (destroyedRef.current || !globeRef.current) return;
+        globeRef.current.arcsData(allArcs);
+      }, 3600);
+      timers.push(t3);
 
       arcTimersRef.current = timers;
     });

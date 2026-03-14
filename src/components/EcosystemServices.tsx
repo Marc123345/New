@@ -280,20 +280,42 @@ export function EcosystemServices() {
         </motion.div>
       </div>
 
-      <motion.p
-        className="relative z-10 mb-4 sm:mb-6 text-center"
-        style={{
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.7rem',
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: '#ffffff',
-        }}
-        animate={{ opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      <motion.div
+        className="relative z-10 mb-4 sm:mb-6 flex justify-center"
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        Tap a pillar to explore
-      </motion.p>
+        <motion.span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: '0.65rem',
+            letterSpacing: '0.28em',
+            textTransform: 'uppercase',
+            color: 'var(--color-secondary)',
+            padding: '8px 20px',
+            border: '1px solid rgba(164,108,252,0.5)',
+            boxShadow: '0 0 18px rgba(164,108,252,0.25), inset 0 0 12px rgba(164,108,252,0.05)',
+          }}
+          animate={{ boxShadow: [
+            '0 0 18px rgba(164,108,252,0.25), inset 0 0 12px rgba(164,108,252,0.05)',
+            '0 0 32px rgba(164,108,252,0.55), inset 0 0 20px rgba(164,108,252,0.12)',
+            '0 0 18px rgba(164,108,252,0.25), inset 0 0 12px rgba(164,108,252,0.05)',
+          ]}}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <motion.span
+            animate={{ rotate: [0, 15, -15, 0] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ fontSize: '0.9rem', lineHeight: 1 }}
+          >
+            ↗
+          </motion.span>
+          Tap a pillar to explore
+        </motion.span>
+      </motion.div>
 
       {/* Orbit Interaction Area */}
       {/* ADDED: scale classes for perfect mobile view! */}

@@ -33,17 +33,19 @@ const BOUNDS_X = 16;
 const BOUNDS_Y = 10;
 
 // Lushion-style physics tweaks
-const CURSOR_SPHERE_R = 4.0;
-const CURSOR_SMOOTH = 8.0;
-const CURSOR_FIELD_R = 12.0;
+const CURSOR_SPHERE_R = 5.0;
+const CURSOR_SMOOTH = 16.0;
+const CURSOR_FIELD_R = 20.0;
 
-const SPRING_HOME = 0.04;
-const FRICTION = 0.95;
-const MAX_SPEED = 30.0;
+const SPRING_HOME = 0.03;
+const FRICTION = 0.94;
+const MAX_SPEED = 45.0;
 const MAX_SPEED_SQ = MAX_SPEED * MAX_SPEED;
 
-const JELLY_SPRING = 12.0;
-const JELLY_DAMPING = 4.5;
+const JELLY_SPRING = 22.0;
+const JELLY_DAMPING = 3.8;
+
+const CURSOR_ATTRACT_R = 12.0;  // attraction zone radius (inside FIELD, outside SPHERE)
 
 const CUBE_VERT = `
 varying vec3 vNormal;
@@ -442,10 +444,10 @@ export function HeroWebGLPanel() {
       prevSphereX = sphereX;
       prevSphereY = sphereY;
 
-      const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.04 : 0;
-      const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.035 : 0;
-      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-2.5 * dt));
-      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-2.5 * dt));
+      const targetTiltX = mouseActive ? (mouseNdcX - 0.5) * 0.09 : 0;
+      const targetTiltY = mouseActive ? -(mouseNdcY - 0.5) * 0.07 : 0;
+      tiltX += (targetTiltX - tiltX) * (1 - Math.exp(-3.5 * dt));
+      tiltY += (targetTiltY - tiltY) * (1 - Math.exp(-3.5 * dt));
       mainGroup.rotation.y = tiltX;
       mainGroup.rotation.x = tiltY;
 
@@ -553,10 +555,12 @@ export function HeroWebGLPanel() {
             const ddx = px[i] - sphereX;
             const ddy = py[i] - sphereY;
             const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+            const nx = ddx / (dist + 0.0001);
+            const ny = ddy / (dist + 0.0001);
             const contactDist = CURSOR_SPHERE_R + radii[i];
 
+            // Hard exclusion: push out and bounce
             if (dist < contactDist && dist > 0.001) {
-              const nx = ddx / dist, ny = ddy / dist;
               const overlap = contactDist - dist;
 
               px[i] += nx * overlap;
@@ -564,31 +568,47 @@ export function HeroWebGLPanel() {
 
               const relVn = (vx[i] - sphereVx) * nx + (vy[i] - sphereVy) * ny;
               if (relVn < 0) {
-                const impulseMag = -(1 + 0.7) * relVn;
+                const impulseMag = -(1 + 0.85) * relVn;
                 vx[i] += nx * impulseMag;
                 vy[i] += ny * impulseMag;
               }
 
-              const sweepFactor = Math.min(sphereSpeed * 0.012, 1.0);
+              // Sweep impulse on fast movement
+              const sweepFactor = Math.min(sphereSpeed * 0.018, 1.4);
               vx[i] += sphereVx * sweepFactor * subDt * 60;
               vy[i] += sphereVy * sweepFactor * subDt * 60;
 
-              const squishAmt = Math.min(overlap / contactDist * 0.45, 0.28);
-              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.6;
-              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.6;
-              jellyTargetZ[i] = 1 - squishAmt * 0.35;
+              // Jelly squish
+              const squishAmt = Math.min(overlap / contactDist * 0.55, 0.35);
+              jellyTargetX[i] = 1 + Math.abs(ny) * squishAmt - Math.abs(nx) * squishAmt * 0.7;
+              jellyTargetY[i] = 1 + Math.abs(nx) * squishAmt - Math.abs(ny) * squishAmt * 0.7;
+              jellyTargetZ[i] = 1 - squishAmt * 0.5;
             }
 
-            if (dist < CURSOR_FIELD_R && dist > contactDist) {
-              const nx = ddx / dist, ny = ddy / dist;
+            // Field zone: attract when slow, scatter when fast (Lushion signature)
+            if (dist >= contactDist && dist < CURSOR_FIELD_R) {
               const t = (dist - contactDist) / (CURSOR_FIELD_R - contactDist);
-              const falloff = (1 - t) * (1 - t);
-              const pushStr = 12.0 * falloff * (1 + sphereSpeed * 0.035) * subDt;
-              vx[i] += nx * pushStr;
-              vy[i] += ny * pushStr;
+              const falloff = (1 - t * t) * (1 - t * t); // sharper falloff near cursor
 
-              if (sphereSpeed > 2.0) {
-                const sweepStr = sphereSpeed * 0.0025 * falloff * subDt * 60;
+              const speedBlend = Math.min(sphereSpeed / 6.0, 1.0); // 0=still, 1=fast
+
+              // Attract when cursor is still/slow (elements cluster toward cursor)
+              if (speedBlend < 0.85 && dist < CURSOR_ATTRACT_R) {
+                const tA = (dist - contactDist) / (CURSOR_ATTRACT_R - contactDist);
+                const attractFalloff = (1 - tA) * (1 - tA);
+                const attractStr = 9.0 * attractFalloff * (1 - speedBlend) * subDt;
+                vx[i] -= nx * attractStr; // toward cursor (invert direction)
+                vy[i] -= ny * attractStr;
+              }
+
+              // Scatter when cursor moves fast
+              if (speedBlend > 0.15) {
+                const scatterStr = 28.0 * falloff * speedBlend * subDt;
+                vx[i] += nx * scatterStr; // away from cursor
+                vy[i] += ny * scatterStr;
+
+                // Sweep in direction of cursor movement
+                const sweepStr = sphereSpeed * 0.005 * falloff * speedBlend * subDt * 60;
                 vx[i] += sphereVx * sweepStr;
                 vy[i] += sphereVy * sweepStr;
               }
@@ -664,7 +684,7 @@ export function HeroWebGLPanel() {
         displacementMaterial.uniforms.uMouse.value.set(mouseNdcX, mouseNdcY);
         displacementMaterial.uniforms.uVelocity.value.set(sphereVx * 0.008, sphereVy * 0.008);
         displacementMaterial.uniforms.uStrength.value =
-          displacementStrength * Math.min(cursorSpeed * 0.05 + 0.25, 1.8);
+          displacementStrength * Math.min(cursorSpeed * 0.07 + 0.4, 2.5);
 
         renderer.setRenderTarget(renderTarget);
         renderer.render(scene, camera);

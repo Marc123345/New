@@ -1,10 +1,7 @@
-import { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
+import { useRef, memo } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'motion/react';
 import { useIsMobile } from '../hooks/useIsMobile';
-
-const GlobeWrapper = lazy(() =>
-  import('./HeroStory/Globe/GlobeWrapper').then((m) => ({ default: m.GlobeWrapper }))
-);
+import UnicornScene from 'unicornstudio-react';
 
 const phases = [
   {
@@ -116,10 +113,6 @@ const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<
   </div>
 ));
 
-const PURPLE_OVERLAY = {
-  background: 'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
-} as const;
-
 const GRADIENT_OVERLAY_DESKTOP = {
   background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
 } as const;
@@ -133,14 +126,12 @@ const BOTTOM_FADE_STYLE = {
 } as const;
 
 const STICKY_BG = {
-  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
+  background: '#000',
 } as const;
 
 export function HeroStory() {
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [globeReady, setGlobeReady] = useState(false);
   const isMobile = useIsMobile();
 
   const { scrollYProgress } = useScroll({
@@ -149,22 +140,6 @@ export function HeroStory() {
   });
 
   const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
-
-  useEffect(() => {
-    const el = stickyRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const visible = entry.isIntersecting;
-        setIsVisible(visible);
-        if (visible) setGlobeReady(true);
-      },
-      { threshold: 0, rootMargin: '400px 0px' }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div
@@ -177,16 +152,16 @@ export function HeroStory() {
         className="sticky top-0 h-screen w-full overflow-hidden"
         style={STICKY_BG}
       >
-        {globeReady && (
-          <Suspense fallback={null}>
-            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
-          </Suspense>
-        )}
-
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={PURPLE_OVERLAY}
-        />
+        <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+          <UnicornScene
+            projectId="US9XVS5BHKCmCNH60lQg"
+            width="100%"
+            height="100%"
+            scale={1}
+            dpi={1.5}
+            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+          />
+        </div>
 
         <div
           className="absolute inset-0 pointer-events-none"

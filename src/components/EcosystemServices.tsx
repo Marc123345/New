@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { motion } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
@@ -22,26 +22,18 @@ const ORBIT_DURATION = 18000;
 interface OrbitNodeProps {
   item: typeof PILLARS[number];
   index: number;
-  total: number;
   onSelect: (index: number) => void;
-  orbitAngle: number;
+  containerRef: (el: HTMLDivElement | null) => void;
 }
 
-const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps) => {
-  const baseAngle = (index / total) * 2 * Math.PI;
-  const angle = baseAngle + orbitAngle;
-  const x = Math.cos(angle) * ORBIT_RADIUS;
-  const y = Math.sin(angle) * ORBIT_RADIUS;
+const OrbitNode = memo(({ item, index, onSelect, containerRef }: OrbitNodeProps) => {
   const label = `0${index + 1}`;
 
   return (
     <div
+      ref={containerRef}
       className="absolute z-30"
-      style={{
-        left: '50%',
-        top: '50%',
-        transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-      }}
+      style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
     >
       <button
         type="button"
@@ -111,260 +103,271 @@ const OrbitNode = ({ item, index, total, onSelect, orbitAngle }: OrbitNodeProps)
       </button>
     </div>
   );
-};
+});
 
-function useOrbitAngle(paused: boolean) {
-  const angleRef = useRef(0);
-  const lastTimeRef = useRef<number | null>(null);
-  const [angle, setAngle] = useState(0);
-  const rafRef = useRef<number>(0);
-
-  useEffect(() => {
-    const step = (now: number) => {
-      if (!paused) {
-        if (lastTimeRef.current !== null) {
-          const delta = now - lastTimeRef.current;
-          angleRef.current += (delta / ORBIT_DURATION) * 2 * Math.PI;
-          setAngle(angleRef.current);
-        }
-        lastTimeRef.current = now;
-      } else {
-        lastTimeRef.current = null;
-      }
-      rafRef.current = requestAnimationFrame(step);
-    };
-    rafRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [paused]);
-
-  return angle;
+interface LaptopMockupProps {
+  wrapperRef: (el: HTMLDivElement | null) => void;
 }
 
-
-const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
-
-function LaptopMockup() {
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const rafRef = useRef(0);
-
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    mouseRef.current = {
-      x: (e.clientX / window.innerWidth) * 2 - 1,
-      y: (e.clientY / window.innerHeight) * 2 - 1,
-    };
-  }, []);
-
-  useEffect(() => {
-    const tick = () => {
-      setTilt(prev => ({
-        x: prev.x + (mouseRef.current.x - prev.x) * 0.06,
-        y: prev.y + (mouseRef.current.y - prev.y) * 0.06,
-      }));
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('mousemove', onMouseMove);
-    };
-  }, [onMouseMove]);
-
-  const rx = 8 - tilt.y * 6;
-  const ry = -5 + tilt.x * 7;
-
-  return (
+const LaptopMockup = memo(({ wrapperRef }: LaptopMockupProps) => (
+  <motion.div
+    animate={{ y: [0, -14, 0] }}
+    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+    style={{ position: 'relative', userSelect: 'none' }}
+  >
+    {/* Ambient ground glow */}
     <motion.div
-      animate={{ y: [0, -14, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      style={{ position: 'relative', userSelect: 'none' }}
-    >
-      {/* Ambient ground glow */}
-      <motion.div
-        animate={{ opacity: [0.5, 0.9, 0.5], scaleX: [1, 1.15, 1] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        style={{
-          position: 'absolute', bottom: -28, left: '50%',
-          transform: 'translateX(-50%)',
-          width: 180, height: 28,
-          background: 'radial-gradient(ellipse, rgba(164,108,252,0.55) 0%, transparent 70%)',
-          filter: 'blur(10px)',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      animate={{ opacity: [0.5, 0.9, 0.5], scaleX: [1, 1.15, 1] }}
+      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      style={{
+        position: 'absolute', bottom: -28, left: '50%',
+        transform: 'translateX(-50%)',
+        width: 180, height: 28,
+        background: 'radial-gradient(ellipse, rgba(164,108,252,0.55) 0%, transparent 70%)',
+        filter: 'blur(10px)',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }}
+    />
 
-      {/* 3D perspective wrapper */}
-      <div style={{
+    {/* 3D perspective wrapper — updated imperatively via wrapperRef */}
+    <div
+      ref={wrapperRef}
+      style={{
         transformStyle: 'preserve-3d',
-        transform: `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg)`,
-        transition: 'transform 0.12s ease-out',
+        transform: 'perspective(1000px) rotateX(8deg) rotateY(-5deg)',
         position: 'relative', zIndex: 1,
-      }}>
-
-        {/* ── SCREEN LID ── */}
+      }}
+    >
+      {/* ── SCREEN LID ── */}
+      <motion.div
+        animate={{
+          boxShadow: [
+            '0 0 0 1.5px rgba(164,108,252,0.4), 0 0 24px rgba(164,108,252,0.2), inset 0 1px 0 rgba(255,255,255,0.07)',
+            '0 0 0 1.5px rgba(164,108,252,0.8), 0 0 48px rgba(164,108,252,0.5), 0 0 80px rgba(164,108,252,0.15), inset 0 1px 0 rgba(255,255,255,0.07)',
+            '0 0 0 1.5px rgba(164,108,252,0.4), 0 0 24px rgba(164,108,252,0.2), inset 0 1px 0 rgba(255,255,255,0.07)',
+          ],
+        }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          width: 240,
+          background: 'linear-gradient(160deg, #1c1138 0%, #0d0820 100%)',
+          borderRadius: '12px 12px 2px 2px',
+          padding: '10px 10px 7px',
+          position: 'relative',
+        }}
+      >
+        {/* Webcam */}
         <motion.div
-          animate={{
-            boxShadow: [
-              '0 0 0 1.5px rgba(164,108,252,0.4), 0 0 24px rgba(164,108,252,0.2), inset 0 1px 0 rgba(255,255,255,0.07)',
-              '0 0 0 1.5px rgba(164,108,252,0.8), 0 0 48px rgba(164,108,252,0.5), 0 0 80px rgba(164,108,252,0.15), inset 0 1px 0 rgba(255,255,255,0.07)',
-              '0 0 0 1.5px rgba(164,108,252,0.4), 0 0 24px rgba(164,108,252,0.2), inset 0 1px 0 rgba(255,255,255,0.07)',
-            ],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ opacity: [0.5, 1, 0.5], boxShadow: ['0 0 4px rgba(164,108,252,0.6)', '0 0 10px rgba(164,108,252,1)', '0 0 4px rgba(164,108,252,0.6)'] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           style={{
-            width: 240,
-            background: 'linear-gradient(160deg, #1c1138 0%, #0d0820 100%)',
-            borderRadius: '12px 12px 2px 2px',
-            padding: '10px 10px 7px',
-            position: 'relative',
+            position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)',
+            width: 5, height: 5, borderRadius: '50%',
+            background: 'rgba(164,108,252,0.8)',
           }}
-        >
-          {/* Webcam */}
+        />
+
+        {/* Screen bezel + image */}
+        <div style={{
+          background: '#04020e',
+          borderRadius: 5,
+          overflow: 'hidden',
+          position: 'relative',
+          border: '1px solid rgba(164,108,252,0.25)',
+        }}>
+          <img
+            src="https://ik.imagekit.io/qcvroy8xpd/unnamed%20(2)%201.png?updatedAt=1773188163565"
+            alt="H2H"
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+          />
+
+          {/* Scanlines */}
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)',
+          }} />
+
+          {/* Moving scan glow */}
           <motion.div
-            animate={{ opacity: [0.5, 1, 0.5], boxShadow: ['0 0 4px rgba(164,108,252,0.6)', '0 0 10px rgba(164,108,252,1)', '0 0 4px rgba(164,108,252,0.6)'] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ y: ['-100%', '220%'] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: 'linear', repeatDelay: 1.2 }}
             style={{
-              position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)',
-              width: 5, height: 5, borderRadius: '50%',
-              background: 'rgba(164,108,252,0.8)',
+              position: 'absolute', left: 0, right: 0, height: '35%',
+              background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.10), transparent)',
+              pointerEvents: 'none',
             }}
           />
 
-          {/* Screen bezel + image */}
+          {/* Corner reflection */}
           <div style={{
-            background: '#04020e',
-            borderRadius: 5,
-            overflow: 'hidden',
-            position: 'relative',
-            border: '1px solid rgba(164,108,252,0.25)',
-          }}>
-            <img
-              src="https://ik.imagekit.io/qcvroy8xpd/unnamed%20(2)%201.png?updatedAt=1773188163565"
-              alt="H2H"
-              draggable={false}
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-            />
-
-            {/* Scanlines */}
-            <div style={{
-              position: 'absolute', inset: 0, pointerEvents: 'none',
-              background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px)',
-            }} />
-
-            {/* Moving scan glow */}
-            <motion.div
-              animate={{ y: ['-100%', '220%'] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'linear', repeatDelay: 1.2 }}
-              style={{
-                position: 'absolute', left: 0, right: 0, height: '35%',
-                background: 'linear-gradient(to bottom, transparent, rgba(164,108,252,0.10), transparent)',
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Corner reflection */}
-            <div style={{
-              position: 'absolute', inset: 0, pointerEvents: 'none',
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 35%)',
-            }} />
-          </div>
-
-          {/* Lid top shine */}
-          <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
-            borderRadius: '12px 12px 0 0',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), transparent)',
-            pointerEvents: 'none',
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 35%)',
           }} />
-        </motion.div>
+        </div>
 
-        {/* ── HINGE ── */}
+        {/* Lid top shine */}
         <div style={{
-          width: 240, height: 6,
-          background: 'linear-gradient(to bottom, rgba(164,108,252,0.55), rgba(60,30,110,0.8))',
-          borderLeft: '1.5px solid rgba(164,108,252,0.5)',
-          borderRight: '1.5px solid rgba(164,108,252,0.5)',
+          position: 'absolute', top: 0, left: 0, right: 0, height: '40%',
+          borderRadius: '12px 12px 0 0',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), transparent)',
+          pointerEvents: 'none',
+        }} />
+      </motion.div>
+
+      {/* ── HINGE ── */}
+      <div style={{
+        width: 240, height: 6,
+        background: 'linear-gradient(to bottom, rgba(164,108,252,0.55), rgba(60,30,110,0.8))',
+        borderLeft: '1.5px solid rgba(164,108,252,0.5)',
+        borderRight: '1.5px solid rgba(164,108,252,0.5)',
+      }} />
+
+      {/* ── BASE (keyboard + trackpad) ── */}
+      <div style={{
+        width: 258, marginLeft: -9,
+        background: 'linear-gradient(175deg, #1e1240 0%, #0f0924 60%, #0a0618 100%)',
+        border: '1.5px solid rgba(164,108,252,0.45)',
+        borderTop: 'none',
+        borderRadius: '0 0 10px 10px',
+        padding: '6px 8px 8px',
+        boxShadow: '0 16px 40px rgba(0,0,0,0.8), inset 0 -1px 0 rgba(164,108,252,0.1)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Keyboard rows */}
+        {[11, 11, 10, 10].map((count, row) => (
+          <div key={row} style={{ display: 'flex', gap: 2, marginBottom: 2, justifyContent: 'center' }}>
+            {Array.from({ length: count }).map((_, i) => (
+              <div key={i} style={{
+                flex: i === 0 && row === 3 ? 2 : 1,
+                height: 5,
+                background: 'rgba(164,108,252,0.07)',
+                border: '1px solid rgba(164,108,252,0.18)',
+                borderRadius: 1.5,
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+              }} />
+            ))}
+          </div>
+        ))}
+
+        {/* Spacebar */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
+          <div style={{
+            width: 80, height: 5,
+            background: 'rgba(164,108,252,0.07)',
+            border: '1px solid rgba(164,108,252,0.18)',
+            borderRadius: 1.5,
+          }} />
+        </div>
+
+        {/* Trackpad */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{
+            width: 68, height: 14,
+            background: 'rgba(164,108,252,0.06)',
+            border: '1px solid rgba(164,108,252,0.22)',
+            borderRadius: 4,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+          }} />
+        </div>
+
+        {/* Base shine */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 45%)',
+          pointerEvents: 'none', borderRadius: '0 0 10px 10px',
         }} />
 
-        {/* ── BASE (keyboard + trackpad) ── */}
-        <div style={{
-          width: 258, marginLeft: -9,
-          background: 'linear-gradient(175deg, #1e1240 0%, #0f0924 60%, #0a0618 100%)',
-          border: '1.5px solid rgba(164,108,252,0.45)',
-          borderTop: 'none',
-          borderRadius: '0 0 10px 10px',
-          padding: '6px 8px 8px',
-          boxShadow: '0 16px 40px rgba(0,0,0,0.8), inset 0 -1px 0 rgba(164,108,252,0.1)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          {/* Keyboard rows */}
-          {[11, 11, 10, 10].map((count, row) => (
-            <div key={row} style={{ display: 'flex', gap: 2, marginBottom: 2, justifyContent: 'center' }}>
-              {Array.from({ length: count }).map((_, i) => (
-                <div key={i} style={{
-                  flex: i === 0 && row === 3 ? 2 : 1,
-                  height: 5,
-                  background: 'rgba(164,108,252,0.07)',
-                  border: '1px solid rgba(164,108,252,0.18)',
-                  borderRadius: 1.5,
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-                }} />
-              ))}
-            </div>
-          ))}
-
-          {/* Spacebar */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
-            <div style={{
-              width: 80, height: 5,
-              background: 'rgba(164,108,252,0.07)',
-              border: '1px solid rgba(164,108,252,0.18)',
-              borderRadius: 1.5,
-            }} />
-          </div>
-
-          {/* Trackpad */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              width: 68, height: 14,
-              background: 'rgba(164,108,252,0.06)',
-              border: '1px solid rgba(164,108,252,0.22)',
-              borderRadius: 4,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-            }} />
-          </div>
-
-          {/* Base shine */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 45%)',
-            pointerEvents: 'none', borderRadius: '0 0 10px 10px',
-          }} />
-
-          {/* Subtle RGB edge glow on base bottom */}
-          <motion.div
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
-              background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.6), rgba(200,150,255,0.8), rgba(164,108,252,0.6), transparent)',
-              borderRadius: '0 0 10px 10px',
-            }}
-          />
-        </div>
+        {/* Subtle RGB edge glow on base bottom */}
+        <motion.div
+          animate={{ opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
+            background: 'linear-gradient(90deg, transparent, rgba(164,108,252,0.6), rgba(200,150,255,0.8), rgba(164,108,252,0.6), transparent)',
+            borderRadius: '0 0 10px 10px',
+          }}
+        />
       </div>
-    </motion.div>
-  );
-}
+    </div>
+  </motion.div>
+));
+
+const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const isMobile = useIsMobile();
-  const orbitAngle = useOrbitAngle(false);
   const visiblePlanets = useMemo(() => isMobile ? PLANET_IMAGES.slice(0, 3) : PLANET_IMAGES, [isMobile]);
+
+  // Single RAF driving both orbit animation and laptop tilt (no React state updates)
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
+  const laptopWrapperRef = useRef<HTMLDivElement | null>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const tiltRef = useRef({ x: 0, y: 0 });
+  const orbitAngleRef = useRef(0);
+  const lastTimeRef = useRef<number | null>(null);
+  const rafRef = useRef(0);
+
+  // Stable ref callbacks for orbit nodes
+  const nodeRefCallbacks = useMemo(
+    () => PILLARS.map((_, i) => (el: HTMLDivElement | null) => { nodeRefs.current[i] = el; }),
+    []
+  );
+  const laptopRef = useCallback((el: HTMLDivElement | null) => { laptopWrapperRef.current = el; }, []);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current = {
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1,
+      };
+    };
+
+    const tick = (now: number) => {
+      // Update orbit angle
+      if (lastTimeRef.current !== null) {
+        const delta = now - lastTimeRef.current;
+        orbitAngleRef.current += (delta / ORBIT_DURATION) * 2 * Math.PI;
+      }
+      lastTimeRef.current = now;
+
+      // Update orbit node positions directly via DOM
+      const angle = orbitAngleRef.current;
+      const total = PILLARS.length;
+      nodeRefs.current.forEach((el, index) => {
+        if (!el) return;
+        const baseAngle = (index / total) * 2 * Math.PI;
+        const a = baseAngle + angle;
+        const x = Math.cos(a) * ORBIT_RADIUS;
+        const y = Math.sin(a) * ORBIT_RADIUS;
+        el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+      });
+
+      // Update laptop tilt directly via DOM
+      tiltRef.current.x += (mouseRef.current.x - tiltRef.current.x) * 0.06;
+      tiltRef.current.y += (mouseRef.current.y - tiltRef.current.y) * 0.06;
+      if (laptopWrapperRef.current) {
+        const rx = 8 - tiltRef.current.y * 6;
+        const ry = -5 + tiltRef.current.x * 7;
+        laptopWrapperRef.current.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('mousemove', onMouseMove);
+    };
+  }, []);
 
   return (
     <section
@@ -408,6 +411,8 @@ export function EcosystemServices() {
             <img
               src={planet.src}
               alt=""
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover rounded-full"
             />
             <div
@@ -513,7 +518,6 @@ export function EcosystemServices() {
       </motion.p>
 
       {/* Orbit Interaction Area */}
-      {/* ADDED: scale classes for perfect mobile view! */}
       <div
         className="relative z-20 flex items-center justify-center scale-[0.6] sm:scale-75 md:scale-100 transition-transform duration-500"
         style={{ width: ORBIT_DIAMETER + 120, height: ORBIT_DIAMETER + 120 }}
@@ -537,7 +541,7 @@ export function EcosystemServices() {
 
           {/* Center: Dynamic Laptop */}
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <LaptopMockup />
+            <LaptopMockup wrapperRef={laptopRef} />
           </div>
 
           {/* Orbiting Nodes */}
@@ -547,9 +551,8 @@ export function EcosystemServices() {
                 key={i}
                 item={pillar}
                 index={i}
-                total={PILLARS.length}
                 onSelect={setSelectedService}
-                orbitAngle={orbitAngle}
+                containerRef={nodeRefCallbacks[i]}
               />
             ))}
           </div>

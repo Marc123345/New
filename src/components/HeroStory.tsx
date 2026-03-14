@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
+import React, { useRef, useState, useEffect, memo, lazy, Suspense } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'motion/react';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -39,7 +39,22 @@ const HEADING_STYLES = phases.map((_, i) => ({
   whiteSpace: 'pre-line' as const,
 }));
 
-const SUBTITLE_STYLE = { color: 'rgba(192,132,252,0.95)' } as const;
+const EYEBROW_BOX: React.CSSProperties = {
+  display: 'inline-block',
+  alignSelf: 'flex-start',
+  marginBottom: '1.5rem',
+  padding: '6px 16px',
+  border: '2px solid var(--color-secondary)',
+  boxShadow: '4px 4px 0 var(--color-secondary)',
+};
+const EYEBROW_TEXT: React.CSSProperties = {
+  fontFamily: 'var(--font-stack-heading)',
+  fontSize: '0.6rem',
+  fontWeight: 700,
+  letterSpacing: '0.3em',
+  textTransform: 'uppercase',
+  color: 'var(--color-secondary)',
+};
 const DESC_STYLE = { color: 'rgba(209,213,219,0.9)' } as const;
 
 const PhaseText = memo(({
@@ -59,12 +74,9 @@ const PhaseText = memo(({
       className="absolute inset-0 flex flex-col justify-center"
       style={{ opacity, y, willChange: 'transform, opacity' }}
     >
-      <p
-        className="text-xs sm:text-sm uppercase tracking-[0.25em] font-bold mb-3 sm:mb-4"
-        style={SUBTITLE_STYLE}
-      >
-        {phase.subtitle}
-      </p>
+      <div style={EYEBROW_BOX}>
+        <span style={EYEBROW_TEXT}>{phase.subtitle}</span>
+      </div>
       <h2
         className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-6 text-white"
         style={HEADING_STYLES[phaseIndex]}

@@ -1,4 +1,4 @@
-import { ReactNode, Suspense } from 'react';
+import React, { ReactNode, Suspense } from 'react';
 import { useInView } from '../hooks/useInView';
 
 interface LazySectionProps {
@@ -35,7 +35,7 @@ export function LazySection({
   });
 
   return (
-    <div ref={ref} style={{ minHeight: '200px' }}>
+    <div ref={ref} style={{ minHeight: '1px', contentVisibility: 'auto', containIntrinsicSize: '0 500px' } as React.CSSProperties}>
       {isInView ? (
         <Suspense fallback={fallback}>
           {children}

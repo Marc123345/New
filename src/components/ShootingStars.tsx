@@ -48,20 +48,10 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
       <style>{`
         @keyframes shootingStar {
-          0% {
-            transform: translateX(0) translateY(0) rotate(-35deg);
-            opacity: 0;
-          }
-          5% {
-            opacity: 1;
-          }
-          70% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(300px) translateY(200px) rotate(-35deg);
-            opacity: 0;
-          }
+          0% { transform: translateX(0) translateY(0) rotate(-35deg); opacity: 0; }
+          5% { opacity: 1; }
+          70% { opacity: 1; }
+          100% { transform: translateX(300px) translateY(200px) rotate(-35deg); opacity: 0; }
         }
         .shooting-star {
           position: absolute;
@@ -80,6 +70,16 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
           height: 1px;
           background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6));
         }
+        @keyframes twinkle {
+          0%, 100% { opacity: var(--base-opacity); }
+          50% { opacity: 0.1; }
+        }
+        .twinkle-star {
+          position: absolute;
+          border-radius: 50%;
+          background: white;
+          animation: twinkle var(--twinkle-duration) var(--twinkle-delay) ease-in-out infinite;
+        }
       `}</style>
       {stars.map((star) => (
         <div
@@ -95,19 +95,6 @@ export function ShootingStars({ count = 18 }: ShootingStarsProps) {
           } as React.CSSProperties}
         />
       ))}
-      {/* Static twinkling stars */}
-      <style>{`
-        @keyframes twinkle {
-          0%, 100% { opacity: var(--base-opacity); }
-          50% { opacity: 0.1; }
-        }
-        .twinkle-star {
-          position: absolute;
-          border-radius: 50%;
-          background: white;
-          animation: twinkle var(--twinkle-duration) var(--twinkle-delay) ease-in-out infinite;
-        }
-      `}</style>
       {twinkleStars.map((star) => (
         <div
           key={`twinkle-${star.id}`}

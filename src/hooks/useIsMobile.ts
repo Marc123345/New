@@ -11,9 +11,16 @@ export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(getIsMobile);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(getIsMobile());
+    let timer = 0;
+    const handleResize = () => {
+      clearTimeout(timer);
+      timer = window.setTimeout(() => setIsMobile(getIsMobile()), 150);
+    };
     window.addEventListener('resize', handleResize, { passive: true });
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
   }, []);
 
   return isMobile;

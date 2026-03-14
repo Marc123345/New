@@ -35,7 +35,7 @@ export function ScrollProgress() {
       <div
         ref={barRef}
         className="h-full bg-[var(--color-secondary)]"
-        style={{ width: '0%', willChange: 'width', transition: 'width 0.1s linear' }}
+        style={{ width: '0%', willChange: 'width' }}
       />
     </div>
   );

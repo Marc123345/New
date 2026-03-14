@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useRef, useState, useEffect } from "react";
 import UnicornScene from "unicornstudio-react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
@@ -28,6 +28,37 @@ const Testimonials = lazy(() =>
 const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
 );
+
+// Measures its container and feeds exact pixel dimensions to UnicornScene
+function HeroUnicorn() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 1512, h: 945 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentRect.width);
+      const h = Math.round(entry.contentRect.height);
+      if (w > 0 && h > 0) setDims({ w, h });
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="absolute inset-0" style={{ zIndex: 0 }}>
+      <UnicornScene
+        projectId="zePXIpCcN69AcXLL5Mvg"
+        width={`${dims.w}px`}
+        height={`${dims.h}px`}
+        scale={1}
+        dpi={1.5}
+        sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+      />
+    </div>
+  );
+}
 
 const SECTION_PADDING: React.CSSProperties = {
   paddingTop: 'var(--space-8x)',
@@ -117,17 +148,8 @@ function AppContent() {
                   e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
                 }}
               >
-                {/* UnicornScene background */}
-                <div className="absolute inset-0" style={{ zIndex: 0 }}>
-                  <UnicornScene
-                    projectId="zePXIpCcN69AcXLL5Mvg"
-                    width="1512px"
-                    height="945px"
-                    scale={1}
-                    dpi={1.5}
-                    sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
-                  />
-                </div>
+                {/* UnicornScene background — dimensions measured from container */}
+                <HeroUnicorn />
                 {/* Cubes — absolute inset-0 so the div has proper dimensions for the Three.js canvas */}
                 <div className="absolute inset-0" style={{ zIndex: 1 }}>
                   <HeroWebGLPanel />

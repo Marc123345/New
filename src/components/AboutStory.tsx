@@ -159,6 +159,7 @@ const EYEBROW_TEXT: React.CSSProperties = {
 
 const EYEBROW_BOX: React.CSSProperties = {
   display: 'inline-block',
+  alignSelf: 'flex-start',
   marginBottom: '1.5rem',
   padding: '6px 16px',
   border: '2px solid var(--color-secondary)',

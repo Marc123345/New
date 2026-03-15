@@ -1,4 +1,5 @@
-import React, { Suspense, lazy, useRef, useState, useEffect } from "react";
+import React, { Suspense, lazy, useRef, useState, useEffect, useCallback } from "react";
+import { Loader } from "./components/Loader";
 import UnicornScene from "unicornstudio-react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
@@ -217,8 +218,12 @@ function AppContent() {
 }
 
 export default function App() {
+  const [loaded, setLoaded] = useState(false);
+  const onComplete = useCallback(() => setLoaded(true), []);
+
   return (
     <ErrorBoundary>
+      {!loaded && <Loader onComplete={onComplete} />}
       <AppContent />
     </ErrorBoundary>
   );

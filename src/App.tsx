@@ -1,6 +1,5 @@
-import React, { Suspense, lazy, useRef, useState, useEffect, useCallback } from "react";
+import React, { Suspense, lazy, useState, useCallback } from "react";
 import { Loader } from "./components/Loader";
-import UnicornScene from "unicornstudio-react";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
@@ -12,7 +11,6 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
-import { ShootingStars } from "./components/ShootingStars";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -30,33 +28,56 @@ const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
 );
 
-// Measures its container and feeds exact pixel dimensions to UnicornScene
-function HeroUnicorn() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dims, setDims] = useState({ w: 1512, h: 945 });
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const obs = new ResizeObserver(([entry]) => {
-      const w = Math.round(entry.contentRect.width);
-      const h = Math.round(entry.contentRect.height);
-      if (w > 0 && h > 0) setDims({ w, h });
-    });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
+function BrowserFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div ref={containerRef} className="absolute inset-0" style={{ zIndex: 0, pointerEvents: 'none' }}>
-      <UnicornScene
-        projectId="zePXIpCcN69AcXLL5Mvg"
-        width={`${dims.w}px`}
-        height={`${dims.h}px`}
-        scale={1}
-        dpi={1.5}
-        sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
-      />
+    <div
+      style={{
+        borderRadius: 10,
+        overflow: 'hidden',
+        border: '1px solid rgba(0,0,0,0.1)',
+        boxShadow: '0 32px 80px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.07)',
+      }}
+    >
+      {/* Browser chrome bar */}
+      <div
+        style={{
+          height: 42,
+          background: '#f0eff0',
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          paddingLeft: 14,
+          gap: 7,
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57', flexShrink: 0 }} />
+        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#febc2e', flexShrink: 0 }} />
+        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840', flexShrink: 0 }} />
+        <div
+          style={{
+            flex: 1,
+            marginLeft: 10,
+            marginRight: 14,
+            height: 22,
+            background: '#fff',
+            borderRadius: 5,
+            border: '1px solid rgba(0,0,0,0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 11,
+            fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+            color: '#999',
+            letterSpacing: '0.01em',
+            userSelect: 'none',
+          }}
+        >
+          h2h.social
+        </div>
+      </div>
+      {/* Canvas content */}
+      {children}
     </div>
   );
 }
@@ -107,65 +128,34 @@ function AppContent() {
       <section
         id="hero"
         className="relative min-h-screen overflow-hidden"
-        style={{ background: '#040608' }}
+        style={{ background: '#ffffff' }}
       >
         <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/eyecatching-starry-night-sky-banner-universe-experience_1017-50621.avif)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'rgba(0,0,0,0.65)' }}
-        />
-        <div className="absolute inset-0">
-          <ShootingStars count={22} />
-        </div>
-
-        <div
-          className="relative z-10 px-4 md:px-8 lg:px-12"
-          style={{
-            paddingTop: 'var(--space-8x)',
-            paddingBottom: 'var(--space-8x)',
-          }}
+          className="relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-16 px-6 md:px-10 lg:px-16 min-h-screen"
+          style={{ paddingTop: 'calc(var(--space-8x) + 32px)', paddingBottom: 'var(--space-8x)' }}
         >
-          <div className="max-w-8xl mx-auto">
-            <HeroTitle>
-              <div
-                className="hero-webgl-container relative mx-auto w-full overflow-hidden transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1"
-                style={{
-                  background: 'transparent',
-                  border: '2px solid rgba(255,255,255,0.18)',
-                  boxShadow: '4px 4px 0 rgba(164,108,252,0.7)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '6px 6px 0 #a46cfc';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '4px 4px 0 rgba(164,108,252,0.7)';
-                }}
-              >
-                {/* UnicornScene background — dimensions measured from container */}
-                <HeroUnicorn />
-                {/* Cubes — absolute inset-0 so the div has proper dimensions for the Three.js canvas */}
-                <div className="absolute inset-0" style={{ zIndex: 10, isolation: 'isolate', transform: 'translateZ(0)' }}>
-                  <HeroWebGLPanel />
-                </div>
+          {/* ── TEXT ── */}
+          <div className="lg:w-[42%] xl:w-[38%] flex flex-col justify-center shrink-0">
+            <HeroTitle />
+          </div>
+
+          {/* ── BROWSER FRAME + CUBES ── */}
+          <div className="lg:w-[58%] xl:w-[62%] w-full">
+            <BrowserFrame>
+              <div style={{ height: 'clamp(280px, 44vw, 620px)', position: 'relative', background: '#ffffff' }}>
+                <HeroWebGLPanel />
               </div>
-            </HeroTitle>
+            </BrowserFrame>
           </div>
         </div>
 
+        {/* Scroll cue */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
           <span
             className="text-xs tracking-[0.25em] uppercase"
-            style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-stack-heading)', letterSpacing: '0.2em' }}
+            style={{ color: 'rgba(0,0,0,0.25)', fontFamily: 'var(--font-stack-heading)', letterSpacing: '0.2em' }}
           >
-            scroll to explore
+            scroll
           </span>
           <svg
             className="w-4 h-4"
@@ -173,7 +163,7 @@ function AppContent() {
             stroke="currentColor"
             strokeWidth={1.5}
             viewBox="0 0 24 24"
-            style={{ color: 'rgba(255,255,255,0.25)' }}
+            style={{ color: 'rgba(0,0,0,0.18)' }}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>

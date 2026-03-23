@@ -174,7 +174,7 @@ export function HeroWebGLPanel() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 0, 36);
+    camera.position.set(0, 0, 12);
 
     const mobile = isMobileDevice();
     const maxDpr = mobile ? 1 : Math.min(window.devicePixelRatio, 1.5);

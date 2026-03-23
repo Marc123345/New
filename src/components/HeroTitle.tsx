@@ -2,7 +2,90 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { HologramOverlay } from './HologramOverlay';
 
-function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outline'; children: React.ReactNode; onClick?: () => void }) {
+const LINES = [
+  ['We', 'help', 'brands'],
+  ['become', 'truly'],
+  ['unforgettable.'],
+];
+
+function WordReveal() {
+  let globalIndex = 0;
+  return (
+    <h1
+      style={{
+        fontFamily: "'Aeonik', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontSize: '2.5vw',
+        fontWeight: 400,
+        lineHeight: 1.1,
+        color: '#000',
+        margin: 0,
+        letterSpacing: '-0.01em',
+      }}
+    >
+      {LINES.map((words, li) => (
+        <div
+          key={li}
+          style={{
+            display: 'block',
+            overflow: 'hidden',
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {words.map((word, wi) => {
+            const delay = (globalIndex++ ) * 0.06 + 0.1;
+            return (
+              <React.Fragment key={wi}>
+                <motion.span
+                  style={{
+                    display: 'inline-block',
+                    position: 'relative',
+                    top: '-0.1em',
+                    transformOrigin: 'bottom left',
+                  }}
+                  initial={{ y: '1.5em', rotate: 15 }}
+                  animate={{ y: 0, rotate: 0 }}
+                  transition={{
+                    duration: 0.85,
+                    delay,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  {word}
+                </motion.span>
+                {wi < words.length - 1 && (
+                  <span style={{ display: 'inline-block', width: '0.3em' }} />
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      ))}
+
+      <style>{`
+        @media (max-width: 812px) {
+          .hero-wordreveal { font-size: 6vw !important; }
+        }
+        @media (max-width: 380px) {
+          .hero-wordreveal { font-size: 7vw !important; }
+        }
+        @media (min-aspect-ratio: 21/9) {
+          .hero-wordreveal { font-size: 1.7vw !important; }
+        }
+      `}</style>
+    </h1>
+  );
+}
+
+function HeroButton({
+  variant,
+  children,
+  onClick,
+}: {
+  variant: 'primary' | 'outline';
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
   const isPrimary = variant === 'primary';
   const [hovered, setHovered] = React.useState(false);
 
@@ -13,16 +96,14 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
       onMouseLeave={() => setHovered(false)}
       className="inline-block px-5 py-3 sm:px-8 sm:py-4 border-2 cursor-pointer uppercase"
       style={{
-        fontFamily: 'var(--font-stack-heading)',
-        fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
+        fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
+        fontSize: 'clamp(0.62rem, 1.3vw, 0.72rem)',
         letterSpacing: '0.15em',
-        background: isPrimary ? '#fbfbfc' : 'transparent',
-        color: isPrimary ? '#291e56' : '#fbfbfc',
-        borderColor: '#fbfbfc',
-        boxShadow: hovered
-          ? `6px 6px 0 #a46cfc`
-          : `4px 4px 0 rgba(164,108,252,0.7)`,
-        transform: hovered ? 'translate(-2px, -2px)' : 'translate(0, 0)',
+        background: isPrimary ? '#0a0a0a' : 'transparent',
+        color: isPrimary ? '#fff' : '#0a0a0a',
+        borderColor: '#0a0a0a',
+        boxShadow: hovered ? `4px 4px 0 #a46cfc` : `3px 3px 0 rgba(0,0,0,0.15)`,
+        transform: hovered ? 'translate(-1px, -1px)' : 'translate(0,0)',
         transition: 'box-shadow 0.18s ease, transform 0.18s ease',
       }}
     >
@@ -31,82 +112,45 @@ function HeroButton({ variant, children, onClick }: { variant: 'primary' | 'outl
   );
 }
 
-export function HeroTitle({ children }: { children?: React.ReactNode }) {
+export function HeroTitle() {
   const [videoOpen, setVideoOpen] = useState(false);
   const [hologramOpen, setHologramOpen] = useState(false);
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
-  };
-
   return (
-    <div className="flex flex-col gap-8 lg:gap-12">
-      <div>
-        <header>
-          <motion.h1
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.05 }}
-            style={{
-              fontSize: 'clamp(2.2rem, 7vw, 5rem)',
-              lineHeight: 1.08,
-              letterSpacing: '-0.03em',
-              fontFamily: 'var(--font-stack-heading)',
-              color: '#ffffff',
-              marginBottom: 'var(--space-6x)',
-              textShadow: '0 2px 20px rgba(0,0,0,0.5)',
-            }}
-          >
-            From <span className="outline-text">Business2Business</span>
-            <br className="hidden sm:block" />
-            {' '}to <span className="outline-text">Human2Human</span>
-            <br className="hidden sm:block" />
-            {' '}Build a Brand People
-            <br className="hidden sm:block" />
-            {' '}Want to Talk To
-          </motion.h1>
+    <div className="flex flex-col gap-8 lg:gap-10">
+      <WordReveal />
 
-          <motion.p
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.2 }}
-            className="text-base sm:text-xl md:text-2xl"
-            style={{
-              color: 'rgba(255,255,255,0.85)',
-              lineHeight: 1.6,
-              maxWidth: '36rem',
-              marginBottom: 'var(--space-6x)',
-              textShadow: '0 1px 10px rgba(0,0,0,0.4)',
-            }}
-          >
-            People don't only want to connect with brands anymore,
-            they connect with the people behind them.
-          </motion.p>
+      <motion.p
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
+          fontSize: 'clamp(0.85rem, 1.3vw, 1.05rem)',
+          color: 'rgba(0,0,0,0.45)',
+          lineHeight: 1.6,
+          maxWidth: '30rem',
+          margin: 0,
+        }}
+      >
+        A social-first agency helping African brands grow through
+        human connection, strategic storytelling, and award-winning
+        digital experiences.
+      </motion.p>
 
-          <motion.div
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.35 }}
-            className="flex flex-wrap gap-4"
-          >
-            <HeroButton variant="primary" onClick={() => setVideoOpen(true)}>
-              Hear Our Story
-            </HeroButton>
-            <HeroButton variant="outline" onClick={() => setHologramOpen(true)}>
-              Meet the Founder
-            </HeroButton>
-          </motion.div>
-        </header>
-      </div>
-
-      {children && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.4 }}
-        >
-          {children}
-        </motion.div>
-      )}
+      <motion.div
+        className="flex flex-wrap gap-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <HeroButton variant="primary" onClick={() => setVideoOpen(true)}>
+          Hear Our Story
+        </HeroButton>
+        <HeroButton variant="outline" onClick={() => setHologramOpen(true)}>
+          Meet the Founder
+        </HeroButton>
+      </motion.div>
 
       <HologramOverlay
         isOpen={videoOpen}
@@ -114,41 +158,10 @@ export function HeroTitle({ children }: { children?: React.ReactNode }) {
         title="Hear Our Story"
         videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
       />
-
       <HologramOverlay
         isOpen={hologramOpen}
         onClose={() => setHologramOpen(false)}
       />
-
-      <style>{`
-        @keyframes waveFlow {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 200% 50%; }
-        }
-        @keyframes glowPulse {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.3)); }
-          50% { filter: drop-shadow(0 0 18px rgba(139,92,246,0.6)) drop-shadow(0 0 40px rgba(124,58,237,0.2)); }
-        }
-        .outline-text {
-          position: relative;
-          -webkit-text-stroke: 1.5px rgba(255,255,255,0.12);
-          background: linear-gradient(
-            110deg,
-            rgba(139,92,246,0.6) 0%,
-            #a78bfa 20%,
-            #e0d4ff 35%,
-            #c4b5fd 50%,
-            #8b5cf6 65%,
-            #a78bfa 80%,
-            rgba(139,92,246,0.6) 100%
-          );
-          background-size: 200% 100%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          animation: waveFlow 6s linear infinite, glowPulse 3s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

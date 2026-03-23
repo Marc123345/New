@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useState, useCallback } from "react";
+import { motion } from "motion/react";
 import { Loader } from "./components/Loader";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
@@ -28,59 +29,6 @@ const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
 );
 
-function BrowserFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        borderRadius: 10,
-        overflow: 'hidden',
-        border: '1px solid rgba(0,0,0,0.1)',
-        boxShadow: '0 32px 80px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.07)',
-      }}
-    >
-      {/* Browser chrome bar */}
-      <div
-        style={{
-          height: 42,
-          background: '#f0eff0',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          paddingLeft: 14,
-          gap: 7,
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57', flexShrink: 0 }} />
-        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#febc2e', flexShrink: 0 }} />
-        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840', flexShrink: 0 }} />
-        <div
-          style={{
-            flex: 1,
-            marginLeft: 10,
-            marginRight: 14,
-            height: 22,
-            background: '#fff',
-            borderRadius: 5,
-            border: '1px solid rgba(0,0,0,0.08)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 11,
-            fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-            color: '#999',
-            letterSpacing: '0.01em',
-            userSelect: 'none',
-          }}
-        >
-          h2h.social
-        </div>
-      </div>
-      {/* Canvas content */}
-      {children}
-    </div>
-  );
-}
 
 const SECTION_PADDING: React.CSSProperties = {
   paddingTop: 'var(--space-8x)',

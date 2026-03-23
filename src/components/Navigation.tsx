@@ -22,6 +22,7 @@ export function Navigation() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -37,6 +38,7 @@ export function Navigation() {
       rafId = requestAnimationFrame(() => {
         rafId = 0;
         setScrolled(window.scrollY > 40);
+        setPastHero(window.scrollY > window.innerHeight * 0.85);
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -118,52 +120,105 @@ export function Navigation() {
     }
   }, [navigate, isHomePage]);
 
+  // Hero canvas is full-bleed (always dark), sections below also dark
+  const onDark = true;
+  const inkColor = onDark ? "rgba(232,226,255,0.9)" : "rgba(10,10,10,0.85)";
+  const inkColorFaint = onDark ? "rgba(232,226,255,0.45)" : "rgba(10,10,10,0.45)";
+
   return (
     <>
-      <div className="h-20 md:h-24 w-full" />
+      {!isHomePage && <div className="h-20 md:h-24 w-full" />}
 
       <header
-        className="fixed top-0 left-0 w-full z-[100] py-6 transition-all duration-500"
+        className="fixed top-0 left-0 w-full z-[100] transition-all duration-500"
         style={{
-          backgroundColor: scrolled ? "var(--color-background-light)" : "transparent",
-          borderBottom: scrolled ? "1px solid var(--color-text-dark)" : "1px solid transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
+          padding: "clamp(16px, 2.5vh, 28px) clamp(20px, 4vw, 56px)",
+          backgroundColor: scrolled
+            ? onDark
+              ? "rgba(14,11,31,0.85)"
+              : "rgba(255,255,255,0.88)"
+            : "transparent",
+          backdropFilter: scrolled ? "blur(14px)" : "none",
+          borderBottom: scrolled
+            ? onDark
+              ? "1px solid rgba(164,108,252,0.12)"
+              : "1px solid rgba(0,0,0,0.07)"
+            : "1px solid transparent",
         }}
       >
-        <div className="container mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
           <a
             href="/"
             aria-label="H2H Social Home"
             onClick={handleLogoClick}
             className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           >
-            <H2HLogo height={56} className="transition-all duration-300" />
+            <H2HLogo
+              height={44}
+              className="transition-all duration-500"
+              style={{ filter: onDark ? "none" : "invert(1)" }}
+            />
           </a>
 
-          <button
-            onClick={() => setIsOpen(true)}
-            aria-label="Open navigation"
-            aria-expanded={isOpen}
-            className={`relative z-[110] group flex items-center gap-3 transition-all duration-300 ${
+          {/* Right side: Let's Talk pill + Menu trigger */}
+          <div
+            className={`flex items-center gap-3 sm:gap-4 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
-            style={{ minWidth: 44, minHeight: 44, touchAction: "manipulation" }}
           >
-            <span
-              className="hidden sm:block text-[10px] uppercase tracking-[0.3em] font-medium transition-colors duration-500"
+            {/* Let's Talk pill */}
+            <a
+              href="#contact"
+              onClick={(e) => handleNavClick(e, "#contact")}
+              className="hidden sm:inline-flex items-center"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                color: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)",
+                fontSize: "0.65rem",
+                fontWeight: 500,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#fff",
+                background: "#0a0a0a",
+                borderRadius: 999,
+                padding: "10px 22px",
+                whiteSpace: "nowrap",
+                transition: "background 0.2s ease, transform 0.2s ease",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "var(--color-secondary)";
+                (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "#0a0a0a";
+                (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
               }}
             >
-              Menu
-            </span>
-            <div className="flex flex-col gap-[5px] w-6">
-              <span className="block h-[1.5px] w-full transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
-              <span className="block h-[1.5px] w-3/4 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
-              <span className="block h-[1.5px] w-1/2 transition-colors duration-500" style={{ backgroundColor: scrolled ? "var(--color-text-dark)" : "rgba(255,255,255,0.85)" }} />
-            </div>
-          </button>
+              Let&apos;s Talk
+            </a>
+
+            {/* Menu trigger */}
+            <button
+              onClick={() => setIsOpen(true)}
+              aria-label="Open navigation"
+              aria-expanded={isOpen}
+              className="group flex items-center gap-2.5"
+              style={{ minWidth: 44, minHeight: 44, touchAction: "manipulation" }}
+            >
+              <span
+                className="hidden sm:block text-[10px] uppercase tracking-[0.28em] font-medium transition-colors duration-400"
+                style={{ fontFamily: "var(--font-stack-heading)", color: inkColorFaint }}
+              >
+                Menu
+              </span>
+              <div className="flex flex-col gap-[5px] w-5">
+                <span className="block h-[1.5px] w-full transition-colors duration-400" style={{ backgroundColor: inkColor }} />
+                <span className="block h-[1.5px] w-3/4 transition-colors duration-400" style={{ backgroundColor: inkColor }} />
+                <span className="block h-[1.5px] w-1/2 transition-colors duration-400" style={{ backgroundColor: inkColor }} />
+              </div>
+            </button>
+          </div>
         </div>
       </header>
 

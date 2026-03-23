@@ -11,7 +11,8 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HeroWebGLPanel } from "./components/HeroWebGLPanel";
+import { HeroCubes } from "./components/HeroCubes";
+import UnicornScene from "unicornstudio-react";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -75,19 +76,30 @@ function AppContent() {
 
       <section
         id="hero"
-        className="relative overflow-hidden"
-        style={{ height: '100vh', background: '#ffffff' }}
+        style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}
       >
-        {/* ── FULL-VIEWPORT CANVAS ── */}
+        {/* ── FULL-BLEED UNICORN CANVAS ── */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <HeroWebGLPanel />
+          <UnicornScene
+            projectId="KI3a4DfsuWahvGReo6hr"
+            width="100%"
+            height="100%"
+            scale={1}
+            dpi={1.5}
+            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+          />
         </div>
 
-        {/* ── TEXT OVERLAY — bottom-left, lusion-style ── */}
+        {/* ── SPHERES — transparent overlay ── */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+          <HeroCubes />
+        </div>
+
+        {/* ── TEXT — bottom-left, lusion-style ── */}
         <div
           style={{
             position: 'absolute',
-            bottom: 'clamp(40px, 6vh, 88px)',
+            bottom: 'clamp(40px, 7vh, 96px)',
             left: 'clamp(24px, 5vw, 80px)',
             zIndex: 10,
           }}
@@ -96,26 +108,19 @@ function AppContent() {
         </div>
 
         {/* ── SCROLL CUE ── */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+        <motion.div
+          className="absolute left-1/2 -translate-x-1/2 z-20"
           style={{ bottom: 28 }}
+          animate={{ y: [0, 5, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
         >
-          <motion.div
-            animate={{ y: [0, 5, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <svg
-              width="14" height="22"
-              viewBox="0 0 14 22"
-              fill="none"
-              style={{ color: 'rgba(0,0,0,0.18)' }}
-            >
-              <rect x="1" y="1" width="12" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
-              <rect x="6" y="5" width="2" height="4" rx="1" fill="currentColor" />
-            </svg>
-          </motion.div>
-        </div>
+          <svg width="14" height="22" viewBox="0 0 14 22" fill="none"
+            style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <rect x="1" y="1" width="12" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
+            <rect x="6" y="5" width="2" height="4" rx="1" fill="currentColor" />
+          </svg>
+        </motion.div>
       </section>
 
       <HeroStory />

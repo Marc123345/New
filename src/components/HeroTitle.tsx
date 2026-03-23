@@ -18,7 +18,7 @@ function WordReveal() {
         fontSize: '3.8vw',
         fontWeight: 400,
         lineHeight: 1.08,
-        color: '#000',
+        color: '#ffffff',
         margin: 0,
         letterSpacing: '-0.02em',
       }}
@@ -64,6 +64,9 @@ function WordReveal() {
       ))}
 
       <style>{`
+        @media (max-width: 1280px) {
+          .hero-wordreveal { font-size: 4.4vw !important; }
+        }
         @media (max-width: 1024px) {
           .hero-wordreveal { font-size: 5.5vw !important; }
         }
@@ -74,7 +77,7 @@ function WordReveal() {
           .hero-wordreveal { font-size: 9vw !important; }
         }
         @media (min-aspect-ratio: 21/9) {
-          .hero-wordreveal { font-size: 2.6vw !important; }
+          .hero-wordreveal { font-size: 2.8vw !important; }
         }
       `}</style>
     </h1>
@@ -103,10 +106,10 @@ function HeroButton({
         fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
         fontSize: 'clamp(0.62rem, 1.3vw, 0.72rem)',
         letterSpacing: '0.15em',
-        background: isPrimary ? '#0a0a0a' : 'transparent',
-        color: isPrimary ? '#fff' : '#0a0a0a',
-        borderColor: '#0a0a0a',
-        boxShadow: hovered ? `4px 4px 0 #a46cfc` : `3px 3px 0 rgba(0,0,0,0.15)`,
+        background: isPrimary ? '#ffffff' : 'transparent',
+        color: isPrimary ? '#0a0a0a' : '#ffffff',
+        borderColor: '#ffffff',
+        boxShadow: hovered ? `4px 4px 0 #a46cfc` : `3px 3px 0 rgba(255,255,255,0.15)`,
         transform: hovered ? 'translate(-1px, -1px)' : 'translate(0,0)',
         transition: 'box-shadow 0.18s ease, transform 0.18s ease',
       }}

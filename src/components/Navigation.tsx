@@ -120,8 +120,8 @@ export function Navigation() {
     }
   }, [navigate, isHomePage]);
 
-  // Hero canvas is full-bleed (always dark), sections below also dark
-  const onDark = true;
+  // Hero is white; after scrolling past it everything is dark
+  const onDark = isHomePage ? pastHero : true;
   const inkColor = onDark ? "rgba(232,226,255,0.9)" : "rgba(10,10,10,0.85)";
   const inkColorFaint = onDark ? "rgba(232,226,255,0.45)" : "rgba(10,10,10,0.45)";
 

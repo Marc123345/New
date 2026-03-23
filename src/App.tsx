@@ -74,53 +74,66 @@ function AppContent() {
       <Navigation />
       <ScrollProgress />
 
+      {/* ═══ HERO — Lusion-style: white page, headline above rounded canvas ═══ */}
       <section
         id="hero"
-        style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}
+        style={{
+          minHeight: '100vh',
+          background: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
+          paddingTop: 'clamp(80px, 11vh, 120px)',   /* clears floating nav */
+          paddingBottom: 'clamp(24px, 4vh, 40px)',
+        }}
       >
-        {/* ── FULL-BLEED UNICORN CANVAS ── */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <UnicornScene
-            projectId="KI3a4DfsuWahvGReo6hr"
-            width="100%"
-            height="100%"
-            scale={1}
-            dpi={1.5}
-            sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
-          />
-        </div>
-
-        {/* ── SPHERES — transparent overlay ── */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-          <HeroCubes />
-        </div>
-
-        {/* ── TEXT — bottom-left, lusion-style ── */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 'clamp(40px, 7vh, 96px)',
-            left: 'clamp(24px, 5vw, 80px)',
-            zIndex: 10,
-          }}
-        >
+        {/* ── HEADLINE above the canvas ── */}
+        <div style={{ padding: '0 clamp(24px, 5vw, 64px)', marginBottom: 'clamp(16px, 3vh, 28px)' }}>
           <HeroTitle />
         </div>
 
-        {/* ── SCROLL CUE ── */}
-        <motion.div
-          className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ bottom: 28 }}
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          aria-hidden="true"
+        {/* ── ROUNDED CANVAS — fills the remaining viewport height ── */}
+        <div
+          style={{
+            flex: 1,
+            margin: '0 clamp(12px, 2.5vw, 32px)',
+            borderRadius: 'clamp(16px, 2vw, 24px)',
+            overflow: 'hidden',
+            position: 'relative',
+            minHeight: 'clamp(300px, 58vh, 700px)',
+          }}
         >
-          <svg width="14" height="22" viewBox="0 0 14 22" fill="none"
-            style={{ color: 'rgba(255,255,255,0.5)' }}>
-            <rect x="1" y="1" width="12" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="6" y="5" width="2" height="4" rx="1" fill="currentColor" />
-          </svg>
-        </motion.div>
+          {/* UnicornScene background */}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <UnicornScene
+              projectId="KI3a4DfsuWahvGReo6hr"
+              width="100%"
+              height="100%"
+              scale={1}
+              dpi={1.5}
+              sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+            />
+          </div>
+
+          {/* Spheres float on top */}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+            <HeroCubes />
+          </div>
+        </div>
+
+        {/* ── SCROLL CUE ── */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 'clamp(12px, 2vh, 20px)' }}>
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            aria-hidden="true"
+          >
+            <svg width="14" height="22" viewBox="0 0 14 22" fill="none"
+              style={{ color: 'rgba(0,0,0,0.22)' }}>
+              <rect x="1" y="1" width="12" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="6" y="5" width="2" height="4" rx="1" fill="currentColor" />
+            </svg>
+          </motion.div>
+        </div>
       </section>
 
       <HeroStory />

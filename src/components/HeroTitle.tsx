@@ -15,26 +15,21 @@ function WordReveal() {
       className="hero-wordreveal"
       style={{
         fontFamily: "'Aeonik', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        fontSize: '3.8vw',
-        fontWeight: 400,
-        lineHeight: 1.08,
-        color: '#ffffff',
+        fontSize: '3.4vw',
+        fontWeight: 300,
+        lineHeight: 1.1,
+        color: '#0a0a0a',
         margin: 0,
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.01em',
       }}
     >
       {LINES.map((words, li) => (
         <div
           key={li}
-          style={{
-            display: 'block',
-            overflow: 'hidden',
-            width: '100%',
-            position: 'relative',
-          }}
+          style={{ display: 'block', overflow: 'hidden', position: 'relative' }}
         >
           {words.map((word, wi) => {
-            const delay = (globalIndex++ ) * 0.06 + 0.1;
+            const delay = (globalIndex++) * 0.06 + 0.1;
             return (
               <React.Fragment key={wi}>
                 <motion.span
@@ -44,18 +39,14 @@ function WordReveal() {
                     top: '-0.1em',
                     transformOrigin: 'bottom left',
                   }}
-                  initial={{ y: '1.5em', rotate: 15 }}
+                  initial={{ y: '1.5em', rotate: 12 }}
                   animate={{ y: 0, rotate: 0 }}
-                  transition={{
-                    duration: 0.85,
-                    delay,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
+                  transition={{ duration: 0.85, delay, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {word}
                 </motion.span>
                 {wi < words.length - 1 && (
-                  <span style={{ display: 'inline-block', width: '0.3em' }} />
+                  <span style={{ display: 'inline-block', width: '0.28em' }} />
                 )}
               </React.Fragment>
             );
@@ -64,30 +55,18 @@ function WordReveal() {
       ))}
 
       <style>{`
-        @media (max-width: 1280px) {
-          .hero-wordreveal { font-size: 4.4vw !important; }
-        }
-        @media (max-width: 1024px) {
-          .hero-wordreveal { font-size: 5.5vw !important; }
-        }
-        @media (max-width: 812px) {
-          .hero-wordreveal { font-size: 7.5vw !important; }
-        }
-        @media (max-width: 380px) {
-          .hero-wordreveal { font-size: 9vw !important; }
-        }
-        @media (min-aspect-ratio: 21/9) {
-          .hero-wordreveal { font-size: 2.8vw !important; }
-        }
+        @media (max-width: 1280px) { .hero-wordreveal { font-size: 4.2vw !important; } }
+        @media (max-width: 1024px) { .hero-wordreveal { font-size: 5.2vw !important; } }
+        @media (max-width: 812px)  { .hero-wordreveal { font-size: 7vw !important; } }
+        @media (max-width: 480px)  { .hero-wordreveal { font-size: 8.5vw !important; } }
+        @media (min-aspect-ratio: 21/9) { .hero-wordreveal { font-size: 2.6vw !important; } }
       `}</style>
     </h1>
   );
 }
 
 function HeroButton({
-  variant,
-  children,
-  onClick,
+  variant, children, onClick,
 }: {
   variant: 'primary' | 'outline';
   children: React.ReactNode;
@@ -101,17 +80,21 @@ function HeroButton({
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="inline-block px-5 py-3 sm:px-8 sm:py-4 border-2 cursor-pointer uppercase"
+      className="inline-flex items-center cursor-pointer"
       style={{
         fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
-        fontSize: 'clamp(0.62rem, 1.3vw, 0.72rem)',
-        letterSpacing: '0.15em',
-        background: isPrimary ? '#ffffff' : 'transparent',
-        color: isPrimary ? '#0a0a0a' : '#ffffff',
-        borderColor: '#ffffff',
-        boxShadow: hovered ? `4px 4px 0 #a46cfc` : `3px 3px 0 rgba(255,255,255,0.15)`,
-        transform: hovered ? 'translate(-1px, -1px)' : 'translate(0,0)',
-        transition: 'box-shadow 0.18s ease, transform 0.18s ease',
+        fontSize: 'clamp(0.6rem, 1.1vw, 0.68rem)',
+        fontWeight: 400,
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        padding: '10px 24px',
+        borderRadius: 999,
+        border: `1.5px solid ${isPrimary ? '#0a0a0a' : 'rgba(10,10,10,0.25)'}`,
+        background: isPrimary
+          ? hovered ? '#a46cfc' : '#0a0a0a'
+          : hovered ? 'rgba(10,10,10,0.06)' : 'transparent',
+        color: isPrimary ? '#ffffff' : '#0a0a0a',
+        transition: 'background 0.22s ease, border-color 0.22s ease',
       }}
     >
       {children}
@@ -124,14 +107,32 @@ export function HeroTitle() {
   const [hologramOpen, setHologramOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-5 lg:gap-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(14px, 2.5vh, 24px)' }}>
+      {/* Eyebrow */}
+      <motion.p
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
+          fontSize: 'clamp(0.6rem, 1vw, 0.7rem)',
+          fontWeight: 400,
+          letterSpacing: '0.28em',
+          textTransform: 'uppercase',
+          color: 'rgba(10,10,10,0.4)',
+          margin: 0,
+        }}
+      >
+        Human-to-Human Brand Communication
+      </motion.p>
+
       <WordReveal />
 
       <motion.div
-        className="flex flex-wrap gap-4"
-        initial={{ opacity: 0, y: 10 }}
+        style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
       >
         <HeroButton variant="primary" onClick={() => setVideoOpen(true)}>
           Hear Our Story

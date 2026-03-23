@@ -3,23 +3,24 @@ import { motion } from 'motion/react';
 import { HologramOverlay } from './HologramOverlay';
 
 const LINES = [
-  ['We', 'help', 'brands'],
-  ['become', 'truly'],
-  ['unforgettable.'],
+  ['from', 'B2B', 'to', 'H2H'],
+  ['Build', 'a', 'Brand', 'People'],
+  ['want', 'to', 'talk', 'to.'],
 ];
 
 function WordReveal() {
   let globalIndex = 0;
   return (
     <h1
+      className="hero-wordreveal"
       style={{
         fontFamily: "'Aeonik', 'Helvetica Neue', Helvetica, Arial, sans-serif",
-        fontSize: '2.5vw',
+        fontSize: '3.8vw',
         fontWeight: 400,
-        lineHeight: 1.1,
+        lineHeight: 1.08,
         color: '#000',
         margin: 0,
-        letterSpacing: '-0.01em',
+        letterSpacing: '-0.02em',
       }}
     >
       {LINES.map((words, li) => (
@@ -63,14 +64,17 @@ function WordReveal() {
       ))}
 
       <style>{`
+        @media (max-width: 1024px) {
+          .hero-wordreveal { font-size: 5.5vw !important; }
+        }
         @media (max-width: 812px) {
-          .hero-wordreveal { font-size: 6vw !important; }
+          .hero-wordreveal { font-size: 7.5vw !important; }
         }
         @media (max-width: 380px) {
-          .hero-wordreveal { font-size: 7vw !important; }
+          .hero-wordreveal { font-size: 9vw !important; }
         }
         @media (min-aspect-ratio: 21/9) {
-          .hero-wordreveal { font-size: 1.7vw !important; }
+          .hero-wordreveal { font-size: 2.6vw !important; }
         }
       `}</style>
     </h1>
@@ -117,26 +121,8 @@ export function HeroTitle() {
   const [hologramOpen, setHologramOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-8 lg:gap-10">
+    <div className="flex flex-col gap-5 lg:gap-6">
       <WordReveal />
-
-      <motion.p
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
-          fontSize: 'clamp(0.85rem, 1.3vw, 1.05rem)',
-          color: 'rgba(0,0,0,0.45)',
-          lineHeight: 1.6,
-          maxWidth: '30rem',
-          margin: 0,
-        }}
-      >
-        A social-first agency helping African brands grow through
-        human connection, strategic storytelling, and award-winning
-        digital experiences.
-      </motion.p>
 
       <motion.div
         className="flex flex-wrap gap-4"

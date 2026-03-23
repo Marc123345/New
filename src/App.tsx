@@ -127,46 +127,46 @@ function AppContent() {
 
       <section
         id="hero"
-        className="relative min-h-screen overflow-hidden"
-        style={{ background: '#ffffff' }}
+        className="relative overflow-hidden"
+        style={{ height: '100vh', background: '#ffffff' }}
       >
-        <div
-          className="relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-16 px-6 md:px-10 lg:px-16 min-h-screen"
-          style={{ paddingTop: 'calc(var(--space-8x) + 32px)', paddingBottom: 'var(--space-8x)' }}
-        >
-          {/* ── TEXT ── */}
-          <div className="lg:w-[42%] xl:w-[38%] flex flex-col justify-center shrink-0">
-            <HeroTitle />
-          </div>
-
-          {/* ── BROWSER FRAME + CUBES ── */}
-          <div className="lg:w-[58%] xl:w-[62%] w-full">
-            <BrowserFrame>
-              <div style={{ height: 'clamp(280px, 44vw, 620px)', position: 'relative', background: '#ffffff' }}>
-                <HeroWebGLPanel />
-              </div>
-            </BrowserFrame>
-          </div>
+        {/* ── FULL-VIEWPORT CANVAS ── */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <HeroWebGLPanel />
         </div>
 
-        {/* Scroll cue */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 animate-bounce" aria-hidden="true">
-          <span
-            className="text-xs tracking-[0.25em] uppercase"
-            style={{ color: 'rgba(0,0,0,0.25)', fontFamily: 'var(--font-stack-heading)', letterSpacing: '0.2em' }}
+        {/* ── TEXT OVERLAY — bottom-left, lusion-style ── */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 'clamp(40px, 6vh, 88px)',
+            left: 'clamp(24px, 5vw, 80px)',
+            zIndex: 10,
+          }}
+        >
+          <HeroTitle />
+        </div>
+
+        {/* ── SCROLL CUE ── */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+          style={{ bottom: 28 }}
+          aria-hidden="true"
+        >
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           >
-            scroll
-          </span>
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            viewBox="0 0 24 24"
-            style={{ color: 'rgba(0,0,0,0.18)' }}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
+            <svg
+              width="14" height="22"
+              viewBox="0 0 14 22"
+              fill="none"
+              style={{ color: 'rgba(0,0,0,0.18)' }}
+            >
+              <rect x="1" y="1" width="12" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="6" y="5" width="2" height="4" rx="1" fill="currentColor" />
+            </svg>
+          </motion.div>
         </div>
       </section>
 

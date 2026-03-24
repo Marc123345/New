@@ -2,11 +2,10 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import tailwindcss from '@tailwindcss/vite';
-  import wasm from 'vite-plugin-wasm';
   import path from 'path';
 
   export default defineConfig({
-    plugins: [tailwindcss(), react(), wasm()],
+    plugins: [tailwindcss(), react()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -50,9 +49,6 @@
         '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
         '@': path.resolve(__dirname, './src'),
       },
-    },
-    optimizeDeps: {
-      exclude: ['@react-three/rapier', '@dimforge/rapier3d-compat'],
     },
     build: {
       target: 'esnext',

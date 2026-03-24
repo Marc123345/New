@@ -11,7 +11,6 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HeroCubes } from "./components/HeroCubes";
 import UnicornScene from "unicornstudio-react";
 
 const AboutStory = lazy(() =>
@@ -105,19 +104,16 @@ function AppContent() {
           {/* UnicornScene background */}
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
             <UnicornScene
-              projectId="KI3a4DfsuWahvGReo6hr"
+              projectId="US9XVS5BHKCmCNH60lQg"
               width="100%"
               height="100%"
               scale={1}
               dpi={1.5}
-              sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.4/dist/unicornStudio.umd.js"
+              sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.5/dist/unicornStudio.umd.js"
             />
           </div>
 
-          {/* Spheres float on top */}
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-            <HeroCubes />
-          </div>
+
         </div>
 
         {/* ── SCROLL CUE ── */}

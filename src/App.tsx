@@ -112,6 +112,99 @@ function AppContent() {
             </ErrorBoundary>
           </div>
 
+          {/* ── Overlay nav — label + caption + action buttons ── */}
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 10,
+            display: 'flex', flexDirection: 'column',
+            justifyContent: 'space-between',
+            padding: 'clamp(16px, 2.5vw, 28px)',
+            pointerEvents: 'none',
+          }}>
+            {/* Top row */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.5)',
+                  margin: 0,
+                }}>
+                  Human to Human
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.25)',
+                  margin: '4px 0 0',
+                }}>
+                  Social Strategy
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 8, pointerEvents: 'auto' }}>
+                <a href="#ecosystem" style={{ textDecoration: 'none' }}>
+                  <div style={{
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: 'clamp(0.5rem, 0.85vw, 0.6rem)',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: '#ffffff',
+                    padding: '8px 16px',
+                    borderRadius: 999,
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(8px)',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    Our Services
+                  </div>
+                </a>
+                <div style={{
+                  fontFamily: 'var(--font-stack-heading)',
+                  fontSize: 'clamp(0.5rem, 0.85vw, 0.6rem)',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.4)',
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  background: 'rgba(255,255,255,0.04)',
+                }}>
+                  ///
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom row */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+              <p style={{
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.3)',
+                margin: 0,
+              }}>
+                Click to cycle colours
+              </p>
+              <p style={{
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.3)',
+                margin: 0,
+                textAlign: 'right',
+              }}>
+                Interactive
+              </p>
+            </div>
+          </div>
+
 
         </div>
 

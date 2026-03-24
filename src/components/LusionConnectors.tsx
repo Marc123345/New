@@ -2,7 +2,7 @@
 
 import { useRef, useReducer, useMemo, Suspense } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
+import { MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
 import { EffectComposer, N8AO } from '@react-three/postprocessing'
 import { easing } from 'maath'
 import * as THREE from 'three'
@@ -35,13 +35,13 @@ function Model({
   roughness?: number
 }) {
   const ref = useRef<THREE.Mesh>(null!)
-  const { nodes, materials } = useGLTF('/c-transformed.glb') as any
   useFrame((_state, delta) => {
     easing.dampC(ref.current.material.color, color, 0.2, delta)
   })
   return (
-    <mesh ref={ref} castShadow receiveShadow scale={10} geometry={nodes.connector.geometry}>
-      <meshStandardMaterial metalness={0.2} roughness={roughness} map={materials.base.map} />
+    <mesh ref={ref} castShadow receiveShadow>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial metalness={0.2} roughness={roughness} />
       {children}
     </mesh>
   )
@@ -200,4 +200,3 @@ export function LusionConnectors() {
   )
 }
 
-useGLTF.preload('/c-transformed.glb')

@@ -1,14 +1,11 @@
-// Lusion.co connector demo — exact source, rapier physics
-// https://twitter.com/lusionltd/status/1701534187545636964
+// Lusion.co connector demo — GLB models, pure-JS physics (no WASM)
 
-import { useRef, useReducer, useMemo, useState, useEffect, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useReducer, useMemo, Suspense } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
-import { CuboidCollider, BallCollider, Physics, RigidBody } from '@react-three/rapier'
 import { EffectComposer, N8AO } from '@react-three/postprocessing'
 import { easing } from 'maath'
 import * as THREE from 'three'
-import { init as initRapier } from '@dimforge/rapier3d-compat'
 
 // ─── H2H accent colors ────────────────────────────────────────────────────────
 
@@ -25,18 +22,6 @@ const shuffle = (accent = 0) => [
   { color: accents[accent], roughness: 0.75, accent: true },
   { color: accents[accent], roughness: 0.1, accent: true },
 ]
-
-// ─── Rapier pre-initializer ───────────────────────────────────────────────────
-// rapier.es.js ships with import.meta.url deleted — we must pass the WASM URL
-// explicitly so fetch() can load it from /public.
-
-function useRapierReady() {
-  const [ready, setReady] = useState(false)
-  useEffect(() => {
-    initRapier('/rapier_wasm3d_bg.wasm').then(() => setReady(true))
-  }, [])
-  return ready
-}
 
 // ─── GLB connector model ──────────────────────────────────────────────────────
 
@@ -62,87 +47,126 @@ function Model({
   )
 }
 
-// ─── Connector rigid body ─────────────────────────────────────────────────────
+// ─── Mouse world position tracker ────────────────────────────────────────────
 
-function Connector({
-  position,
-  children,
-  vec = new THREE.Vector3(),
-  accent,
-  color = 'white',
-  roughness = 0,
-}: {
-  position?: [number, number, number]
-  children?: React.ReactNode
-  vec?: THREE.Vector3
-  accent?: boolean
-  color?: string
-  roughness?: number
-}) {
-  const api = useRef<any>(null)
-  const r = THREE.MathUtils.randFloatSpread
-  const pos = useMemo<[number, number, number]>(() => position ?? [r(10), r(10), r(10)], []) // eslint-disable-line
-  useFrame((_state, delta) => {
-    delta = Math.min(0.1, delta)
-    api.current?.applyImpulse(vec.copy(api.current.translation()).negate().multiplyScalar(0.2))
-  })
-  return (
-    <RigidBody linearDamping={4} angularDamping={1} friction={0.1} position={pos} ref={api} colliders={false}>
-      <CuboidCollider args={[0.38, 1.27, 0.38]} />
-      <CuboidCollider args={[1.27, 0.38, 0.38]} />
-      <CuboidCollider args={[0.38, 0.38, 1.27]} />
-      {children ?? <Model color={color} roughness={roughness} />}
-      {accent && <pointLight intensity={4} distance={2.5} color={color} />}
-    </RigidBody>
-  )
-}
-
-// ─── Kinematic mouse pointer ──────────────────────────────────────────────────
-
-function Pointer({ vec = new THREE.Vector3() }) {
-  const ref = useRef<any>(null)
-  useFrame(({ mouse, viewport }) => {
-    ref.current?.setNextKinematicTranslation(
-      vec.set((mouse.x * viewport.width) / 2, (mouse.y * viewport.height) / 2, 0),
+function MouseTracker({ target }: { target: React.MutableRefObject<THREE.Vector3> }) {
+  const { viewport } = useThree()
+  useFrame(({ mouse }) => {
+    target.current.set(
+      (mouse.x * viewport.width) / 2,
+      (mouse.y * viewport.height) / 2,
+      0,
     )
   })
+  return null
+}
+
+// ─── Single connector (pure-JS physics) ──────────────────────────────────────
+
+function Connector({
+  color = 'white',
+  roughness = 0,
+  accent = false,
+  glass = false,
+  mouse,
+}: {
+  color?: string
+  roughness?: number
+  accent?: boolean
+  glass?: boolean
+  mouse: React.MutableRefObject<THREE.Vector3>
+}) {
+  const group = useRef<THREE.Group>(null!)
+  const r = THREE.MathUtils.randFloatSpread
+
+  // stable per-instance state
+  const state = useMemo(() => ({
+    pos: new THREE.Vector3(r(8), r(8), r(3)),
+    vel: new THREE.Vector3((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 1),
+    rot: new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2),
+    rotV: new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 0.5),
+  }), []) // eslint-disable-line
+
+  useFrame((_s, dt) => {
+    const d = Math.min(dt, 0.05)
+    const { pos, vel, rot, rotV } = state
+
+    // centre-seeking (zero gravity feel)
+    vel.addScaledVector(pos, -0.15 * d * 60)
+    // linear damping
+    vel.multiplyScalar(Math.pow(0.985, d * 60))
+
+    // mouse repulsion
+    const mx = pos.x - mouse.current.x
+    const my = pos.y - mouse.current.y
+    const md = Math.sqrt(mx * mx + my * my)
+    if (md < 2.0 && md > 0.001) {
+      const f = (2.0 - md) * 4.0
+      vel.x += (mx / md) * f * d
+      vel.y += (my / md) * f * d
+    }
+
+    pos.addScaledVector(vel, d)
+
+    // soft wall bounce
+    const WALL = 5.5
+    if (Math.abs(pos.x) > WALL) { vel.x *= -0.65; pos.x = Math.sign(pos.x) * WALL }
+    if (Math.abs(pos.y) > WALL) { vel.y *= -0.65; pos.y = Math.sign(pos.y) * WALL }
+    if (Math.abs(pos.z) > 2.5)  { vel.z *= -0.65; pos.z = Math.sign(pos.z) * 2.5 }
+
+    // tumble
+    rot.x += rotV.x * d * 0.6
+    rot.y += rotV.y * d * 0.6
+    rot.z += rotV.z * d * 0.3
+
+    group.current.position.copy(pos)
+    group.current.rotation.copy(rot)
+  })
+
   return (
-    <RigidBody position={[0, 0, 0]} type="kinematicPosition" colliders={false} ref={ref}>
-      <BallCollider args={[1]} />
-    </RigidBody>
+    <group ref={group}>
+      {glass ? (
+        <Model roughness={roughness} color={color}>
+          <MeshTransmissionMaterial
+            clearcoat={1}
+            thickness={0.1}
+            anisotropicBlur={0.1}
+            chromaticAberration={0.1}
+            samples={8}
+            resolution={512}
+          />
+        </Model>
+      ) : (
+        <Model color={color} roughness={roughness} />
+      )}
+      {accent && <pointLight intensity={4} distance={2.5} color={color} />}
+    </group>
   )
 }
 
-// ─── Scene (only rendered after rapier WASM is ready) ────────────────────────
+// ─── Scene ────────────────────────────────────────────────────────────────────
 
 function Scene({ accent }: { accent: number }) {
+  const mouse = useRef(new THREE.Vector3())
   const connectors = useMemo(() => shuffle(accent), [accent])
+
   return (
     <>
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-      <Physics gravity={[0, 0, 0]}>
-        <Pointer />
-        {connectors.map((props, i) => (
-          <Connector key={i} {...props} />
-        ))}
-        <Connector position={[10, 10, 5]}>
-          <Model>
-            <MeshTransmissionMaterial
-              clearcoat={1}
-              thickness={0.1}
-              anisotropicBlur={0.1}
-              chromaticAberration={0.1}
-              samples={8}
-              resolution={512}
-            />
-          </Model>
-        </Connector>
-      </Physics>
+      <MouseTracker target={mouse} />
+
+      {connectors.map((props, i) => (
+        <Connector key={i} {...props} mouse={mouse} />
+      ))}
+      {/* Glass connector — fixed spawn off-screen, drifts in */}
+      <Connector glass roughness={0} color="white" mouse={mouse} />
+
       <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
       </EffectComposer>
+
       <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
@@ -159,7 +183,6 @@ function Scene({ accent }: { accent: number }) {
 
 export function LusionConnectors() {
   const [accent, click] = useReducer((s: number) => (s + 1) % accents.length, 0)
-  const rapierReady = useRapierReady()
 
   return (
     <Canvas
@@ -170,11 +193,9 @@ export function LusionConnectors() {
       camera={{ position: [0, 0, 15], fov: 17.5, near: 1, far: 20 }}
       style={{ width: '100%', height: '100%' }}
     >
-      {rapierReady && (
-        <Suspense fallback={null}>
-          <Scene accent={accent} />
-        </Suspense>
-      )}
+      <Suspense fallback={null}>
+        <Scene accent={accent} />
+      </Suspense>
     </Canvas>
   )
 }

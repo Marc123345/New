@@ -155,7 +155,7 @@ export function Navigation() {
             className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
           >
             <H2HLogo
-              height={44}
+              height={64}
               className="transition-all duration-500"
               onDark={onDark}
             />

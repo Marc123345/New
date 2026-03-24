@@ -1,11 +1,16 @@
-import { useRef, useMemo, useReducer, Suspense } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Environment, Lightformer, MeshTransmissionMaterial, useGLTF } from '@react-three/drei'
-import { EffectComposer, N8AO } from '@react-three/postprocessing'
-import * as THREE from 'three'
-import * as easing from 'maath/easing'
+// Lusion.co connector demo — exact source, rapier physics
+// https://twitter.com/lusionltd/status/1701534187545636964
 
-// ─── H2H accent color palette (purple tones) ───────────────────────────────
+import { useRef, useReducer, useMemo, useState, useEffect, Suspense } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useGLTF, MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
+import { CuboidCollider, BallCollider, Physics, RigidBody } from '@react-three/rapier'
+import { EffectComposer, N8AO } from '@react-three/postprocessing'
+import { easing } from 'maath'
+import * as THREE from 'three'
+import { init as initRapier } from '@dimforge/rapier3d-compat'
+
+// ─── H2H accent colors ────────────────────────────────────────────────────────
 
 const accents = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea']
 
@@ -21,9 +26,25 @@ const shuffle = (accent = 0) => [
   { color: accents[accent], roughness: 0.1, accent: true },
 ]
 
-// ─── GLB connector model ────────────────────────────────────────────────────
+// ─── Rapier pre-initializer ───────────────────────────────────────────────────
+// rapier.es.js ships with import.meta.url deleted — we must pass the WASM URL
+// explicitly so fetch() can load it from /public.
 
-function Model({ children, color = 'white', roughness = 0 }: {
+function useRapierReady() {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    initRapier('/rapier_wasm3d_bg.wasm').then(() => setReady(true))
+  }, [])
+  return ready
+}
+
+// ─── GLB connector model ──────────────────────────────────────────────────────
+
+function Model({
+  children,
+  color = 'white',
+  roughness = 0,
+}: {
   children?: React.ReactNode
   color?: string
   roughness?: number
@@ -41,122 +62,72 @@ function Model({ children, color = 'white', roughness = 0 }: {
   )
 }
 
-// ─── Physics connector (pure JS, no WASM) ───────────────────────────────────
-
-const BOX = 5 // half-extent of bounding box
+// ─── Connector rigid body ─────────────────────────────────────────────────────
 
 function Connector({
+  position,
+  children,
+  vec = new THREE.Vector3(),
+  accent,
   color = 'white',
   roughness = 0,
-  accent = false,
-  children,
-  mouseWorld,
 }: {
+  position?: [number, number, number]
+  children?: React.ReactNode
+  vec?: THREE.Vector3
+  accent?: boolean
   color?: string
   roughness?: number
-  accent?: boolean
-  children?: React.ReactNode
-  mouseWorld: React.RefObject<THREE.Vector3>
 }) {
-  const groupRef = useRef<THREE.Group>(null!)
+  const api = useRef<any>(null)
   const r = THREE.MathUtils.randFloatSpread
-  const pos = useMemo<THREE.Vector3>(() => new THREE.Vector3(r(6), r(6), r(4)), [])
-  const vel = useMemo<THREE.Vector3>(() => new THREE.Vector3(
-    (Math.random() - 0.5) * 3,
-    (Math.random() - 0.5) * 3,
-    (Math.random() - 0.5) * 1.5
-  ), [])
-  const rot = useMemo<THREE.Euler>(() => new THREE.Euler(
-    Math.random() * Math.PI,
-    Math.random() * Math.PI,
-    Math.random() * Math.PI
-  ), [])
-  const rotVel = useMemo<THREE.Vector3>(() => new THREE.Vector3(
-    (Math.random() - 0.5) * 1.5,
-    (Math.random() - 0.5) * 1.5,
-    (Math.random() - 0.5) * 1.5
-  ), [])
-
+  const pos = useMemo<[number, number, number]>(() => position ?? [r(10), r(10), r(10)], []) // eslint-disable-line
   useFrame((_state, delta) => {
-    const dt = Math.min(delta, 0.1)
-
-    // Center-seeking force
-    vel.addScaledVector(pos, -0.12 * dt * 60)
-
-    // Damping
-    vel.multiplyScalar(1 - 0.4 * dt * 60 * 0.016)
-
-    // Mouse repulsion
-    const mouse = mouseWorld.current!
-    const dx = pos.x - mouse.x
-    const dy = pos.y - mouse.y
-    const dist = Math.sqrt(dx * dx + dy * dy)
-    if (dist < 2.2 && dist > 0.001) {
-      const force = (2.2 - dist) * 3.5
-      vel.x += (dx / dist) * force * dt * 60 * 0.016
-      vel.y += (dy / dist) * force * dt * 60 * 0.016
-    }
-
-    // Integrate
-    pos.addScaledVector(vel, dt)
-
-    // Bounce off walls
-    if (pos.x > BOX) { pos.x = BOX; vel.x *= -0.7 }
-    if (pos.x < -BOX) { pos.x = -BOX; vel.x *= -0.7 }
-    if (pos.y > BOX) { pos.y = BOX; vel.y *= -0.7 }
-    if (pos.y < -BOX) { pos.y = -BOX; vel.y *= -0.7 }
-    if (pos.z > 2.5) { pos.z = 2.5; vel.z *= -0.7 }
-    if (pos.z < -2.5) { pos.z = -2.5; vel.z *= -0.7 }
-
-    // Rotation
-    rot.x += rotVel.x * dt * 0.5
-    rot.y += rotVel.y * dt * 0.5
-    rot.z += rotVel.z * dt * 0.5
-
-    groupRef.current.position.copy(pos)
-    groupRef.current.rotation.copy(rot)
+    delta = Math.min(0.1, delta)
+    api.current?.applyImpulse(vec.copy(api.current.translation()).negate().multiplyScalar(0.2))
   })
-
   return (
-    <group ref={groupRef}>
+    <RigidBody linearDamping={4} angularDamping={1} friction={0.1} position={pos} ref={api} colliders={false}>
+      <CuboidCollider args={[0.38, 1.27, 0.38]} />
+      <CuboidCollider args={[1.27, 0.38, 0.38]} />
+      <CuboidCollider args={[0.38, 0.38, 1.27]} />
       {children ?? <Model color={color} roughness={roughness} />}
       {accent && <pointLight intensity={4} distance={2.5} color={color} />}
-    </group>
+    </RigidBody>
   )
 }
 
-// ─── Mouse tracker ───────────────────────────────────────────────────────────
+// ─── Kinematic mouse pointer ──────────────────────────────────────────────────
 
-function MouseTracker({ mouseWorld }: { mouseWorld: React.RefObject<THREE.Vector3> }) {
-  const { viewport } = useThree()
-  useFrame(({ mouse }) => {
-    mouseWorld.current!.set(
-      (mouse.x * viewport.width) / 2,
-      (mouse.y * viewport.height) / 2,
-      0
+function Pointer({ vec = new THREE.Vector3() }) {
+  const ref = useRef<any>(null)
+  useFrame(({ mouse, viewport }) => {
+    ref.current?.setNextKinematicTranslation(
+      vec.set((mouse.x * viewport.width) / 2, (mouse.y * viewport.height) / 2, 0),
     )
   })
-  return null
+  return (
+    <RigidBody position={[0, 0, 0]} type="kinematicPosition" colliders={false} ref={ref}>
+      <BallCollider args={[1]} />
+    </RigidBody>
+  )
 }
 
-// ─── Scene ───────────────────────────────────────────────────────────────────
+// ─── Scene (only rendered after rapier WASM is ready) ────────────────────────
 
-function SceneContent({ connectors, mouseWorld }: {
-  connectors: ReturnType<typeof shuffle>
-  mouseWorld: React.RefObject<THREE.Vector3>
-}) {
+function Scene({ accent }: { accent: number }) {
+  const connectors = useMemo(() => shuffle(accent), [accent])
   return (
     <>
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-      <MouseTracker mouseWorld={mouseWorld} />
-
-      <Suspense fallback={null}>
+      <Physics gravity={[0, 0, 0]}>
+        <Pointer />
         {connectors.map((props, i) => (
-          <Connector key={i} {...props} mouseWorld={mouseWorld} />
+          <Connector key={i} {...props} />
         ))}
-        <Connector mouseWorld={mouseWorld}>
+        <Connector position={[10, 10, 5]}>
           <Model>
             <MeshTransmissionMaterial
               clearcoat={1}
@@ -168,12 +139,10 @@ function SceneContent({ connectors, mouseWorld }: {
             />
           </Model>
         </Connector>
-      </Suspense>
-
+      </Physics>
       <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
       </EffectComposer>
-
       <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
@@ -190,8 +159,7 @@ function SceneContent({ connectors, mouseWorld }: {
 
 export function LusionConnectors() {
   const [accent, click] = useReducer((s: number) => (s + 1) % accents.length, 0)
-  const connectors = useMemo(() => shuffle(accent), [accent])
-  const mouseWorld = useRef<THREE.Vector3>(new THREE.Vector3())
+  const rapierReady = useRapierReady()
 
   return (
     <Canvas
@@ -202,7 +170,11 @@ export function LusionConnectors() {
       camera={{ position: [0, 0, 15], fov: 17.5, near: 1, far: 20 }}
       style={{ width: '100%', height: '100%' }}
     >
-      <SceneContent connectors={connectors} mouseWorld={mouseWorld} />
+      {rapierReady && (
+        <Suspense fallback={null}>
+          <Scene accent={accent} />
+        </Suspense>
+      )}
     </Canvas>
   )
 }

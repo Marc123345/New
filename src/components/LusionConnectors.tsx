@@ -1,4 +1,4 @@
-import { useRef, useMemo, useReducer } from 'react'
+import { useRef, useMemo, useReducer, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics, RigidBody, BallCollider, CuboidCollider } from '@react-three/rapier'
 import { Environment, Lightformer, MeshTransmissionMaterial, useGLTF } from '@react-three/drei'
@@ -130,24 +130,26 @@ function Scene() {
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-      <Physics gravity={[0, 0, 0]}>
-        <Pointer />
-        {connectors.map((props, i) => (
-          <Connector key={i} {...props} />
-        ))}
-        <Connector position={[10, 10, 5]}>
-          <Model>
-            <MeshTransmissionMaterial
-              clearcoat={1}
-              thickness={0.1}
-              anisotropicBlur={0.1}
-              chromaticAberration={0.1}
-              samples={8}
-              resolution={512}
-            />
-          </Model>
-        </Connector>
-      </Physics>
+      <Suspense fallback={null}>
+        <Physics gravity={[0, 0, 0]}>
+          <Pointer />
+          {connectors.map((props, i) => (
+            <Connector key={i} {...props} />
+          ))}
+          <Connector position={[10, 10, 5]}>
+            <Model>
+              <MeshTransmissionMaterial
+                clearcoat={1}
+                thickness={0.1}
+                anisotropicBlur={0.1}
+                chromaticAberration={0.1}
+                samples={8}
+                resolution={512}
+              />
+            </Model>
+          </Connector>
+        </Physics>
+      </Suspense>
       <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
       </EffectComposer>

@@ -11,7 +11,9 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { LusionConnectors } from "./components/LusionConnectors";
+const LusionConnectors = lazy(() =>
+  import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
+);
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -103,7 +105,11 @@ function AppContent() {
         >
           {/* Lusion connectors canvas */}
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <LusionConnectors />
+            <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
+              <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
+                <LusionConnectors />
+              </Suspense>
+            </ErrorBoundary>
           </div>
 
 

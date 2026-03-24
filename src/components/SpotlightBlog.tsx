@@ -42,6 +42,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
           gridTemplateColumns: "1fr 1fr",
           minHeight: "auto",
           border: "2px solid var(--color-text-dark)",
+          borderRadius: 16,
           boxShadow: hovered ? "var(--shadow-geometric-hover)" : "var(--shadow-geometric)",
           transform: hovered ? "translate(-3px,-3px)" : "translate(0,0)",
           transition: "box-shadow 0.3s ease, transform 0.3s ease",
@@ -85,6 +86,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 fontFamily: "var(--font-stack-heading)",
+                borderRadius: 999,
                 background: "var(--color-primary)",
                 color: "#ffffff",
                 border: "1px solid var(--color-text-dark)",
@@ -284,31 +286,6 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
           }}>
             {!hideHeader && (
               <div>
-                <motion.div
-                  style={{
-                    display: "inline-block",
-                    marginBottom: "10px",
-                    padding: "6px 16px",
-                    border: "2px solid var(--color-secondary)",
-                    boxShadow: "4px 4px 0 var(--color-secondary)",
-                  }}
-                  initial={{ opacity: 0, x: -16 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                  <span
-                    style={{
-                      fontSize: "0.68rem",
-                      letterSpacing: "0.3em",
-                      textTransform: "uppercase",
-                      fontFamily: "var(--font-stack-heading)",
-                      color: "var(--color-secondary)",
-                    }}
-                  >
-                    Journal
-                  </span>
-                </motion.div>
                 <h2
                   style={{
                     fontSize: "clamp(2.4rem, 5vw, 4rem)",
@@ -339,6 +316,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                     textTransform: "uppercase",
                     fontFamily: "var(--font-stack-heading)",
                     border: "1.5px solid var(--color-text-dark)",
+                    borderRadius: 999,
                     background: activeCategory === cat ? "var(--color-primary)" : "transparent",
                     color: activeCategory === cat ? "#ffffff" : "var(--color-text-dark)",
                     cursor: "pointer",

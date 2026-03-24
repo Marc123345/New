@@ -14,7 +14,7 @@ function WordReveal() {
     <h1
       className="hero-wordreveal"
       style={{
-        fontFamily: "'Aeonik', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontFamily: "var(--font-stack-heading)",
         fontSize: '3.4vw',
         fontWeight: 300,
         lineHeight: 1.1,
@@ -82,7 +82,7 @@ function HeroButton({
       onMouseLeave={() => setHovered(false)}
       className="inline-flex items-center cursor-pointer"
       style={{
-        fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
+        fontFamily: "var(--font-stack-heading)",
         fontSize: 'clamp(0.6rem, 1.1vw, 0.68rem)',
         fontWeight: 400,
         letterSpacing: '0.18em',

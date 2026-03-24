@@ -66,6 +66,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             ? "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease"
             : "transform 0.08s ease-out",
           border: "2px solid var(--color-text-dark)",
+          borderRadius: 16,
           boxShadow:
             tilt.x !== 0 || tilt.y !== 0
               ? "var(--shadow-geometric-hover)"
@@ -126,6 +127,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
               className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.2em]"
               style={{
                 fontFamily: "var(--font-stack-heading)",
+                borderRadius: 999,
                 background: "rgba(0,0,0,0.65)",
                 backdropFilter: "blur(8px)",
                 border: "1px solid rgba(255,255,255,0.2)",
@@ -180,6 +182,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
               className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-white"
               style={{
                 border: "1px solid var(--color-text-dark)",
+                borderRadius: 8,
                 color: "var(--color-text-dark)",
               }}
             >

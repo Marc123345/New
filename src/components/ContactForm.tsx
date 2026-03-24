@@ -70,6 +70,7 @@ export function ContactForm() {
             aspectRatio: "3 / 4",
             position: "relative",
             border: "3px solid var(--color-text-dark)",
+            borderRadius: 16,
             boxShadow: "8px 8px 0 var(--color-surface-dark)",
             background: "linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #0a1a0d 100%)",
             overflow: "hidden",
@@ -86,6 +87,7 @@ export function ContactForm() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
           style={{
             border: "3px solid var(--color-text-dark)",
+            borderRadius: 16,
             padding: "clamp(24px, 4vw, 52px)",
             background: "var(--color-background-light)",
             boxShadow: "8px 8px 0 var(--color-surface-dark)",
@@ -93,25 +95,8 @@ export function ContactForm() {
           }}
         >
           <div style={{ marginBottom: "36px" }}>
-            <div style={{
-              display: 'inline-block',
-              alignSelf: 'flex-start',
-              marginBottom: '1.5rem',
-              padding: '6px 16px',
-              border: '2px solid var(--color-secondary)',
-              boxShadow: '4px 4px 0 var(--color-secondary)',
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: '0.6rem',
-                fontWeight: 700,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase' as const,
-                color: 'var(--color-secondary)',
-              }}>Contact Us</span>
-            </div>
             <h2 style={{
-              fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
+              fontSize: "clamp(2rem, 3.5vw, 3rem)",
               fontWeight: 700,
               color: "var(--color-text-dark)",
               marginBottom: "12px",
@@ -152,6 +137,7 @@ export function ContactForm() {
                 <div style={{
                   width: "64px", height: "64px",
                   border: "3px solid var(--color-text-dark)",
+                  borderRadius: 12,
                   boxShadow: "4px 4px 0 var(--color-surface-dark)",
                   display: "flex",
                   alignItems: "center",
@@ -227,7 +213,7 @@ export function ContactForm() {
                           width: "100%",
                           background: "var(--color-background-light)",
                           border: "3px solid var(--color-text-dark)",
-                          borderRadius: 0,
+                          borderRadius: 8,
                           padding: "13px 16px 13px 40px",
                           color: "var(--color-text-dark)",
                           fontSize: "0.9rem",

@@ -148,24 +148,6 @@ function ChapterGlyph({ progress }: { progress: MotionValue<number> }) {
 
 // ─── Individual beats ─────────────────────────────────────────────────────────
 
-const EYEBROW_TEXT: React.CSSProperties = {
-  fontFamily: 'var(--font-stack-heading)',
-  fontSize: '0.6rem',
-  fontWeight: 700,
-  letterSpacing: '0.3em',
-  textTransform: 'uppercase',
-  color: 'var(--color-secondary)',
-};
-
-const EYEBROW_BOX: React.CSSProperties = {
-  display: 'inline-block',
-  alignSelf: 'flex-start',
-  marginBottom: '1.5rem',
-  padding: '6px 16px',
-  border: '2px solid var(--color-secondary)',
-  boxShadow: '4px 4px 0 var(--color-secondary)',
-};
-
 const H2_STYLE: React.CSSProperties = {
   fontFamily: 'var(--font-stack-heading)',
   fontWeight: 900,
@@ -206,7 +188,6 @@ function Beat0({ progress }: { progress: MotionValue<number> }) {
   const { opacity, y } = useBeat(progress, 0);
   return (
     <motion.div style={{ opacity, y, position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'inherit' }}>
-      <div style={EYEBROW_BOX}><span style={EYEBROW_TEXT}>About H2H</span></div>
       <h2 style={H2_STYLE}>
         <span style={{ display: 'block' }}>From Brand Voice</span>
         <span style={{ display: 'block' }}>
@@ -269,7 +250,6 @@ function Beat3({ progress }: { progress: MotionValue<number> }) {
   const { opacity, y } = useBeat(progress, 3);
   return (
     <motion.div style={{ opacity, y, position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'inherit' }}>
-      <div style={EYEBROW_BOX}><span style={EYEBROW_TEXT}>Why H2H</span></div>
       <h2 style={H2_STYLE}>
         <span style={{ display: 'block' }}>Because we</span>
         <span style={{ display: 'block' }}>
@@ -303,18 +283,6 @@ function Beat4({ progress }: { progress: MotionValue<number> }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', maxWidth: 680 }}>
         {PARTNER_ITEMS.map((item) => (
           <div key={item.tag}>
-            <span style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: '0.6rem',
-              fontWeight: 700,
-              letterSpacing: '0.3em',
-              textTransform: 'uppercase',
-              color: 'var(--color-secondary)',
-              display: 'block',
-              marginBottom: '0.6rem',
-            }}>
-              {item.tag}
-            </span>
             <p style={BODY_STYLE}>{item.text}</p>
           </div>
         ))}

@@ -157,7 +157,7 @@ export function Navigation() {
             <H2HLogo
               height={44}
               className="transition-all duration-500"
-              style={{ filter: onDark ? "none" : "invert(1)" }}
+              onDark={onDark}
             />
           </a>
 

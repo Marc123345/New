@@ -10,6 +10,7 @@ import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 import { HologramOverlay } from "./components/HologramOverlay";
+import { H2HLogo } from "./components/H2HLogo";
 const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
 );
@@ -93,17 +94,7 @@ function HeroLusion() {
         gap: '1em',
         alignItems: 'center',
       }}>
-        <h1 style={{
-          margin: 0,
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: 'clamp(1.2rem, 2.5vw, 2.5em)',
-          fontWeight: 400,
-          letterSpacing: '-0.01em',
-          color: '#0a0a0a',
-          lineHeight: 1,
-        }}>
-          H2H
-        </h1>
+        <H2HLogo height={52} onDark={false} />
 
         <div />
 

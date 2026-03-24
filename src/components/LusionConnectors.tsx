@@ -79,22 +79,22 @@ function Connector({
   const group = useRef<THREE.Group>(null!)
   const r = THREE.MathUtils.randFloatSpread
 
-  // stable per-instance state
+  // stable per-instance state — spawn spread wide so they don't overlap
   const state = useMemo(() => ({
-    pos: new THREE.Vector3(r(8), r(8), r(3)),
-    vel: new THREE.Vector3((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 1),
+    pos: new THREE.Vector3(r(20), r(20), r(6)),
+    vel: new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 0.5),
     rot: new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2),
-    rotV: new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 0.5),
+    rotV: new THREE.Vector3((Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 0.4),
   }), []) // eslint-disable-line
 
   useFrame((_s, dt) => {
     const d = Math.min(dt, 0.05)
     const { pos, vel, rot, rotV } = state
 
-    // centre-seeking (zero gravity feel)
-    vel.addScaledVector(pos, -0.15 * d * 60)
+    // weak centre-seeking — soft drift, not a snap
+    vel.addScaledVector(pos, -0.04 * d * 60)
     // linear damping
-    vel.multiplyScalar(Math.pow(0.985, d * 60))
+    vel.multiplyScalar(Math.pow(0.978, d * 60))
 
     // mouse repulsion
     const mx = pos.x - mouse.current.x
@@ -109,10 +109,10 @@ function Connector({
     pos.addScaledVector(vel, d)
 
     // soft wall bounce
-    const WALL = 5.5
-    if (Math.abs(pos.x) > WALL) { vel.x *= -0.65; pos.x = Math.sign(pos.x) * WALL }
-    if (Math.abs(pos.y) > WALL) { vel.y *= -0.65; pos.y = Math.sign(pos.y) * WALL }
-    if (Math.abs(pos.z) > 2.5)  { vel.z *= -0.65; pos.z = Math.sign(pos.z) * 2.5 }
+    const WALL = 8
+    if (Math.abs(pos.x) > WALL) { vel.x *= -0.6; pos.x = Math.sign(pos.x) * WALL }
+    if (Math.abs(pos.y) > WALL) { vel.y *= -0.6; pos.y = Math.sign(pos.y) * WALL }
+    if (Math.abs(pos.z) > 3.5)  { vel.z *= -0.6; pos.z = Math.sign(pos.z) * 3.5 }
 
     // tumble
     rot.x += rotV.x * d * 0.6

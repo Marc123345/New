@@ -108,24 +108,6 @@ export function HeroTitle() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(14px, 2.5vh, 24px)' }}>
-      {/* Eyebrow */}
-      <motion.p
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          fontFamily: "'Aeonik', 'Helvetica Neue', sans-serif",
-          fontSize: 'clamp(0.6rem, 1vw, 0.7rem)',
-          fontWeight: 400,
-          letterSpacing: '0.28em',
-          textTransform: 'uppercase',
-          color: 'rgba(10,10,10,0.4)',
-          margin: 0,
-        }}
-      >
-        Human-to-Human Brand Communication
-      </motion.p>
-
       <WordReveal />
 
       <motion.div

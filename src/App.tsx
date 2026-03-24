@@ -1,16 +1,15 @@
 import React, { Suspense, lazy, useState, useCallback } from "react";
-import { motion } from "motion/react";
 import { Loader } from "./components/Loader";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Navigation } from "./components/Navigation";
-import { HeroTitle } from "./components/HeroTitle";
 import { ScrollReveal } from "./components/ScrollReveal";
 import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
+import { HologramOverlay } from "./components/HologramOverlay";
 const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
 );
@@ -67,6 +66,108 @@ const Section = ({
   </section>
 );
 
+// ─── Lusion-exact hero ───────────────────────────────────────────────────────
+
+function HeroLusion() {
+  const [videoOpen, setVideoOpen] = useState(false)
+
+  return (
+    <section
+      id="hero"
+      style={{
+        width: '100%',
+        height: '100vh',
+        background: '#f0f0f0',
+        display: 'grid',
+        gridTemplateRows: 'auto 1fr',
+        gap: '3em',
+        padding: '3em 5em',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+      }}
+    >
+      {/* ── Nav row: label | spacer | caption | spacer | button | button ── */}
+      <nav style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 0.25fr 1fr 0.25fr auto auto',
+        gap: '1em',
+        alignItems: 'center',
+      }}>
+        <h1 style={{
+          margin: 0,
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: 'clamp(1.2rem, 2.5vw, 2.5em)',
+          fontWeight: 400,
+          letterSpacing: '-0.01em',
+          color: '#0a0a0a',
+          lineHeight: 1,
+        }}>
+          H2H
+        </h1>
+
+        <div />
+
+        <span style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',
+          fontWeight: 300,
+          color: '#0a0a0a',
+          maxWidth: 500,
+          lineHeight: 1.2,
+        }}>
+          from B2B to H2H — Build a Brand People want to talk to.
+        </span>
+
+        <div />
+
+        <button
+          onClick={() => setVideoOpen(true)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#141622', color: 'white',
+            height: 52, borderRadius: 30, padding: '0 2em',
+            border: 'none', cursor: 'pointer',
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Hear Our Story
+        </button>
+
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#cccccc', color: '#141622',
+          height: 52, borderRadius: 30, padding: '0 2em',
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+          letterSpacing: '0.12em',
+          whiteSpace: 'nowrap',
+        }}>
+          ///
+        </div>
+      </nav>
+
+      {/* ── 3D canvas — fills remaining height ── */}
+      <div style={{ borderRadius: 20, overflow: 'hidden', position: 'relative' }}>
+        <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
+          <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
+            <LusionConnectors />
+          </Suspense>
+        </ErrorBoundary>
+      </div>
+
+      <HologramOverlay
+        isOpen={videoOpen}
+        onClose={() => setVideoOpen(false)}
+        title="Hear Our Story"
+        videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
+      />
+    </section>
+  )
+}
+
 function AppContent() {
 
   return (
@@ -75,154 +176,8 @@ function AppContent() {
       <Navigation />
       <ScrollProgress />
 
-      {/* ═══ HERO — Lusion-style: white page, headline above rounded canvas ═══ */}
-      <section
-        id="hero"
-        style={{
-          minHeight: '100vh',
-          background: '#ffffff',
-          display: 'flex',
-          flexDirection: 'column',
-          paddingTop: 'clamp(80px, 11vh, 120px)',   /* clears floating nav */
-          paddingBottom: 'clamp(24px, 4vh, 40px)',
-        }}
-      >
-        {/* ── HEADLINE above the canvas ── */}
-        <div style={{ padding: '0 clamp(24px, 5vw, 64px)', marginBottom: 'clamp(16px, 3vh, 28px)' }}>
-          <HeroTitle />
-        </div>
-
-        {/* ── ROUNDED CANVAS — fills the remaining viewport height ── */}
-        <div
-          style={{
-            flex: 1,
-            margin: '0 clamp(12px, 2.5vw, 32px)',
-            borderRadius: 'clamp(16px, 2vw, 24px)',
-            overflow: 'hidden',
-            position: 'relative',
-            minHeight: 'clamp(300px, 58vh, 700px)',
-          }}
-        >
-          {/* Lusion connectors canvas */}
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
-              <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
-                <LusionConnectors />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-
-          {/* ── Overlay nav — label + caption + action buttons ── */}
-          <div style={{
-            position: 'absolute', inset: 0, zIndex: 10,
-            display: 'flex', flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: 'clamp(16px, 2.5vw, 28px)',
-            pointerEvents: 'none',
-          }}>
-            {/* Top row */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-              <div>
-                <p style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.5)',
-                  margin: 0,
-                }}>
-                  Human to Human
-                </p>
-                <p style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.25)',
-                  margin: '4px 0 0',
-                }}>
-                  Social Strategy
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: 8, pointerEvents: 'auto' }}>
-                <a href="#ecosystem" style={{ textDecoration: 'none' }}>
-                  <div style={{
-                    fontFamily: 'var(--font-stack-heading)',
-                    fontSize: 'clamp(0.5rem, 0.85vw, 0.6rem)',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    color: '#ffffff',
-                    padding: '8px 16px',
-                    borderRadius: 999,
-                    border: '1px solid rgba(255,255,255,0.25)',
-                    background: 'rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(8px)',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    Our Services
-                  </div>
-                </a>
-                <div style={{
-                  fontFamily: 'var(--font-stack-heading)',
-                  fontSize: 'clamp(0.5rem, 0.85vw, 0.6rem)',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.4)',
-                  padding: '8px 14px',
-                  borderRadius: 999,
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  background: 'rgba(255,255,255,0.04)',
-                }}>
-                  ///
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom row */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-              <p style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.3)',
-                margin: 0,
-              }}>
-                Click to cycle colours
-              </p>
-              <p style={{
-                fontFamily: 'var(--font-stack-heading)',
-                fontSize: 'clamp(0.55rem, 0.9vw, 0.65rem)',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.3)',
-                margin: 0,
-                textAlign: 'right',
-              }}>
-                Interactive
-              </p>
-            </div>
-          </div>
-
-
-        </div>
-
-        {/* ── SCROLL CUE ── */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 'clamp(12px, 2vh, 20px)' }}>
-          <motion.div
-            animate={{ y: [0, 5, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            aria-hidden="true"
-          >
-            <svg width="14" height="22" viewBox="0 0 14 22" fill="none"
-              style={{ color: 'rgba(0,0,0,0.22)' }}>
-              <rect x="1" y="1" width="12" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
-              <rect x="6" y="5" width="2" height="4" rx="1" fill="currentColor" />
-            </svg>
-          </motion.div>
-        </div>
-      </section>
+      {/* ═══ HERO — exact Lusion layout ═══ */}
+      <HeroLusion />
 
       <HeroStory />
 

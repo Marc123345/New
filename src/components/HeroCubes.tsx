@@ -94,10 +94,10 @@ export function HeroCubes() {
     let bx = Math.abs(f0.r);   // half-width
     let by = Math.abs(f0.t);   // half-height
 
-    /* Scatter initial positions across full visible area */
+    /* Scatter initial positions strictly inside bounds */
     for (let i = 0; i < N; i++) {
-      px[i] = (Math.random() * 2 - 1) * (bx - RADIUS);
-      py[i] = (Math.random() * 2 - 1) * (by - RADIUS);
+      px[i] = (Math.random() * 2 - 1) * (bx - RADIUS) * 0.9;
+      py[i] = (Math.random() * 2 - 1) * (by - RADIUS) * 0.9;
       /* give each sphere a random initial velocity */
       const speed = 0.5 + Math.random() * 1.5;
       const angle = Math.random() * Math.PI * 2;
@@ -165,16 +165,7 @@ export function HeroCubes() {
           py[i] += vy[i] * subDt;
         }
 
-        /* 2. Wall bounce — spheres stay inside the frustum */
-        for (let i = 0; i < N; i++) {
-          const maxX = bx - RADIUS, maxY = by - RADIUS;
-          if (px[i] >  maxX) { px[i] =  maxX; vx[i] = -Math.abs(vx[i]) * 0.85; }
-          if (px[i] < -maxX) { px[i] = -maxX; vx[i] =  Math.abs(vx[i]) * 0.85; }
-          if (py[i] >  maxY) { py[i] =  maxY; vy[i] = -Math.abs(vy[i]) * 0.85; }
-          if (py[i] < -maxY) { py[i] = -maxY; vy[i] =  Math.abs(vy[i]) * 0.85; }
-        }
-
-        /* 3. Sphere–sphere elastic collision (restitution 0.85 — bouncy) */
+        /* 2. Sphere–sphere elastic collision */
         for (let i = 0; i < N; i++) {
           for (let j = i + 1; j < N; j++) {
             const dx = px[j] - px[i], dy = py[j] - py[i];
@@ -192,6 +183,16 @@ export function HeroCubes() {
             vx[i] += nx * imp; vy[i] += ny * imp;
             vx[j] -= nx * imp; vy[j] -= ny * imp;
           }
+        }
+
+        /* 3. Wall bounce — LAST so sphere-sphere corrections can't push past edge.
+              Only flip velocity when moving TOWARD the wall (prevents double-flip). */
+        for (let i = 0; i < N; i++) {
+          const maxX = bx - RADIUS, maxY = by - RADIUS;
+          if (px[i] >  maxX) { px[i] =  maxX; if (vx[i] > 0) vx[i] *= -0.85; }
+          if (px[i] < -maxX) { px[i] = -maxX; if (vx[i] < 0) vx[i] *= -0.85; }
+          if (py[i] >  maxY) { py[i] =  maxY; if (vy[i] > 0) vy[i] *= -0.85; }
+          if (py[i] < -maxY) { py[i] = -maxY; if (vy[i] < 0) vy[i] *= -0.85; }
         }
       }
 

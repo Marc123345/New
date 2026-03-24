@@ -11,7 +11,7 @@ import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import UnicornScene from "unicornstudio-react";
+import { LusionConnectors } from "./components/LusionConnectors";
 
 const AboutStory = lazy(() =>
   import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
@@ -101,16 +101,9 @@ function AppContent() {
             minHeight: 'clamp(300px, 58vh, 700px)',
           }}
         >
-          {/* UnicornScene background */}
+          {/* Lusion connectors canvas */}
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <UnicornScene
-              projectId="US9XVS5BHKCmCNH60lQg"
-              width="100%"
-              height="100%"
-              scale={1}
-              dpi={1.5}
-              sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.5/dist/unicornStudio.umd.js"
-            />
+            <LusionConnectors />
           </div>
 
 

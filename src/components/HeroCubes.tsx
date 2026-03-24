@@ -90,12 +90,19 @@ export function HeroCubes() {
     const vx = new Float32Array(N);
     const vy = new Float32Array(N);
 
-    /* Scatter initial positions across scene */
+    /* World bounds (from orthographic frustum, updated on resize) */
+    let bx = Math.abs(f0.r);   // half-width
+    let by = Math.abs(f0.t);   // half-height
+
+    /* Scatter initial positions across full visible area */
     for (let i = 0; i < N; i++) {
-      const angle = (i / N) * Math.PI * 2;
-      const dist  = 1.0 + Math.random() * 4.0;
-      px[i] = Math.cos(angle) * dist + (Math.random() - 0.5) * 0.5;
-      py[i] = Math.sin(angle) * dist + (Math.random() - 0.5) * 0.5;
+      px[i] = (Math.random() * 2 - 1) * (bx - RADIUS);
+      py[i] = (Math.random() * 2 - 1) * (by - RADIUS);
+      /* give each sphere a random initial velocity */
+      const speed = 0.5 + Math.random() * 1.5;
+      const angle = Math.random() * Math.PI * 2;
+      vx[i] = Math.cos(angle) * speed;
+      vy[i] = Math.sin(angle) * speed;
     }
 
     /* ── Mouse tracking ── */
@@ -152,45 +159,36 @@ export function HeroCubes() {
       const subDt = dt / SUB;
 
       for (let s = 0; s < SUB; s++) {
-        /* 1. Centering force (3.5) — pulls all balls toward origin */
-        for (let i = 0; i < N; i++) {
-          const d  = Math.hypot(px[i], py[i]);
-          if (d < 0.001) continue;
-          const nx = -px[i] / d, ny = -py[i] / d;
-          vx[i] += nx * 3.5 * subDt;
-          vy[i] += ny * 3.5 * subDt;
-        }
-
-        /* 2. Linear damping (0.6): velocity *= (1 - 0.6 * subDt) */
-        const damp = Math.max(0, 1 - 0.6 * subDt);
-        for (let i = 0; i < N; i++) {
-          vx[i] *= damp;
-          vy[i] *= damp;
-        }
-
-        /* 3. Integrate */
+        /* 1. Integrate */
         for (let i = 0; i < N; i++) {
           px[i] += vx[i] * subDt;
           py[i] += vy[i] * subDt;
         }
 
-        /* 4. Sphere–sphere elastic collision (restitution 0.3) */
+        /* 2. Wall bounce — spheres stay inside the frustum */
+        for (let i = 0; i < N; i++) {
+          const maxX = bx - RADIUS, maxY = by - RADIUS;
+          if (px[i] >  maxX) { px[i] =  maxX; vx[i] = -Math.abs(vx[i]) * 0.85; }
+          if (px[i] < -maxX) { px[i] = -maxX; vx[i] =  Math.abs(vx[i]) * 0.85; }
+          if (py[i] >  maxY) { py[i] =  maxY; vy[i] = -Math.abs(vy[i]) * 0.85; }
+          if (py[i] < -maxY) { py[i] = -maxY; vy[i] =  Math.abs(vy[i]) * 0.85; }
+        }
+
+        /* 3. Sphere–sphere elastic collision (restitution 0.85 — bouncy) */
         for (let i = 0; i < N; i++) {
           for (let j = i + 1; j < N; j++) {
             const dx = px[j] - px[i], dy = py[j] - py[i];
             const d2 = dx * dx + dy * dy;
-            const md = RADIUS * 2 * 1.002;
+            const md = RADIUS * 2 * 1.001;
             if (d2 >= md * md || d2 < 0.0001) continue;
             const d  = Math.sqrt(d2);
             const nx = dx / d, ny = dy / d;
-            /* positional correction */
             const corr = (md - d) * 0.5;
             px[i] -= nx * corr; py[i] -= ny * corr;
             px[j] += nx * corr; py[j] += ny * corr;
-            /* velocity exchange */
             const rvn = (vx[i] - vx[j]) * nx + (vy[i] - vy[j]) * ny;
             if (rvn > 0) continue;
-            const imp = -(1 + 0.3) * rvn * 0.5;   // equal mass
+            const imp = -(1 + 0.85) * rvn * 0.5;
             vx[i] += nx * imp; vy[i] += ny * imp;
             vx[j] -= nx * imp; vy[j] -= ny * imp;
           }
@@ -211,6 +209,8 @@ export function HeroCubes() {
       W = container.clientWidth;
       H = container.clientHeight;
       const fn = getFrustum(W, H);
+      bx = Math.abs(fn.r);
+      by = Math.abs(fn.t);
       (camera as THREE.OrthographicCamera).left   = fn.l;
       (camera as THREE.OrthographicCamera).right  = fn.r;
       (camera as THREE.OrthographicCamera).top    = fn.t;

@@ -132,6 +132,9 @@ export function Navigation() {
       <header
         className="fixed top-0 left-0 w-full z-[100] transition-all duration-500"
         style={{
+          opacity: pastHero ? 1 : 0,
+          pointerEvents: pastHero ? 'auto' : 'none',
+          transform: pastHero ? 'translateY(0)' : 'translateY(-100%)',
           padding: "clamp(16px, 2.5vh, 28px) clamp(20px, 4vw, 56px)",
           backgroundColor: scrolled
             ? onDark

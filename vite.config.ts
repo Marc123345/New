@@ -2,10 +2,12 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import tailwindcss from '@tailwindcss/vite';
+  import wasm from 'vite-plugin-wasm';
+  import topLevelAwait from 'vite-plugin-top-level-await';
   import path from 'path';
 
   export default defineConfig({
-    plugins: [tailwindcss(), react()],
+    plugins: [tailwindcss(), react(), wasm(), topLevelAwait()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -58,6 +60,7 @@
           manualChunks: {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
             'vendor-three': ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing'],
+            'vendor-rapier': ['@react-three/rapier', '@dimforge/rapier3d-compat'],
             'vendor-motion': ['framer-motion', 'motion'],
             'vendor-globe': ['globe.gl'],
           },

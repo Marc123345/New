@@ -62,7 +62,9 @@
             "three": "^0.183.2",
             "three-mesh-bvh": "^0.8.0",
             "unicornstudio-react": "^2.1.4",
-            "vaul": "^1.1.2"
+            "vaul": "^1.1.2",
+            "vite-plugin-top-level-await": "^1.6.0",
+            "vite-plugin-wasm": "^3.6.0"
       },
       "devDependencies": {
             "@tailwindcss/vite": "^4.2.1",

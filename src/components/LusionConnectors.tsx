@@ -37,6 +37,16 @@ import { easing } from 'maath'
 import * as THREE from 'three'
 import { mergeBufferGeometries } from 'three-stdlib'
 
+// ─── Physics constants ────────────────────────────────────────────────────────
+
+const CENTRE_PULL          = 0.2   // matches original pmndrs impulse scale
+const STUCK_DIST           = 0.5   // origin dead-zone: centre-pull → ~0 here
+const STUCK_SPEED_ENTER    = 0.10  // enter escape mode below this m/s
+const STUCK_SPEED_EXIT     = 0.30  // leave escape mode above this (hysteresis)
+const STUCK_GRACE          = 20    // consecutive slow frames before acting
+const ESCAPE_FORCE         = 0.5   // same order as normal drift — no visible snap
+const ESCAPE_ROTATE_FRAMES = 25    // rotate escapeDir after this many escape frames
+
 // ─── Accent palette ───────────────────────────────────────────────────────────
 
 const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
@@ -158,10 +168,11 @@ function Connector({
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
-  // Mutable escape direction — refreshed whenever the connector stays stuck
-  // for too long, so it doesn't keep pushing into the same wall.
-  const escapeDir   = useRef(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize())
+  const escapeDir   = useRef(
+    new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize()
+  )
   const stuckFrames = useRef(0)
+  const inEscape    = useRef(false)
 
   useFrame((_s, delta) => {
     if (!api.current) return
@@ -172,21 +183,40 @@ function Connector({
     const dist  = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
     const speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 
-    // A connector is "stuck" if it's near the origin (centre-pull → 0)
-    // OR if it has nearly stopped anywhere (e.g. wedged against a wall).
-    const stuck = dist < 0.8 || speed < 0.15
-
-    if (stuck) {
-      stuckFrames.current++
-      // Rotate the escape direction every 40 frames so a connector wedged
-      // against a wall eventually tries a different way out.
-      if (stuckFrames.current % 40 === 0) {
-        escapeDir.current.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize()
+    // ── Stuck state machine ─────────────────────────────────────────────────
+    // Grace period prevents false kicks after a normal post-collision slowdown.
+    // Hysteresis (ENTER < EXIT thresholds) prevents oscillation at boundary.
+    if (!inEscape.current) {
+      if (dist < STUCK_DIST || speed < STUCK_SPEED_ENTER) {
+        stuckFrames.current++
+        if (stuckFrames.current >= STUCK_GRACE) {
+          inEscape.current    = true
+          stuckFrames.current = 0
+        }
+      } else {
+        stuckFrames.current = 0
       }
-      vec.copy(escapeDir.current).multiplyScalar(3.0)
     } else {
-      stuckFrames.current = 0
-      vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
+      stuckFrames.current++
+      if (stuckFrames.current % ESCAPE_ROTATE_FRAMES === 0) {
+        escapeDir.current
+          .set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
+          .normalize()
+      }
+      // Exit only when clearly moving — hysteresis prevents mode-flicker.
+      if (speed > STUCK_SPEED_EXIT && dist > STUCK_DIST) {
+        inEscape.current    = false
+        stuckFrames.current = 0
+      }
+    }
+
+    // ── Impulse ─────────────────────────────────────────────────────────────
+    if (inEscape.current) {
+      // ESCAPE_FORCE=0.5 → terminal ~8 m/s, same order as normal drift.
+      // No visible snap; motion looks continuous.
+      vec.copy(escapeDir.current).multiplyScalar(ESCAPE_FORCE)
+    } else {
+      vec.set(t.x, t.y, t.z).negate().multiplyScalar(CENTRE_PULL * d * 60)
     }
     api.current.applyImpulse(vec, true)
   })
@@ -235,12 +265,12 @@ function Connector({
 function Walls() {
   return (
     <>
-      <RigidBody type="fixed" position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
-      <RigidBody type="fixed" position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
-      <RigidBody type="fixed" position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
-      <RigidBody type="fixed" position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
-      <RigidBody type="fixed" position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
-      <RigidBody type="fixed" position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
     </>
   )
 }

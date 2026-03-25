@@ -156,6 +156,15 @@ function Connector({
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
+  // Fixed escape direction chosen once per connector. When a body drifts to
+  // the origin the center-pull impulse becomes ~zero, so we push along this
+  // consistent direction each frame until it escapes the dead zone — rather
+  // than picking a new random direction every frame (which cancels itself out).
+  const escapeDir = useMemo(
+    () => new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(),
+    [],
+  )
+
   useFrame((_s, delta) => {
     if (!api.current) return
     const d = Math.min(delta, 0.1)
@@ -163,11 +172,7 @@ function Connector({
     const dist = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
 
     if (dist < 0.5) {
-      // Too close to origin — the center-pull impulse would be ~zero,
-      // so kick it in a random direction instead.
-      vec.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
-        .normalize()
-        .multiplyScalar(0.5)
+      vec.copy(escapeDir).multiplyScalar(2.0)
     } else {
       vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
     }

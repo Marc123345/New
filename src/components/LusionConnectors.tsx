@@ -1,15 +1,17 @@
 /**
- * LusionConnectors — faithful TypeScript port of the pmndrs "Lusion connectors" demo
- * with face avatars and social media logos on select connectors.
+ * LusionConnectors — floating face cubes with the same zero-gravity physics
+ * as the original pmndrs "Lusion connectors" demo.
+ *
+ * Each cube has a face photo texture on all sides. Same motion model:
+ * centre-pull impulse, linearDamping=4, pointer interaction, no walls.
  */
 
 import { useRef, useReducer, useMemo, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import {
-  MeshTransmissionMaterial,
   Environment,
   Lightformer,
-  Html,
+  RoundedBox,
 } from '@react-three/drei'
 import {
   Physics,
@@ -19,173 +21,57 @@ import {
 } from '@react-three/rapier'
 import type { RapierRigidBody } from '@react-three/rapier'
 import { EffectComposer, N8AO } from '@react-three/postprocessing'
-import { easing } from 'maath'
 import * as THREE from 'three'
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+
+// ─── Face image URLs ──────────────────────────────────────────────────────────
+
+const FACES = [
+  'https://i.pravatar.cc/256?img=32',
+  'https://i.pravatar.cc/256?img=47',
+  'https://i.pravatar.cc/256?img=12',
+  'https://i.pravatar.cc/256?img=25',
+  'https://i.pravatar.cc/256?img=56',
+  'https://i.pravatar.cc/256?img=68',
+  'https://i.pravatar.cc/256?img=3',
+  'https://i.pravatar.cc/256?img=41',
+  'https://i.pravatar.cc/256?img=5',
+  'https://i.pravatar.cc/256?img=9',
+  'https://i.pravatar.cc/256?img=15',
+  'https://i.pravatar.cc/256?img=20',
+  'https://i.pravatar.cc/256?img=33',
+  'https://i.pravatar.cc/256?img=36',
+  'https://i.pravatar.cc/256?img=49',
+  'https://i.pravatar.cc/256?img=52',
+  'https://i.pravatar.cc/256?img=60',
+  'https://i.pravatar.cc/256?img=65',
+]
 
 // ─── Accent palette ───────────────────────────────────────────────────────────
 
 const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
 
-// ─── Overlay definitions ──────────────────────────────────────────────────────
+// ─── Cube size ────────────────────────────────────────────────────────────────
 
-type OverlayType = 'face' | 'logo' | undefined
+const CUBE_SIZE = 1.4
+const CUBE_HALF = CUBE_SIZE / 2
+const CUBE_RADIUS = 0.15
 
-interface OverlayDef {
-  type: OverlayType
-  src?: string        // face image URL
-  logo?: string       // logo key
-}
+// ─── Face-textured cube ──────────────────────────────────────────────────────
 
-const FACE_URLS = [
-  'https://i.pravatar.cc/150?img=32',
-  'https://i.pravatar.cc/150?img=47',
-  'https://i.pravatar.cc/150?img=12',
-  'https://i.pravatar.cc/150?img=25',
-  'https://i.pravatar.cc/150?img=56',
-  'https://i.pravatar.cc/150?img=68',
-  'https://i.pravatar.cc/150?img=3',
-  'https://i.pravatar.cc/150?img=41',
-]
-
-const LOGO_DEFS: Record<string, { bg: string; label: string; color?: string }> = {
-  linkedin:  { bg: '#0A66C2', label: 'in' },
-  instagram: { bg: 'linear-gradient(135deg, #F58529, #DD2A7B, #8134AF, #515BD4)', label: '📷', color: '#fff' },
-  x:         { bg: '#000000', label: '𝕏' },
-  tiktok:    { bg: '#000000', label: '♪' },
-  facebook:  { bg: '#1877F2', label: 'f' },
-  youtube:   { bg: '#FF0000', label: '▶' },
-  snapchat:  { bg: '#FFFC00', label: '👻', color: '#000' },
-  whatsapp:  { bg: '#25D366', label: '💬' },
-  pinterest: { bg: '#E60023', label: 'P' },
-}
-
-function connectorConfigs(accent = 0) {
-  return [
-    // Faces
-    { color: '#444',            roughness: 0.1,  overlay: { type: 'face' as const, src: FACE_URLS[0] } },
-    { color: '#444',            roughness: 0.75, overlay: { type: 'face' as const, src: FACE_URLS[1] } },
-    { color: 'white',           roughness: 0.75, overlay: { type: 'face' as const, src: FACE_URLS[2] } },
-    { color: 'white',           roughness: 0.1,  overlay: { type: 'face' as const, src: FACE_URLS[3] } },
-    { color: '#444',            roughness: 0.5,  overlay: { type: 'face' as const, src: FACE_URLS[4] } },
-    { color: 'white',           roughness: 0.3,  overlay: { type: 'face' as const, src: FACE_URLS[5] } },
-    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: { type: 'face' as const, src: FACE_URLS[6] } },
-    { color: ACCENTS[accent],   roughness: 0.75, accent: true, overlay: { type: 'face' as const, src: FACE_URLS[7] } },
-    // Logos
-    { color: '#333',            roughness: 0.1,  overlay: { type: 'logo' as const, logo: 'linkedin' } },
-    { color: '#333',            roughness: 0.75, overlay: { type: 'logo' as const, logo: 'instagram' } },
-    { color: 'red',             roughness: 0.1,  overlay: { type: 'logo' as const, logo: 'youtube' } },
-    { color: '#444',            roughness: 0.5,  overlay: { type: 'logo' as const, logo: 'x' } },
-    { color: 'white',           roughness: 0.1,  overlay: { type: 'logo' as const, logo: 'tiktok' } },
-    { color: 'white',           roughness: 0.75, overlay: { type: 'logo' as const, logo: 'facebook' } },
-    { color: '#333',            roughness: 0.3,  overlay: { type: 'logo' as const, logo: 'whatsapp' } },
-    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: { type: 'logo' as const, logo: 'snapchat' } },
-    { color: ACCENTS[accent],   roughness: 0.5,  accent: true, overlay: { type: 'logo' as const, logo: 'pinterest' } },
-  ]
-}
-
-// ─── Connector geometry (cross shape, built once) ─────────────────────────────
-
-const connectorGeom: THREE.BufferGeometry = (() => {
-  const arms = [
-    new THREE.BoxGeometry(0.76, 2.54, 0.76),
-    new THREE.BoxGeometry(2.54, 0.76, 0.76),
-    new THREE.BoxGeometry(0.76, 0.76, 2.54),
-  ]
-  const merged = BufferGeometryUtils.mergeGeometries(arms) ?? new THREE.BoxGeometry(1, 1, 1)
-  arms.forEach((a) => a.dispose())
-  return merged
-})()
-
-// ─── Model ────────────────────────────────────────────────────────────────────
-
-interface ModelProps {
-  color?: string
-  roughness?: number
-  glass?: boolean
-  children?: React.ReactNode
-}
-
-function Model({ color = 'white', roughness = 0, glass = false, children }: ModelProps) {
-  const ref = useRef<THREE.Mesh>(null!)
-
-  useFrame((_s, dt) => {
-    if (!children) {
-      easing.dampC(
-        (ref.current.material as THREE.MeshStandardMaterial).color,
-        color,
-        0.2,
-        dt,
-      )
-    }
-  })
+function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
+  const texture = useLoader(THREE.TextureLoader, url)
+  texture.colorSpace = THREE.SRGBColorSpace
 
   return (
-    <mesh ref={ref} castShadow={!glass} receiveShadow geometry={connectorGeom}>
-      {children ?? (
-        <meshStandardMaterial metalness={0.2} roughness={roughness} />
-      )}
-    </mesh>
+    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
+      <meshStandardMaterial
+        map={texture}
+        metalness={0.05}
+        roughness={0.35}
+        envMapIntensity={0.6}
+      />
+    </RoundedBox>
   )
-}
-
-// ─── Overlay: face avatar or social logo rendered via Html ────────────────────
-
-const OVERLAY_CONTAINER: React.CSSProperties = {
-  width: 44,
-  height: 44,
-  borderRadius: '50%',
-  overflow: 'hidden',
-  border: '2px solid rgba(255,255,255,0.2)',
-  boxShadow: '0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(164,108,252,0.15)',
-  backdropFilter: 'blur(4px)',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}
-
-function ConnectorOverlay({ overlay }: { overlay: OverlayDef }) {
-  if (!overlay.type) return null
-
-  if (overlay.type === 'face' && overlay.src) {
-    return (
-      <Html center distanceFactor={7} style={{ pointerEvents: 'none' }}>
-        <div style={OVERLAY_CONTAINER}>
-          <img
-            src={overlay.src}
-            alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            loading="lazy"
-          />
-        </div>
-      </Html>
-    )
-  }
-
-  if (overlay.type === 'logo' && overlay.logo) {
-    const def = LOGO_DEFS[overlay.logo]
-    if (!def) return null
-    return (
-      <Html center distanceFactor={7} style={{ pointerEvents: 'none' }}>
-        <div
-          style={{
-            ...OVERLAY_CONTAINER,
-            background: def.bg,
-            color: def.color || '#fff',
-            fontSize: overlay.logo === 'instagram' ? '18px' : '16px',
-            fontWeight: 800,
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            letterSpacing: overlay.logo === 'linkedin' ? '-0.02em' : 0,
-          }}
-        >
-          {def.label}
-        </div>
-      </Html>
-    )
-  }
-
-  return null
 }
 
 // ─── Pointer ──────────────────────────────────────────────────────────────────
@@ -207,36 +93,31 @@ function Pointer() {
   )
 }
 
-// ─── Connector ────────────────────────────────────────────────────────────────
+// ─── Connector (face cube with physics) ──────────────────────────────────────
 
 interface ConnectorProps {
   position?: [number, number, number]
-  color?: string
-  roughness?: number
+  faceUrl: string
   accent?: boolean
-  glass?: boolean
-  overlay?: OverlayDef
+  accentColor?: string
 }
 
 function Connector({
   position,
-  color = 'white',
-  roughness = 0,
+  faceUrl,
   accent = false,
-  glass = false,
-  overlay,
+  accentColor,
 }: ConnectorProps) {
   const api = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
-  const r   = THREE.MathUtils.randFloatSpread
+  const r = THREE.MathUtils.randFloatSpread
   const pos = useMemo<[number, number, number]>(
     () => position ?? [r(10), r(10), r(10)],
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
-  useFrame((_s, delta) => {
+  useFrame(() => {
     if (!api.current) return
-    delta = Math.min(0.1, delta)
     api.current.applyImpulse(
       vec.copy(api.current.translation() as unknown as THREE.Vector3).negate().multiplyScalar(0.2),
       true,
@@ -252,28 +133,13 @@ function Connector({
       friction={0.1}
       colliders={false}
     >
-      <CuboidCollider args={[0.38, 1.27, 0.38]} />
-      <CuboidCollider args={[1.27, 0.38, 0.38]} />
-      <CuboidCollider args={[0.38, 0.38, 1.27]} />
+      <CuboidCollider args={[CUBE_HALF, CUBE_HALF, CUBE_HALF]} />
 
-      {glass ? (
-        <Model roughness={roughness} glass>
-          <MeshTransmissionMaterial
-            clearcoat={1}
-            thickness={0.1}
-            anisotropicBlur={0.1}
-            chromaticAberration={0.1}
-            samples={8}
-            resolution={512}
-          />
-        </Model>
-      ) : (
-        <Model color={color} roughness={roughness} />
+      <FaceCube url={faceUrl} />
+
+      {accent && accentColor && (
+        <pointLight intensity={4} distance={2.5} color={accentColor} />
       )}
-
-      {overlay && <ConnectorOverlay overlay={overlay} />}
-
-      {accent && <pointLight intensity={4} distance={2.5} color={color} />}
     </RigidBody>
   )
 }
@@ -281,17 +147,20 @@ function Connector({
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
 function Scene({ accent }: { accent: number }) {
-  const connectors = useMemo(() => connectorConfigs(accent), [accent])
+  const accentColor = ACCENTS[accent]
 
   return (
     <Physics gravity={[0, 0, 0]}>
       <Pointer />
 
-      {connectors.map((props, i) => (
-        <Connector key={i} {...props} />
+      {FACES.map((url, i) => (
+        <Connector
+          key={i}
+          faceUrl={url}
+          accent={i >= FACES.length - 3}
+          accentColor={accentColor}
+        />
       ))}
-
-      <Connector position={[10, 10, 5]} glass />
 
       <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
@@ -299,10 +168,10 @@ function Scene({ accent }: { accent: number }) {
 
       <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
-          <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2}  position={[0, 5, -9]}   scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2}  position={[-5, 1, -1]}  scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2}  position={[-5, -1, -1]} scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]}   scale={8} />
+          <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={8} />
         </group>
       </Environment>
     </Physics>

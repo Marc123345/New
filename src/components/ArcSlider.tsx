@@ -564,45 +564,102 @@ export function ArcSlider() {
           </h2>
         </div>
 
-        {/* Horizontal Scrollable Tab Bar */}
+        {/* Horizontal Scrollable Tab Bar with left/right arrows */}
         <div
-          ref={tabBarRef}
-          className="relative z-30 flex gap-1.5 sm:gap-2 justify-start md:justify-center px-6 sm:px-8 mb-8 sm:mb-12 md:mb-16 overflow-x-auto"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
-          role="tablist"
+          className="relative z-30 flex items-center gap-2 px-4 sm:px-6 mb-8 sm:mb-12 md:mb-16"
         >
-          {SERVICES.map((service, i) => (
-            <button
-              key={service.id}
-              ref={(el) => (tabRefs.current[i] = el)}
-              role="tab"
-              aria-selected={i === activeIndex}
-              onClick={() => navigateTo(i)}
-              className="flex-shrink-0 transition-all duration-300 font-semibold"
-              style={{
-                fontFamily: "var(--font-stack-heading)",
-                fontSize: "0.65rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                padding: "8px 14px",
-                whiteSpace: "nowrap",
-                border: "2px solid var(--color-secondary, #9B59F5)",
-                borderRadius: "0",
-                background: i === activeIndex
-                  ? "var(--color-secondary, #9B59F5)"
-                  : "transparent",
-                color: i === activeIndex
-                  ? "#ffffff"
-                  : "#1a1a2e",
-                cursor: "pointer",
-                boxShadow: i === activeIndex
-                  ? "0 4px 14px rgba(155, 89, 245, 0.4)"
-                  : "none",
-              }}
-            >
-              {service.title}
-            </button>
-          ))}
+          {/* Left arrow */}
+          <button
+            onClick={() => navigateTo(activeIndex - 1)}
+            disabled={activeIndex === 0}
+            aria-label="Previous service"
+            style={{
+              flexShrink: 0,
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1.5px solid",
+              borderColor: activeIndex === 0 ? "rgba(26,26,46,0.15)" : "var(--color-secondary, #9B59F5)",
+              borderRadius: "50%",
+              background: "transparent",
+              color: activeIndex === 0 ? "rgba(26,26,46,0.25)" : "var(--color-secondary, #9B59F5)",
+              cursor: activeIndex === 0 ? "default" : "pointer",
+              transition: "all 0.25s ease",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 3L5 7L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+          {/* Tab bar */}
+          <div
+            ref={tabBarRef}
+            className="flex-1 flex gap-1.5 sm:gap-2 justify-start md:justify-center overflow-x-auto"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+            role="tablist"
+          >
+            {SERVICES.map((service, i) => (
+              <button
+                key={service.id}
+                ref={(el) => (tabRefs.current[i] = el)}
+                role="tab"
+                aria-selected={i === activeIndex}
+                onClick={() => navigateTo(i)}
+                className="flex-shrink-0 transition-all duration-300 font-semibold"
+                style={{
+                  fontFamily: "var(--font-stack-heading)",
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  padding: "8px 14px",
+                  whiteSpace: "nowrap",
+                  border: "2px solid var(--color-secondary, #9B59F5)",
+                  borderRadius: "0",
+                  background: i === activeIndex
+                    ? "var(--color-secondary, #9B59F5)"
+                    : "transparent",
+                  color: i === activeIndex
+                    ? "#ffffff"
+                    : "#1a1a2e",
+                  cursor: "pointer",
+                  boxShadow: i === activeIndex
+                    ? "0 4px 14px rgba(155, 89, 245, 0.4)"
+                    : "none",
+                }}
+              >
+                {service.title}
+              </button>
+            ))}
+          </div>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => navigateTo(activeIndex + 1)}
+            disabled={activeIndex === SERVICES.length - 1}
+            aria-label="Next service"
+            style={{
+              flexShrink: 0,
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1.5px solid",
+              borderColor: activeIndex === SERVICES.length - 1 ? "rgba(26,26,46,0.15)" : "var(--color-secondary, #9B59F5)",
+              borderRadius: "50%",
+              background: "transparent",
+              color: activeIndex === SERVICES.length - 1 ? "rgba(26,26,46,0.25)" : "var(--color-secondary, #9B59F5)",
+              cursor: activeIndex === SERVICES.length - 1 ? "default" : "pointer",
+              transition: "all 0.25s ease",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
 
         {/* Mobile: Horizontal scroll slider with peek */}

@@ -54,7 +54,7 @@ const WALL_Z               = 3
 
 const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
 
-function shuffle(accent = 0) {
+function connectorConfigs(accent = 0) {
   return [
     { color: '#444',            roughness: 0.1  },
     { color: '#444',            roughness: 0.75 },
@@ -92,11 +92,13 @@ interface ModelProps {
   /** Smoothly animated target colour (maath easing). */
   color?: string
   roughness?: number
+  /** When true the mesh is transparent — skip castShadow. */
+  glass?: boolean
   /** Pass <MeshTransmissionMaterial> as child for the glass connector. */
   children?: React.ReactNode
 }
 
-function Model({ color = 'white', roughness = 0, children }: ModelProps) {
+function Model({ color = 'white', roughness = 0, glass = false, children }: ModelProps) {
   const ref = useRef<THREE.Mesh>(null!)
 
   useFrame((_s, dt) => {
@@ -112,7 +114,7 @@ function Model({ color = 'white', roughness = 0, children }: ModelProps) {
   })
 
   return (
-    <mesh ref={ref} castShadow receiveShadow geometry={connectorGeom}>
+    <mesh ref={ref} castShadow={!glass} receiveShadow geometry={connectorGeom}>
       {children ?? (
         <meshStandardMaterial metalness={0.2} roughness={roughness} />
       )}
@@ -126,17 +128,17 @@ function Pointer() {
   const ref = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
   const active = useRef(false)
+  const needsWarp = useRef(true)
   const { gl } = useThree()
 
   useEffect(() => {
     const activate = () => { active.current = true }
     const el = gl.domElement
+    // Only activate on pointermove — ensures state.mouse has real coordinates.
+    // Mobile touch-drag fires pointermove; a pure tap doesn't activate the
+    // physics pointer (accent cycling still works via Canvas onPointerUp).
     el.addEventListener('pointermove', activate, { once: true })
-    el.addEventListener('pointerdown', activate, { once: true })
-    return () => {
-      el.removeEventListener('pointermove', activate)
-      el.removeEventListener('pointerdown', activate)
-    }
+    return () => el.removeEventListener('pointermove', activate)
   }, [gl])
 
   useFrame(({ mouse, viewport }) => {
@@ -146,7 +148,14 @@ function Pointer() {
       (mouse.y * viewport.height) / 2,
       0,
     )
-    ref.current.setNextKinematicTranslation(vec)
+    // First active frame: warp instantly (setTranslation) to avoid sweeping
+    // from z=20 through the scene and launching connectors.
+    if (needsWarp.current) {
+      needsWarp.current = false
+      ref.current.setTranslation(vec, true)
+    } else {
+      ref.current.setNextKinematicTranslation(vec)
+    }
   })
 
   return (
@@ -202,6 +211,10 @@ function Connector({
       firstFrame.current = false
       api.current.setLinvel(
         { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2, z: (Math.random() - 0.5) * 0.5 },
+        true,
+      )
+      api.current.setAngvel(
+        { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2, z: (Math.random() - 0.5) * 2 },
         true,
       )
       return
@@ -273,7 +286,7 @@ function Connector({
       <CuboidCollider args={[0.38, 0.38, 1.27]} />
 
       {glass ? (
-        <Model roughness={roughness}>
+        <Model roughness={roughness} glass>
           <MeshTransmissionMaterial
             clearcoat={1}
             thickness={0.5}
@@ -315,7 +328,7 @@ function Walls() {
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
 function Scene({ accent }: { accent: number }) {
-  const connectors = useMemo(() => shuffle(accent), [accent])
+  const connectors = useMemo(() => connectorConfigs(accent), [accent])
 
   return (
     <Physics gravity={[0, 0, 0]}>
@@ -334,7 +347,7 @@ function Scene({ accent }: { accent: number }) {
         <N8AO distanceFalloff={1} aoRadius={1} intensity={2} />
       </EffectComposer>
 
-      <Environment resolution={256}>
+      <Environment resolution={512}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2}  position={[0, 5, -9]}   scale={2} />
           <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2}  position={[-5, 1, -1]}  scale={2} />
@@ -365,11 +378,12 @@ export function LusionConnectors() {
         if (Math.sqrt(dx * dx + dy * dy) < 4) cycleAccent()
         pointerDown.current = null
       }}
+      onPointerLeave={() => { pointerDown.current = null }}
       shadows
       dpr={[1, 1.5]}
       gl={{ antialias: false }}
       camera={{ position: [0, 0, 15], fov: 17.5, near: 1, far: 20 }}
-      style={{ width: '100%', height: '100%' }}
+      style={{ width: '100%', height: '100%', cursor: 'grab' }}
     >
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />

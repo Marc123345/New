@@ -1,13 +1,10 @@
 /**
  * LusionConnectors — floating face cubes with the same zero-gravity physics
  * as the original pmndrs "Lusion connectors" demo.
- *
- * Each cube has a face photo texture on all sides. Same motion model:
- * centre-pull impulse, linearDamping=4, pointer interaction, no walls.
  */
 
-import { useRef, useReducer, useMemo, Suspense } from 'react'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
+import { useRef, useReducer, useMemo, useState, useEffect, Suspense } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import {
   Environment,
   Lightformer,
@@ -56,16 +53,44 @@ const CUBE_SIZE = 1.4
 const CUBE_HALF = CUBE_SIZE / 2
 const CUBE_RADIUS = 0.15
 
+// ─── Texture loader (handles CORS, doesn't suspend) ─────────────────────────
+
+const textureLoader = new THREE.TextureLoader()
+textureLoader.setCrossOrigin('anonymous')
+
+function useTextureSafe(url: string): THREE.Texture | null {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    textureLoader.load(
+      url,
+      (tex) => {
+        if (cancelled) return
+        tex.colorSpace = THREE.SRGBColorSpace
+        setTexture(tex)
+      },
+      undefined,
+      () => {
+        // Failed — leave as null, cube shows solid color
+      },
+    )
+    return () => { cancelled = true }
+  }, [url])
+
+  return texture
+}
+
 // ─── Face-textured cube ──────────────────────────────────────────────────────
 
 function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
-  const texture = useLoader(THREE.TextureLoader, url)
-  texture.colorSpace = THREE.SRGBColorSpace
+  const texture = useTextureSafe(url)
 
   return (
     <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
       <meshStandardMaterial
         map={texture}
+        color={texture ? '#ffffff' : '#665599'}
         metalness={0.05}
         roughness={0.35}
         envMapIntensity={0.6}
@@ -93,7 +118,7 @@ function Pointer() {
   )
 }
 
-// ─── Connector (face cube with physics) ──────────────────────────────────────
+// ─── Connector ────────────────────────────────────────────────────────────────
 
 interface ConnectorProps {
   position?: [number, number, number]
@@ -134,9 +159,7 @@ function Connector({
       colliders={false}
     >
       <CuboidCollider args={[CUBE_HALF, CUBE_HALF, CUBE_HALF]} />
-
       <FaceCube url={faceUrl} />
-
       {accent && accentColor && (
         <pointLight intensity={4} distance={2.5} color={accentColor} />
       )}

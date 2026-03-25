@@ -158,11 +158,19 @@ function Connector({
 
   useFrame((_s, delta) => {
     if (!api.current) return
-    // Clamp delta so a tab-switch doesn't fire a huge impulse.
     const d = Math.min(delta, 0.1)
-    // Pull toward origin: impulse ∝ -(current position) × 0.2
     const t = api.current.translation()
-    vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
+    const dist = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
+
+    if (dist < 0.5) {
+      // Too close to origin — the center-pull impulse would be ~zero,
+      // so kick it in a random direction instead.
+      vec.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
+        .normalize()
+        .multiplyScalar(0.5)
+    } else {
+      vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
+    }
     api.current.applyImpulse(vec, true)
   })
 

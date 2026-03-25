@@ -735,69 +735,76 @@ export function ArcSlider() {
           </div>
         </div>
 
-        {/* Card area with large side arrows */}
-        <div className="relative" style={{ display: "flex", alignItems: "center", gap: "clamp(8px, 1.5vw, 20px)" }}>
-          {/* Left arrow */}
+        {/* Card area with absolutely positioned side arrows */}
+        <div className="relative">
+          {/* Left arrow — pinned to left edge */}
           <button
             onClick={() => navigateTo(activeIndex - 1)}
             disabled={activeIndex === 0}
             aria-label="Previous service"
             className="hidden md:flex"
             style={{
-              flexShrink: 0,
-              width: 56,
-              height: 56,
+              position: "absolute",
+              left: "clamp(12px, 2vw, 32px)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 48,
+              height: 48,
               alignItems: "center",
               justifyContent: "center",
               border: "2px solid",
               borderColor: activeIndex === 0 ? "rgba(26,26,46,0.12)" : "var(--color-secondary, #9B59F5)",
               borderRadius: "50%",
-              background: activeIndex === 0 ? "transparent" : "rgba(164,108,252,0.06)",
+              background: activeIndex === 0 ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.9)",
               color: activeIndex === 0 ? "rgba(26,26,46,0.2)" : "var(--color-secondary, #9B59F5)",
               cursor: activeIndex === 0 ? "default" : "pointer",
               transition: "all 0.3s ease",
-              zIndex: 30,
+              zIndex: 40,
+              backdropFilter: "blur(8px)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
               <path d="M14 5L8 11L14 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
 
           {/* Cards */}
-          <div className="flex-1 min-w-0">
-            {/* Desktop */}
-            <DesktopArcSlider
-              activeIndex={activeIndex}
-              navigateTo={navigateTo}
-              dragRef={dragRef}
-              setOverlayService={setOverlayService}
-            />
-          </div>
+          <DesktopArcSlider
+            activeIndex={activeIndex}
+            navigateTo={navigateTo}
+            dragRef={dragRef}
+            setOverlayService={setOverlayService}
+          />
 
-          {/* Right arrow */}
+          {/* Right arrow — pinned to right edge */}
           <button
             onClick={() => navigateTo(activeIndex + 1)}
             disabled={activeIndex === SERVICES.length - 1}
             aria-label="Next service"
             className="hidden md:flex"
             style={{
-              flexShrink: 0,
-              width: 56,
-              height: 56,
+              position: "absolute",
+              right: "clamp(12px, 2vw, 32px)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 48,
+              height: 48,
               alignItems: "center",
               justifyContent: "center",
               border: "2px solid",
               borderColor: activeIndex === SERVICES.length - 1 ? "rgba(26,26,46,0.12)" : "var(--color-secondary, #9B59F5)",
               borderRadius: "50%",
-              background: activeIndex === SERVICES.length - 1 ? "transparent" : "rgba(164,108,252,0.06)",
+              background: activeIndex === SERVICES.length - 1 ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.9)",
               color: activeIndex === SERVICES.length - 1 ? "rgba(26,26,46,0.2)" : "var(--color-secondary, #9B59F5)",
               cursor: activeIndex === SERVICES.length - 1 ? "default" : "pointer",
               transition: "all 0.3s ease",
-              zIndex: 30,
+              zIndex: 40,
+              backdropFilter: "blur(8px)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
               <path d="M8 5L14 11L8 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>

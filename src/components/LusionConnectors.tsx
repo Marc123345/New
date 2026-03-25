@@ -1,6 +1,6 @@
 /**
- * LusionConnectors — floating face cubes with the same zero-gravity physics
- * as the original pmndrs "Lusion connectors" demo.
+ * LusionConnectors — floating cubes with full face photos and company logos,
+ * same zero-gravity physics as the pmndrs "Lusion connectors" demo.
  */
 
 import { useRef, useReducer, useMemo, useState, useEffect, Suspense } from 'react'
@@ -20,80 +20,77 @@ import type { RapierRigidBody } from '@react-three/rapier'
 import { EffectComposer, N8AO } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-// ─── Face image URLs ──────────────────────────────────────────────────────────
-
-const FACES = [
-  'https://i.pravatar.cc/256?img=32',
-  'https://i.pravatar.cc/256?img=47',
-  'https://i.pravatar.cc/256?img=12',
-  'https://i.pravatar.cc/256?img=25',
-  'https://i.pravatar.cc/256?img=56',
-  'https://i.pravatar.cc/256?img=68',
-  'https://i.pravatar.cc/256?img=3',
-  'https://i.pravatar.cc/256?img=41',
-  'https://i.pravatar.cc/256?img=5',
-  'https://i.pravatar.cc/256?img=9',
-  'https://i.pravatar.cc/256?img=15',
-  'https://i.pravatar.cc/256?img=20',
-  'https://i.pravatar.cc/256?img=33',
-  'https://i.pravatar.cc/256?img=36',
-  'https://i.pravatar.cc/256?img=49',
-  'https://i.pravatar.cc/256?img=52',
-  'https://i.pravatar.cc/256?img=60',
-  'https://i.pravatar.cc/256?img=65',
-]
-
 // ─── Accent palette ───────────────────────────────────────────────────────────
 
 const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
+
+// ─── Image URLs — full photos for faces, logo images for brands ──────────────
+
+const IMAGES = [
+  // Faces — full portrait photos
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=256&h=256&fit=crop&crop=face',
+  // Company logos (from logo.clearbit.com — CORS-friendly, square)
+  'https://logo.clearbit.com/linkedin.com',
+  'https://logo.clearbit.com/instagram.com',
+  'https://logo.clearbit.com/youtube.com',
+  'https://logo.clearbit.com/x.com',
+  'https://logo.clearbit.com/tiktok.com',
+  'https://logo.clearbit.com/google.com',
+  'https://logo.clearbit.com/facebook.com',
+  'https://logo.clearbit.com/spotify.com',
+  'https://logo.clearbit.com/whatsapp.com',
+]
+
+// ─── Texture hook — loads image as full-bleed texture, no suspend ────────────
+
+function useImageTexture(url: string): THREE.Texture | null {
+  const [tex, setTex] = useState<THREE.Texture | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      if (cancelled) return
+      const t = new THREE.Texture(img)
+      t.colorSpace = THREE.SRGBColorSpace
+      t.needsUpdate = true
+      setTex(t)
+    }
+    img.src = url
+    return () => { cancelled = true }
+  }, [url])
+
+  return tex
+}
 
 // ─── Cube size ────────────────────────────────────────────────────────────────
 
 const CUBE_SIZE = 1.4
 const CUBE_HALF = CUBE_SIZE / 2
-const CUBE_RADIUS = 0.15
+const CUBE_RADIUS = 0.12
 
-// ─── Texture loader (handles CORS, doesn't suspend) ─────────────────────────
+// ─── Image cube — full bleed photo/logo on every face ────────────────────────
 
-const textureLoader = new THREE.TextureLoader()
-textureLoader.setCrossOrigin('anonymous')
-
-function useTextureSafe(url: string): THREE.Texture | null {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    textureLoader.load(
-      url,
-      (tex) => {
-        if (cancelled) return
-        tex.colorSpace = THREE.SRGBColorSpace
-        setTexture(tex)
-      },
-      undefined,
-      () => {
-        // Failed — leave as null, cube shows solid color
-      },
-    )
-    return () => { cancelled = true }
-  }, [url])
-
-  return texture
-}
-
-// ─── Face-textured cube ──────────────────────────────────────────────────────
-
-function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
-  const texture = useTextureSafe(url)
+function ImageCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
+  const texture = useImageTexture(url)
 
   return (
     <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
       <meshStandardMaterial
         map={texture}
-        color={texture ? '#ffffff' : '#665599'}
+        color={texture ? '#ffffff' : '#2a1a45'}
         metalness={0.05}
-        roughness={0.35}
-        envMapIntensity={0.6}
+        roughness={0.3}
+        envMapIntensity={0.5}
       />
     </RoundedBox>
   )
@@ -120,19 +117,17 @@ function Pointer() {
 
 // ─── Connector ────────────────────────────────────────────────────────────────
 
-interface ConnectorProps {
-  position?: [number, number, number]
-  faceUrl: string
-  accent?: boolean
-  accentColor?: string
-}
-
 function Connector({
   position,
-  faceUrl,
+  imageUrl,
   accent = false,
   accentColor,
-}: ConnectorProps) {
+}: {
+  position?: [number, number, number]
+  imageUrl: string
+  accent?: boolean
+  accentColor?: string
+}) {
   const api = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
   const r = THREE.MathUtils.randFloatSpread
@@ -159,7 +154,7 @@ function Connector({
       colliders={false}
     >
       <CuboidCollider args={[CUBE_HALF, CUBE_HALF, CUBE_HALF]} />
-      <FaceCube url={faceUrl} />
+      <ImageCube url={imageUrl} />
       {accent && accentColor && (
         <pointLight intensity={4} distance={2.5} color={accentColor} />
       )}
@@ -176,11 +171,11 @@ function Scene({ accent }: { accent: number }) {
     <Physics gravity={[0, 0, 0]}>
       <Pointer />
 
-      {FACES.map((url, i) => (
+      {IMAGES.map((url, i) => (
         <Connector
           key={i}
-          faceUrl={url}
-          accent={i >= FACES.length - 3}
+          imageUrl={url}
+          accent={i >= IMAGES.length - 3}
           accentColor={accentColor}
         />
       ))}

@@ -26,18 +26,17 @@ const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
 
 // ─── Image URLs — full photos for faces, logo images for brands ──────────────
 
-// All images use canvas-generated textures to avoid CORS issues entirely.
-// Faces are loaded via Image() then drawn onto canvas; logos are drawn directly.
+// Face images served from /public — same origin, zero CORS issues.
 const FACE_URLS = [
-  'https://i.pravatar.cc/256?img=32',
-  'https://i.pravatar.cc/256?img=47',
-  'https://i.pravatar.cc/256?img=12',
-  'https://i.pravatar.cc/256?img=25',
-  'https://i.pravatar.cc/256?img=56',
-  'https://i.pravatar.cc/256?img=68',
-  'https://i.pravatar.cc/256?img=3',
-  'https://i.pravatar.cc/256?img=41',
-  'https://i.pravatar.cc/256?img=5',
+  '/faces/face1.jpg',
+  '/faces/face2.jpg',
+  '/faces/face3.jpg',
+  '/faces/face4.jpg',
+  '/faces/face5.jpg',
+  '/faces/face6.jpg',
+  '/faces/face7.jpg',
+  '/faces/face8.jpg',
+  '/faces/face9.jpg',
 ]
 
 interface LogoDef { text: string; bg: string; fg: string }

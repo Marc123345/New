@@ -33,14 +33,6 @@ const phases = [
   },
 ] as const;
 
-const HEADING_STYLES = phases.map((_, i) => ({
-  fontFamily: 'var(--font-stack-heading)',
-  textShadow: `0 0 50px rgba(168,85,247,${0.4 + i * 0.15})`,
-  whiteSpace: 'pre-line' as const,
-}));
-
-const DESC_STYLE = { color: 'rgba(209,213,219,0.9)' } as const;
-
 const PhaseText = memo(({
   scrollYProgress,
   phaseIndex,
@@ -58,76 +50,85 @@ const PhaseText = memo(({
       className="absolute inset-0 flex flex-col justify-center"
       style={{ opacity, y, willChange: 'transform, opacity' }}
     >
+      <span
+        style={{
+          fontSize: 'clamp(0.6rem, 0.9vw, 0.75rem)',
+          letterSpacing: '0.25em',
+          textTransform: 'uppercase',
+          color: 'rgba(192,132,252,0.9)',
+          fontFamily: 'var(--font-stack-heading)',
+          marginBottom: '16px',
+          display: 'block',
+        }}
+      >
+        {phase.subtitle}
+      </span>
       <h2
-        className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 sm:mb-6 text-white"
-        style={HEADING_STYLES[phaseIndex]}
+        style={{
+          fontSize: 'clamp(2rem, 4.5vw, 4rem)',
+          fontWeight: 900,
+          lineHeight: 1.05,
+          color: '#ffffff',
+          fontFamily: 'var(--font-stack-heading)',
+          whiteSpace: 'pre-line',
+          marginBottom: '20px',
+          letterSpacing: '-0.02em',
+        }}
       >
         {phase.title}
       </h2>
-      <p className="text-sm sm:text-base md:text-lg leading-relaxed max-w-sm" style={DESC_STYLE}>
+      <p
+        style={{
+          fontSize: 'clamp(0.875rem, 1.1vw, 1.1rem)',
+          lineHeight: 1.7,
+          color: 'rgba(209,213,219,0.85)',
+          maxWidth: '420px',
+          fontFamily: 'var(--font-stack-body)',
+        }}
+      >
         {phase.description}
       </p>
     </motion.div>
   );
 });
 
-const PROGRESS_BG_STYLE = { background: 'rgba(168,85,247,0.2)' } as const;
-const PROGRESS_FILL_BG = 'linear-gradient(to right, rgba(168,85,247,0.9), rgba(192,132,252,0.5))';
-const DOT_STYLE_BASE = {
-  width: 6,
-  height: 6,
-  borderRadius: '50%',
-  background: '#c084fc',
-  boxShadow: '0 0 8px rgba(192,132,252,0.8)',
-  translateX: '-50%',
-} as const;
-const SCROLL_LABEL_STYLE = {
-  color: 'rgba(192,132,252,0.75)',
-  fontFamily: 'var(--font-stack-heading)',
-} as const;
-
-const ProgressBar = memo(({ progressBarWidth }: { progressBarWidth: MotionValue<string> }) => (
-  <div className="absolute bottom-6 left-4 md:left-8 lg:left-12 right-4 md:right-8 z-20 hidden md:flex flex-col gap-2">
-    <div className="w-64 h-px relative" style={PROGRESS_BG_STYLE}>
-      <motion.div
-        className="absolute inset-y-0 left-0"
-        style={{ width: progressBarWidth, background: PROGRESS_FILL_BG }}
-      />
-      <motion.div
-        className="absolute top-1/2 -translate-y-1/2"
-        style={{ left: progressBarWidth, ...DOT_STYLE_BASE }}
-      />
+const ProgressDots = memo(({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) => {
+  return (
+    <div
+      className="hidden md:flex flex-col items-center gap-3"
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 20,
+      }}
+    >
+      {phases.map((phase, i) => {
+        const mid = (phase.range[1] + phase.range[2]) / 2;
+        return <DotIndicator key={i} scrollYProgress={scrollYProgress} target={mid} />;
+      })}
     </div>
-    <div className="flex items-center gap-2">
-      <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
-        <path d="M0 4H12M12 4L8 1M12 4L8 7" stroke="rgba(192,132,252,0.75)" strokeWidth="1" strokeLinecap="round"/>
-      </svg>
-      <span className="text-xs uppercase tracking-[0.2em]" style={SCROLL_LABEL_STYLE}>
-        scroll to explore
-      </span>
-    </div>
-  </div>
-));
+  );
+});
 
-const PURPLE_OVERLAY = {
-  background: 'radial-gradient(ellipse at 50% 40%, rgba(88,28,135,0.35) 0%, rgba(59,7,100,0.25) 40%, rgba(30,0,60,0.2) 70%, transparent 100%)',
-} as const;
-
-const GRADIENT_OVERLAY_DESKTOP = {
-  background: 'linear-gradient(to right, rgba(2,0,8,0.75) 0%, rgba(2,0,8,0.4) 35%, transparent 60%)',
-} as const;
-
-const GRADIENT_OVERLAY_MOBILE = {
-  background: 'linear-gradient(to top, rgba(2,0,8,0.95) 0%, rgba(2,0,8,0.8) 25%, rgba(2,0,8,0.5) 45%, rgba(2,0,8,0.15) 65%, transparent 80%)',
-} as const;
-
-const BOTTOM_FADE_STYLE = {
-  background: 'linear-gradient(to top, rgba(2,0,8,0.6) 0%, transparent 100%)',
-} as const;
-
-const STICKY_BG = {
-  background: 'radial-gradient(ellipse at 60% 50%, #1a0a35 0%, #0e0422 40%, #080118 100%)',
-} as const;
+function DotIndicator({ scrollYProgress, target }: { scrollYProgress: MotionValue<number>; target: number }) {
+  const scale = useTransform(scrollYProgress, [target - 0.12, target, target + 0.12], [0.6, 1, 0.6]);
+  const dotOpacity = useTransform(scrollYProgress, [target - 0.15, target, target + 0.15], [0.3, 1, 0.3]);
+  return (
+    <motion.div
+      style={{
+        width: 8,
+        height: 8,
+        borderRadius: '50%',
+        background: '#c084fc',
+        scale,
+        opacity: dotOpacity,
+        boxShadow: '0 0 10px rgba(192,132,252,0.6)',
+      }}
+    />
+  );
+}
 
 export function HeroStory() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -141,12 +142,9 @@ export function HeroStory() {
     offset: ['start start', 'end end'],
   });
 
-  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
-
   useEffect(() => {
     const el = stickyRef.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visible = entry.isIntersecting;
@@ -168,43 +166,69 @@ export function HeroStory() {
       <div
         ref={stickyRef}
         className="sticky top-0 h-screen w-full overflow-hidden"
-        style={STICKY_BG}
+        style={{ background: '#0a0118' }}
       >
-        {globeReady && (
-          <Suspense fallback={null}>
-            <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
-          </Suspense>
-        )}
+        {/* ── Split layout ── */}
+        <div className="relative z-10 h-full flex flex-col md:flex-row">
 
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={PURPLE_OVERLAY}
-        />
+          {/* Left: Text phases */}
+          <div
+            className="relative flex-1 flex items-center"
+            style={{
+              padding: isMobile ? '0 24px' : '0 clamp(40px, 5vw, 80px)',
+              paddingTop: isMobile ? '15vh' : 0,
+            }}
+          >
+            {/* Subtle gradient behind text for readability */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: isMobile
+                  ? 'linear-gradient(to bottom, rgba(10,1,24,0.95) 0%, rgba(10,1,24,0.7) 60%, transparent 100%)'
+                  : 'linear-gradient(to right, rgba(10,1,24,0.95) 0%, rgba(10,1,24,0.6) 70%, transparent 100%)',
+              }}
+            />
 
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={isMobile ? GRADIENT_OVERLAY_MOBILE : GRADIENT_OVERLAY_DESKTOP}
-        />
-
-        <div className={`relative z-10 h-full flex ${isMobile ? 'items-start pt-[38vh]' : 'items-center'}`}>
-          <div className="w-full max-w-8xl mx-auto px-4 md:px-8 lg:px-12">
-            <div className="w-full md:w-1/2 relative" style={{ minHeight: isMobile ? 160 : 200 }}>
+            <div className="relative z-10 w-full max-w-lg" style={{ minHeight: isMobile ? 180 : 220 }}>
               {phases.map((_, i) => (
-                <PhaseText
-                  key={i}
-                  scrollYProgress={scrollYProgress}
-                  phaseIndex={i}
-                />
+                <PhaseText key={i} scrollYProgress={scrollYProgress} phaseIndex={i} />
               ))}
             </div>
           </div>
+
+          {/* Centre dots (desktop only) */}
+          <ProgressDots scrollYProgress={scrollYProgress} />
+
+          {/* Right: Globe */}
+          <div
+            className="absolute md:relative md:flex-1"
+            style={{
+              inset: isMobile ? 0 : undefined,
+              width: isMobile ? '100%' : undefined,
+              height: isMobile ? '100%' : undefined,
+              zIndex: isMobile ? 1 : undefined,
+            }}
+          >
+            {/* Purple ambient glow behind globe */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'radial-gradient(ellipse at 50% 45%, rgba(88,28,135,0.4) 0%, rgba(30,0,60,0.15) 50%, transparent 80%)',
+              }}
+            />
+
+            {globeReady && (
+              <Suspense fallback={null}>
+                <GlobeWrapper scrollYProgress={scrollYProgress} isVisible={isVisible} />
+              </Suspense>
+            )}
+          </div>
         </div>
 
-        <ProgressBar progressBarWidth={progressBarWidth} />
-
+        {/* Bottom fade */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={BOTTOM_FADE_STYLE}
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-20"
+          style={{ background: 'linear-gradient(to top, #0a0118 0%, transparent 100%)' }}
         />
       </div>
     </div>

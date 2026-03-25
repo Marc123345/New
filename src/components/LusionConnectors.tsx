@@ -200,6 +200,26 @@ function Connector({
   )
 }
 
+// ─── Walls ────────────────────────────────────────────────────────────────────
+//
+// Six invisible fixed planes that match the visible viewport bounds.
+// Camera fov=17.5 at z=15 → visible ≈ ±4.1 x / ±2.3 y at z=0.
+// Walls are placed just beyond those edges so connectors bounce back
+// before they fully leave the frame.
+
+function Walls() {
+  return (
+    <>
+      <RigidBody type="fixed" position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+    </>
+  )
+}
+
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
 function Scene({ accent }: { accent: number }) {
@@ -208,6 +228,7 @@ function Scene({ accent }: { accent: number }) {
   return (
     <Physics gravity={[0, 0, 0]}>
       <Pointer />
+      <Walls />
 
       {/* 9 standard connectors */}
       {connectors.map((props, i) => (

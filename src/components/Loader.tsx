@@ -132,7 +132,7 @@ export function Loader({ onComplete }: LoaderProps) {
       />
 
       {/* Main content */}
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 48 }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40 }}>
 
         {/* Logo */}
         <div
@@ -142,6 +142,47 @@ export function Loader({ onComplete }: LoaderProps) {
           }}
         >
           <H2HLogo height={72} />
+        </div>
+
+        {/* Social media icons row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {[
+            { text: 'in', bg: '#0A66C2' },
+            { text: 'f',  bg: '#1877F2' },
+            { text: '▶', bg: '#FF0000' },
+            { text: '𝕏', bg: '#000' },
+            { text: '♪', bg: '#010101' },
+            { text: 'G',  bg: '#4285F4' },
+            { text: 'P',  bg: '#E60023' },
+            { text: '♫', bg: '#1DB954' },
+          ].map((icon, i) => {
+            const threshold = (i + 1) * 11;
+            const visible = progress >= threshold;
+            return (
+              <div
+                key={i}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: visible ? icon.bg : 'rgba(164,108,252,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  color: visible ? '#fff' : 'rgba(164,108,252,0.15)',
+                  transition: 'all 0.5s cubic-bezier(0.22,1,0.36,1)',
+                  transform: visible ? 'scale(1)' : 'scale(0.7)',
+                  opacity: visible ? 1 : 0.3,
+                  boxShadow: visible ? `0 0 12px ${icon.bg}55` : 'none',
+                }}
+              >
+                {icon.text}
+              </div>
+            );
+          })}
         </div>
 
         {/* Counter + bar */}

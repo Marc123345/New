@@ -8,8 +8,10 @@
  *   so it slows down quickly on its own.
  * • Every frame, applyImpulse( -translation * 0.2 ) pulls the body back toward
  *   the origin — giving the drifting "back to centre" feel.
- * • Pointer is a kinematic RigidBody moved each frame to track the mouse.
- *   Its BallCollider(r=2) physically pushes any connector that gets too close.
+ * • Soft wall repulsion starts 1.2 units from each wall, gently steering
+ *   connectors inward before they hit the hard collider.
+ * • Pointer is a kinematic RigidBody that lerp-tracks the mouse each frame.
+ *   Its BallCollider(r=1.5) physically pushes any connector that gets close.
  * • Clicking cycles through accent colours; the accent connector carries a
  *   pointLight so it glows.
  * • One connector uses MeshTransmissionMaterial for the glass effect.
@@ -39,16 +41,15 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 
 // ─── Physics constants ────────────────────────────────────────────────────────
 
-const CENTRE_PULL          = 0.2   // matches original pmndrs impulse scale
-const STUCK_DIST           = 0.5   // origin dead-zone: centre-pull → ~0 here
-const STUCK_SPEED_ENTER    = 0.10  // enter escape mode below this m/s
-const STUCK_SPEED_EXIT     = 0.30  // leave escape mode above this (hysteresis)
-const STUCK_GRACE          = 20    // consecutive slow frames before acting
-const ESCAPE_FORCE         = 0.5   // same order as normal drift — no visible snap
-const ESCAPE_ROTATE_FRAMES = 25    // rotate escapeDir after this many escape frames
-const WALL_X               = 5    // wall positions for escape-dir bias
-const WALL_Y               = 3
-const WALL_Z               = 3
+const CENTRE_PULL    = 0.2    // matches original pmndrs impulse scale
+const WALL_MARGIN    = 1.2    // soft repulsion begins this far from wall
+const WALL_PUSH      = 0.4    // repulsion strength (ramps linearly within margin)
+const NUDGE_SPEED    = 2.0    // velocity set when genuinely stuck at origin
+const NUDGE_COOLDOWN = 60     // frames of being stuck before nudging (~1 s)
+const POINTER_LERP   = 0.5    // pointer tracking smoothness (0 = frozen, 1 = instant)
+const WALL_X         = 5      // wall half-extents
+const WALL_Y         = 3
+const WALL_Z         = 3
 
 // ─── Accent palette ───────────────────────────────────────────────────────────
 
@@ -102,7 +103,6 @@ function Model({ color = 'white', roughness = 0, glass = false, children }: Mode
   const ref = useRef<THREE.Mesh>(null!)
 
   useFrame((_s, dt) => {
-    // Only animate when using MeshStandardMaterial (not the glass variant).
     if (!children) {
       easing.dampC(
         (ref.current.material as THREE.MeshStandardMaterial).color,
@@ -134,33 +134,37 @@ function Pointer() {
   useEffect(() => {
     const activate = () => { active.current = true }
     const el = gl.domElement
-    // Only activate on pointermove — ensures state.mouse has real coordinates.
-    // Mobile touch-drag fires pointermove; a pure tap doesn't activate the
-    // physics pointer (accent cycling still works via Canvas onPointerUp).
     el.addEventListener('pointermove', activate, { once: true })
     return () => el.removeEventListener('pointermove', activate)
   }, [gl])
 
   useFrame(({ mouse, viewport }) => {
     if (!ref.current || !active.current) return
-    vec.set(
-      (mouse.x * viewport.width)  / 2,
-      (mouse.y * viewport.height) / 2,
-      0,
-    )
-    // First active frame: warp instantly (setTranslation) to avoid sweeping
-    // from z=20 through the scene and launching connectors.
+
+    const tx = (mouse.x * viewport.width) / 2
+    const ty = (mouse.y * viewport.height) / 2
+
     if (needsWarp.current) {
+      // First active frame: warp instantly so we don't sweep from z = 20.
       needsWarp.current = false
+      vec.set(tx, ty, 0)
       ref.current.setTranslation(vec, true)
     } else {
+      // Lerp toward mouse — caps effective kinematic velocity so the pointer
+      // can't teleport through the cluster and launch everything in one frame.
+      const curr = ref.current.translation()
+      vec.set(
+        curr.x + (tx - curr.x) * POINTER_LERP,
+        curr.y + (ty - curr.y) * POINTER_LERP,
+        0,
+      )
       ref.current.setNextKinematicTranslation(vec)
     }
   })
 
   return (
-    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 20]} restitution={1.0}>
-      <BallCollider args={[2]} />
+    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 20]} restitution={0.5}>
+      <BallCollider args={[1.5]} />
     </RigidBody>
   )
 }
@@ -187,26 +191,18 @@ function Connector({
   const vec = useMemo(() => new THREE.Vector3(), [])
   const r   = THREE.MathUtils.randFloatSpread
 
-  // Stable spawn position — evaluated once on mount.
-  // Kept within wall bounds (±5 x, ±3 y, ±3 z) so connectors don't
-  // spawn past a wall and immediately bounce back toward the centre.
   const pos = useMemo<[number, number, number]>(
     () => position ?? [r(7), r(4), r(4)],
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
-  const escapeDir   = useRef(
-    new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize()
-  )
   const stuckFrames = useRef(0)
-  const inEscape    = useRef(false)
   const firstFrame  = useRef(true)
 
   useFrame((_s, delta) => {
     if (!api.current) return
 
-    // Give each connector a small random kick on its first frame so the scene
-    // looks alive immediately and the stuck-detector doesn't fire on spawn.
+    // ── First-frame kick — scene looks alive immediately ──────────────────
     if (firstFrame.current) {
       firstFrame.current = false
       api.current.setLinvel(
@@ -221,53 +217,49 @@ function Connector({
     }
 
     const d = Math.min(delta, 0.1)
+    const s = d * 60 // frame-rate normalisation
     const t = api.current.translation()
     const v = api.current.linvel()
 
     const dist  = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
     const speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 
-    // ── Stuck state machine ─────────────────────────────────────────────────
-    // Grace period prevents false kicks after a normal post-collision slowdown.
-    // Hysteresis (ENTER < EXIT thresholds) prevents oscillation at boundary.
-    if (!inEscape.current) {
-      if (dist < STUCK_DIST || speed < STUCK_SPEED_ENTER) {
-        stuckFrames.current++
-        if (stuckFrames.current >= STUCK_GRACE) {
-          inEscape.current    = true
-          stuckFrames.current = 0
-        }
-      } else {
-        stuckFrames.current = 0
-      }
-    } else {
-      stuckFrames.current++
-      if (stuckFrames.current % ESCAPE_ROTATE_FRAMES === 0) {
-        // Random direction biased away from the nearest wall so connectors
-        // don't repeatedly slam into corners.
-        const dir = escapeDir.current
-          .set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
-        if (Math.abs(t.x) > WALL_X * 0.6) dir.x = -Math.sign(t.x) * Math.abs(dir.x)
-        if (Math.abs(t.y) > WALL_Y * 0.6) dir.y = -Math.sign(t.y) * Math.abs(dir.y)
-        if (Math.abs(t.z) > WALL_Z * 0.6) dir.z = -Math.sign(t.z) * Math.abs(dir.z)
-        dir.normalize()
-      }
-      // Exit only when clearly moving — hysteresis prevents mode-flicker.
-      if (speed > STUCK_SPEED_EXIT && dist > STUCK_DIST) {
-        inEscape.current    = false
-        stuckFrames.current = 0
-      }
-    }
+    // ── Centre pull — always active ───────────────────────────────────────
+    vec.set(t.x, t.y, t.z).negate().multiplyScalar(CENTRE_PULL * s)
 
-    // ── Impulse ─────────────────────────────────────────────────────────────
-    if (inEscape.current) {
-      // ESCAPE_FORCE=0.5 → terminal ~8 m/s, same order as normal drift.
-      // No visible snap; motion looks continuous.
-      vec.copy(escapeDir.current).multiplyScalar(ESCAPE_FORCE * d * 60)
-    } else {
-      vec.set(t.x, t.y, t.z).negate().multiplyScalar(CENTRE_PULL * d * 60)
-    }
+    // ── Soft wall repulsion — prevents corner trapping ────────────────────
+    // Ramps linearly from 0 at (WALL - MARGIN) to full WALL_PUSH at the wall.
+    // Combined with centre-pull this gently steers connectors inward before
+    // they hit the hard collider, eliminating corner-vibration entirely.
+    const px = Math.abs(t.x) - (WALL_X - WALL_MARGIN)
+    const py = Math.abs(t.y) - (WALL_Y - WALL_MARGIN)
+    const pz = Math.abs(t.z) - (WALL_Z - WALL_MARGIN)
+    if (px > 0) vec.x -= Math.sign(t.x) * (px / WALL_MARGIN) * WALL_PUSH * s
+    if (py > 0) vec.y -= Math.sign(t.y) * (py / WALL_MARGIN) * WALL_PUSH * s
+    if (pz > 0) vec.z -= Math.sign(t.z) * (pz / WALL_MARGIN) * WALL_PUSH * s
+
     api.current.applyImpulse(vec, true)
+
+    // ── Stuck nudge — only when genuinely stuck near origin ───────────────
+    // With 10 connectors jostling each other this almost never fires, but it
+    // catches the rare edge-case of a body at rest right at the origin.
+    // setLinvel is used (not applyImpulse) so the nudge survives heavy damping.
+    if (dist < 0.3 && speed < 0.05) {
+      stuckFrames.current++
+      if (stuckFrames.current >= NUDGE_COOLDOWN) {
+        stuckFrames.current = 0
+        const nx = Math.random() - 0.5
+        const ny = Math.random() - 0.5
+        const nz = Math.random() - 0.5
+        const len = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1
+        api.current.setLinvel(
+          { x: (nx / len) * NUDGE_SPEED, y: (ny / len) * NUDGE_SPEED, z: (nz / len) * NUDGE_SPEED },
+          true,
+        )
+      }
+    } else {
+      stuckFrames.current = 0
+    }
   })
 
   return (
@@ -276,11 +268,10 @@ function Connector({
       position={pos}
       linearDamping={4}
       angularDamping={1}
-      friction={0}
+      friction={0.1}
       restitution={0.5}
       colliders={false}
     >
-      {/* Three cuboid arms that match the visual geometry above */}
       <CuboidCollider args={[0.38, 1.27, 0.38]} />
       <CuboidCollider args={[1.27, 0.38, 0.38]} />
       <CuboidCollider args={[0.38, 0.38, 1.27]} />
@@ -309,18 +300,18 @@ function Connector({
 //
 // Six invisible fixed planes that match the visible viewport bounds.
 // Camera fov=17.5 at z=15 → visible ≈ ±4.1 x / ±2.3 y at z=0.
-// Walls are placed just beyond those edges so connectors bounce back
-// before they fully leave the frame.
+// Walls sit just beyond those edges. Soft repulsion handles most steering;
+// the hard colliders are a safety net for fast-moving bodies.
 
 function Walls() {
   return (
     <>
-      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} restitution={0.8} position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.5} position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.5} position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.5} position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.5} position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.5} position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.5} position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
     </>
   )
 }
@@ -335,12 +326,10 @@ function Scene({ accent }: { accent: number }) {
       <Pointer />
       <Walls />
 
-      {/* 9 standard connectors */}
       {connectors.map((props, i) => (
         <Connector key={i} {...props} />
       ))}
 
-      {/* 1 glass connector — random spawn like the rest */}
       <Connector glass />
 
       <EffectComposer disableNormalPass multisampling={8}>
@@ -394,10 +383,6 @@ export function LusionConnectors() {
         intensity={1}
         castShadow
       />
-      {/*
-        Suspense is required here — Physics suspends while the Rapier WASM
-        loads. The dark fallback keeps the canvas background consistent.
-      */}
       <Suspense fallback={null}>
         <Scene accent={accent} />
       </Suspense>

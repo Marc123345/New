@@ -22,8 +22,8 @@
  * no external file required.
  */
 
-import { useRef, useReducer, useMemo, Suspense } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useReducer, useMemo, useEffect, Suspense } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
 import {
   Physics,
@@ -56,7 +56,7 @@ function shuffle(accent = 0) {
     { color: '#444',            roughness: 0.1  },
     { color: '#444',            roughness: 0.75 },
     { color: '#444',            roughness: 0.75 },
-    { color: '#1a0a2e',         roughness: 0.1  },
+    { color: '#2a1055',         roughness: 0.1  },
     { color: 'white',           roughness: 0.75 },
     { color: 'white',           roughness: 0.1  },
     { color: ACCENTS[accent],   roughness: 0.1,  accent: true },
@@ -120,9 +120,17 @@ function Model({ color = 'white', roughness = 0, children }: ModelProps) {
 function Pointer() {
   const ref = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
+  const active = useRef(false)
+  const { gl } = useThree()
+
+  useEffect(() => {
+    const onMove = () => { active.current = true }
+    gl.domElement.addEventListener('pointermove', onMove, { once: true })
+    return () => gl.domElement.removeEventListener('pointermove', onMove)
+  }, [gl])
 
   useFrame(({ mouse, viewport }) => {
-    if (!ref.current) return
+    if (!ref.current || !active.current) return
     vec.set(
       (mouse.x * viewport.width)  / 2,
       (mouse.y * viewport.height) / 2,
@@ -132,7 +140,7 @@ function Pointer() {
   })
 
   return (
-    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 0]}>
+    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 20]}>
       <BallCollider args={[2]} />
     </RigidBody>
   )
@@ -173,9 +181,22 @@ function Connector({
   )
   const stuckFrames = useRef(0)
   const inEscape    = useRef(false)
+  const firstFrame  = useRef(true)
 
   useFrame((_s, delta) => {
     if (!api.current) return
+
+    // Give each connector a small random kick on its first frame so the scene
+    // looks alive immediately and the stuck-detector doesn't fire on spawn.
+    if (firstFrame.current) {
+      firstFrame.current = false
+      api.current.setLinvel(
+        { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2, z: (Math.random() - 0.5) * 0.5 },
+        true,
+      )
+      return
+    }
+
     const d = Math.min(delta, 0.1)
     const t = api.current.translation()
     const v = api.current.linvel()
@@ -227,7 +248,7 @@ function Connector({
       position={pos}
       linearDamping={4}
       angularDamping={1}
-      friction={-0.1}
+      friction={0}
       colliders={false}
     >
       {/* Three cuboid arms that match the visual geometry above */}
@@ -239,7 +260,7 @@ function Connector({
         <Model roughness={roughness}>
           <MeshTransmissionMaterial
             clearcoat={1}
-            thickness={0.1}
+            thickness={0.5}
             anisotropicBlur={0.1}
             chromaticAberration={0.1}
             samples={8}
@@ -290,11 +311,11 @@ function Scene({ accent }: { accent: number }) {
         <Connector key={i} {...props} />
       ))}
 
-      {/* 1 glass connector — spawns inside bounds so it drifts naturally */}
-      <Connector position={[4, 2, 0]} glass />
+      {/* 1 glass connector — random spawn like the rest */}
+      <Connector glass />
 
       <EffectComposer disableNormalPass multisampling={8}>
-        <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
+        <N8AO distanceFalloff={1} aoRadius={1} intensity={2} />
       </EffectComposer>
 
       <Environment resolution={256}>

@@ -158,24 +158,34 @@ function Connector({
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
-  // Fixed escape direction chosen once per connector. When a body drifts to
-  // the origin the center-pull impulse becomes ~zero, so we push along this
-  // consistent direction each frame until it escapes the dead zone — rather
-  // than picking a new random direction every frame (which cancels itself out).
-  const escapeDir = useMemo(
-    () => new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(),
-    [],
-  )
+  // Mutable escape direction — refreshed whenever the connector stays stuck
+  // for too long, so it doesn't keep pushing into the same wall.
+  const escapeDir   = useRef(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize())
+  const stuckFrames = useRef(0)
 
   useFrame((_s, delta) => {
     if (!api.current) return
     const d = Math.min(delta, 0.1)
     const t = api.current.translation()
-    const dist = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
+    const v = api.current.linvel()
 
-    if (dist < 0.8) {
-      vec.copy(escapeDir).multiplyScalar(3.0)
+    const dist  = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
+    const speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
+
+    // A connector is "stuck" if it's near the origin (centre-pull → 0)
+    // OR if it has nearly stopped anywhere (e.g. wedged against a wall).
+    const stuck = dist < 0.8 || speed < 0.15
+
+    if (stuck) {
+      stuckFrames.current++
+      // Rotate the escape direction every 40 frames so a connector wedged
+      // against a wall eventually tries a different way out.
+      if (stuckFrames.current % 40 === 0) {
+        escapeDir.current.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize()
+      }
+      vec.copy(escapeDir.current).multiplyScalar(3.0)
     } else {
+      stuckFrames.current = 0
       vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
     }
     api.current.applyImpulse(vec, true)

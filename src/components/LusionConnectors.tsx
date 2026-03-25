@@ -151,8 +151,10 @@ function Connector({
   const r   = THREE.MathUtils.randFloatSpread
 
   // Stable spawn position — evaluated once on mount.
+  // Kept within wall bounds (±5 x, ±3 y, ±3 z) so connectors don't
+  // spawn past a wall and immediately bounce back toward the centre.
   const pos = useMemo<[number, number, number]>(
-    () => position ?? [r(10), r(10), r(10)],
+    () => position ?? [r(7), r(4), r(4)],
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
@@ -171,8 +173,8 @@ function Connector({
     const t = api.current.translation()
     const dist = Math.sqrt(t.x * t.x + t.y * t.y + t.z * t.z)
 
-    if (dist < 0.5) {
-      vec.copy(escapeDir).multiplyScalar(2.0)
+    if (dist < 0.8) {
+      vec.copy(escapeDir).multiplyScalar(3.0)
     } else {
       vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
     }

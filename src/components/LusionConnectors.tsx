@@ -46,6 +46,9 @@ const STUCK_SPEED_EXIT     = 0.30  // leave escape mode above this (hysteresis)
 const STUCK_GRACE          = 20    // consecutive slow frames before acting
 const ESCAPE_FORCE         = 0.5   // same order as normal drift — no visible snap
 const ESCAPE_ROTATE_FRAMES = 25    // rotate escapeDir after this many escape frames
+const WALL_X               = 5    // wall positions for escape-dir bias
+const WALL_Y               = 3
+const WALL_Z               = 3
 
 // ─── Accent palette ───────────────────────────────────────────────────────────
 
@@ -55,7 +58,7 @@ function shuffle(accent = 0) {
   return [
     { color: '#444',            roughness: 0.1  },
     { color: '#444',            roughness: 0.75 },
-    { color: '#444',            roughness: 0.75 },
+    { color: '#555',            roughness: 0.5  },
     { color: '#2a1055',         roughness: 0.1  },
     { color: 'white',           roughness: 0.75 },
     { color: 'white',           roughness: 0.1  },
@@ -78,7 +81,9 @@ const connectorGeom: THREE.BufferGeometry = (() => {
     new THREE.BoxGeometry(2.54, 0.76, 0.76),
     new THREE.BoxGeometry(0.76, 0.76, 2.54),
   ]
-  return BufferGeometryUtils.mergeGeometries(arms) ?? new THREE.BoxGeometry(1, 1, 1)
+  const merged = BufferGeometryUtils.mergeGeometries(arms) ?? new THREE.BoxGeometry(1, 1, 1)
+  arms.forEach((a) => a.dispose())
+  return merged
 })()
 
 // ─── Model ────────────────────────────────────────────────────────────────────
@@ -124,9 +129,14 @@ function Pointer() {
   const { gl } = useThree()
 
   useEffect(() => {
-    const onMove = () => { active.current = true }
-    gl.domElement.addEventListener('pointermove', onMove, { once: true })
-    return () => gl.domElement.removeEventListener('pointermove', onMove)
+    const activate = () => { active.current = true }
+    const el = gl.domElement
+    el.addEventListener('pointermove', activate, { once: true })
+    el.addEventListener('pointerdown', activate, { once: true })
+    return () => {
+      el.removeEventListener('pointermove', activate)
+      el.removeEventListener('pointerdown', activate)
+    }
   }, [gl])
 
   useFrame(({ mouse, viewport }) => {
@@ -140,7 +150,7 @@ function Pointer() {
   })
 
   return (
-    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 20]}>
+    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 20]} restitution={1.0}>
       <BallCollider args={[2]} />
     </RigidBody>
   )
@@ -220,9 +230,14 @@ function Connector({
     } else {
       stuckFrames.current++
       if (stuckFrames.current % ESCAPE_ROTATE_FRAMES === 0) {
-        escapeDir.current
+        // Random direction biased away from the nearest wall so connectors
+        // don't repeatedly slam into corners.
+        const dir = escapeDir.current
           .set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
-          .normalize()
+        if (Math.abs(t.x) > WALL_X * 0.6) dir.x = -Math.sign(t.x) * Math.abs(dir.x)
+        if (Math.abs(t.y) > WALL_Y * 0.6) dir.y = -Math.sign(t.y) * Math.abs(dir.y)
+        if (Math.abs(t.z) > WALL_Z * 0.6) dir.z = -Math.sign(t.z) * Math.abs(dir.z)
+        dir.normalize()
       }
       // Exit only when clearly moving — hysteresis prevents mode-flicker.
       if (speed > STUCK_SPEED_EXIT && dist > STUCK_DIST) {
@@ -235,7 +250,7 @@ function Connector({
     if (inEscape.current) {
       // ESCAPE_FORCE=0.5 → terminal ~8 m/s, same order as normal drift.
       // No visible snap; motion looks continuous.
-      vec.copy(escapeDir.current).multiplyScalar(ESCAPE_FORCE)
+      vec.copy(escapeDir.current).multiplyScalar(ESCAPE_FORCE * d * 60)
     } else {
       vec.set(t.x, t.y, t.z).negate().multiplyScalar(CENTRE_PULL * d * 60)
     }
@@ -249,6 +264,7 @@ function Connector({
       linearDamping={4}
       angularDamping={1}
       friction={0}
+      restitution={0.5}
       colliders={false}
     >
       {/* Three cuboid arms that match the visual geometry above */}
@@ -286,12 +302,12 @@ function Connector({
 function Walls() {
   return (
     <>
-      <RigidBody type="fixed" friction={0} position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
-      <RigidBody type="fixed" friction={0} position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.8} position={[-5,  0,  0]}><CuboidCollider args={[0.1, 10, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0,  3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0, -3,  0]}><CuboidCollider args={[10, 0.1, 10]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0,  0,  3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
+      <RigidBody type="fixed" friction={0} restitution={0.8} position={[ 0,  0, -3]}><CuboidCollider args={[10, 10, 0.1]} /></RigidBody>
     </>
   )
 }

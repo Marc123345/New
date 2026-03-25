@@ -28,56 +28,86 @@ function Model({ children, color = 'white', roughness = 0 }: {
   useFrame((_s, dt) => { easing.dampC(ref.current.material.color, color, 0.2, dt) })
   return (
     <mesh ref={ref} castShadow receiveShadow>
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={[0.75, 0.75, 0.75]} />
       <meshStandardMaterial metalness={0.2} roughness={roughness} />
       {children}
     </mesh>
   )
 }
 
-// ─── Mouse tracker ────────────────────────────────────────────────────────────
+// ─── Pointer sphere (kinematic, repels nearby objects) ────────────────────────
 
-function MouseTracker({ target }: { target: React.MutableRefObject<THREE.Vector3> }) {
+function PointerRepulsor({ target }: { target: React.MutableRefObject<THREE.Vector3> }) {
   const { viewport } = useThree()
   useFrame(({ mouse }) => {
-    target.current.set((mouse.x * viewport.width) / 2, (mouse.y * viewport.height) / 2, 0)
+    target.current.set(
+      (mouse.x * viewport.width)  / 2,
+      (mouse.y * viewport.height) / 2,
+      0,
+    )
   })
   return null
 }
 
+// ─── Physics constants ────────────────────────────────────────────────────────
+//
+// Camera sits at z=15, fov=17.5 — visible world at z=0:
+//   half-height ≈ 15 * tan(8.75°) ≈ 2.31 units
+//   half-width  ≈ 2.31 * aspect   ≈ 4.1  units (16:9)
+//
+// All constants are tuned to that coordinate space.
+
+const REPEL_RADIUS  = 1.8   // inter-object repulsion distance
+const REPEL_FORCE   = 10.0  // repulsion magnitude
+const MOUSE_RADIUS  = 2.8   // mouse push radius
+const MOUSE_FORCE   = 6.0
+const CENTER_PULL   = 0.06  // gentle pull back to origin
+const DAMPING       = 0.965 // velocity decay
+const WALL_X        = 4.5
+const WALL_Y        = 2.8
+const WALL_Z        = 2.0
+
 // ─── Connector ────────────────────────────────────────────────────────────────
 
-const REPEL_RADIUS = 2.2   // distance at which objects push each other apart
-const REPEL_FORCE  = 6.0   // how hard they push
-const CENTER_PULL  = 0.03  // gentle drift back to origin
-const DAMPING      = 0.975 // velocity decay per frame
-const WALL         = 7.5   // bounding box half-extent
-
-function Connector({ color = 'white', roughness = 0, accent = false, glass = false, mouse, positions, index }: {
+function Connector({ color = 'white', roughness = 0, accent = false, glass = false, mouse, positions, index, startPos }: {
   color?: string; roughness?: number; accent?: boolean; glass?: boolean
   mouse: React.MutableRefObject<THREE.Vector3>
   positions: React.MutableRefObject<THREE.Vector3[]>
   index: number
+  startPos: [number, number, number]
 }) {
   const group = useRef<THREE.Group>(null!)
-  const r = THREE.MathUtils.randFloatSpread
 
   const state = useMemo(() => ({
-    pos: new THREE.Vector3(r(14), r(14), r(4)),
-    vel: new THREE.Vector3((Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, 0),
-    rot: new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2),
-    rotV: new THREE.Vector3((Math.random() - 0.5) * 1.2, (Math.random() - 0.5) * 1.2, (Math.random() - 0.5) * 0.3),
+    pos: new THREE.Vector3(...startPos),
+    vel: new THREE.Vector3(
+      (Math.random() - 0.5) * 1.2,
+      (Math.random() - 0.5) * 1.2,
+      (Math.random() - 0.5) * 0.3,
+    ),
+    rot: new THREE.Euler(
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+    ),
+    rotV: new THREE.Vector3(
+      (Math.random() - 0.5) * 1.5,
+      (Math.random() - 0.5) * 1.5,
+      (Math.random() - 0.5) * 0.4,
+    ),
   }), []) // eslint-disable-line
 
   useFrame((_s, dt) => {
     const d = Math.min(dt, 0.05)
     const { pos, vel, rot, rotV } = state
 
-    // register own position so others can read it
+    // register own position
     positions.current[index] = pos
 
     // 1 — weak centre pull
-    vel.addScaledVector(pos, -CENTER_PULL * d * 60)
+    vel.x += -pos.x * CENTER_PULL * d * 60
+    vel.y += -pos.y * CENTER_PULL * d * 60
+    vel.z += -pos.z * CENTER_PULL * d * 60 * 0.5
 
     // 2 — repel every other connector
     for (let i = 0; i < positions.current.length; i++) {
@@ -89,10 +119,10 @@ function Connector({ color = 'white', roughness = 0, accent = false, glass = fal
       const dz = pos.z - other.z
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001
       if (dist < REPEL_RADIUS) {
-        const f = (REPEL_RADIUS - dist) / REPEL_RADIUS * REPEL_FORCE
-        vel.x += (dx / dist) * f * d
-        vel.y += (dy / dist) * f * d
-        vel.z += (dz / dist) * f * d * 0.3
+        const f = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_FORCE * d
+        vel.x += (dx / dist) * f
+        vel.y += (dy / dist) * f
+        vel.z += (dz / dist) * f * 0.3
       }
     }
 
@@ -100,10 +130,10 @@ function Connector({ color = 'white', roughness = 0, accent = false, glass = fal
     const mx = pos.x - mouse.current.x
     const my = pos.y - mouse.current.y
     const md = Math.sqrt(mx * mx + my * my) || 0.001
-    if (md < 2.5) {
-      const f = (2.5 - md) / 2.5 * 5.0
-      vel.x += (mx / md) * f * d
-      vel.y += (my / md) * f * d
+    if (md < MOUSE_RADIUS) {
+      const f = ((MOUSE_RADIUS - md) / MOUSE_RADIUS) * MOUSE_FORCE * d
+      vel.x += (mx / md) * f
+      vel.y += (my / md) * f
     }
 
     // 4 — damping
@@ -113,9 +143,9 @@ function Connector({ color = 'white', roughness = 0, accent = false, glass = fal
     pos.addScaledVector(vel, d)
 
     // 6 — wall bounce
-    if (Math.abs(pos.x) > WALL) { vel.x *= -0.6; pos.x = Math.sign(pos.x) * WALL }
-    if (Math.abs(pos.y) > WALL) { vel.y *= -0.6; pos.y = Math.sign(pos.y) * WALL }
-    if (Math.abs(pos.z) > 3.5)  { vel.z *= -0.6; pos.z = Math.sign(pos.z) * 3.5 }
+    if (Math.abs(pos.x) > WALL_X) { vel.x *= -0.6; pos.x = Math.sign(pos.x) * WALL_X }
+    if (Math.abs(pos.y) > WALL_Y) { vel.y *= -0.6; pos.y = Math.sign(pos.y) * WALL_Y }
+    if (Math.abs(pos.z) > WALL_Z) { vel.z *= -0.6; pos.z = Math.sign(pos.z) * WALL_Z }
 
     // 7 — tumble
     rot.x += rotV.x * d * 0.5
@@ -142,6 +172,22 @@ function Connector({ color = 'white', roughness = 0, accent = false, glass = fal
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
+// Pre-separated start positions spread across the visible viewport.
+// Camera fov=17.5 at z=15 → visible ≈ ±4 x × ±2.2 y at z=0.
+// Using a loose grid so objects never start on top of each other.
+const START_POSITIONS: [number, number, number][] = [
+  [-3.2,  1.6,  0.8],
+  [-1.2,  1.8, -0.5],
+  [ 1.2,  1.5,  0.6],
+  [ 3.0,  1.7, -0.8],
+  [-3.4, -0.1,  0.4],
+  [-0.6,  0.0, -0.7],
+  [ 2.2,  0.0,  0.9],
+  [-2.0, -1.6,  0.3],
+  [ 0.4, -1.8, -0.6],
+  [ 3.2, -1.5,  0.7],
+]
+
 function Scene({ accent }: { accent: number }) {
   const mouse = useRef(new THREE.Vector3())
   const connectors = useMemo(() => shuffle(accent), [accent])
@@ -153,10 +199,17 @@ function Scene({ accent }: { accent: number }) {
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-      <MouseTracker target={mouse} />
+      <PointerRepulsor target={mouse} />
 
       {allItems.map((props, i) => (
-        <Connector key={i} index={i} positions={positions} mouse={mouse} {...props} />
+        <Connector
+          key={i}
+          index={i}
+          positions={positions}
+          mouse={mouse}
+          startPos={START_POSITIONS[i % START_POSITIONS.length]}
+          {...props}
+        />
       ))}
 
       <EffectComposer disableNormalPass multisampling={8}>

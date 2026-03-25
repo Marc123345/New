@@ -141,8 +141,8 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
 
         <div className="p-5 sm:p-6" style={{ position: "relative", zIndex: 3 }}>
           <div
-            className="flex items-center gap-3 mb-4 text-[11px] tracking-wider uppercase opacity-65"
-            style={{ fontFamily: "var(--font-stack-heading)" }}
+            className="flex items-center gap-3 mb-4 text-[11px] tracking-wider uppercase"
+            style={{ color: "rgba(26,26,46,0.55)", fontFamily: "var(--font-stack-heading)" }}
           >
             <span>{post.date}</span>
             <span className="w-1 h-1 rounded-full bg-current" />
@@ -162,8 +162,8 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           </h3>
 
           <p
-            className="text-sm leading-relaxed opacity-80 mb-5 line-clamp-2"
-            style={{ fontFamily: "var(--font-stack-body)" }}
+            className="text-sm leading-relaxed mb-5 line-clamp-2"
+            style={{ fontFamily: "var(--font-stack-body)", color: "rgba(26,26,46,0.72)" }}
           >
             {post.excerpt}
           </p>
@@ -173,8 +173,8 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             style={{ borderTop: "1px solid rgba(26,26,46,0.12)" }}
           >
             <span
-              className="text-[11px] tracking-wider uppercase opacity-65"
-              style={{ fontFamily: "var(--font-stack-heading)" }}
+              className="text-[11px] tracking-wider uppercase"
+              style={{ fontFamily: "var(--font-stack-heading)", color: "rgba(26,26,46,0.6)" }}
             >
               {post.author}
             </span>

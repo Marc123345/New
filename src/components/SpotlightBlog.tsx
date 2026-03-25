@@ -129,7 +129,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
               fontSize: "0.7rem",
               letterSpacing: "0.15em",
               textTransform: "uppercase",
-              opacity: 0.65,
+              color: "rgba(26,26,46,0.55)",
               fontFamily: "var(--font-stack-heading)",
             }}>
               <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -160,7 +160,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
             <p style={{
               fontSize: "clamp(0.875rem, 1.1vw, 1rem)",
               lineHeight: 1.7,
-              opacity: 0.8,
+              color: "rgba(26,26,46,0.75)",
               fontFamily: "var(--font-stack-body)",
               marginBottom: "32px",
             }}>
@@ -531,7 +531,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
             fontSize: "0.68rem",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            opacity: 0.65,
+            color: "rgba(26,26,46,0.55)",
             fontFamily: "var(--font-stack-heading)",
           }}>
             <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
@@ -562,7 +562,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
           <p style={{
             fontSize: "0.875rem",
             lineHeight: 1.6,
-            opacity: 0.78,
+            color: "rgba(26,26,46,0.72)",
             fontFamily: "var(--font-stack-body)",
             marginBottom: "20px",
             display: "-webkit-box",
@@ -587,7 +587,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
               fontSize: "0.7rem",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              opacity: 0.7,
+              color: "rgba(26,26,46,0.6)",
               fontFamily: "var(--font-stack-heading)",
             }}>
               <User size={11} /> {post.author}

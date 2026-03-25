@@ -5,7 +5,7 @@ import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Navigation } from "./components/Navigation";
 import { ScrollReveal } from "./components/ScrollReveal";
-import { HeroStory } from "./components/HeroStory";
+
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
@@ -169,8 +169,6 @@ function AppContent() {
 
       {/* ═══ HERO — exact Lusion layout ═══ */}
       <HeroLusion />
-
-      <HeroStory />
 
       <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
         <EcosystemServices />

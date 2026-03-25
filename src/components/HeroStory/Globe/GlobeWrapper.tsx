@@ -25,10 +25,11 @@ function getArcThreshold(progress: number, mobile: boolean): number {
   );
 }
 
+// Elegant gradient arcs — primary glow, secondary shimmer, tertiary whisper
 const ARC_COLORS = [
-  ['rgba(192,132,252,1)', 'rgba(168,85,247,0.85)'],
-  ['rgba(139,92,246,0.95)', 'rgba(167,139,250,0.8)'],
-  ['rgba(216,180,254,1)', 'rgba(192,132,252,0.85)'],
+  ['rgba(192,132,252,0.9)', 'rgba(139,92,246,0.5)'],   // bright → mid purple
+  ['rgba(167,139,250,0.7)', 'rgba(124,58,237,0.35)'],   // soft lavender → deep violet
+  ['rgba(216,180,254,0.5)', 'rgba(192,132,252,0.2)'],   // faint shimmer
 ];
 const EMPTY_ARCS: object[] = [];
 
@@ -84,11 +85,11 @@ function getArcs(progress: number, mobile: boolean): object[] {
 }
 
 function buildPointData(cities: typeof TOP_CITIES, count: number) {
-  return cities.slice(0, count).map((c) => ({
+  return cities.slice(0, count).map((c, i) => ({
     lat: c.lat,
     lng: c.lng,
-    size: 0.6,
-    color: 'rgba(216,180,254,0.95)',
+    size: i < 5 ? 0.45 : 0.3,
+    color: i < 5 ? 'rgba(216,180,254,0.9)' : 'rgba(192,132,252,0.6)',
   }));
 }
 
@@ -162,31 +163,37 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
       globe
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
-        .atmosphereColor('rgba(140,80,230,0.6)')
-        .atmosphereAltitude(mobile ? 0.12 : 0.18)
+        .atmosphereColor('rgba(140,80,230,0.45)')
+        .atmosphereAltitude(mobile ? 0.15 : 0.22)
         .width(w)
         .height(h);
 
       if (!hideArcs) {
+        // Heatmap — subtle warm glow on the surface
         globe
           .heatmapPointLat('lat')
           .heatmapPointLng('lng')
           .heatmapPointWeight('pop')
-          .heatmapBandwidth(mobile ? 0.8 : 1.1)
-          .heatmapColorSaturation(mobile ? 2.8 : 3.5)
-          .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
-          .arcColor('color')
-          .arcDashLength(mobile ? 0.6 : 0.5)
-          .arcDashGap(mobile ? 0.15 : 0.1)
-          .arcDashAnimateTime(mobile ? 1800 : 1200)
-          .arcStroke(mobile ? 1.5 : 2.2)
-          .arcsTransitionDuration(400);
+          .heatmapBandwidth(mobile ? 0.6 : 0.9)
+          .heatmapColorSaturation(mobile ? 2.2 : 2.8)
+          .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES]);
 
+        // Arcs — thin, flowing, elegant
+        globe
+          .arcColor('color')
+          .arcDashLength(mobile ? 0.8 : 0.7)
+          .arcDashGap(mobile ? 0.2 : 0.15)
+          .arcDashAnimateTime(mobile ? 2400 : 2000)
+          .arcStroke(mobile ? 0.8 : 1.2)
+          .arcAltitudeAutoScale(0.4)
+          .arcsTransitionDuration(800);
+
+        // City points — small, soft glowing dots
         globe
           .pointLat('lat')
           .pointLng('lng')
           .pointColor('color')
-          .pointAltitude(0.01)
+          .pointAltitude(0.008)
           .pointRadius('size')
           .pointsMerge(true)
           .pointsData(EMPTY_POINTS);

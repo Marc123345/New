@@ -5,7 +5,7 @@ import { LazySection, SectionLoader } from "./components/LazySection";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Navigation } from "./components/Navigation";
 import { ScrollReveal } from "./components/ScrollReveal";
-
+import { HeroStory } from "./components/HeroStory";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
@@ -15,9 +15,6 @@ const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
 );
 
-const AboutStory = lazy(() =>
-  import("./components/AboutStory").then((m) => ({ default: m.AboutStory })),
-);
 const EcosystemServices = lazy(() =>
   import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),
 );
@@ -170,14 +167,10 @@ function AppContent() {
       {/* ═══ HERO — exact Lusion layout ═══ */}
       <HeroLusion />
 
+      <HeroStory />
+
       <div id="ecosystem" className="relative" style={{ zIndex: 2 }}>
         <EcosystemServices />
-      </div>
-
-      <div id="about" className="relative" style={{ zIndex: 2 }}>
-        <Suspense fallback={<SectionLoader />}>
-          <AboutStory />
-        </Suspense>
       </div>
 
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>

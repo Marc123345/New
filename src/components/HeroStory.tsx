@@ -322,14 +322,19 @@ export function HeroStory() {
         className="sticky top-0 h-screen w-full overflow-hidden"
         style={{ background: '#0a0118' }}
       >
-        {/* ── Split layout ── */}
-        <div className="relative z-10 h-full flex flex-col md:flex-row">
+        {/* ── True 50/50 split via CSS grid ── */}
+        <div
+          className="relative z-10 h-full"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          }}
+        >
 
           {/* Left: Text */}
           <div
-            className="relative flex items-center justify-center"
+            className="relative flex items-center"
             style={{
-              flex: isMobile ? '1' : '0 0 50%',
               padding: isMobile ? '0 28px' : '0 clamp(48px, 6vw, 96px)',
               paddingTop: isMobile ? '12vh' : 0,
               zIndex: 10,
@@ -341,7 +346,7 @@ export function HeroStory() {
               style={{
                 background: isMobile
                   ? 'linear-gradient(to bottom, rgba(10,1,24,0.97) 0%, rgba(10,1,24,0.75) 50%, transparent 100%)'
-                  : 'linear-gradient(105deg, rgba(10,1,24,0.97) 0%, rgba(10,1,24,0.85) 55%, rgba(10,1,24,0.3) 80%, transparent 100%)',
+                  : 'linear-gradient(to right, rgba(10,1,24,0.95) 0%, rgba(10,1,24,0.8) 60%, rgba(10,1,24,0.2) 90%, transparent 100%)',
               }}
             />
 
@@ -352,17 +357,12 @@ export function HeroStory() {
             </div>
           </div>
 
-          {/* Centre progress track (desktop) */}
-          <ProgressTrack scrollYProgress={scrollYProgress} />
-
           {/* Right: Globe */}
           <div
-            className="absolute md:relative"
+            className="relative"
             style={{
-              flex: isMobile ? undefined : '0 0 50%',
+              position: isMobile ? 'absolute' : 'relative',
               inset: isMobile ? 0 : undefined,
-              width: isMobile ? '100%' : undefined,
-              height: '100%',
               zIndex: isMobile ? 1 : 5,
             }}
           >
@@ -380,6 +380,9 @@ export function HeroStory() {
               </Suspense>
             )}
           </div>
+
+          {/* Centre progress track — absolutely positioned over the grid seam */}
+          <ProgressTrack scrollYProgress={scrollYProgress} />
         </div>
 
         {/* Scroll hint */}

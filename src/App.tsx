@@ -101,7 +101,7 @@ function HeroLusion() {
         <span style={{
           fontFamily: 'var(--font-stack-heading)',
           fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',
-          fontWeight: 300,
+          fontWeight: 700,
           color: '#0a0a0a',
           maxWidth: 500,
           lineHeight: 1.2,

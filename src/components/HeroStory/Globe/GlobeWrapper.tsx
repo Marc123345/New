@@ -167,30 +167,32 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         .width(w)
         .height(h);
 
-      globe
-        .heatmapPointLat('lat')
-        .heatmapPointLng('lng')
-        .heatmapPointWeight('pop')
-        .heatmapBandwidth(mobile ? 0.8 : 1.1)
-        .heatmapColorSaturation(mobile ? 2.8 : 3.5)
-        .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
-        .arcColor('color')
-        .arcDashLength(mobile ? 0.6 : 0.5)
-        .arcDashGap(mobile ? 0.15 : 0.1)
-        .arcDashAnimateTime(mobile ? 1800 : 1200)
-        .arcStroke(mobile ? 1.5 : 2.2)
-        .arcsTransitionDuration(400);
+      if (!hideArcs) {
+        globe
+          .heatmapPointLat('lat')
+          .heatmapPointLng('lng')
+          .heatmapPointWeight('pop')
+          .heatmapBandwidth(mobile ? 0.8 : 1.1)
+          .heatmapColorSaturation(mobile ? 2.8 : 3.5)
+          .heatmapsData([mobile ? HEATMAP_CITIES_MOBILE : HEATMAP_CITIES])
+          .arcColor('color')
+          .arcDashLength(mobile ? 0.6 : 0.5)
+          .arcDashGap(mobile ? 0.15 : 0.1)
+          .arcDashAnimateTime(mobile ? 1800 : 1200)
+          .arcStroke(mobile ? 1.5 : 2.2)
+          .arcsTransitionDuration(400);
 
-      globe
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor('color')
-        .pointAltitude(0.01)
-        .pointRadius('size')
-        .pointsMerge(true)
-        .pointsData(EMPTY_POINTS);
+        globe
+          .pointLat('lat')
+          .pointLng('lng')
+          .pointColor('color')
+          .pointAltitude(0.01)
+          .pointRadius('size')
+          .pointsMerge(true)
+          .pointsData(EMPTY_POINTS);
 
-      globe.arcsData(EMPTY_ARCS);
+        globe.arcsData(EMPTY_ARCS);
+      }
 
       const controls = globe.controls();
       controls.autoRotate = true;

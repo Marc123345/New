@@ -223,6 +223,7 @@ export function Testimonials() {
                       <GlobeWrapper
                         scrollYProgress={scrollYProgress}
                         isVisible={globeVisible}
+                        hideArcs
                       />
                     </Suspense>
                   )}

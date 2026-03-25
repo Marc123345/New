@@ -557,7 +557,7 @@ export function ArcSlider() {
             style={{
               fontSize: "clamp(2rem, 5vw, 4rem)",
               fontFamily: "var(--font-stack-heading)",
-              color: "var(--color-text-dark, #111)",
+              color: "#1a1a2e",
             }}
           >
             Our Capabilities
@@ -593,7 +593,7 @@ export function ArcSlider() {
                   : "transparent",
                 color: i === activeIndex
                   ? "#ffffff"
-                  : "var(--color-text-dark, #111)",
+                  : "#1a1a2e",
                 cursor: "pointer",
                 boxShadow: i === activeIndex
                   ? "0 4px 14px rgba(155, 89, 245, 0.4)"
@@ -756,7 +756,7 @@ export function ArcSlider() {
                 borderRadius: "0",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
-                  : "rgba(155, 89, 245, 0.2)",
+                  : "rgba(155, 89, 245, 0.35)",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,

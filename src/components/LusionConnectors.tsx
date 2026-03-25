@@ -1,241 +1,268 @@
+/**
+ * LusionConnectors — faithful TypeScript port of the pmndrs "Lusion connectors" demo.
+ *
+ * Motion model
+ * ─────────────
+ * • <Physics gravity={[0,0,0]}> → zero-gravity world.
+ * • Each Connector is a dynamic RigidBody with linearDamping=4 / angularDamping=1
+ *   so it slows down quickly on its own.
+ * • Every frame, applyImpulse( -translation * 0.2 ) pulls the body back toward
+ *   the origin — giving the drifting "back to centre" feel.
+ * • Pointer is a kinematic RigidBody moved each frame to track the mouse.
+ *   Its BallCollider(r=3) physically pushes any connector that gets too close.
+ * • Clicking cycles through accent colours; the accent connector carries a
+ *   pointLight so it glows.
+ * • One connector uses MeshTransmissionMaterial for the glass effect.
+ *
+ * Geometry
+ * ─────────
+ * The original demo loads /c-transformed.glb (a cross-shaped connector piece).
+ * We reproduce that shape procedurally by merging three BoxGeometries into a
+ * single BufferGeometry — same three-arm cuboid the pmndrs example uses,
+ * no external file required.
+ */
+
 import { useRef, useReducer, useMemo, Suspense } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
+import {
+  Physics,
+  RigidBody,
+  CuboidCollider,
+  BallCollider,
+} from '@react-three/rapier'
+import type { RapierRigidBody } from '@react-three/rapier'
 import { EffectComposer, N8AO } from '@react-three/postprocessing'
 import { easing } from 'maath'
 import * as THREE from 'three'
+import { mergeBufferGeometries } from 'three-stdlib'
 
-const accents = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea']
+// ─── Accent palette ───────────────────────────────────────────────────────────
 
-const shuffle = (accent = 0) => [
-  { color: '#444', roughness: 0.1 },
-  { color: '#444', roughness: 0.75 },
-  { color: '#444', roughness: 0.75 },
-  { color: '#1a0a2e', roughness: 0.1 },
-  { color: 'white', roughness: 0.75 },
-  { color: 'white', roughness: 0.1 },
-  { color: accents[accent], roughness: 0.1, accent: true },
-  { color: accents[accent], roughness: 0.75, accent: true },
-  { color: accents[accent], roughness: 0.1, accent: true },
-]
+const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
+
+function shuffle(accent = 0) {
+  return [
+    { color: '#444',            roughness: 0.1  },
+    { color: '#444',            roughness: 0.75 },
+    { color: '#444',            roughness: 0.75 },
+    { color: '#1a0a2e',         roughness: 0.1  },
+    { color: 'white',           roughness: 0.75 },
+    { color: 'white',           roughness: 0.1  },
+    { color: ACCENTS[accent],   roughness: 0.1,  accent: true },
+    { color: ACCENTS[accent],   roughness: 0.75, accent: true },
+    { color: ACCENTS[accent],   roughness: 0.1,  accent: true },
+  ]
+}
+
+// ─── Connector geometry (cross shape, built once) ─────────────────────────────
+//
+// Three arms matching the CuboidCollider half-extents used below:
+//   [0.38, 1.27, 0.38]  →  BoxGeometry(0.76, 2.54, 0.76)  (vertical)
+//   [1.27, 0.38, 0.38]  →  BoxGeometry(2.54, 0.76, 0.76)  (horizontal)
+//   [0.38, 0.38, 1.27]  →  BoxGeometry(0.76, 0.76, 2.54)  (depth)
+
+const connectorGeom: THREE.BufferGeometry = (() => {
+  const arms = [
+    new THREE.BoxGeometry(0.76, 2.54, 0.76),
+    new THREE.BoxGeometry(2.54, 0.76, 0.76),
+    new THREE.BoxGeometry(0.76, 0.76, 2.54),
+  ]
+  return mergeBufferGeometries(arms) ?? new THREE.BoxGeometry(1, 1, 1)
+})()
 
 // ─── Model ────────────────────────────────────────────────────────────────────
 
-function Model({ children, color = 'white', roughness = 0 }: {
-  children?: React.ReactNode; color?: string; roughness?: number
-}) {
+interface ModelProps {
+  /** Smoothly animated target colour (maath easing). */
+  color?: string
+  roughness?: number
+  /** Pass <MeshTransmissionMaterial> as child for the glass connector. */
+  children?: React.ReactNode
+}
+
+function Model({ color = 'white', roughness = 0, children }: ModelProps) {
   const ref = useRef<THREE.Mesh>(null!)
-  useFrame((_s, dt) => { easing.dampC(ref.current.material.color, color, 0.2, dt) })
+
+  useFrame((_s, dt) => {
+    // Only animate when using MeshStandardMaterial (not the glass variant).
+    if (!children) {
+      easing.dampC(
+        (ref.current.material as THREE.MeshStandardMaterial).color,
+        color,
+        0.2,
+        dt,
+      )
+    }
+  })
+
   return (
-    <mesh ref={ref} castShadow receiveShadow>
-      <boxGeometry args={[0.75, 0.75, 0.75]} />
-      <meshStandardMaterial metalness={0.2} roughness={roughness} />
-      {children}
+    <mesh ref={ref} castShadow receiveShadow geometry={connectorGeom}>
+      {children ?? (
+        <meshStandardMaterial metalness={0.2} roughness={roughness} />
+      )}
     </mesh>
   )
 }
 
-// ─── Pointer sphere (kinematic, repels nearby objects) ────────────────────────
+// ─── Pointer ──────────────────────────────────────────────────────────────────
 
-function PointerRepulsor({ target }: { target: React.MutableRefObject<THREE.Vector3> }) {
-  const { viewport } = useThree()
-  useFrame(({ mouse }) => {
-    target.current.set(
+function Pointer() {
+  const ref = useRef<RapierRigidBody>(null)
+  const vec = useMemo(() => new THREE.Vector3(), [])
+
+  useFrame(({ mouse, viewport }) => {
+    if (!ref.current) return
+    vec.set(
       (mouse.x * viewport.width)  / 2,
       (mouse.y * viewport.height) / 2,
       0,
     )
-  })
-  return null
-}
-
-// ─── Physics constants ────────────────────────────────────────────────────────
-//
-// Camera sits at z=15, fov=17.5 — visible world at z=0:
-//   half-height ≈ 15 * tan(8.75°) ≈ 2.31 units
-//   half-width  ≈ 2.31 * aspect   ≈ 4.1  units (16:9)
-//
-// All constants are tuned to that coordinate space.
-
-const REPEL_RADIUS  = 1.8   // inter-object repulsion distance
-const REPEL_FORCE   = 10.0  // repulsion magnitude
-const MOUSE_RADIUS  = 2.8   // mouse push radius
-const MOUSE_FORCE   = 6.0
-const CENTER_PULL   = 0.06  // gentle pull back to origin
-const DAMPING       = 0.965 // velocity decay
-const WALL_X        = 4.5
-const WALL_Y        = 2.8
-const WALL_Z        = 2.0
-
-// ─── Connector ────────────────────────────────────────────────────────────────
-
-function Connector({ color = 'white', roughness = 0, accent = false, glass = false, mouse, positions, index, startPos }: {
-  color?: string; roughness?: number; accent?: boolean; glass?: boolean
-  mouse: React.MutableRefObject<THREE.Vector3>
-  positions: React.MutableRefObject<THREE.Vector3[]>
-  index: number
-  startPos: [number, number, number]
-}) {
-  const group = useRef<THREE.Group>(null!)
-
-  const state = useMemo(() => ({
-    pos: new THREE.Vector3(...startPos),
-    vel: new THREE.Vector3(
-      (Math.random() - 0.5) * 1.2,
-      (Math.random() - 0.5) * 1.2,
-      (Math.random() - 0.5) * 0.3,
-    ),
-    rot: new THREE.Euler(
-      Math.random() * Math.PI * 2,
-      Math.random() * Math.PI * 2,
-      Math.random() * Math.PI * 2,
-    ),
-    rotV: new THREE.Vector3(
-      (Math.random() - 0.5) * 1.5,
-      (Math.random() - 0.5) * 1.5,
-      (Math.random() - 0.5) * 0.4,
-    ),
-  }), []) // eslint-disable-line
-
-  useFrame((_s, dt) => {
-    const d = Math.min(dt, 0.05)
-    const { pos, vel, rot, rotV } = state
-
-    // register own position
-    positions.current[index] = pos
-
-    // 1 — weak centre pull
-    vel.x += -pos.x * CENTER_PULL * d * 60
-    vel.y += -pos.y * CENTER_PULL * d * 60
-    vel.z += -pos.z * CENTER_PULL * d * 60 * 0.5
-
-    // 2 — repel every other connector
-    for (let i = 0; i < positions.current.length; i++) {
-      if (i === index) continue
-      const other = positions.current[i]
-      if (!other) continue
-      const dx = pos.x - other.x
-      const dy = pos.y - other.y
-      const dz = pos.z - other.z
-      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001
-      if (dist < REPEL_RADIUS) {
-        const f = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_FORCE * d
-        vel.x += (dx / dist) * f
-        vel.y += (dy / dist) * f
-        vel.z += (dz / dist) * f * 0.3
-      }
-    }
-
-    // 3 — mouse repulsion
-    const mx = pos.x - mouse.current.x
-    const my = pos.y - mouse.current.y
-    const md = Math.sqrt(mx * mx + my * my) || 0.001
-    if (md < MOUSE_RADIUS) {
-      const f = ((MOUSE_RADIUS - md) / MOUSE_RADIUS) * MOUSE_FORCE * d
-      vel.x += (mx / md) * f
-      vel.y += (my / md) * f
-    }
-
-    // 4 — damping
-    vel.multiplyScalar(Math.pow(DAMPING, d * 60))
-
-    // 5 — integrate
-    pos.addScaledVector(vel, d)
-
-    // 6 — wall bounce
-    if (Math.abs(pos.x) > WALL_X) { vel.x *= -0.6; pos.x = Math.sign(pos.x) * WALL_X }
-    if (Math.abs(pos.y) > WALL_Y) { vel.y *= -0.6; pos.y = Math.sign(pos.y) * WALL_Y }
-    if (Math.abs(pos.z) > WALL_Z) { vel.z *= -0.6; pos.z = Math.sign(pos.z) * WALL_Z }
-
-    // 7 — tumble
-    rot.x += rotV.x * d * 0.5
-    rot.y += rotV.y * d * 0.5
-    rot.z += rotV.z * d * 0.25
-
-    group.current.position.copy(pos)
-    group.current.rotation.copy(rot)
+    ref.current.setNextKinematicTranslation(vec)
   })
 
   return (
-    <group ref={group}>
+    <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 0]}>
+      <BallCollider args={[3]} />
+    </RigidBody>
+  )
+}
+
+// ─── Connector ────────────────────────────────────────────────────────────────
+
+interface ConnectorProps {
+  position?: [number, number, number]
+  color?: string
+  roughness?: number
+  accent?: boolean
+  /** Renders the glass / transmission variant. */
+  glass?: boolean
+}
+
+function Connector({
+  position,
+  color = 'white',
+  roughness = 0,
+  accent = false,
+  glass = false,
+}: ConnectorProps) {
+  const api = useRef<RapierRigidBody>(null)
+  const vec = useMemo(() => new THREE.Vector3(), [])
+  const r   = THREE.MathUtils.randFloatSpread
+
+  // Stable spawn position — evaluated once on mount.
+  const pos = useMemo<[number, number, number]>(
+    () => position ?? [r(10), r(10), r(10)],
+    [], // eslint-disable-line react-hooks/exhaustive-deps
+  )
+
+  useFrame((_s, delta) => {
+    if (!api.current) return
+    // Clamp delta so a tab-switch doesn't fire a huge impulse.
+    const d = Math.min(delta, 0.1)
+    // Pull toward origin: impulse ∝ -(current position) × 0.2
+    const t = api.current.translation()
+    vec.set(t.x, t.y, t.z).negate().multiplyScalar(0.2 * d * 60)
+    api.current.applyImpulse(vec, true)
+  })
+
+  return (
+    <RigidBody
+      ref={api}
+      position={pos}
+      linearDamping={4}
+      angularDamping={1}
+      friction={-0.1}
+      colliders={false}
+    >
+      {/* Three cuboid arms that match the visual geometry above */}
+      <CuboidCollider args={[0.38, 1.27, 0.38]} />
+      <CuboidCollider args={[1.27, 0.38, 0.38]} />
+      <CuboidCollider args={[0.38, 0.38, 1.27]} />
+
       {glass ? (
-        <Model roughness={roughness} color={color}>
-          <MeshTransmissionMaterial clearcoat={1} thickness={0.1} anisotropicBlur={0.1} chromaticAberration={0.1} samples={8} resolution={512} />
+        <Model roughness={roughness}>
+          <MeshTransmissionMaterial
+            clearcoat={1}
+            thickness={0.1}
+            anisotropicBlur={0.1}
+            chromaticAberration={0.1}
+            samples={8}
+            resolution={512}
+          />
         </Model>
       ) : (
         <Model color={color} roughness={roughness} />
       )}
+
       {accent && <pointLight intensity={4} distance={2.5} color={color} />}
-    </group>
+    </RigidBody>
   )
 }
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
-// Pre-separated start positions spread across the visible viewport.
-// Camera fov=17.5 at z=15 → visible ≈ ±4 x × ±2.2 y at z=0.
-// Using a loose grid so objects never start on top of each other.
-const START_POSITIONS: [number, number, number][] = [
-  [-3.2,  1.6,  0.8],
-  [-1.2,  1.8, -0.5],
-  [ 1.2,  1.5,  0.6],
-  [ 3.0,  1.7, -0.8],
-  [-3.4, -0.1,  0.4],
-  [-0.6,  0.0, -0.7],
-  [ 2.2,  0.0,  0.9],
-  [-2.0, -1.6,  0.3],
-  [ 0.4, -1.8, -0.6],
-  [ 3.2, -1.5,  0.7],
-]
-
 function Scene({ accent }: { accent: number }) {
-  const mouse = useRef(new THREE.Vector3())
   const connectors = useMemo(() => shuffle(accent), [accent])
-  const allItems = useMemo(() => [...connectors, { color: 'white', roughness: 0, glass: true }], [connectors])
-  const positions = useRef<THREE.Vector3[]>([])
 
   return (
-    <>
-      <color attach="background" args={['#141622']} />
-      <ambientLight intensity={0.4} />
-      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-      <PointerRepulsor target={mouse} />
+    <Physics gravity={[0, 0, 0]}>
+      <Pointer />
 
-      {allItems.map((props, i) => (
-        <Connector
-          key={i}
-          index={i}
-          positions={positions}
-          mouse={mouse}
-          startPos={START_POSITIONS[i % START_POSITIONS.length]}
-          {...props}
-        />
+      {/* 9 standard connectors */}
+      {connectors.map((props, i) => (
+        <Connector key={i} {...props} />
       ))}
+
+      {/* 1 glass connector — starts off-screen, falls into view */}
+      <Connector position={[10, 10, 10]} glass />
 
       <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
       </EffectComposer>
+
       <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
-          <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={8} />
+          <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2}  position={[0, 5, -9]}   scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2}  position={[-5, 1, -1]}  scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2}  position={[-5, -1, -1]} scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]}   scale={8} />
         </group>
       </Environment>
-    </>
+    </Physics>
   )
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export function LusionConnectors() {
-  const [accent, click] = useReducer((s: number) => (s + 1) % accents.length, 0)
+  const [accent, cycleAccent] = useReducer(
+    (s: number) => (s + 1) % ACCENTS.length,
+    0,
+  )
 
   return (
-    <Canvas onClick={click} shadows dpr={[1, 1.5]} gl={{ antialias: false }}
+    <Canvas
+      onClick={cycleAccent}
+      shadows
+      dpr={[1, 1.5]}
+      gl={{ antialias: false }}
       camera={{ position: [0, 0, 15], fov: 17.5, near: 1, far: 20 }}
-      style={{ width: '100%', height: '100%' }}>
+      style={{ width: '100%', height: '100%' }}
+    >
+      <color attach="background" args={['#141622']} />
+      <ambientLight intensity={0.4} />
+      <spotLight
+        position={[10, 10, 10]}
+        angle={0.15}
+        penumbra={1}
+        intensity={1}
+        castShadow
+      />
+      {/*
+        Suspense is required here — Physics suspends while the Rapier WASM
+        loads. The dark fallback keeps the canvas background consistent.
+      */}
       <Suspense fallback={null}>
         <Scene accent={accent} />
       </Suspense>

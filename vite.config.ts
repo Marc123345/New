@@ -6,6 +6,11 @@
 
   export default defineConfig({
     plugins: [tailwindcss(), react()],
+    // Prevent esbuild from pre-bundling rapier — it has an inline base64 WASM
+    // blob that esbuild strips. Excluding lets the browser load it natively.
+    optimizeDeps: {
+      exclude: ['@react-three/rapier', '@dimforge/rapier3d-compat'],
+    },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {

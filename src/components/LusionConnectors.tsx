@@ -26,33 +26,67 @@ const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
 
 // ─── Image URLs — full photos for faces, logo images for brands ──────────────
 
-const IMAGES = [
-  // Faces — full portrait photos
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=256&h=256&fit=crop&crop=face',
-  // Company logos (from logo.clearbit.com — CORS-friendly, square)
-  'https://logo.clearbit.com/linkedin.com',
-  'https://logo.clearbit.com/instagram.com',
-  'https://logo.clearbit.com/youtube.com',
-  'https://logo.clearbit.com/x.com',
-  'https://logo.clearbit.com/tiktok.com',
-  'https://logo.clearbit.com/google.com',
-  'https://logo.clearbit.com/facebook.com',
-  'https://logo.clearbit.com/spotify.com',
-  'https://logo.clearbit.com/whatsapp.com',
+// All images use canvas-generated textures to avoid CORS issues entirely.
+// Faces are loaded via Image() then drawn onto canvas; logos are drawn directly.
+const FACE_URLS = [
+  'https://i.pravatar.cc/256?img=32',
+  'https://i.pravatar.cc/256?img=47',
+  'https://i.pravatar.cc/256?img=12',
+  'https://i.pravatar.cc/256?img=25',
+  'https://i.pravatar.cc/256?img=56',
+  'https://i.pravatar.cc/256?img=68',
+  'https://i.pravatar.cc/256?img=3',
+  'https://i.pravatar.cc/256?img=41',
+  'https://i.pravatar.cc/256?img=5',
 ]
 
-// ─── Texture hook — loads image as full-bleed texture, no suspend ────────────
+interface LogoDef { text: string; bg: string; fg: string }
+const LOGOS: LogoDef[] = [
+  { text: 'in', bg: '#0A66C2', fg: '#fff' },
+  { text: 'f',  bg: '#1877F2', fg: '#fff' },
+  { text: '▶', bg: '#FF0000', fg: '#fff' },
+  { text: '𝕏', bg: '#000000', fg: '#fff' },
+  { text: '♪', bg: '#010101', fg: '#25F4EE' },
+  { text: 'G',  bg: '#4285F4', fg: '#fff' },
+  { text: 'P',  bg: '#E60023', fg: '#fff' },
+  { text: '♫', bg: '#1DB954', fg: '#fff' },
+  { text: '✉', bg: '#25D366', fg: '#fff' },
+]
 
-function useImageTexture(url: string): THREE.Texture | null {
-  const [tex, setTex] = useState<THREE.Texture | null>(null)
+// ─── Canvas texture generators (no CORS issues) ─────────────────────────────
+
+const TEX = 256
+
+function createLogoTexture(logo: LogoDef): THREE.CanvasTexture {
+  const c = document.createElement('canvas')
+  c.width = TEX; c.height = TEX
+  const ctx = c.getContext('2d')!
+  // Full background
+  ctx.fillStyle = logo.bg
+  ctx.fillRect(0, 0, TEX, TEX)
+  // Centered text
+  ctx.fillStyle = logo.fg
+  ctx.font = `bold ${TEX * 0.45}px system-ui, -apple-system, sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(logo.text, TEX / 2, TEX / 2 + 2)
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  return t
+}
+
+function useFaceTexture(url: string): THREE.Texture {
+  const [tex, setTex] = useState<THREE.Texture>(() => {
+    // Immediate placeholder — dark purple
+    const c = document.createElement('canvas')
+    c.width = TEX; c.height = TEX
+    const ctx = c.getContext('2d')!
+    ctx.fillStyle = '#2a1a45'
+    ctx.fillRect(0, 0, TEX, TEX)
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    return t
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -60,9 +94,17 @@ function useImageTexture(url: string): THREE.Texture | null {
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       if (cancelled) return
-      const t = new THREE.Texture(img)
+      // Draw full-bleed face onto canvas
+      const c = document.createElement('canvas')
+      c.width = TEX; c.height = TEX
+      const ctx = c.getContext('2d')!
+      // Cover-fit the image
+      const s = Math.max(TEX / img.width, TEX / img.height)
+      const w = img.width * s
+      const h = img.height * s
+      ctx.drawImage(img, (TEX - w) / 2, (TEX - h) / 2, w, h)
+      const t = new THREE.CanvasTexture(c)
       t.colorSpace = THREE.SRGBColorSpace
-      t.needsUpdate = true
       setTex(t)
     }
     img.src = url
@@ -78,20 +120,22 @@ const CUBE_SIZE = 1.4
 const CUBE_HALF = CUBE_SIZE / 2
 const CUBE_RADIUS = 0.12
 
-// ─── Image cube — full bleed photo/logo on every face ────────────────────────
+// ─── Cube components ─────────────────────────────────────────────────────────
 
-function ImageCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
-  const texture = useImageTexture(url)
-
+function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
+  const texture = useFaceTexture(url)
   return (
     <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
-      <meshStandardMaterial
-        map={texture}
-        color={texture ? '#ffffff' : '#2a1a45'}
-        metalness={0.05}
-        roughness={0.3}
-        envMapIntensity={0.5}
-      />
+      <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
+    </RoundedBox>
+  )
+}
+
+function LogoCube({ logo, size = CUBE_SIZE }: { logo: LogoDef; size?: number }) {
+  const texture = useMemo(() => createLogoTexture(logo), [logo])
+  return (
+    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
+      <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
     </RoundedBox>
   )
 }
@@ -119,12 +163,14 @@ function Pointer() {
 
 function Connector({
   position,
-  imageUrl,
+  faceUrl,
+  logo,
   accent = false,
   accentColor,
 }: {
   position?: [number, number, number]
-  imageUrl: string
+  faceUrl?: string
+  logo?: LogoDef
   accent?: boolean
   accentColor?: string
 }) {
@@ -154,7 +200,8 @@ function Connector({
       colliders={false}
     >
       <CuboidCollider args={[CUBE_HALF, CUBE_HALF, CUBE_HALF]} />
-      <ImageCube url={imageUrl} />
+      {faceUrl && <FaceCube url={faceUrl} />}
+      {logo && <LogoCube logo={logo} />}
       {accent && accentColor && (
         <pointLight intensity={4} distance={2.5} color={accentColor} />
       )}
@@ -171,13 +218,11 @@ function Scene({ accent }: { accent: number }) {
     <Physics gravity={[0, 0, 0]}>
       <Pointer />
 
-      {IMAGES.map((url, i) => (
-        <Connector
-          key={i}
-          imageUrl={url}
-          accent={i >= IMAGES.length - 3}
-          accentColor={accentColor}
-        />
+      {FACE_URLS.map((url, i) => (
+        <Connector key={`f${i}`} faceUrl={url} accent={i >= FACE_URLS.length - 2} accentColor={accentColor} />
+      ))}
+      {LOGOS.map((logo, i) => (
+        <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} />
       ))}
 
       <EffectComposer disableNormalPass multisampling={8}>

@@ -60,27 +60,40 @@ function createLogoTexture(logo: LogoDef): THREE.CanvasTexture {
   const c = document.createElement('canvas')
   c.width = TEX; c.height = TEX
   const ctx = c.getContext('2d')!
-  // Full background
-  ctx.fillStyle = logo.bg
+
+  // Same purple background as face cubes
+  ctx.fillStyle = '#1e1535'
   ctx.fillRect(0, 0, TEX, TEX)
-  // Centered text
+
+  // Centered logo circle
+  const cx = TEX / 2
+  const cy = TEX / 2
+  const r = TEX * 0.3
+  ctx.beginPath()
+  ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.fillStyle = logo.bg
+  ctx.fill()
+
+  // Logo text
   ctx.fillStyle = logo.fg
-  ctx.font = `bold ${TEX * 0.45}px system-ui, -apple-system, sans-serif`
+  ctx.font = `bold ${r * 1.1}px system-ui, -apple-system, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(logo.text, TEX / 2, TEX / 2 + 2)
+  ctx.fillText(logo.text, cx, cy + 2)
+
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
   return t
 }
 
+const FACE_BG = '#1e1535'
+
 function useFaceTexture(url: string): THREE.Texture {
   const [tex, setTex] = useState<THREE.Texture>(() => {
-    // Immediate placeholder — dark purple
     const c = document.createElement('canvas')
     c.width = TEX; c.height = TEX
     const ctx = c.getContext('2d')!
-    ctx.fillStyle = '#2a1a45'
+    ctx.fillStyle = FACE_BG
     ctx.fillRect(0, 0, TEX, TEX)
     const t = new THREE.CanvasTexture(c)
     t.colorSpace = THREE.SRGBColorSpace
@@ -93,15 +106,39 @@ function useFaceTexture(url: string): THREE.Texture {
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       if (cancelled) return
-      // Draw full-bleed face onto canvas
       const c = document.createElement('canvas')
       c.width = TEX; c.height = TEX
       const ctx = c.getContext('2d')!
-      // Cover-fit the image
-      const s = Math.max(TEX / img.width, TEX / img.height)
-      const w = img.width * s
-      const h = img.height * s
-      ctx.drawImage(img, (TEX - w) / 2, (TEX - h) / 2, w, h)
+
+      // Purple background
+      ctx.fillStyle = FACE_BG
+      ctx.fillRect(0, 0, TEX, TEX)
+
+      // Draw face centered in a circular clip with padding
+      const cx = TEX / 2
+      const cy = TEX / 2
+      const radius = TEX * 0.4
+
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+      ctx.clip()
+
+      // Cover-fit the image inside the circle
+      const aspect = img.width / img.height
+      let dw = radius * 2
+      let dh = dw / aspect
+      if (dh < dw) { dh = dw; dw = dh * aspect }
+      ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh)
+      ctx.restore()
+
+      // Subtle ring around the face
+      ctx.beginPath()
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+      ctx.strokeStyle = 'rgba(164,108,252,0.4)'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
       const t = new THREE.CanvasTexture(c)
       t.colorSpace = THREE.SRGBColorSpace
       setTex(t)

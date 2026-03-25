@@ -156,16 +156,7 @@ export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
         .width(w)
         .height(h);
 
-      // Arcs removed — clean globe without connectors
-
-      globe
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor('color')
-        .pointAltitude(0.012)
-        .pointRadius('size')
-        .pointsMerge(false)
-        .pointsData([]);
+      // No arcs or points — clean globe only
 
       const controls = globe.controls();
       controls.autoRotate = true;
@@ -184,14 +175,7 @@ export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
 
       globe.globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg');
 
-      // Show points after a short delay
-      const timers: ReturnType<typeof setTimeout>[] = [];
-      const t0 = setTimeout(() => {
-        if (destroyedRef.current || !globeRef.current) return;
-        globeRef.current.pointsData(POINTS);
-      }, 800);
-      timers.push(t0);
-      arcTimersRef.current = timers;
+      arcTimersRef.current = [];
     });
 
     return () => {

@@ -1,26 +1,16 @@
 /**
- * LusionConnectors — faithful TypeScript port of the pmndrs "Lusion connectors" demo.
- *
- * Motion model (matches original exactly)
- * ────────────────────────────────────────
- * • <Physics gravity={[0,0,0]}> → zero-gravity world.
- * • Each Connector is a dynamic RigidBody with linearDamping=4 / angularDamping=1.
- * • Every frame: applyImpulse( -translation * 0.2 ) pulls toward origin.
- * • No walls — centre-pull alone keeps connectors in frame.
- * • Pointer is a kinematic RigidBody with BallCollider(r=1), direct mouse tracking.
- * • Restitution=0 everywhere — soft, gooey inelastic collisions.
- * • Clicking cycles accent colours; accent connectors carry a pointLight.
- * • One connector uses MeshTransmissionMaterial for the glass effect.
- *
- * Geometry
- * ─────────
- * The original loads /c-transformed.glb. We reproduce the cross shape
- * procedurally by merging three BoxGeometries — no external file required.
+ * LusionConnectors — faithful TypeScript port of the pmndrs "Lusion connectors" demo
+ * with face avatars and social media logos on select connectors.
  */
 
 import { useRef, useReducer, useMemo, Suspense } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { MeshTransmissionMaterial, Environment, Lightformer } from '@react-three/drei'
+import {
+  MeshTransmissionMaterial,
+  Environment,
+  Lightformer,
+  Html,
+} from '@react-three/drei'
 import {
   Physics,
   RigidBody,
@@ -37,17 +27,54 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 
 const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
 
+// ─── Overlay definitions ──────────────────────────────────────────────────────
+
+type OverlayType = 'face' | 'logo' | undefined
+
+interface OverlayDef {
+  type: OverlayType
+  src?: string        // face image URL
+  logo?: string       // logo key
+}
+
+const FACE_URLS = [
+  'https://i.pravatar.cc/150?img=32',
+  'https://i.pravatar.cc/150?img=47',
+  'https://i.pravatar.cc/150?img=12',
+  'https://i.pravatar.cc/150?img=25',
+]
+
+const LOGO_DEFS: Record<string, { bg: string; label: string; color?: string }> = {
+  linkedin:  { bg: '#0A66C2', label: 'in' },
+  instagram: { bg: 'linear-gradient(135deg, #F58529, #DD2A7B, #8134AF, #515BD4)', label: '📷', color: '#fff' },
+  x:         { bg: '#000000', label: '𝕏' },
+  tiktok:    { bg: '#000000', label: '♪' },
+  facebook:  { bg: '#1877F2', label: 'f' },
+}
+
+const OVERLAYS: OverlayDef[] = [
+  { type: 'face', src: FACE_URLS[0] },
+  { type: 'logo', logo: 'linkedin' },
+  { type: 'face', src: FACE_URLS[1] },
+  { type: 'logo', logo: 'instagram' },
+  { type: 'face', src: FACE_URLS[2] },
+  { type: 'logo', logo: 'x' },
+  { type: 'face', src: FACE_URLS[3] },
+  { type: 'logo', logo: 'tiktok' },
+  { type: undefined },                   // accent — no overlay
+]
+
 function connectorConfigs(accent = 0) {
   return [
-    { color: '#444',            roughness: 0.1  },
-    { color: '#444',            roughness: 0.75 },
-    { color: '#444',            roughness: 0.75 },
-    { color: 'red',             roughness: 0.1  },
-    { color: 'white',           roughness: 0.75 },
-    { color: 'white',           roughness: 0.1  },
-    { color: ACCENTS[accent],   roughness: 0.1,  accent: true },
-    { color: ACCENTS[accent],   roughness: 0.75, accent: true },
-    { color: ACCENTS[accent],   roughness: 0.1,  accent: true },
+    { color: '#444',            roughness: 0.1,  overlay: OVERLAYS[0] },
+    { color: '#444',            roughness: 0.75, overlay: OVERLAYS[1] },
+    { color: '#444',            roughness: 0.75, overlay: OVERLAYS[2] },
+    { color: 'red',             roughness: 0.1,  overlay: OVERLAYS[3] },
+    { color: 'white',           roughness: 0.75, overlay: OVERLAYS[4] },
+    { color: 'white',           roughness: 0.1,  overlay: OVERLAYS[5] },
+    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: OVERLAYS[6] },
+    { color: ACCENTS[accent],   roughness: 0.75, accent: true, overlay: OVERLAYS[7] },
+    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: OVERLAYS[8] },
   ]
 }
 
@@ -96,7 +123,66 @@ function Model({ color = 'white', roughness = 0, glass = false, children }: Mode
   )
 }
 
-// ─── Pointer (matches original: radius 1, direct tracking, no lerp) ─────────
+// ─── Overlay: face avatar or social logo rendered via Html ────────────────────
+
+const OVERLAY_CONTAINER: React.CSSProperties = {
+  width: 44,
+  height: 44,
+  borderRadius: '50%',
+  overflow: 'hidden',
+  border: '2px solid rgba(255,255,255,0.2)',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(164,108,252,0.15)',
+  backdropFilter: 'blur(4px)',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+
+function ConnectorOverlay({ overlay }: { overlay: OverlayDef }) {
+  if (!overlay.type) return null
+
+  if (overlay.type === 'face' && overlay.src) {
+    return (
+      <Html center distanceFactor={7} style={{ pointerEvents: 'none' }}>
+        <div style={OVERLAY_CONTAINER}>
+          <img
+            src={overlay.src}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            loading="lazy"
+          />
+        </div>
+      </Html>
+    )
+  }
+
+  if (overlay.type === 'logo' && overlay.logo) {
+    const def = LOGO_DEFS[overlay.logo]
+    if (!def) return null
+    return (
+      <Html center distanceFactor={7} style={{ pointerEvents: 'none' }}>
+        <div
+          style={{
+            ...OVERLAY_CONTAINER,
+            background: def.bg,
+            color: def.color || '#fff',
+            fontSize: overlay.logo === 'instagram' ? '18px' : '16px',
+            fontWeight: 800,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            letterSpacing: overlay.logo === 'linkedin' ? '-0.02em' : 0,
+          }}
+        >
+          {def.label}
+        </div>
+      </Html>
+    )
+  }
+
+  return null
+}
+
+// ─── Pointer ──────────────────────────────────────────────────────────────────
 
 function Pointer() {
   const ref = useRef<RapierRigidBody>(null)
@@ -115,7 +201,7 @@ function Pointer() {
   )
 }
 
-// ─── Connector (matches original: just centre-pull, no walls, no stuck logic) ─
+// ─── Connector ────────────────────────────────────────────────────────────────
 
 interface ConnectorProps {
   position?: [number, number, number]
@@ -123,6 +209,7 @@ interface ConnectorProps {
   roughness?: number
   accent?: boolean
   glass?: boolean
+  overlay?: OverlayDef
 }
 
 function Connector({
@@ -131,6 +218,7 @@ function Connector({
   roughness = 0,
   accent = false,
   glass = false,
+  overlay,
 }: ConnectorProps) {
   const api = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
@@ -142,9 +230,6 @@ function Connector({
 
   useFrame((_s, delta) => {
     if (!api.current) return
-    // Exact same impulse as the original — no delta scaling, no stuck logic.
-    // Centre-pull alone keeps connectors in frame; inter-body collisions
-    // prevent clustering. Simple and clean.
     delta = Math.min(0.1, delta)
     api.current.applyImpulse(
       vec.copy(api.current.translation() as unknown as THREE.Vector3).negate().multiplyScalar(0.2),
@@ -180,6 +265,8 @@ function Connector({
         <Model color={color} roughness={roughness} />
       )}
 
+      {overlay && <ConnectorOverlay overlay={overlay} />}
+
       {accent && <pointLight intensity={4} distance={2.5} color={color} />}
     </RigidBody>
   )
@@ -194,12 +281,10 @@ function Scene({ accent }: { accent: number }) {
     <Physics gravity={[0, 0, 0]}>
       <Pointer />
 
-      {/* 9 standard connectors */}
       {connectors.map((props, i) => (
         <Connector key={i} {...props} />
       ))}
 
-      {/* Glass connector — starts off-screen, drifts in via centre-pull */}
       <Connector position={[10, 10, 5]} glass />
 
       <EffectComposer disableNormalPass multisampling={8}>

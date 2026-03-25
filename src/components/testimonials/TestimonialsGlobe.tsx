@@ -149,22 +149,14 @@ export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
       const h = containerRef.current!.clientHeight || 300;
 
       globe
-        .backgroundColor('rgba(0,0,0,0)')
+        .backgroundColor('#ffffff')
         .showAtmosphere(true)
         .atmosphereColor('rgba(140,80,230,0.7)')
         .atmosphereAltitude(0.18)
         .width(w)
         .height(h);
 
-      globe
-        .arcColor('color')
-        .arcDashLength(0.45)
-        .arcDashGap(0.08)
-        .arcDashAnimateTime(1600)
-        .arcStroke(mobile ? 1.2 : 1.8)
-        .arcAltitude(0.25)
-        .arcsTransitionDuration(600)
-        .arcsData([]);
+      // Arcs removed — clean globe without connectors
 
       globe
         .pointLat('lat')
@@ -192,38 +184,13 @@ export function TestimonialsGlobe({ isVisible }: { isVisible: boolean }) {
 
       globe.globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg');
 
+      // Show points after a short delay
       const timers: ReturnType<typeof setTimeout>[] = [];
-
-      // Show points quickly
       const t0 = setTimeout(() => {
         if (destroyedRef.current || !globeRef.current) return;
         globeRef.current.pointsData(POINTS);
       }, 800);
       timers.push(t0);
-
-      // Reveal arcs in 3 waves: testimonial arcs first, then hubs, then backbone
-      const testimonialArcs = ALL_ARCS.slice(0, 9);
-      const hubArcs = ALL_ARCS.slice(0, 22);
-      const allArcs = ALL_ARCS;
-
-      const t1 = setTimeout(() => {
-        if (destroyedRef.current || !globeRef.current) return;
-        globeRef.current.arcsData(testimonialArcs);
-      }, 1200);
-      timers.push(t1);
-
-      const t2 = setTimeout(() => {
-        if (destroyedRef.current || !globeRef.current) return;
-        globeRef.current.arcsData(hubArcs);
-      }, 2400);
-      timers.push(t2);
-
-      const t3 = setTimeout(() => {
-        if (destroyedRef.current || !globeRef.current) return;
-        globeRef.current.arcsData(allArcs);
-      }, 3600);
-      timers.push(t3);
-
       arcTimersRef.current = timers;
     });
 

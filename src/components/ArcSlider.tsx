@@ -528,7 +528,7 @@ export function ArcSlider() {
     <>
       <div
         className="relative w-full py-16 md:py-24 overflow-hidden"
-        style={{ background: "var(--color-background-light, #f8f9fa)" }}
+        style={{ background: "#ffffff" }}
       >
         <div className="relative z-30 text-center px-5 sm:px-6 mb-8 md:mb-14 flex flex-col items-center">
           <div

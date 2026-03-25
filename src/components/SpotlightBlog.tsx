@@ -47,7 +47,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
           transform: hovered ? "translate(-3px,-3px)" : "translate(0,0)",
           transition: "box-shadow 0.3s ease, transform 0.3s ease",
           overflow: "hidden",
-          background: "var(--color-background-light)",
+          background: "#ffffff",
         }}
         className="featured-hero-grid"
       >
@@ -261,7 +261,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
     <section
       className="relative"
       style={{
-        background: "var(--color-background-light)",
+        background: "#ffffff",
         paddingTop: "clamp(60px, 8vw, 100px)",
         paddingBottom: "clamp(80px, 8vw, 120px)",
         overflow: "clip",
@@ -481,7 +481,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
         boxShadow: hovered ? "var(--shadow-geometric-hover)" : "var(--shadow-geometric)",
         transform: hovered ? "translate(-3px,-3px)" : "translate(0,0)",
         transition: "box-shadow 0.3s ease, transform 0.3s ease",
-        background: "var(--color-background-light)",
+        background: "#ffffff",
         overflow: "hidden",
       }}>
         {/* Image */}

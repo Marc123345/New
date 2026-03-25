@@ -65,7 +65,8 @@ const Section = ({
 // ─── Lusion-exact hero ───────────────────────────────────────────────────────
 
 function HeroLusion() {
-  const [videoOpen, setVideoOpen] = useState(false)
+  const [storyOpen, setStoryOpen] = useState(false)
+  const [founderOpen, setFounderOpen] = useState(false)
 
   return (
     <section
@@ -107,7 +108,7 @@ function HeroLusion() {
         <div />
 
         <button
-          onClick={() => setVideoOpen(true)}
+          onClick={() => setStoryOpen(true)}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: '#141622', color: 'white',
@@ -122,17 +123,21 @@ function HeroLusion() {
           Hear Our Story
         </button>
 
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: '#cccccc', color: '#141622',
-          height: 52, borderRadius: 30, padding: '0 2em',
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-          letterSpacing: '0.12em',
-          whiteSpace: 'nowrap',
-        }}>
-          ///
-        </div>
+        <button
+          onClick={() => setFounderOpen(true)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#cccccc', color: '#141622',
+            height: 52, borderRadius: 30, padding: '0 2em',
+            border: 'none', cursor: 'pointer',
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Meet Our Founder
+        </button>
       </nav>
 
       {/* ── 3D canvas — fills remaining height ── */}
@@ -145,9 +150,15 @@ function HeroLusion() {
       </div>
 
       <HologramOverlay
-        isOpen={videoOpen}
-        onClose={() => setVideoOpen(false)}
+        isOpen={storyOpen}
+        onClose={() => setStoryOpen(false)}
         title="Hear Our Story"
+        videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
+      />
+      <HologramOverlay
+        isOpen={founderOpen}
+        onClose={() => setFounderOpen(false)}
+        title="Meet Our Founder"
         videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
       />
     </section>

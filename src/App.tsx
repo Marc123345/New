@@ -9,7 +9,7 @@ import { ScrollReveal } from "./components/ScrollReveal";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
-import { HologramOverlay } from "./components/HologramOverlay";
+
 import { H2HLogo } from "./components/H2HLogo";
 const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
@@ -65,8 +65,10 @@ const Section = ({
 // ─── Lusion-exact hero ───────────────────────────────────────────────────────
 
 function HeroLusion() {
-  const [storyOpen, setStoryOpen] = useState(false)
-  const [founderOpen, setFounderOpen] = useState(false)
+  const [activeVideo, setActiveVideo] = useState<string | null>(null)
+
+  const storyUrl = 'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4'
+  const founderUrl = 'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4'
 
   return (
     <section
@@ -108,7 +110,7 @@ function HeroLusion() {
         <div />
 
         <button
-          onClick={() => setStoryOpen(true)}
+          onClick={() => setActiveVideo(storyUrl)}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: '#141622', color: 'white',
@@ -124,7 +126,7 @@ function HeroLusion() {
         </button>
 
         <button
-          onClick={() => setFounderOpen(true)}
+          onClick={() => setActiveVideo(founderUrl)}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: '#cccccc', color: '#141622',
@@ -149,18 +151,57 @@ function HeroLusion() {
         </ErrorBoundary>
       </div>
 
-      <HologramOverlay
-        isOpen={storyOpen}
-        onClose={() => setStoryOpen(false)}
-        title="Hear Our Story"
-        videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
-      />
-      <HologramOverlay
-        isOpen={founderOpen}
-        onClose={() => setFounderOpen(false)}
-        title="Meet Our Founder"
-        videoUrl="https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4"
-      />
+      {activeVideo && (
+        <div
+          onClick={() => setActiveVideo(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            background: 'rgba(0,0,0,0.92)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <button
+            onClick={(e) => { e.stopPropagation(); setActiveVideo(null) }}
+            style={{
+              position: 'absolute',
+              top: 24,
+              right: 24,
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              border: '1.5px solid rgba(255,255,255,0.3)',
+              background: 'rgba(255,255,255,0.08)',
+              color: '#fff',
+              fontSize: '20px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10,
+            }}
+          >
+            ✕
+          </button>
+          <video
+            src={activeVideo}
+            autoPlay
+            controls
+            playsInline
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              cursor: 'default',
+            }}
+          />
+        </div>
+      )}
     </section>
   )
 }

@@ -9,7 +9,7 @@
  * • Every frame, applyImpulse( -translation * 0.2 ) pulls the body back toward
  *   the origin — giving the drifting "back to centre" feel.
  * • Pointer is a kinematic RigidBody moved each frame to track the mouse.
- *   Its BallCollider(r=3) physically pushes any connector that gets too close.
+ *   Its BallCollider(r=2) physically pushes any connector that gets too close.
  * • Clicking cycles through accent colours; the accent connector carries a
  *   pointLight so it glows.
  * • One connector uses MeshTransmissionMaterial for the glass effect.
@@ -35,7 +35,7 @@ import type { RapierRigidBody } from '@react-three/rapier'
 import { EffectComposer, N8AO } from '@react-three/postprocessing'
 import { easing } from 'maath'
 import * as THREE from 'three'
-import { mergeBufferGeometries } from 'three-stdlib'
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 // ─── Physics constants ────────────────────────────────────────────────────────
 
@@ -78,7 +78,7 @@ const connectorGeom: THREE.BufferGeometry = (() => {
     new THREE.BoxGeometry(2.54, 0.76, 0.76),
     new THREE.BoxGeometry(0.76, 0.76, 2.54),
   ]
-  return mergeBufferGeometries(arms) ?? new THREE.BoxGeometry(1, 1, 1)
+  return BufferGeometryUtils.mergeGeometries(arms) ?? new THREE.BoxGeometry(1, 1, 1)
 })()
 
 // ─── Model ────────────────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ function Pointer() {
 
   return (
     <RigidBody ref={ref} type="kinematicPosition" colliders={false} position={[0, 0, 0]}>
-      <BallCollider args={[3]} />
+      <BallCollider args={[2]} />
     </RigidBody>
   )
 }
@@ -290,8 +290,8 @@ function Scene({ accent }: { accent: number }) {
         <Connector key={i} {...props} />
       ))}
 
-      {/* 1 glass connector — starts off-screen, falls into view */}
-      <Connector position={[10, 10, 10]} glass />
+      {/* 1 glass connector — spawns inside bounds so it drifts naturally */}
+      <Connector position={[4, 2, 0]} glass />
 
       <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
@@ -316,10 +316,18 @@ export function LusionConnectors() {
     (s: number) => (s + 1) % ACCENTS.length,
     0,
   )
+  const pointerDown = useRef<{ x: number; y: number } | null>(null)
 
   return (
     <Canvas
-      onClick={cycleAccent}
+      onPointerDown={(e) => { pointerDown.current = { x: e.clientX, y: e.clientY } }}
+      onPointerUp={(e) => {
+        if (!pointerDown.current) return
+        const dx = e.clientX - pointerDown.current.x
+        const dy = e.clientY - pointerDown.current.y
+        if (Math.sqrt(dx * dx + dy * dy) < 4) cycleAccent()
+        pointerDown.current = null
+      }}
       shadows
       dpr={[1, 1.5]}
       gl={{ antialias: false }}

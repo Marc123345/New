@@ -42,6 +42,10 @@ const FACE_URLS = [
   'https://i.pravatar.cc/150?img=47',
   'https://i.pravatar.cc/150?img=12',
   'https://i.pravatar.cc/150?img=25',
+  'https://i.pravatar.cc/150?img=56',
+  'https://i.pravatar.cc/150?img=68',
+  'https://i.pravatar.cc/150?img=3',
+  'https://i.pravatar.cc/150?img=41',
 ]
 
 const LOGO_DEFS: Record<string, { bg: string; label: string; color?: string }> = {
@@ -50,31 +54,33 @@ const LOGO_DEFS: Record<string, { bg: string; label: string; color?: string }> =
   x:         { bg: '#000000', label: '𝕏' },
   tiktok:    { bg: '#000000', label: '♪' },
   facebook:  { bg: '#1877F2', label: 'f' },
+  youtube:   { bg: '#FF0000', label: '▶' },
+  snapchat:  { bg: '#FFFC00', label: '👻', color: '#000' },
+  whatsapp:  { bg: '#25D366', label: '💬' },
+  pinterest: { bg: '#E60023', label: 'P' },
 }
-
-const OVERLAYS: OverlayDef[] = [
-  { type: 'face', src: FACE_URLS[0] },
-  { type: 'logo', logo: 'linkedin' },
-  { type: 'face', src: FACE_URLS[1] },
-  { type: 'logo', logo: 'instagram' },
-  { type: 'face', src: FACE_URLS[2] },
-  { type: 'logo', logo: 'x' },
-  { type: 'face', src: FACE_URLS[3] },
-  { type: 'logo', logo: 'tiktok' },
-  { type: undefined },                   // accent — no overlay
-]
 
 function connectorConfigs(accent = 0) {
   return [
-    { color: '#444',            roughness: 0.1,  overlay: OVERLAYS[0] },
-    { color: '#444',            roughness: 0.75, overlay: OVERLAYS[1] },
-    { color: '#444',            roughness: 0.75, overlay: OVERLAYS[2] },
-    { color: 'red',             roughness: 0.1,  overlay: OVERLAYS[3] },
-    { color: 'white',           roughness: 0.75, overlay: OVERLAYS[4] },
-    { color: 'white',           roughness: 0.1,  overlay: OVERLAYS[5] },
-    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: OVERLAYS[6] },
-    { color: ACCENTS[accent],   roughness: 0.75, accent: true, overlay: OVERLAYS[7] },
-    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: OVERLAYS[8] },
+    // Faces
+    { color: '#444',            roughness: 0.1,  overlay: { type: 'face' as const, src: FACE_URLS[0] } },
+    { color: '#444',            roughness: 0.75, overlay: { type: 'face' as const, src: FACE_URLS[1] } },
+    { color: 'white',           roughness: 0.75, overlay: { type: 'face' as const, src: FACE_URLS[2] } },
+    { color: 'white',           roughness: 0.1,  overlay: { type: 'face' as const, src: FACE_URLS[3] } },
+    { color: '#444',            roughness: 0.5,  overlay: { type: 'face' as const, src: FACE_URLS[4] } },
+    { color: 'white',           roughness: 0.3,  overlay: { type: 'face' as const, src: FACE_URLS[5] } },
+    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: { type: 'face' as const, src: FACE_URLS[6] } },
+    { color: ACCENTS[accent],   roughness: 0.75, accent: true, overlay: { type: 'face' as const, src: FACE_URLS[7] } },
+    // Logos
+    { color: '#333',            roughness: 0.1,  overlay: { type: 'logo' as const, logo: 'linkedin' } },
+    { color: '#333',            roughness: 0.75, overlay: { type: 'logo' as const, logo: 'instagram' } },
+    { color: 'red',             roughness: 0.1,  overlay: { type: 'logo' as const, logo: 'youtube' } },
+    { color: '#444',            roughness: 0.5,  overlay: { type: 'logo' as const, logo: 'x' } },
+    { color: 'white',           roughness: 0.1,  overlay: { type: 'logo' as const, logo: 'tiktok' } },
+    { color: 'white',           roughness: 0.75, overlay: { type: 'logo' as const, logo: 'facebook' } },
+    { color: '#333',            roughness: 0.3,  overlay: { type: 'logo' as const, logo: 'whatsapp' } },
+    { color: ACCENTS[accent],   roughness: 0.1,  accent: true, overlay: { type: 'logo' as const, logo: 'snapchat' } },
+    { color: ACCENTS[accent],   roughness: 0.5,  accent: true, overlay: { type: 'logo' as const, logo: 'pinterest' } },
   ]
 }
 

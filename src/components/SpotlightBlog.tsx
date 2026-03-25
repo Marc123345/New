@@ -41,7 +41,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           minHeight: "auto",
-          border: "2px solid var(--color-text-dark)",
+          border: "2px solid #1a1a2e",
           borderRadius: 16,
           boxShadow: hovered ? "var(--shadow-geometric-hover)" : "var(--shadow-geometric)",
           transform: hovered ? "translate(-3px,-3px)" : "translate(0,0)",
@@ -89,7 +89,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 borderRadius: 999,
                 background: "var(--color-primary)",
                 color: "#ffffff",
-                border: "1px solid var(--color-text-dark)",
+                border: "1px solid #1a1a2e",
               }}
             >
               Featured
@@ -146,7 +146,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 fontSize: "clamp(1.6rem, 2.8vw, 2.4rem)",
                 fontWeight: 800,
                 lineHeight: 1.1,
-                color: "var(--color-text-dark)",
+                color: "#1a1a2e",
                 fontFamily: "var(--font-stack-heading)",
                 marginBottom: "20px",
                 letterSpacing: "-0.02em",
@@ -175,7 +175,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
               gap: "10px",
               marginBottom: "28px",
               paddingTop: "20px",
-              borderTop: "1px solid rgba(232,226,255,0.12)",
+              borderTop: "1px solid rgba(26,26,46,0.12)",
             }}>
               <div style={{
                 width: "32px", height: "32px",
@@ -197,7 +197,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   fontFamily: "var(--font-stack-heading)",
-                  color: "var(--color-text-dark)",
+                  color: "#1a1a2e",
                   letterSpacing: "0.05em",
                 }}>
                   {post.author}
@@ -216,7 +216,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 textTransform: "uppercase",
                 fontFamily: "var(--font-stack-heading)",
                 fontWeight: 700,
-                border: "2px solid var(--color-text-dark)",
+                border: "2px solid #1a1a2e",
                 background: hovered ? "var(--color-primary)" : "transparent",
                 color: hovered ? "#ffffff" : "var(--color-text-dark)",
                 cursor: "pointer",
@@ -291,7 +291,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                     fontSize: "clamp(2.4rem, 5vw, 4rem)",
                     fontWeight: 900,
                     fontFamily: "var(--font-stack-heading)",
-                    color: "var(--color-text-dark)",
+                    color: "#1a1a2e",
                     lineHeight: 1,
                     letterSpacing: "-0.03em",
                     margin: 0,
@@ -315,7 +315,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
                     fontFamily: "var(--font-stack-heading)",
-                    border: "1.5px solid var(--color-text-dark)",
+                    border: "1.5px solid #1a1a2e",
                     borderRadius: 999,
                     background: activeCategory === cat ? "var(--color-primary)" : "transparent",
                     color: activeCategory === cat ? "#ffffff" : "var(--color-text-dark)",
@@ -334,7 +334,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
             style={{
               marginTop: "28px",
               height: "2px",
-              background: "var(--color-text-dark)",
+              background: "#1a1a2e",
               transformOrigin: "left",
             }}
             initial={{ scaleX: 0 }}
@@ -366,7 +366,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                   fontFamily: "var(--font-stack-heading)",
                   background: "var(--color-primary)",
                   color: "#ffffff",
-                  border: "2px solid var(--color-text-dark)",
+                  border: "2px solid #1a1a2e",
                   cursor: "pointer",
                   boxShadow: "var(--shadow-button)",
                 }}
@@ -442,7 +442,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
           }
           .featured-hero-content {
             border-left: none !important;
-            border-top: 2px solid var(--color-text-dark) !important;
+            border-top: 2px solid #1a1a2e !important;
             padding: 20px !important;
           }
           .secondary-posts-grid {
@@ -477,7 +477,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
       className="group cursor-pointer"
     >
       <div style={{
-        border: "2px solid var(--color-text-dark)",
+        border: "2px solid #1a1a2e",
         boxShadow: hovered ? "var(--shadow-geometric-hover)" : "var(--shadow-geometric)",
         transform: hovered ? "translate(-3px,-3px)" : "translate(0,0)",
         transition: "box-shadow 0.3s ease, transform 0.3s ease",
@@ -548,7 +548,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
               fontSize: "clamp(1.1rem, 1.6vw, 1.4rem)",
               fontWeight: 800,
               lineHeight: 1.2,
-              color: "var(--color-text-dark)",
+              color: "#1a1a2e",
               fontFamily: "var(--font-stack-heading)",
               marginBottom: "12px",
               letterSpacing: "-0.015em",
@@ -578,7 +578,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
             alignItems: "center",
             justifyContent: "space-between",
             paddingTop: "16px",
-            borderTop: "1px solid rgba(232,226,255,0.1)",
+            borderTop: "1px solid rgba(26,26,46,0.12)",
           }}>
             <span style={{
               display: "flex",
@@ -597,8 +597,8 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              border: "1.5px solid var(--color-text-dark)",
-              color: "var(--color-text-dark)",
+              border: "1.5px solid #1a1a2e",
+              color: "#1a1a2e",
               background: hovered ? "var(--color-primary)" : "transparent",
               transition: "background 0.25s, color 0.25s",
             }}

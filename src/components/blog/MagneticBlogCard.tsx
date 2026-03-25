@@ -65,13 +65,13 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           transition: tilt.x === 0 && tilt.y === 0
             ? "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease"
             : "transform 0.08s ease-out",
-          border: "2px solid var(--color-text-dark)",
+          border: "2px solid #1a1a2e",
           borderRadius: 16,
           boxShadow:
             tilt.x !== 0 || tilt.y !== 0
               ? "var(--shadow-geometric-hover)"
               : "var(--shadow-geometric)",
-          background: "var(--color-background-light)",
+          background: "#ffffff",
           position: "relative",
           overflow: "hidden",
           willChange: "transform",
@@ -152,7 +152,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
           <h3
             className="leading-tight mb-3 transition-colors duration-300 group-hover:text-[var(--color-secondary)]"
             style={{
-              color: "var(--color-text-dark)",
+              color: "#1a1a2e",
               fontFamily: "var(--font-stack-heading)",
               fontSize: "1.35rem",
               lineHeight: 1.15,
@@ -170,7 +170,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
 
           <div
             className="flex items-center justify-between pt-4"
-            style={{ borderTop: "1px solid rgba(232,226,255,0.12)" }}
+            style={{ borderTop: "1px solid rgba(26,26,46,0.12)" }}
           >
             <span
               className="text-[11px] tracking-wider uppercase opacity-65"
@@ -181,9 +181,9 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             <div
               className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-white"
               style={{
-                border: "1px solid var(--color-text-dark)",
+                border: "1px solid #1a1a2e",
                 borderRadius: 8,
-                color: "var(--color-text-dark)",
+                color: "#1a1a2e",
               }}
             >
               <ArrowUpRight size={14} />

@@ -127,7 +127,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
               className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.2em]"
               style={{
                 fontFamily: "var(--font-stack-heading)",
-                borderRadius: 999,
+                borderRadius: 8,
                 background: "rgba(0,0,0,0.65)",
                 backdropFilter: "blur(8px)",
                 border: "1px solid rgba(255,255,255,0.2)",

@@ -86,10 +86,10 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 fontFamily: "var(--font-stack-heading)",
-                borderRadius: 999,
-                background: "var(--color-primary)",
+                borderRadius: 8,
+                background: "#a46cfc",
                 color: "#ffffff",
-                border: "1px solid #1a1a2e",
+                border: "1px solid rgba(164,108,252,0.4)",
               }}
             >
               Featured
@@ -315,10 +315,10 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
                     fontFamily: "var(--font-stack-heading)",
-                    border: "1.5px solid #1a1a2e",
-                    borderRadius: 999,
-                    background: activeCategory === cat ? "var(--color-primary)" : "transparent",
-                    color: activeCategory === cat ? "#ffffff" : "var(--color-text-dark)",
+                    border: "1.5px solid rgba(164,108,252,0.4)",
+                    borderRadius: 8,
+                    background: activeCategory === cat ? "#a46cfc" : "transparent",
+                    color: activeCategory === cat ? "#ffffff" : "#a46cfc",
                     cursor: "pointer",
                     transition: "background 0.2s, color 0.2s",
                     boxShadow: activeCategory === cat ? "var(--shadow-button)" : "none",

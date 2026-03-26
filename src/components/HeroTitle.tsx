@@ -88,12 +88,12 @@ function HeroButton({
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
         padding: '10px 24px',
-        borderRadius: 999,
-        border: `1.5px solid ${isPrimary ? '#0a0a0a' : 'rgba(10,10,10,0.25)'}`,
+        borderRadius: 8,
+        border: `1.5px solid ${isPrimary ? '#a46cfc' : 'rgba(164,108,252,0.4)'}`,
         background: isPrimary
-          ? hovered ? '#a46cfc' : '#0a0a0a'
-          : hovered ? 'rgba(10,10,10,0.06)' : 'transparent',
-        color: isPrimary ? '#ffffff' : '#0a0a0a',
+          ? hovered ? '#7c3aed' : '#a46cfc'
+          : hovered ? 'rgba(164,108,252,0.1)' : 'transparent',
+        color: isPrimary ? '#ffffff' : '#a46cfc',
         transition: 'background 0.22s ease, border-color 0.22s ease',
       }}
     >

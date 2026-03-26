@@ -5,7 +5,7 @@ import { HologramVideoBlock } from './HologramVideoBlock';
 const EASE_OUT_EXPO: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const FOUNDER_VIDEO_URL =
-  'https://ik.imagekit.io/qcvroy8xpd/IMG_9186%20(1).mp4';
+  'https://ik.imagekit.io/qcvroy8xpd/IMG_9186%20(1).mp4?updatedAt=1772720484624';
 
 const PARTNER_ITEMS = [
   { tag: 'Embedded', text: 'We don\'t deliver from the outside. We embed ourselves in your world, learning your rhythm and your audience.' },

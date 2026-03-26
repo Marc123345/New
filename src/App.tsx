@@ -68,7 +68,7 @@ function HeroLusion() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null)
 
   const storyUrl = 'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4'
-  const founderUrl = 'https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Video%202026-03-03%20at%2019.21.41.mp4'
+  const founderUrl = 'https://ik.imagekit.io/qcvroy8xpd/IMG_9186%20(1).mp4?updatedAt=1772720484624'
 
   return (
     <section
@@ -113,8 +113,8 @@ function HeroLusion() {
           onClick={() => setActiveVideo(storyUrl)}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#141622', color: 'white',
-            height: 52, borderRadius: 30, padding: '0 2em',
+            background: '#a46cfc', color: 'white',
+            height: 52, borderRadius: 8, padding: '0 2em',
             border: 'none', cursor: 'pointer',
             fontFamily: 'var(--font-stack-heading)',
             fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
@@ -129,8 +129,9 @@ function HeroLusion() {
           onClick={() => setActiveVideo(founderUrl)}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#cccccc', color: '#141622',
-            height: 52, borderRadius: 30, padding: '0 2em',
+            background: 'transparent', color: '#a46cfc',
+            height: 52, borderRadius: 8, padding: '0 2em',
+            border: '1.5px solid rgba(164,108,252,0.4)',
             border: 'none', cursor: 'pointer',
             fontFamily: 'var(--font-stack-heading)',
             fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',

@@ -8,13 +8,11 @@ import { easing } from 'maath'
 
 // Your images
 const PEOPLE_IMAGES = [
-  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200",
-  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200",
-  "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200",
-  "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=200",
-  "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=200",
-  "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=200",
-  "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200"
+  "https://ik.imagekit.io/qcvroy8xpd/Ellipse%206.png?updatedAt=1769949025784",
+  "https://ik.imagekit.io/qcvroy8xpd/Ellipse%205.png?updatedAt=1769949025733",
+  "https://ik.imagekit.io/qcvroy8xpd/Ellipse%202.png?updatedAt=1769949025746",
+  "https://ik.imagekit.io/qcvroy8xpd/Ellipse%203.png?updatedAt=1769949025608",
+  "https://ik.imagekit.io/qcvroy8xpd/Ellipse%204.png?updatedAt=1769949025655"
 ];
 
 // Fallback for brandLogos if not imported

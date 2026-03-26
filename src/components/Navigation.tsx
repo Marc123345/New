@@ -182,8 +182,8 @@ export function Navigation() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 color: "#fff",
-                background: "#0a0a0a",
-                borderRadius: 999,
+                background: "#a46cfc",
+                borderRadius: 8,
                 padding: "10px 22px",
                 whiteSpace: "nowrap",
                 transition: "background 0.2s ease, transform 0.2s ease",
@@ -194,7 +194,7 @@ export function Navigation() {
                 (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "#0a0a0a";
+                (e.currentTarget as HTMLAnchorElement).style.background = "#a46cfc";
                 (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
               }}
             >

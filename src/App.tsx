@@ -144,26 +144,7 @@ function HeroLusion() {
           </div>
         </div>
 
-        {/* Right: hamburger menu */}
-        <button
-          onClick={() => {
-            const nav = document.querySelector('[data-nav-toggle]') as HTMLButtonElement;
-            if (nav) nav.click();
-          }}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 48, height: 48, flexShrink: 0,
-            background: 'transparent', border: '1.5px solid rgba(0,0,0,0.15)',
-            borderRadius: 8, cursor: 'pointer', marginTop: 2,
-          }}
-          aria-label="Open menu"
-        >
-          <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-            <line x1="0" y1="1" x2="22" y2="1" stroke="#0a0a0a" strokeWidth="2" />
-            <line x1="0" y1="8" x2="22" y2="8" stroke="#0a0a0a" strokeWidth="2" />
-            <line x1="0" y1="15" x2="22" y2="15" stroke="#0a0a0a" strokeWidth="2" />
-          </svg>
-        </button>
+        {/* Hamburger handled by Navigation component at bottom */}
       </nav>
 
       {/* ── 3D canvas — fills remaining height ── */}

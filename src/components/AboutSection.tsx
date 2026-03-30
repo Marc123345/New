@@ -168,16 +168,16 @@ export function AboutSection() {
           onEnter: () => step.classList.add('is-visible'),
         });
 
-        // Scrub heading fill — stroke → solid as user stays on the step
+        // Fade heading to full opacity as user scrolls through the step
         const h3 = step.querySelector('.about-step-h3');
         if (h3) {
           gsap.to(h3, {
-            color: '${HEADING_COLOR}',
+            opacity: 1,
             ease: 'none',
             scrollTrigger: {
               trigger: step,
-              start: 'top 50%',
-              end: 'bottom 50%',
+              start: 'top 55%',
+              end: 'top 20%',
               scrub: true,
             },
           });
@@ -528,13 +528,12 @@ export function AboutSection() {
         .about-step-h3 {
           font-family: var(--font-stack-heading);
           font-size: 6.875em;
-          font-weight: bold;
-          line-height: 0.85;
+          font-weight: 800;
+          line-height: 0.88;
           text-transform: uppercase;
-          color: transparent;
-          -webkit-text-stroke: 1.5px ${HEADING_COLOR};
-          text-stroke: 1.5px ${HEADING_COLOR};
-          opacity: 0.8;
+          letter-spacing: -0.03em;
+          color: ${HEADING_COLOR};
+          opacity: 0.45;
           position: relative;
           top: -0.4em;
           margin: 0;

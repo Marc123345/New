@@ -939,13 +939,33 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
         dragRef.current.hasMoved = true;
       }
 
-      const dampened = currentDelta * 0.3;
-      const activeCard = cardsRef.current[activeIndex];
-      if (activeCard) {
-        activeCard.style.transition = "none";
-        const baseTransform = `translateX(${dampened}px) rotateY(0deg) translateZ(0px) scale(1)`;
-        activeCard.style.transform = baseTransform;
-      }
+      // Move ALL cards during drag so the whole carousel shifts
+      const dampened = currentDelta * 0.4;
+      const containerWidth = containerRef.current?.offsetWidth ?? 900;
+      const cardWidth = Math.min(380, Math.max(260, containerWidth * 0.55));
+      const spreadStep1 = cardWidth * 0.82;
+      const spreadStep2 = cardWidth * 1.3;
+      const spreadStep3 = cardWidth * 1.75;
+
+      SERVICES.forEach((_, i) => {
+        const card = cardsRef.current[i];
+        if (!card) return;
+        const offset = i - activeIndex;
+        const absOffset = Math.abs(offset);
+
+        let baseX: number;
+        if (absOffset === 0) baseX = 0;
+        else if (absOffset === 1) baseX = offset * spreadStep1;
+        else if (absOffset === 2) baseX = offset * spreadStep2;
+        else baseX = offset * spreadStep3;
+
+        const rotateY = absOffset === 0 ? 0 : absOffset === 1 ? (offset < 0 ? 28 : -28) : absOffset === 2 ? (offset < 0 ? 42 : -42) : (offset < 0 ? 52 : -52);
+        const translateZ = absOffset === 0 ? 0 : absOffset === 1 ? -100 : absOffset === 2 ? -200 : -300;
+        const scale = absOffset === 0 ? 1 : absOffset === 1 ? 0.83 : absOffset === 2 ? 0.66 : 0.5;
+
+        card.style.transition = "none";
+        card.style.transform = `translateX(${baseX + dampened}px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+      });
     };
 
     const onEnd = (e: MouseEvent | TouchEvent) => {

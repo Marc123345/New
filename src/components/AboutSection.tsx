@@ -296,7 +296,7 @@ export function AboutSection() {
           {STEPS.map((step, stepIdx) => (
             <div
               key={step.num}
-              className={`about-step${stepIdx === STEPS.length - 1 ? ' about-step--last' : ''}`}
+              className={`about-step${stepIdx % 2 === 1 ? ' about-step--stroke' : ''}${stepIdx === STEPS.length - 1 ? ' about-step--last' : ''}`}
             >
               {/* Heading row: index | title */}
               <div className="about-step-heading">
@@ -537,6 +537,13 @@ export function AboutSection() {
           position: relative;
           top: -0.4em;
           margin: 0;
+        }
+
+        /* Every second step heading is stroke */
+        .about-step--stroke .about-step-h3 {
+          color: transparent;
+          -webkit-text-stroke: 1.5px ${HEADING_COLOR};
+          text-stroke: 1.5px ${HEADING_COLOR};
         }
 
         /* ── Text-appear (heading line reveal) ── */

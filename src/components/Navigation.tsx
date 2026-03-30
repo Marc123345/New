@@ -147,16 +147,6 @@ export function Navigation() {
             <a href="/" onClick={handleLogoClick} aria-label="H2H Social Home" className="shrink-0">
               <H2HLogo height={36} className="transition-all duration-500" onDark={true} />
             </a>
-            <span className="hidden md:block" style={{
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(0.65rem, 1vw, 0.85rem)',
-              fontWeight: 600,
-              color: 'rgba(232,226,255,0.7)',
-              lineHeight: 1.25,
-              maxWidth: 280,
-            }}>
-              from B2B to H2H — Build a Brand People want to talk to.
-            </span>
           </div>
 
           {/* Right: Menu trigger */}

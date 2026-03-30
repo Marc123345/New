@@ -177,7 +177,7 @@ export function Testimonials() {
           <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
             <div
               className="inline-block mb-3 md:mb-4 px-3 py-1.5 md:px-4 md:py-2"
-              style={{ border: "2px solid var(--color-secondary)", boxShadow: "4px 4px 0 var(--color-secondary)" }}
+              style={{ border: "2px solid var(--color-secondary)", borderRadius: "6px", boxShadow: "4px 4px 0 var(--color-secondary)" }}
             >
               <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase" style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}>
                 Human Stories, Proven Results
@@ -196,7 +196,7 @@ export function Testimonials() {
             {/* LEFT: Globe Panel — desktop only */}
             <div
               className="hidden lg:flex w-[400px] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0 bg-[#1A1040]"
-              style={{ border: "4px solid var(--color-secondary)", boxShadow: "var(--shadow-geometric)" }}
+              style={{ border: "4px solid var(--color-secondary)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)" }}
             >
               <div className="text-center z-10 mt-4">
                 <p className="text-lg leading-tight" style={{ fontFamily: "var(--font-stack-heading)" }}>
@@ -252,7 +252,7 @@ export function Testimonials() {
             {/* RIGHT: Single active card via AnimatePresence */}
             <div
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
-              style={{ border: "1px solid rgba(255,255,255,0.15)", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(360px, 60vh, 600px)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(360px, 60vh, 600px)" }}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
@@ -274,6 +274,7 @@ export function Testimonials() {
                       maxHeight: "calc(100% - 1.5rem)",
                       padding: "clamp(1.25rem, 4vw, 2.5rem)",
                       border: "1px solid rgba(255,255,255,0.15)",
+                      borderRadius: "10px",
                       boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
                       willChange: "transform, opacity",
                     }}
@@ -281,7 +282,7 @@ export function Testimonials() {
                     <div className="relative flex flex-col gap-4 md:gap-6 overflow-hidden">
                       <div
                         className="self-start text-[9px] sm:text-[10px] tracking-[0.25em] uppercase px-2 py-1"
-                        style={{ fontFamily: "var(--font-stack-heading)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.7)" }}
+                        style={{ fontFamily: "var(--font-stack-heading)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "4px", color: "rgba(255,255,255,0.7)" }}
                       >
                         {contact.service}
                       </div>
@@ -306,7 +307,7 @@ export function Testimonials() {
                           </div>
                           <div
                             className="inline-block bg-[var(--color-secondary)] px-2 py-0.5 md:px-3 md:py-1 tracking-widest"
-                            style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(8px, 1.5vw, 11px)", color: "var(--color-background-light)", whiteSpace: "nowrap" }}
+                            style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(8px, 1.5vw, 11px)", borderRadius: "4px", color: "var(--color-background-light)", whiteSpace: "nowrap" }}
                           >
                             {contact.role} · {contact.city}
                           </div>
@@ -318,7 +319,7 @@ export function Testimonials() {
               </div>
 
               {/* Navigation strip */}
-              <div className="relative z-20 shrink-0 border-t border-white/10 bg-[#1A1040]">
+              <div className="relative z-20 shrink-0 border-t border-white/10 bg-[#1A1040]" style={{ borderRadius: "0 0 12px 12px" }}>
                 {/* Mobile: dots */}
                 <div className="flex sm:hidden items-center justify-between px-4 py-3 gap-3">
                   <div className="flex items-center gap-1.5 min-w-0">
@@ -344,7 +345,7 @@ export function Testimonials() {
                     <div
                       key={c.id}
                       className="flex items-center shrink-0 gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200"
-                      style={{ border: i === activeIndex ? "1px solid var(--color-secondary)" : "1px solid rgba(255,255,255,0.1)", background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent" }}
+                      style={{ border: i === activeIndex ? "1px solid var(--color-secondary)" : "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent" }}
                     >
                       <img
                         src={`https://flagcdn.com/20x15/${c.countryCode.toLowerCase()}.png`}

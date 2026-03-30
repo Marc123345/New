@@ -4,14 +4,12 @@ import App from "./App.tsx";
 import { BlogPage } from "./pages/BlogPage.tsx";
 import { PrivacyPage } from "./pages/PrivacyPage.tsx";
 import { TermsPage } from "./pages/TermsPage.tsx";
-import { AboutPage } from "./pages/AboutPage.tsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="/about" element={<AboutPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:id" element={<BlogPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />

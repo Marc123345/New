@@ -87,8 +87,8 @@ function HeroLusion() {
         overflow: 'hidden',
       }}
     >
-      {/* Tagline + video buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2em', flexWrap: 'wrap' }}>
+      {/* Tagline + video buttons stacked below */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         <span style={{
           fontFamily: 'var(--font-stack-heading)',
           fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',

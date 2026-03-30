@@ -229,6 +229,16 @@ export function Testimonials() {
                       />
                     </Suspense>
                   )}
+                  {/* Shadow glow that intensifies with each testimonial */}
+                  <div
+                    className="absolute inset-0 rounded-full pointer-events-none z-10"
+                    style={{
+                      background: 'radial-gradient(circle at 50% 50%, rgba(164,108,252,0.35), rgba(164,108,252,0.1) 50%, transparent 70%)',
+                      opacity: 0.3 + (activeIndex / (CONTACTS.length - 1)) * 0.7,
+                      transition: 'opacity 0.8s ease',
+                      mixBlendMode: 'screen',
+                    }}
+                  />
                 </div>
               </div>
 

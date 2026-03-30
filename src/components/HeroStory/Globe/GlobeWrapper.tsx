@@ -10,8 +10,8 @@ interface GlobeWrapperProps {
   activeCityIndex?: number;
 }
 
-// Testimonial cities — dots always shown when hideArcs is true
-const TESTIMONIAL_DOTS = [
+// Testimonial cities — used for camera tracking
+const TESTIMONIAL_CITIES = [
   { lat: 6.5244,   lng: 3.3792,   name: 'Lagos' },
   { lat: 5.6037,   lng: -0.1870,  name: 'Accra' },
   { lat: -1.2921,  lng: 36.8219,  name: 'Nairobi' },
@@ -178,26 +178,21 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         .width(w)
         .height(h);
 
-      // City points — always configured
-      globe
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor('color')
-        .pointAltitude(0.008)
-        .pointRadius('size')
-        .pointsMerge(false)
-        .pointsTransitionDuration(400);
-
       if (hideArcs) {
-        // Testimonial mode — show city dots, highlight active
-        const dots = TESTIMONIAL_DOTS.map((c, i) => ({
-          lat: c.lat,
-          lng: c.lng,
-          size: i === 0 ? 1.0 : 0.4,
-          color: i === 0 ? 'rgba(216,180,254,1)' : 'rgba(192,132,252,0.45)',
-        }));
-        globe.pointsData(dots);
+        // Testimonial mode — no dots, just atmosphere glow that builds
+        globe
+          .atmosphereColor('rgba(164,108,252,0.55)')
+          .atmosphereAltitude(0.15);
       } else {
+        // City points — configured for non-testimonial mode
+        globe
+          .pointLat('lat')
+          .pointLng('lng')
+          .pointColor('color')
+          .pointAltitude(0.008)
+          .pointRadius('size')
+          .pointsMerge(false)
+          .pointsTransitionDuration(400);
         // Heatmap — subtle warm glow on the surface
         globe
           .heatmapPointLat('lat')
@@ -291,20 +286,28 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
     if (controls) controls.autoRotate = isVisible;
   }, [isVisible]);
 
-  // Update testimonial dots when active city changes
+  // Testimonial mode — grow atmosphere glow + intensify light per step
   useEffect(() => {
     if (!hideArcs || !globeRef.current) return;
     const globe = globeRef.current;
-    const dots = TESTIMONIAL_DOTS.map((c, i) => ({
-      lat: c.lat,
-      lng: c.lng,
-      size: i === activeCityIndex ? 1.0 : 0.4,
-      color: i === activeCityIndex ? 'rgba(216,180,254,1)' : 'rgba(192,132,252,0.45)',
-    }));
-    globe.pointsData(dots);
+    const t = activeCityIndex / (TESTIMONIAL_CITIES.length - 1); // 0 → 1
+
+    // Atmosphere grows with each testimonial
+    globe.atmosphereAltitude(0.15 + t * 0.35);
+    globe.atmosphereColor(`rgba(164,108,252,${(0.4 + t * 0.45).toFixed(2)})`);
+
+    // Intensify the scene lights
+    const scene = globe.scene?.();
+    if (scene) {
+      scene.traverse((obj: any) => {
+        if (obj.isDirectionalLight) obj.intensity = 1.8 + t * 2.0;
+        if (obj.isPointLight) obj.intensity = 0.8 + t * 1.5;
+        if (obj.isAmbientLight) obj.intensity = 0.4 + t * 0.6;
+      });
+    }
 
     // Rotate to face the active city
-    const city = TESTIMONIAL_DOTS[activeCityIndex];
+    const city = TESTIMONIAL_CITIES[activeCityIndex];
     if (city) {
       globe.pointOfView({ lat: city.lat, lng: city.lng, altitude: globe.pointOfView().altitude }, 800);
     }

@@ -537,6 +537,7 @@ export function ArcSlider() {
               marginBottom: "12px",
               padding: "6px 16px",
               border: "2px solid var(--color-secondary)",
+              borderRadius: "6px",
               boxShadow: "4px 4px 0 var(--color-secondary)",
             }}
           >
@@ -587,7 +588,7 @@ export function ArcSlider() {
                 padding: "8px 14px",
                 whiteSpace: "nowrap",
                 border: "2px solid var(--color-secondary, #9B59F5)",
-                borderRadius: "0",
+                borderRadius: "6px",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "transparent",
@@ -643,7 +644,7 @@ export function ArcSlider() {
                     style={{
                       backgroundColor: service.bgColor,
                       border: "2px solid rgba(255,255,255,0.12)",
-                      borderRadius: "0",
+                      borderRadius: "10px",
                       minHeight: "380px",
                       boxShadow: i === activeIndex ? "8px 8px 0 rgba(164,108,252,0.5)" : "none",
                       opacity: i === activeIndex ? 1 : 0.7,
@@ -713,7 +714,7 @@ export function ArcSlider() {
                             color: "#fff",
                             background: "rgba(255,255,255,0.1)",
                             border: "1px solid rgba(255,255,255,0.3)",
-                            borderRadius: "0",
+                            borderRadius: "6px",
                             padding: "12px 24px",
                             cursor: "pointer",
                             minHeight: "44px",
@@ -816,7 +817,7 @@ export function ArcSlider() {
               style={{
                 width: i === activeIndex ? 32 : 8,
                 height: 4,
-                borderRadius: "0",
+                borderRadius: "2px",
                 background: i === activeIndex
                   ? "var(--color-secondary, #9B59F5)"
                   : "rgba(155, 89, 245, 0.35)",
@@ -1022,7 +1023,7 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
                 style={{
                   backgroundColor: service.bgColor,
                   border: "2px solid rgba(255,255,255,0.12)",
-                  borderRadius: "0",
+                  borderRadius: "10px",
                   userSelect: "none",
                   WebkitUserSelect: "none",
                 }}
@@ -1093,7 +1094,7 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
                         color: "#fff",
                         background: "rgba(255,255,255,0.08)",
                         border: "1px solid rgba(255,255,255,0.25)",
-                        borderRadius: "0",
+                        borderRadius: "6px",
                         padding: "12px 24px",
                         cursor: "pointer",
                         pointerEvents: "auto",

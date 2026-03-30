@@ -161,18 +161,16 @@ export function AboutSection() {
           {/* Body — CSS transition unblur, no GSAP */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2x)', flex: 1, paddingTop: 'var(--space-8x)', paddingBottom: 'clamp(80px, 12vw, 160px)' }}>
             <div />
-            <div className="about-step-body" style={{
+            <p className="about-step-body" style={{
               fontFamily: 'var(--font-stack-body)',
               fontSize: 'clamp(1rem, 1.4vw, 1.4em)',
               fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.15,
               color: 'var(--color-text-dark)', paddingRight: '35%',
+              opacity: 0, transform: 'translateY(20px)',
+              transition: 'opacity 0.8s ease, transform 0.8s ease',
             }}>
-              {step.body.split(' ').map((word, i) => (
-                <span key={i} className="about-word" style={{ '--i': i } as React.CSSProperties}>
-                  {word}&nbsp;
-                </span>
-              ))}
-            </div>
+              {step.body}
+            </p>
           </div>
         </div>
       ))}
@@ -206,21 +204,9 @@ export function AboutSection() {
       <style>{`
         .about-step-index.appeared .index-glow { transform: scaleX(1); }
         .about-step-index.appeared span { opacity: 1 !important; }
-
-        .about-word {
-          display: inline-block;
-          opacity: 0;
-          filter: blur(4px);
-          transition: opacity 0.4s ease, filter 0.4s ease;
-          transition-delay: calc(var(--i) * 0.006s);
-        }
-        .about-step-body.revealed .about-word {
-          opacity: 1;
-          filter: blur(0px);
-        }
-
+        .about-step-body.revealed { opacity: 1 !important; transform: translateY(0) !important; }
         @media (prefers-reduced-motion: reduce) {
-          .about-word { opacity: 1 !important; filter: none !important; transition: none !important; }
+          .about-step-body { opacity: 1 !important; transform: none !important; transition: none !important; }
           .text-line { transform: none !important; }
         }
       `}</style>

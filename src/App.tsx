@@ -11,6 +11,7 @@ import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
 
 import { H2HLogo } from "./components/H2HLogo";
+import { AboutSection } from "./components/AboutSection";
 const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
 );
@@ -217,6 +218,9 @@ function AppContent() {
 
       {/* ═══ HERO — exact Lusion layout ═══ */}
       <HeroLusion />
+
+      {/* ═══ ABOUT — African aesthetic, IWC transitions ═══ */}
+      <AboutSection />
 
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
         <ArcSlider />

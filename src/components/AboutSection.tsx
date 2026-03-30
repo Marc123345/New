@@ -28,17 +28,8 @@ const AfricanShapes = memo(function AfricanShapes({ style = {} }: { style?: Reac
   );
 });
 
-/* ════════════════════════════════════════════════════════════════════════════
-   ABOUT SECTION — Optimized scrollytelling
-
-   Performance:
-   - 1 scrubbed ScrollTrigger (progress line)
-   - 5 one-shot ScrollTriggers (1 per step) — each triggers a single
-     timeline that handles heading lines + body reveal together
-   - Body uses CSS transition with staggered --delay vars instead of
-     individual GSAP tweens (0 GSAP instances for words)
-   - Total: 6 ScrollTrigger instances (was ~221)
-   ════════════════════════════════════════════════════════════════════════════ */
+/* Lighter purple for headings — high contrast on dark bg */
+const HEADING_COLOR = '#c9b3ff';
 
 export function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -50,7 +41,7 @@ export function AboutSection() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const ctx = gsap.context(() => {
-      // 1 scrubbed instance — progress line
+      // 1 scrubbed instance — progress line (no blur, just opacity)
       if (lineGlowRef.current) {
         gsap.to(lineGlowRef.current, {
           scaleY: 1, ease: 'none',
@@ -58,47 +49,19 @@ export function AboutSection() {
         });
       }
 
-      // 5 one-shot instances — 1 per step
+      // 5 one-shot instances — pure CSS class toggles, zero GSAP tweens
       gsap.utils.toArray<HTMLElement>('.about-step').forEach((step) => {
-        const lines = step.querySelectorAll<HTMLElement>('.text-line');
-        const body = step.querySelector<HTMLElement>('.about-step-body');
-        const index = step.querySelector<HTMLElement>('.about-step-index');
-
         ScrollTrigger.create({
           trigger: step,
           start: 'top 55%',
           once: true,
-          onEnter: () => {
-            // Index glow — CSS class toggle
-            if (index) index.classList.add('appeared');
-
-            // Heading lines — single timeline (not per-line ScrollTriggers)
-            const tl = gsap.timeline();
-            lines.forEach((line, i) => {
-              tl.to(line, {
-                yPercent: 0, rotate: 0,
-                duration: 0.7, ease: 'power3.out',
-              }, i * 0.12);
-            });
-
-            // Body — CSS class toggle triggers CSS transitions (zero GSAP)
-            if (body) body.classList.add('revealed');
-          },
+          onEnter: () => step.classList.add('is-visible'),
         });
       });
     }, section);
 
     return () => ctx.revert();
   }, []);
-
-  const splitLines = (text: string) =>
-    text.split('\n').map((line, i) => (
-      <div key={i} style={{ overflow: 'clip', display: 'block' }}>
-        <div className="text-line" style={{ display: 'block', transform: 'translateY(100%) rotate(2deg)' }}>
-          {line}
-        </div>
-      </div>
-    ));
 
   return (
     <div ref={sectionRef} id="about" style={{ position: 'relative', background: 'var(--color-background-light)' }}>
@@ -107,22 +70,22 @@ export function AboutSection() {
       <div style={{
         position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
         backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/download.jpeg)',
-        backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover', backgroundPosition: 'center',
         opacity: 0.04, mixBlendMode: 'luminosity',
       }} />
 
-      {/* Progress line */}
-      <div style={{ position: 'absolute', top: 0, left: 'clamp(20px, 4vw, 56px)', bottom: 0, width: 1 }}>
-        <div style={{ width: '100%', height: '100%', position: 'absolute', background: 'var(--color-secondary)', opacity: 0.08 }} />
+      {/* Progress line — no blur, just solid color */}
+      <div style={{ position: 'absolute', top: 0, left: 'clamp(20px, 4vw, 56px)', bottom: 0, width: 1, zIndex: 1 }}>
+        <div style={{ width: '100%', height: '100%', position: 'absolute', background: 'var(--color-secondary)', opacity: 0.1 }} />
         <div ref={lineGlowRef} style={{
-          width: '100%', height: '100%', position: 'absolute',
-          background: 'var(--color-secondary)', opacity: 0.5, filter: 'blur(3px)',
+          width: 2, height: '100%', position: 'absolute', left: -0.5,
+          background: 'var(--color-secondary)', opacity: 0.6,
           transformOrigin: 'top center', transform: 'scaleY(0)',
         }} />
       </div>
 
       {/* Section heading */}
-      <div style={{ paddingTop: 'clamp(100px, 14vw, 180px)', paddingBottom: 'clamp(120px, 16vw, 220px)', paddingLeft: 'clamp(60px, 8vw, 120px)', paddingRight: 'var(--space-4x)', position: 'relative' }}>
+      <div style={{ paddingTop: 'clamp(100px, 14vw, 180px)', paddingBottom: 'clamp(120px, 16vw, 220px)', paddingLeft: 'clamp(60px, 8vw, 120px)', paddingRight: 'var(--space-4x)', position: 'relative', zIndex: 2 }}>
         <AfricanShapes style={{ position: 'absolute', top: '-10%', right: '-8%', width: '500px', height: '500px' }} />
         <span style={{ fontFamily: 'var(--font-stack-heading)', fontSize: '0.8125em', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', color: OCHRE }}>
           About Us
@@ -130,9 +93,9 @@ export function AboutSection() {
       </div>
 
       {/* Steps */}
-      {STEPS.map((step) => (
+      {STEPS.map((step, si) => (
         <div key={step.num} className="about-step" style={{
-          minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative',
+          minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 2,
           paddingLeft: 'clamp(60px, 8vw, 120px)', paddingRight: 'var(--space-4x)',
         }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 13fr', gap: 'var(--space-2x)', alignItems: 'start' }}>
@@ -140,33 +103,29 @@ export function AboutSection() {
             <div className="about-step-index" style={{ display: 'flex', alignItems: 'center', gap: '1em', paddingRight: '25%', transform: 'translateY(-50%)' }}>
               <div style={{ flex: 1, height: 1, position: 'relative' }}>
                 <div style={{ width: '100%', height: '100%', background: 'var(--color-secondary)', opacity: 0.1 }} />
-                <div className="index-glow" style={{
-                  position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                  background: 'var(--color-secondary)', filter: 'blur(3px)', opacity: 0.5,
-                  transform: 'scaleX(0)', transformOrigin: 'left center', transition: 'transform 0.4s',
-                }} />
+                <div className="index-glow" />
               </div>
-              <span style={{
-                fontFamily: 'var(--font-stack-heading)', fontSize: '0.8125em', fontWeight: 500,
-                letterSpacing: '0.04em', textTransform: 'uppercase',
-                color: 'var(--color-text-dark)', opacity: 0.5, transition: 'opacity 0.4s',
-              }}>{step.num}</span>
+              <span className="index-num">{step.num}</span>
             </div>
 
-            {/* Title */}
+            {/* Title — pure CSS animation */}
             <div style={{ paddingRight: '20%' }}>
               <h3 className="about-step-heading" style={{
                 fontFamily: 'var(--font-stack-heading)',
                 fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
                 fontWeight: 'bold', lineHeight: 0.9, textTransform: 'uppercase',
-                color: 'var(--color-text-dark)', position: 'relative', top: '-0.4em',
+                color: HEADING_COLOR,
               }}>
-                {splitLines(step.title)}
+                {step.title.split('\n').map((line, i) => (
+                  <div key={i} style={{ overflow: 'clip', display: 'block' }}>
+                    <div className="text-line" style={{ transitionDelay: `${i * 0.12}s` }}>{line}</div>
+                  </div>
+                ))}
               </h3>
             </div>
           </div>
 
-          {/* Body — CSS transition unblur, no GSAP */}
+          {/* Body */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2x)', flex: 1, paddingTop: 'var(--space-8x)', paddingBottom: 'clamp(80px, 12vw, 160px)' }}>
             <div />
             <p className="about-step-body" style={{
@@ -174,8 +133,6 @@ export function AboutSection() {
               fontSize: 'clamp(1rem, 1.4vw, 1.4em)',
               fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1.15,
               color: 'var(--color-text-dark)', paddingRight: '35%',
-              opacity: 0, transform: 'translateY(20px)',
-              transition: 'opacity 0.8s ease, transform 0.8s ease',
             }}>
               {step.body}
             </p>
@@ -186,7 +143,7 @@ export function AboutSection() {
       {/* Closing */}
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        paddingLeft: 'clamp(60px, 8vw, 120px)', paddingRight: 'var(--space-4x)', position: 'relative',
+        paddingLeft: 'clamp(60px, 8vw, 120px)', paddingRight: 'var(--space-4x)', position: 'relative', zIndex: 2,
       }}>
         <AfricanShapes style={{ position: 'absolute', bottom: '-15%', left: '-10%', width: '600px', height: '600px' }} />
         <div style={{ maxWidth: '680px', position: 'relative', zIndex: 1 }}>
@@ -194,7 +151,7 @@ export function AboutSection() {
             fontFamily: 'var(--font-stack-heading)',
             fontSize: 'clamp(2rem, 5vw, 4rem)',
             fontWeight: 'bold', lineHeight: 0.9, textTransform: 'uppercase',
-            color: 'var(--color-text-dark)',
+            color: HEADING_COLOR,
           }}>
             Social-first.<br />Human-always.
           </h3>
@@ -209,13 +166,37 @@ export function AboutSection() {
         </div>
       </div>
 
+      {/* All animations via CSS — zero GSAP tweens */}
       <style>{`
-        .about-step-index.appeared .index-glow { transform: scaleX(1); }
-        .about-step-index.appeared span { opacity: 1 !important; }
-        .about-step-body.revealed { opacity: 1 !important; transform: translateY(0) !important; }
+        .index-glow {
+          position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: var(--color-secondary); opacity: 0.6;
+          transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+        }
+        .index-num {
+          font-family: var(--font-stack-heading); font-size: 0.8125em; font-weight: 500;
+          letter-spacing: 0.04em; text-transform: uppercase;
+          color: var(--color-text-dark); opacity: 0.4; transition: opacity 0.4s ease;
+        }
+        .text-line {
+          display: block; transform: translateY(110%);
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .about-step-body {
+          opacity: 0; transform: translateY(16px);
+          transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;
+        }
+
+        /* Triggered by ScrollTrigger adding .is-visible */
+        .about-step.is-visible .index-glow { transform: scaleX(1); }
+        .about-step.is-visible .index-num { opacity: 1; }
+        .about-step.is-visible .text-line { transform: translateY(0); }
+        .about-step.is-visible .about-step-body { opacity: 1; transform: translateY(0); }
+
         @media (prefers-reduced-motion: reduce) {
-          .about-step-body { opacity: 1 !important; transform: none !important; transition: none !important; }
-          .text-line { transform: none !important; }
+          .text-line, .about-step-body { transform: none !important; opacity: 1 !important; transition: none !important; }
+          .index-glow { transform: scaleX(1) !important; transition: none !important; }
+          .index-num { opacity: 1 !important; }
         }
       `}</style>
     </div>

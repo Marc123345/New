@@ -155,7 +155,7 @@ export function Navigation() {
           {/* Left: Logo + tagline */}
           <div className={`flex items-center gap-4 sm:gap-6 transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
             <a href="/" onClick={handleLogoClick} aria-label="H2H Social Home" className="shrink-0">
-              <H2HLogo height={36} className="transition-all duration-500" onDark={onDark} />
+              <H2HLogo height={52} className="transition-all duration-500" onDark={onDark} />
             </a>
           </div>
 

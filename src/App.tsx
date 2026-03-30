@@ -78,59 +78,65 @@ function HeroLusion() {
         width: '100%',
         height: '100vh',
         background: '#f0f0f0',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '0',
+        display: 'grid',
+        gridTemplateRows: 'auto 1fr',
+        gap: '3em',
+        padding: '3em 5em',
+        paddingTop: 'calc(70px + 2em)',
         boxSizing: 'border-box',
         overflow: 'hidden',
-        paddingTop: '70px', /* space for fixed nav */
       }}
     >
-      {/* Video buttons — floating over the 3D canvas */}
-      <div style={{
-        position: 'absolute',
-        bottom: 'clamp(24px, 4vh, 48px)',
-        left: 'clamp(24px, 4vw, 56px)',
-        zIndex: 20,
-        display: 'flex',
-        gap: '0.75em',
-        flexWrap: 'wrap',
-      }}>
-        <button
-          onClick={() => setActiveVideo(storyUrl)}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#a46cfc', color: 'white',
-            height: 44, borderRadius: 8, padding: '0 1.5em',
-            border: 'none', cursor: 'pointer',
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Hear Our Story
-        </button>
-        <button
-          onClick={() => setActiveVideo(founderUrl)}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(255,255,255,0.9)', color: '#a46cfc',
-            height: 44, borderRadius: 8, padding: '0 1.5em',
-            border: '1.5px solid rgba(164,108,252,0.3)',
-            cursor: 'pointer',
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Meet Our Founder
-        </button>
+      {/* Tagline + video buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2em', flexWrap: 'wrap' }}>
+        <span style={{
+          fontFamily: 'var(--font-stack-heading)',
+          fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',
+          fontWeight: 700,
+          color: '#0a0a0a',
+          maxWidth: 500,
+          lineHeight: 1.2,
+        }}>
+          from B2B to H2H — Build a Brand People want to talk to.
+        </span>
+
+        <div style={{ display: 'flex', gap: '0.75em', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setActiveVideo(storyUrl)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#a46cfc', color: 'white',
+              height: 44, borderRadius: 8, padding: '0 1.5em',
+              border: 'none', cursor: 'pointer',
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Hear Our Story
+          </button>
+          <button
+            onClick={() => setActiveVideo(founderUrl)}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', color: '#a46cfc',
+              height: 44, borderRadius: 8, padding: '0 1.5em',
+              border: '1.5px solid rgba(164,108,252,0.4)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Meet Our Founder
+          </button>
+        </div>
       </div>
 
-      {/* ── 3D canvas — fills full section ── */}
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+      {/* ── 3D canvas — contained with rounded corners ── */}
+      <div style={{ borderRadius: 20, overflow: 'hidden', position: 'relative' }}>
         <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
           <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
             <LusionConnectors />

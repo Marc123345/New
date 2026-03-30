@@ -103,6 +103,14 @@ export function AboutSection() {
   return (
     <div ref={sectionRef} id="about" style={{ position: 'relative', background: 'var(--color-background-light)' }}>
 
+      {/* Subtle background image */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+        backgroundImage: 'url(https://ik.imagekit.io/qcvroy8xpd/download.jpeg)',
+        backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
+        opacity: 0.04, mixBlendMode: 'luminosity',
+      }} />
+
       {/* Progress line */}
       <div style={{ position: 'absolute', top: 0, left: 'clamp(20px, 4vw, 56px)', bottom: 0, width: 1 }}>
         <div style={{ width: '100%', height: '100%', position: 'absolute', background: 'var(--color-secondary)', opacity: 0.08 }} />

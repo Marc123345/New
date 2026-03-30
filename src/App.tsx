@@ -86,61 +86,83 @@ function HeroLusion() {
         overflow: 'hidden',
       }}
     >
-      {/* ── Nav row: label | spacer | caption | spacer | button | button ── */}
+      {/* ── Nav row: logo + text/buttons left | hamburger right ── */}
       <nav style={{
-        display: 'grid',
-        gridTemplateColumns: 'auto 0.25fr 1fr 0.25fr auto auto',
-        gap: '1em',
-        alignItems: 'center',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: '1.5em',
       }}>
-        <H2HLogo height={52} onDark={false} />
+        {/* Left: logo + tagline + buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+          <H2HLogo height={52} onDark={false} />
 
-        <div />
+          <span style={{
+            fontFamily: 'var(--font-stack-heading)',
+            fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',
+            fontWeight: 700,
+            color: '#0a0a0a',
+            maxWidth: 500,
+            lineHeight: 1.2,
+          }}>
+            from B2B to H2H — Build a Brand People want to talk to.
+          </span>
 
-        <span style={{
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',
-          fontWeight: 700,
-          color: '#0a0a0a',
-          maxWidth: 500,
-          lineHeight: 1.2,
-        }}>
-          from B2B to H2H — Build a Brand People want to talk to.
-        </span>
+          <div style={{ display: 'flex', gap: '0.75em', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveVideo(storyUrl)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: '#a46cfc', color: 'white',
+                height: 44, borderRadius: 8, padding: '0 1.5em',
+                border: 'none', cursor: 'pointer',
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Hear Our Story
+            </button>
 
-        <div />
+            <button
+              onClick={() => setActiveVideo(founderUrl)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'transparent', color: '#a46cfc',
+                height: 44, borderRadius: 8, padding: '0 1.5em',
+                border: '1.5px solid rgba(164,108,252,0.4)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-stack-heading)',
+                fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Meet Our Founder
+            </button>
+          </div>
+        </div>
 
+        {/* Right: hamburger menu */}
         <button
-          onClick={() => setActiveVideo(storyUrl)}
+          onClick={() => {
+            const nav = document.querySelector('[data-nav-toggle]') as HTMLButtonElement;
+            if (nav) nav.click();
+          }}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#a46cfc', color: 'white',
-            height: 52, borderRadius: 8, padding: '0 2em',
-            border: 'none', cursor: 'pointer',
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
+            width: 48, height: 48, flexShrink: 0,
+            background: 'transparent', border: '1.5px solid rgba(0,0,0,0.15)',
+            borderRadius: 8, cursor: 'pointer', marginTop: 2,
           }}
+          aria-label="Open menu"
         >
-          Hear Our Story
-        </button>
-
-        <button
-          onClick={() => setActiveVideo(founderUrl)}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'transparent', color: '#a46cfc',
-            height: 52, borderRadius: 8, padding: '0 2em',
-            border: '1.5px solid rgba(164,108,252,0.4)',
-            border: 'none', cursor: 'pointer',
-            fontFamily: 'var(--font-stack-heading)',
-            fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-            letterSpacing: '0.12em', textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Meet Our Founder
+          <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+            <line x1="0" y1="1" x2="22" y2="1" stroke="#0a0a0a" strokeWidth="2" />
+            <line x1="0" y1="8" x2="22" y2="8" stroke="#0a0a0a" strokeWidth="2" />
+            <line x1="0" y1="15" x2="22" y2="15" stroke="#0a0a0a" strokeWidth="2" />
+          </svg>
         </button>
       </nav>
 

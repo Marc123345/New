@@ -22,7 +22,7 @@ export function Navigation() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [pastHero, setPastHero] = useState(false);
+  const [pastHero, setPastHero] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,7 +38,7 @@ export function Navigation() {
       rafId = requestAnimationFrame(() => {
         rafId = 0;
         setScrolled(window.scrollY > 40);
-        setPastHero(window.scrollY > window.innerHeight * 0.85);
+        setPastHero(true);
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });

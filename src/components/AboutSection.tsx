@@ -270,6 +270,11 @@ export function AboutSection() {
             </div>
           ))}
           <img src={v5.haze} style={ip(100, 350, 1200, 250)} />
+          <img
+            src="https://ik.imagekit.io/qcvroy8xpd/download.jpeg?updatedAt=1774888389369"
+            alt=""
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.06, mixBlendMode: 'luminosity', pointerEvents: 'none' }}
+          />
           <img src={ANIMALS[4]} alt="" className="about-animal about-animal--5" />
         </div>
       </div>
@@ -414,20 +419,21 @@ export function AboutSection() {
         .about-side-line {
           position: absolute;
           top: 0; left: 0; bottom: 0;
-          width: 1px;
+          width: 2px;
           padding: 0.5em 0;
         }
         .about-glow-line { position: relative; width: 100%; height: 100%; }
         .about-glow-line__base {
           position: absolute; inset: 0;
           background: var(--color-secondary);
-          opacity: 0.1;
+          opacity: 0.3;
         }
         .about-glow-line__glow {
           position: absolute; inset: 0;
+          width: 3px; left: -0.5px;
           background: var(--color-secondary);
-          opacity: 0.5;
-          filter: blur(3px);
+          opacity: 0.85;
+          filter: blur(4px);
           transform-origin: top center;
           transform: scaleY(0);
         }
@@ -435,6 +441,7 @@ export function AboutSection() {
         /* Horizontal variant (step index) */
         .about-glow-line--h { width: 100%; height: 100%; }
         .about-glow-line__glow--h {
+          width: 100%; height: 2px; left: 0;
           transform-origin: left center;
           transform: scaleX(0);
           transition: transform 0.4s ease;
@@ -451,29 +458,29 @@ export function AboutSection() {
         }
         .about-heading-corner__base {
           position: absolute; inset: 0;
-          border-top: 1px solid var(--color-secondary);
-          border-left: 1px solid var(--color-secondary);
+          border-top: 2px solid var(--color-secondary);
+          border-left: 2px solid var(--color-secondary);
           border-top-left-radius: 0.5em;
-          opacity: 0.1;
+          opacity: 0.3;
         }
         .about-heading-corner__glow {
           position: absolute; inset: 0;
-          border-top: 1px solid var(--color-secondary);
-          border-left: 1px solid var(--color-secondary);
+          border-top: 2px solid var(--color-secondary);
+          border-left: 2px solid var(--color-secondary);
           border-top-left-radius: 0.5em;
-          opacity: 0.5;
-          filter: blur(3px);
+          opacity: 0.75;
+          filter: blur(4px);
         }
         .about-heading-corner__base--bottom {
           border-top: none;
           border-top-left-radius: 0;
-          border-bottom: 1px solid var(--color-secondary);
+          border-bottom: 2px solid var(--color-secondary);
           border-bottom-left-radius: 0.5em;
         }
         .about-heading-corner__glow--bottom {
           border-top: none;
           border-top-left-radius: 0;
-          border-bottom: 1px solid var(--color-secondary);
+          border-bottom: 2px solid var(--color-secondary);
           border-bottom-left-radius: 0.5em;
         }
         .about-caption {
@@ -517,7 +524,7 @@ export function AboutSection() {
           padding-right: 25%;
           transform: translateY(-50%);
         }
-        .about-step-index-line { flex: 1; height: 1px; }
+        .about-step-index-line { flex: 1; height: 2px; }
         .about-step-index-num p {
           opacity: 0.5;
           transition: opacity 0.4s ease;

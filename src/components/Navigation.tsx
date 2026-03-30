@@ -31,6 +31,8 @@ export function Navigation() {
 
   const isHomePage = location.pathname === "/";
 
+  const [inHero, setInHero] = useState(true);
+
   useEffect(() => {
     let rafId = 0;
     const onScroll = () => {
@@ -39,9 +41,17 @@ export function Navigation() {
         rafId = 0;
         setScrolled(window.scrollY > 40);
         setPastHero(true);
+        const heroEl = document.getElementById("hero");
+        if (heroEl) {
+          const rect = heroEl.getBoundingClientRect();
+          setInHero(rect.bottom > 70);
+        } else {
+          setInHero(false);
+        }
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // run once on mount
     return () => {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafId);
@@ -120,10 +130,10 @@ export function Navigation() {
     }
   }, [navigate, isHomePage]);
 
-  // Always on dark purple background
-  const onDark = true;
-  const inkColor = "rgba(232,226,255,0.9)";
-  const inkColorFaint = "rgba(232,226,255,0.45)";
+  // Switch theme based on hero visibility
+  const onDark = !inHero || !isHomePage;
+  const inkColor = onDark ? "rgba(232,226,255,0.9)" : "rgba(10,10,10,0.85)";
+  const inkColorFaint = onDark ? "rgba(232,226,255,0.45)" : "rgba(10,10,10,0.45)";
 
   return (
     <>
@@ -136,16 +146,16 @@ export function Navigation() {
           pointerEvents: 'auto',
           transform: 'translateY(0)',
           padding: "clamp(12px, 2vh, 20px) clamp(20px, 4vw, 56px)",
-          backgroundColor: "var(--color-primary)",
+          backgroundColor: onDark ? "var(--color-primary)" : "#f0f0f0",
           backdropFilter: "blur(14px)",
-          borderBottom: "1px solid rgba(164,108,252,0.15)",
+          borderBottom: onDark ? "1px solid rgba(164,108,252,0.15)" : "1px solid rgba(0,0,0,0.08)",
         }}
       >
         <div className="flex items-center justify-between gap-4">
           {/* Left: Logo + tagline */}
           <div className={`flex items-center gap-4 sm:gap-6 transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
             <a href="/" onClick={handleLogoClick} aria-label="H2H Social Home" className="shrink-0">
-              <H2HLogo height={36} className="transition-all duration-500" onDark={true} />
+              <H2HLogo height={36} className="transition-all duration-500" onDark={onDark} />
             </a>
           </div>
 

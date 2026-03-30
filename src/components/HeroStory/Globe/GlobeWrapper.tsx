@@ -7,7 +7,17 @@ interface GlobeWrapperProps {
   scrollYProgress: MotionValue<number>;
   isVisible?: boolean;
   hideArcs?: boolean;
+  activeCityIndex?: number;
 }
+
+// Testimonial cities — dots always shown when hideArcs is true
+const TESTIMONIAL_DOTS = [
+  { lat: 6.5244,   lng: 3.3792,   name: 'Lagos' },
+  { lat: 5.6037,   lng: -0.1870,  name: 'Accra' },
+  { lat: -1.2921,  lng: 36.8219,  name: 'Nairobi' },
+  { lat: -26.2041, lng: 28.0473,  name: 'Johannesburg' },
+  { lat: 14.7167,  lng: -17.4677, name: 'Dakar' },
+];
 
 const TOP_CITIES = worldPopulationData.slice(0, 18);
 const TOP_CITIES_MOBILE = worldPopulationData.slice(0, 10);
@@ -133,7 +143,7 @@ function disposeThreeScene(globe: any) {
   } catch (_) {}
 }
 
-export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = false }: GlobeWrapperProps) {
+export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = false, activeCityIndex = 0 }: GlobeWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<any>(null);
   const rafRef = useRef<number>(0);
@@ -168,7 +178,26 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         .width(w)
         .height(h);
 
-      if (!hideArcs) {
+      // City points — always configured
+      globe
+        .pointLat('lat')
+        .pointLng('lng')
+        .pointColor('color')
+        .pointAltitude(0.008)
+        .pointRadius('size')
+        .pointsMerge(false)
+        .pointsTransitionDuration(400);
+
+      if (hideArcs) {
+        // Testimonial mode — show city dots, highlight active
+        const dots = TESTIMONIAL_DOTS.map((c, i) => ({
+          lat: c.lat,
+          lng: c.lng,
+          size: i === 0 ? 1.0 : 0.4,
+          color: i === 0 ? 'rgba(216,180,254,1)' : 'rgba(192,132,252,0.45)',
+        }));
+        globe.pointsData(dots);
+      } else {
         // Heatmap — subtle warm glow on the surface
         globe
           .heatmapPointLat('lat')
@@ -188,16 +217,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
           .arcAltitudeAutoScale(0.4)
           .arcsTransitionDuration(800);
 
-        // City points — small, soft glowing dots
-        globe
-          .pointLat('lat')
-          .pointLng('lng')
-          .pointColor('color')
-          .pointAltitude(0.008)
-          .pointRadius('size')
-          .pointsMerge(true)
-          .pointsData(EMPTY_POINTS);
-
+        globe.pointsData(EMPTY_POINTS);
         globe.arcsData(EMPTY_ARCS);
       }
 
@@ -271,6 +291,25 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
     if (controls) controls.autoRotate = isVisible;
   }, [isVisible]);
 
+  // Update testimonial dots when active city changes
+  useEffect(() => {
+    if (!hideArcs || !globeRef.current) return;
+    const globe = globeRef.current;
+    const dots = TESTIMONIAL_DOTS.map((c, i) => ({
+      lat: c.lat,
+      lng: c.lng,
+      size: i === activeCityIndex ? 1.0 : 0.4,
+      color: i === activeCityIndex ? 'rgba(216,180,254,1)' : 'rgba(192,132,252,0.45)',
+    }));
+    globe.pointsData(dots);
+
+    // Rotate to face the active city
+    const city = TESTIMONIAL_DOTS[activeCityIndex];
+    if (city) {
+      globe.pointOfView({ lat: city.lat, lng: city.lng, altitude: globe.pointOfView().altitude }, 800);
+    }
+  }, [activeCityIndex, hideArcs]);
+
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
     if (!isVisible || !globeRef.current) return;
     if (Math.abs(progress - lastProgressRef.current) < SCROLL_THRESHOLD) return;
@@ -285,11 +324,13 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
       const mobile = mobileRef.current;
       const globe = globeRef.current;
 
-      const startAlt = mobile ? 2.8 : 2.2;
-      const zoomRange = mobile ? 0.5 : 0.8;
-      const minAlt = mobile ? 1.8 : 1.2;
-      const newAltitude = Math.max(minAlt, startAlt - progress * zoomRange);
-      globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 400);
+      if (!hideArcs) {
+        const startAlt = mobile ? 2.8 : 2.2;
+        const zoomRange = mobile ? 0.5 : 0.8;
+        const minAlt = mobile ? 1.8 : 1.2;
+        const newAltitude = Math.max(minAlt, startAlt - progress * zoomRange);
+        globe.pointOfView({ lat: 5, lng: 20, altitude: newAltitude }, 400);
+      }
 
       globe.atmosphereAltitude(
         mobile ? 0.12 + progress * 0.25 : 0.18 + progress * 0.4
@@ -300,11 +341,13 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         controls.autoRotateSpeed = (mobile ? 0.3 : 0.4) + progress * (mobile ? 0.6 : 1.2);
       }
 
-      if (progress > ARC_START && !hideArcs) {
-        const pointData = mobile ? POINT_DATA_MOBILE : POINT_DATA_DESKTOP;
-        globe.pointsData(pointData);
-      } else {
-        globe.pointsData(EMPTY_POINTS);
+      if (!hideArcs) {
+        if (progress > ARC_START) {
+          const pointData = mobile ? POINT_DATA_MOBILE : POINT_DATA_DESKTOP;
+          globe.pointsData(pointData);
+        } else {
+          globe.pointsData(EMPTY_POINTS);
+        }
       }
 
       if (!hideArcs) {

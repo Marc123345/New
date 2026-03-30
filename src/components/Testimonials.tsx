@@ -225,6 +225,7 @@ export function Testimonials() {
                         scrollYProgress={scrollYProgress}
                         isVisible={globeVisible}
                         hideArcs
+                        activeCityIndex={activeIndex}
                       />
                     </Suspense>
                   )}

@@ -116,6 +116,15 @@ const v5 = {
   haze: 'https://www.figma.com/api/mcp/asset/f2062bdd-7eb8-4bb2-8d89-895445c2ea11',
 };
 
+/* ── Animal spirit images — one per step ── */
+const ANIMALS = [
+  'https://ik.imagekit.io/qcvroy8xpd/Lion%202.png',
+  'https://ik.imagekit.io/qcvroy8xpd/Bull.png',
+  'https://ik.imagekit.io/qcvroy8xpd/Elephant.png',
+  'https://ik.imagekit.io/qcvroy8xpd/Grizzly%20Bear.png',
+  'https://ik.imagekit.io/qcvroy8xpd/Monkey.png',
+];
+
 // Helper for image positioning (1440×900 base)
 const ip = (x: number, y: number, w: number, h: number, rot?: number): React.CSSProperties => ({
   position: 'absolute',
@@ -195,7 +204,7 @@ export function AboutSection() {
     <div ref={sectionRef} id="about" className="about-section" data-bg="1">
       {/* Fixed backgrounds — crossfade between 5 variants */}
       <div className="about-fixed-wrapper">
-        {/* V1 — Continent Silhouette (images) */}
+        {/* V1 — Continent Silhouette (images) + Lion */}
         <div className="about-bg-layer about-bg-layer--1">
           <div style={ip(-397, -200, 900, 700, 8)}><img src={v1.ellipse} style={{ width: '100%', height: '100%' }} /></div>
           <div style={ip(700, 330, 800, 600, -5)}><img src={v1.ellipse1} style={{ width: '100%', height: '100%' }} /></div>
@@ -204,6 +213,7 @@ export function AboutSection() {
           <div style={ip(831, 220, 200, 130, 22)}><img src={v1.ellipse2} style={{ width: '100%', height: '100%' }} /></div>
           <img src={v1.ellipse3} style={ip(345, 25, 260, 100)} />
           <img src={v1.ellipse4} style={ip(628, 730, 110, 80)} />
+          <img src={ANIMALS[0]} alt="" className="about-animal about-animal--1" />
         </div>
 
         {/* V2 — Nile River Path (images) */}
@@ -221,11 +231,13 @@ export function AboutSection() {
           <img src={v2.delta4} style={ip(542, 825, 200, 97)} />
           <img src={v2.source} style={ip(685, -62, 130, 95)} />
           <img src={v2.sourceGlow} style={ip(692, -52, 95, 68)} />
+          <img src={ANIMALS[1]} alt="" className="about-animal about-animal--2" />
         </div>
 
-        {/* V3 — Sahara Dune Arc (CSS gradient blobs) */}
+        {/* V3 — Sahara Dune Arc (CSS gradient blobs) + Elephant */}
         <div className="about-bg-layer about-bg-layer--3">
           {BLOB_SETS_V3[0].map((b, i) => <div key={i} style={blobStyle(b)} />)}
+          <img src={ANIMALS[2]} alt="" className="about-animal about-animal--3" />
         </div>
 
         {/* V4 — Great Rift Valley (images) */}
@@ -238,6 +250,7 @@ export function AboutSection() {
           <div style={ip(658, 522, 50, 98, 8)}><img src={v4.lake3} style={{ width: '100%', height: '100%' }} /></div>
           <div style={ip(354, 50, 200, 800, 12)}><img src={v4.escarp} style={{ width: '100%', height: '100%' }} /></div>
           <div style={ip(654, 50, 200, 800, 12)}><img src={v4.escarp} style={{ width: '100%', height: '100%' }} /></div>
+          <img src={ANIMALS[3]} alt="" className="about-animal about-animal--4" />
         </div>
 
         {/* V5 — Congo Basin (images) */}
@@ -257,6 +270,7 @@ export function AboutSection() {
             </div>
           ))}
           <img src={v5.haze} style={ip(100, 350, 1200, 250)} />
+          <img src={ANIMALS[4]} alt="" className="about-animal about-animal--5" />
         </div>
       </div>
 
@@ -372,6 +386,25 @@ export function AboutSection() {
         .about-section[data-bg="3"] .about-bg-layer--3 { opacity: 1; }
         .about-section[data-bg="4"] .about-bg-layer--4 { opacity: 1; }
         .about-section[data-bg="5"] .about-bg-layer--5 { opacity: 1; }
+
+        /* ── Animal spirit images ── */
+        .about-animal {
+          position: absolute;
+          bottom: 0;
+          right: 5%;
+          height: 75%;
+          width: auto;
+          object-fit: contain;
+          opacity: 0.06;
+          mix-blend-mode: luminosity;
+          pointer-events: none;
+          user-select: none;
+        }
+        .about-animal--1 { right: 3%;  height: 80%; }
+        .about-animal--2 { right: 5%;  height: 70%; }
+        .about-animal--3 { right: 4%;  height: 78%; }
+        .about-animal--4 { right: 6%;  height: 72%; }
+        .about-animal--5 { right: 3%;  height: 75%; }
 
         /* ── Structure ── */
         .about-steps { position: relative; }

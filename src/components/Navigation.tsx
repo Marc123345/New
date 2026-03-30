@@ -149,58 +149,13 @@ export function Navigation() {
             : "1px solid transparent",
         }}
       >
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <a
-            href="/"
-            aria-label="H2H Social Home"
-            onClick={handleLogoClick}
-            className={`relative z-[110] transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-          >
-            <H2HLogo
-              height={64}
-              className="transition-all duration-500"
-              onDark={onDark}
-            />
-          </a>
-
-          {/* Right side: Let's Talk pill + Menu trigger */}
+        <div className="flex items-center justify-end">
+          {/* Menu trigger */}
           <div
             className={`flex items-center gap-3 sm:gap-4 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}
           >
-            {/* Let's Talk pill */}
-            <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, "#contact")}
-              className="hidden sm:inline-flex items-center"
-              style={{
-                fontFamily: "var(--font-stack-heading)",
-                fontSize: "0.65rem",
-                fontWeight: 500,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#fff",
-                background: "#a46cfc",
-                borderRadius: 8,
-                padding: "10px 22px",
-                whiteSpace: "nowrap",
-                transition: "background 0.2s ease, transform 0.2s ease",
-                cursor: "pointer",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "var(--color-secondary)";
-                (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "#a46cfc";
-                (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
-              }}
-            >
-              Let&apos;s Talk
-            </a>
-
             {/* Menu trigger */}
             <button
               onClick={() => setIsOpen(true)}

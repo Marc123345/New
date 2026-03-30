@@ -120,10 +120,10 @@ export function Navigation() {
     }
   }, [navigate, isHomePage]);
 
-  // Hero is white; after scrolling past it everything is dark
-  const onDark = isHomePage ? pastHero : true;
-  const inkColor = onDark ? "rgba(232,226,255,0.9)" : "rgba(10,10,10,0.85)";
-  const inkColorFaint = onDark ? "rgba(232,226,255,0.45)" : "rgba(10,10,10,0.45)";
+  // Always on dark purple background
+  const onDark = true;
+  const inkColor = "rgba(232,226,255,0.9)";
+  const inkColorFaint = "rgba(232,226,255,0.45)";
 
   return (
     <>
@@ -132,25 +132,34 @@ export function Navigation() {
       <header
         className="fixed top-0 left-0 w-full z-[100] transition-all duration-500"
         style={{
-          opacity: pastHero ? 1 : 0,
-          pointerEvents: pastHero ? 'auto' : 'none',
-          transform: pastHero ? 'translateY(0)' : 'translateY(-100%)',
-          padding: "clamp(16px, 2.5vh, 28px) clamp(20px, 4vw, 56px)",
-          backgroundColor: scrolled
-            ? onDark
-              ? "rgba(14,11,31,0.85)"
-              : "rgba(255,255,255,0.88)"
-            : "transparent",
-          backdropFilter: scrolled ? "blur(14px)" : "none",
-          borderBottom: scrolled
-            ? onDark
-              ? "1px solid rgba(164,108,252,0.12)"
-              : "1px solid rgba(0,0,0,0.07)"
-            : "1px solid transparent",
+          opacity: 1,
+          pointerEvents: 'auto',
+          transform: 'translateY(0)',
+          padding: "clamp(12px, 2vh, 20px) clamp(20px, 4vw, 56px)",
+          backgroundColor: "var(--color-primary)",
+          backdropFilter: "blur(14px)",
+          borderBottom: "1px solid rgba(164,108,252,0.15)",
         }}
       >
-        <div className="flex items-center justify-end">
-          {/* Menu trigger */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Left: Logo + tagline */}
+          <div className={`flex items-center gap-4 sm:gap-6 transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+            <a href="/" onClick={handleLogoClick} aria-label="H2H Social Home" className="shrink-0">
+              <H2HLogo height={36} className="transition-all duration-500" onDark={true} />
+            </a>
+            <span className="hidden md:block" style={{
+              fontFamily: 'var(--font-stack-heading)',
+              fontSize: 'clamp(0.65rem, 1vw, 0.85rem)',
+              fontWeight: 600,
+              color: 'rgba(232,226,255,0.7)',
+              lineHeight: 1.25,
+              maxWidth: 280,
+            }}>
+              from B2B to H2H — Build a Brand People want to talk to.
+            </span>
+          </div>
+
+          {/* Right: Menu trigger */}
           <div
             className={`flex items-center gap-3 sm:gap-4 transition-all duration-300 ${
               isOpen ? "opacity-0 pointer-events-none" : "opacity-100"

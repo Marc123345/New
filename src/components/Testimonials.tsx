@@ -218,7 +218,7 @@ export function Testimonials() {
 
                 {/* Globe — same as HeroStory, lazy loaded, paused when off-screen */}
                 <div className="absolute inset-[24px] rounded-full overflow-hidden bg-[#1A1040]">
-                  {globeLoaded && globeVisible && (
+                  {globeLoaded && (
                     <Suspense fallback={null}>
                       <GlobeWrapper
                         scrollYProgress={scrollYProgress}

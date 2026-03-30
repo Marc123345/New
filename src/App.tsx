@@ -104,31 +104,38 @@ function HeroLusion() {
           <button
             onClick={() => setActiveVideo(storyUrl)}
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: '#a46cfc', color: 'white',
-              height: 44, borderRadius: 8, padding: '0 1.5em',
-              border: 'none', cursor: 'pointer',
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-              letterSpacing: '0.12em', textTransform: 'uppercase',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '14px 24px', borderRadius: 8,
+              fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase',
+              fontFamily: 'var(--font-stack-heading)', fontWeight: 700,
+              border: '2px solid var(--color-secondary)',
+              background: 'var(--color-secondary)', color: '#ffffff',
+              cursor: 'pointer',
+              transition: 'background 0.25s ease, box-shadow 0.25s ease',
+              boxShadow: 'var(--shadow-button)',
               whiteSpace: 'nowrap',
             }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button-hover)'; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button)'; }}
           >
             Hear Our Story
           </button>
           <button
             onClick={() => setActiveVideo(founderUrl)}
             style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'transparent', color: '#a46cfc',
-              height: 44, borderRadius: 8, padding: '0 1.5em',
-              border: '1.5px solid rgba(164,108,252,0.4)',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '14px 24px', borderRadius: 8,
+              fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase',
+              fontFamily: 'var(--font-stack-heading)', fontWeight: 700,
+              border: '2px solid var(--color-primary)',
+              background: 'var(--color-primary)', color: '#ffffff',
               cursor: 'pointer',
-              fontFamily: 'var(--font-stack-heading)',
-              fontSize: 'clamp(0.6rem, 0.85vw, 0.75rem)',
-              letterSpacing: '0.12em', textTransform: 'uppercase',
+              transition: 'background 0.25s ease, box-shadow 0.25s ease',
+              boxShadow: 'var(--shadow-button)',
               whiteSpace: 'nowrap',
             }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button-hover)'; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button)'; }}
           >
             Meet Our Founder
           </button>

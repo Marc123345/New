@@ -218,6 +218,24 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
       globe.globeImageUrl(
         '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg'
       );
+
+      // Light up the globe — directional sun creates a lit hemisphere as it rotates
+      import('three').then(({ DirectionalLight, AmbientLight, PointLight }) => {
+        if (destroyedRef.current || !globeRef.current) return;
+        const scene = globe.scene();
+        if (!scene) return;
+
+        const sun = new DirectionalLight(0xcbb8ff, 1.8);
+        sun.position.set(5, 2, 4);
+        scene.add(sun);
+
+        const rim = new PointLight(0x7c3aed, 0.8, 50);
+        rim.position.set(-4, 1, -3);
+        scene.add(rim);
+
+        const fill = new AmbientLight(0x1a1040, 0.4);
+        scene.add(fill);
+      });
     });
 
     return () => {

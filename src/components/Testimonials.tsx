@@ -168,6 +168,7 @@ export function Testimonials() {
           50%      { box-shadow: 0 0 18px 4px rgba(164,108,252,0.4); }
         }
         .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; }
+
       `}</style>
 
       <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#13082A]">

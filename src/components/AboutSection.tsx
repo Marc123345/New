@@ -562,8 +562,12 @@ export function AboutSection() {
         }
         .about-ta-line {
           display: block;
-          transform: translateY(110%) rotate(3deg);
-          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateY(105%);
+          opacity: 0;
+          filter: blur(6px);
+          transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                      opacity 0.7s ease,
+                      filter 0.8s ease;
           transition-delay: var(--delay, 0s);
         }
 
@@ -593,15 +597,19 @@ export function AboutSection() {
         .about-ub-word {
           display: inline;
           opacity: 0;
-          transition: opacity 0.4s ease;
+          filter: blur(4px);
+          transform: translateY(4px);
+          transition: opacity 0.5s ease,
+                      filter 0.5s ease,
+                      transform 0.5s ease;
           transition-delay: var(--delay, 0s);
         }
 
         /* ═══ Triggered by .is-visible ═══ */
         .about-step.is-visible .about-glow-line__glow--h { transform: scaleX(1); }
         .about-step.is-visible .about-step-index-num p { opacity: 1; }
-        .about-step.is-visible .about-ta-line { transform: translateY(0) rotate(0deg); }
-        .about-step.is-visible .about-ub-word { opacity: 1; }
+        .about-step.is-visible .about-ta-line { transform: translateY(0); opacity: 1; filter: blur(0); }
+        .about-step.is-visible .about-ub-word { opacity: 1; filter: blur(0); transform: translateY(0); }
 
 
         /* ═══ Responsive ═══ */
@@ -649,8 +657,8 @@ export function AboutSection() {
 
         /* ═══ Reduced motion ═══ */
         @media (prefers-reduced-motion: reduce) {
-          .about-ta-line { transform: none !important; transition: none !important; }
-          .about-ub-word { opacity: 1 !important; transition: none !important; }
+          .about-ta-line { transform: none !important; opacity: 1 !important; filter: none !important; transition: none !important; }
+          .about-ub-word { opacity: 1 !important; filter: none !important; transform: none !important; transition: none !important; }
           .about-glow-line__glow--h { transform: scaleX(1) !important; transition: none !important; }
           .about-step-index-num p { opacity: 1 !important; }
           .about-bg-layer { opacity: 1 !important; transition: none !important; }

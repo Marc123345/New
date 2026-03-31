@@ -15,6 +15,9 @@ import { AboutSection } from "./components/AboutSection";
 const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
 );
+const EcosystemServices = lazy(() =>
+  import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),
+);
 
 
 const ArcSlider = lazy(() =>
@@ -219,6 +222,13 @@ function AppContent() {
 
       {/* ═══ ABOUT — African aesthetic, IWC transitions ═══ */}
       <AboutSection />
+
+      {/* ═══ 3-PILLAR ECOSYSTEM ═══ */}
+      <LazySection>
+        <Suspense fallback={<SectionLoader />}>
+          <EcosystemServices />
+        </Suspense>
+      </LazySection>
 
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
         <ArcSlider />

@@ -12,7 +12,6 @@ import { CursorTrail } from "./components/CursorTrail";
 
 import { H2HLogo } from "./components/H2HLogo";
 import { AboutSection } from "./components/AboutSection";
-import { StickyPanel } from "./components/StickyPanel";
 const LusionConnectors = lazy(() =>
   import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
 );
@@ -218,61 +217,45 @@ function AppContent() {
       <Navigation />
       <ScrollProgress />
 
-      {/* ═══ HERO — sticks first, scales down as About wipes over ═══ */}
-      <StickyPanel zIndex={1} shadow={false} scaleOnExit={true} roundOnExit={true}>
-        <HeroLusion />
-      </StickyPanel>
+      {/* ═══ HERO ═══ */}
+      <HeroLusion />
 
-      {/* ═══ ABOUT — slides over Hero, scales as Ecosystem wipes over ═══ */}
-      <StickyPanel zIndex={2} scaleOnExit={true} roundOnExit={true}>
-        <AboutSection />
-      </StickyPanel>
+      {/* ═══ ABOUT ═══ */}
+      <AboutSection />
 
-      {/* ═══ 3-PILLAR ECOSYSTEM — dark section, scales as Services wipes over ═══ */}
-      <StickyPanel zIndex={3} scaleOnExit={true} roundOnExit={true}>
+      {/* ═══ 3-PILLAR ECOSYSTEM ═══ */}
+      <LazySection>
+        <Suspense fallback={<SectionLoader />}>
+          <EcosystemServices />
+        </Suspense>
+      </LazySection>
+
+      {/* ═══ SERVICES ═══ */}
+      <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
+        <ArcSlider />
+      </Section>
+
+      {/* ═══ TESTIMONIALS ═══ */}
+      <Section id="testimonials" className="bg-[var(--color-background-light)]">
+        <Testimonials />
+      </Section>
+
+      {/* ═══ BLOG ═══ */}
+      <div id="blog">
         <LazySection>
           <Suspense fallback={<SectionLoader />}>
-            <EcosystemServices />
+            <BlogSection />
           </Suspense>
         </LazySection>
-      </StickyPanel>
+      </div>
 
-      {/* ═══ SERVICES — slides over Ecosystem ═══ */}
-      <StickyPanel zIndex={4} style={{ background: 'var(--color-background-light)' }} scaleOnExit={true} roundOnExit={true}>
-        <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
-          <ArcSlider />
-        </Section>
-      </StickyPanel>
+      {/* ═══ CONTACT ═══ */}
+      <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
+        <ContactForm />
+      </Section>
 
-      {/* ═══ TESTIMONIALS — slides over Services ═══ */}
-      <StickyPanel zIndex={5} style={{ background: 'var(--color-background-light)' }} scaleOnExit={true} roundOnExit={true}>
-        <Section id="testimonials" className="bg-[var(--color-background-light)]">
-          <Testimonials />
-        </Section>
-      </StickyPanel>
-
-      {/* ═══ BLOG — slides over Testimonials ═══ */}
-      <StickyPanel zIndex={6} style={{ background: 'var(--color-background-light)' }} scaleOnExit={true} roundOnExit={true}>
-        <div id="blog">
-          <LazySection>
-            <Suspense fallback={<SectionLoader />}>
-              <BlogSection />
-            </Suspense>
-          </LazySection>
-        </div>
-      </StickyPanel>
-
-      {/* ═══ CONTACT — slides over Blog ═══ */}
-      <StickyPanel zIndex={7} style={{ background: 'var(--color-background-light)' }} scaleOnExit={false}>
-        <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
-          <ContactForm />
-        </Section>
-      </StickyPanel>
-
-      {/* ═══ FOOTER — final section, not sticky ═══ */}
-      <StickyPanel zIndex={8} sticky={false}>
-        <Footer />
-      </StickyPanel>
+      {/* ═══ FOOTER ═══ */}
+      <Footer />
     </main>
   );
 }

@@ -8,9 +8,7 @@ interface StickyPanelProps {
   shadow?: boolean;
   sticky?: boolean;
   zIndex?: number;
-  /** The outgoing section scales down and fades as the next section wipes over it */
   scaleOnExit?: boolean;
-  /** Rounded corners that appear as section scales down */
   roundOnExit?: boolean;
 }
 
@@ -26,19 +24,32 @@ export function StickyPanel({
 }: StickyPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Track how far the *outer wrapper* has scrolled through the viewport.
+  // The outer wrapper is 200vh tall (100vh content + 100vh scroll runway).
+  // The inner sticky div locks to the top for the first 100vh, then the
+  // remaining 100vh of scroll drives the exit animation.
   const { scrollYProgress } = useScroll({
     target: ref,
-    // "start start" = when top of element hits top of viewport
-    // "end start" = when bottom of element hits top of viewport
     offset: ['start start', 'end start'],
   });
 
-  // As user scrolls past this section, scale it down slightly (1 → 0.92)
-  const scale = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1, scaleOnExit ? 0.92 : 1]);
-  // Fade it out gently (1 → 0.3)
-  const opacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, scaleOnExit ? 0.4 : 1]);
-  // Round corners as it shrinks (0 → 24px)
-  const borderRadius = useTransform(scrollYProgress, [0, 0.8, 1], [0, 0, roundOnExit ? 24 : 0]);
+  // Exit animations — only fire in the last ~50% of scroll progress
+  // (i.e. during the "runway" scroll after content has stuck)
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.45, 1],
+    [1, 1, scaleOnExit ? 0.92 : 1]
+  );
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.4, 1],
+    [1, 1, scaleOnExit ? 0.35 : 1]
+  );
+  const borderRadius = useTransform(
+    scrollYProgress,
+    [0, 0.45, 1],
+    [0, 0, roundOnExit ? 28 : 0]
+  );
 
   if (!sticky) {
     return (
@@ -52,24 +63,30 @@ export function StickyPanel({
   }
 
   return (
+    // Outer wrapper — 200vh gives the sticky child room to stick + animate out
     <div
       ref={ref}
       className="relative w-full"
-      style={{ zIndex }}
+      style={{ height: '200vh', zIndex }}
     >
       <motion.div
         className={`sticky top-0 w-full overflow-hidden ${className}`}
         style={{
+          height: '100vh',
           scale,
           opacity,
           borderRadius,
-          transformOrigin: 'center top',
+          transformOrigin: 'center center',
           willChange: 'transform, opacity, border-radius',
-          ...(shadow ? { boxShadow: '0 -30px 80px rgba(0,0,0,0.2), 0 -8px 30px rgba(0,0,0,0.12)' } : {}),
+          ...(shadow
+            ? { boxShadow: '0 -40px 100px rgba(0,0,0,0.18), 0 -10px 40px rgba(0,0,0,0.1)' }
+            : {}),
           ...style,
         }}
       >
-        {children}
+        <div className="w-full h-full overflow-y-auto">
+          {children}
+        </div>
       </motion.div>
     </div>
   );

@@ -218,18 +218,18 @@ function AppContent() {
       <Navigation />
       <ScrollProgress />
 
-      {/* ═══ HERO — sticks first, everything slides over it ═══ */}
-      <StickyPanel zIndex={1} shadow={false}>
+      {/* ═══ HERO — sticks first, scales down as About wipes over ═══ */}
+      <StickyPanel zIndex={1} shadow={false} scaleOnExit={true} roundOnExit={true}>
         <HeroLusion />
       </StickyPanel>
 
-      {/* ═══ ABOUT — slides over Hero ═══ */}
-      <StickyPanel zIndex={2}>
+      {/* ═══ ABOUT — slides over Hero, scales as Ecosystem wipes over ═══ */}
+      <StickyPanel zIndex={2} scaleOnExit={true} roundOnExit={true}>
         <AboutSection />
       </StickyPanel>
 
-      {/* ═══ 3-PILLAR ECOSYSTEM — slides over About ═══ */}
-      <StickyPanel zIndex={3}>
+      {/* ═══ 3-PILLAR ECOSYSTEM — dark section, scales as Services wipes over ═══ */}
+      <StickyPanel zIndex={3} scaleOnExit={true} roundOnExit={true}>
         <LazySection>
           <Suspense fallback={<SectionLoader />}>
             <EcosystemServices />
@@ -238,21 +238,21 @@ function AppContent() {
       </StickyPanel>
 
       {/* ═══ SERVICES — slides over Ecosystem ═══ */}
-      <StickyPanel zIndex={4} style={{ background: 'var(--color-background-light)' }}>
+      <StickyPanel zIndex={4} style={{ background: 'var(--color-background-light)' }} scaleOnExit={true} roundOnExit={true}>
         <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>
           <ArcSlider />
         </Section>
       </StickyPanel>
 
       {/* ═══ TESTIMONIALS — slides over Services ═══ */}
-      <StickyPanel zIndex={5} style={{ background: 'var(--color-background-light)' }}>
+      <StickyPanel zIndex={5} style={{ background: 'var(--color-background-light)' }} scaleOnExit={true} roundOnExit={true}>
         <Section id="testimonials" className="bg-[var(--color-background-light)]">
           <Testimonials />
         </Section>
       </StickyPanel>
 
       {/* ═══ BLOG — slides over Testimonials ═══ */}
-      <StickyPanel zIndex={6} style={{ background: 'var(--color-background-light)' }}>
+      <StickyPanel zIndex={6} style={{ background: 'var(--color-background-light)' }} scaleOnExit={true} roundOnExit={true}>
         <div id="blog">
           <LazySection>
             <Suspense fallback={<SectionLoader />}>
@@ -263,7 +263,7 @@ function AppContent() {
       </StickyPanel>
 
       {/* ═══ CONTACT — slides over Blog ═══ */}
-      <StickyPanel zIndex={7} style={{ background: 'var(--color-background-light)' }}>
+      <StickyPanel zIndex={7} style={{ background: 'var(--color-background-light)' }} scaleOnExit={false}>
         <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
           <ContactForm />
         </Section>

@@ -1,15 +1,17 @@
-import { type ReactNode, type CSSProperties } from 'react';
+import { useRef, type ReactNode, type CSSProperties } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
 
 interface StickyPanelProps {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
-  /** Add a shadow on the leading edge so it looks like it's sliding over the previous section */
   shadow?: boolean;
-  /** Set to false if the section should NOT be sticky (e.g. the very last section) */
   sticky?: boolean;
-  /** z-index to control stacking order — higher sections slide over lower ones */
   zIndex?: number;
+  /** The outgoing section scales down and fades as the next section wipes over it */
+  scaleOnExit?: boolean;
+  /** Rounded corners that appear as section scales down */
+  roundOnExit?: boolean;
 }
 
 export function StickyPanel({
@@ -19,19 +21,56 @@ export function StickyPanel({
   shadow = true,
   sticky = true,
   zIndex = 1,
+  scaleOnExit = true,
+  roundOnExit = true,
 }: StickyPanelProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    // "start start" = when top of element hits top of viewport
+    // "end start" = when bottom of element hits top of viewport
+    offset: ['start start', 'end start'],
+  });
+
+  // As user scrolls past this section, scale it down slightly (1 → 0.92)
+  const scale = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1, scaleOnExit ? 0.92 : 1]);
+  // Fade it out gently (1 → 0.3)
+  const opacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, scaleOnExit ? 0.4 : 1]);
+  // Round corners as it shrinks (0 → 24px)
+  const borderRadius = useTransform(scrollYProgress, [0, 0.8, 1], [0, 0, roundOnExit ? 24 : 0]);
+
+  if (!sticky) {
+    return (
+      <section
+        className={`relative w-full ${className}`}
+        style={{ zIndex, ...style }}
+      >
+        {children}
+      </section>
+    );
+  }
+
   return (
-    <section
-      className={`relative w-full ${className}`}
-      style={{
-        position: sticky ? 'sticky' : 'relative',
-        top: 0,
-        zIndex,
-        ...(shadow ? { boxShadow: '0 -20px 60px rgba(0,0,0,0.25)' } : {}),
-        ...style,
-      }}
+    <div
+      ref={ref}
+      className="relative w-full"
+      style={{ zIndex }}
     >
-      {children}
-    </section>
+      <motion.div
+        className={`sticky top-0 w-full overflow-hidden ${className}`}
+        style={{
+          scale,
+          opacity,
+          borderRadius,
+          transformOrigin: 'center top',
+          willChange: 'transform, opacity, border-radius',
+          ...(shadow ? { boxShadow: '0 -30px 80px rgba(0,0,0,0.2), 0 -8px 30px rgba(0,0,0,0.12)' } : {}),
+          ...style,
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }

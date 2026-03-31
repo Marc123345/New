@@ -142,7 +142,7 @@ export function EcosystemServices() {
       style={{
         background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)',
         paddingTop: 'clamp(80px, 12vh, 140px)',
-        paddingBottom: 'clamp(80px, 12vh, 140px)',
+        paddingBottom: 'clamp(60px, 8vh, 100px)',
       }}
     >
       {/* Background Video */}
@@ -204,12 +204,6 @@ export function EcosystemServices() {
             style={{ color: 'rgba(209,213,219,0.85)', lineHeight: 1.7, fontFamily: 'var(--font-stack-body)', fontWeight: 600 }}
           >
             Built for real connection. Designed for measurable growth.
-          </p>
-          <p
-            className="text-sm sm:text-base max-w-xl mx-auto"
-            style={{ color: 'rgba(209,213,219,0.5)', lineHeight: 1.8, fontFamily: 'var(--font-stack-body)' }}
-          >
-            A framework that humanizes your brand across three key layers: your company, your leadership, and your people.
           </p>
         </motion.div>
       </div>
@@ -318,23 +312,6 @@ export function EcosystemServices() {
 
       <PillarOverlay pillarIndex={selectedService} onClose={handleClose} onNavigate={handleSelect} />
 
-      {/* ── BOTTOM SUMMARY ── */}
-      <motion.div
-        className="relative z-10 w-full text-center px-5 sm:px-8 mt-10 sm:mt-14"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="mx-auto max-w-2xl" style={{ borderTop: '1px solid rgba(164,108,252,0.15)', paddingTop: '2.5rem' }}>
-          <p className="text-xs uppercase tracking-[0.3em] font-bold mb-4" style={{ color: 'rgba(164,108,252,0.6)', fontFamily: 'var(--font-stack-heading)' }}>
-            Why the 3-Pillar System Works
-          </p>
-          <p className="text-sm sm:text-base" style={{ color: 'rgba(209,213,219,0.5)', lineHeight: 1.8, fontFamily: 'var(--font-stack-body)' }}>
-            By activating all three pillars — company, leadership, and advocacy — you create a brand that speaks with one voice, powered by many humans. Visibility becomes trust, and trust becomes action.
-          </p>
-        </div>
-      </motion.div>
     </section>
   );
 }

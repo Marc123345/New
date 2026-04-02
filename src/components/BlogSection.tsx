@@ -6,6 +6,7 @@ const spotlightPosts: SpotlightBlogPost[] = BLOG_POSTS.slice(0, 6).map(
     title: post.title,
     excerpt: post.excerpt,
     content: post.content,
+    sections: post.sections,
     author: post.author,
     date: post.date,
     readTime: post.readTime,

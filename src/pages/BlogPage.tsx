@@ -7,6 +7,7 @@ const allPosts: SpotlightBlogPost[] = BLOG_POSTS.map((post, i) => ({
   title: post.title,
   excerpt: post.excerpt,
   content: post.content,
+  sections: post.sections,
   author: post.author,
   date: post.date,
   readTime: post.readTime,
@@ -23,11 +24,12 @@ export function BlogPage() {
     >
       <Navigation />
 
+      {/* Hero */}
       <div
-        className="container mx-auto px-6 md:px-12"
         style={{
-          paddingTop: "clamp(100px, 12vw, 140px)",
-          paddingBottom: 0,
+          padding: "clamp(100px, 14vh, 160px) clamp(20px, 6vw, 80px) clamp(20px, 4vw, 40px)",
+          maxWidth: "1400px",
+          margin: "0 auto",
         }}
       >
         <motion.div
@@ -60,7 +62,7 @@ export function BlogPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
           style={{
-            fontSize: "clamp(2.4rem, 5vw, 4rem)",
+            fontSize: "clamp(2rem, 5vw, 4rem)",
             fontWeight: 900,
             fontFamily: "var(--font-stack-heading)",
             color: "var(--color-text-dark)",
@@ -78,7 +80,7 @@ export function BlogPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
           style={{
-            fontSize: "clamp(0.9rem, 1.2vw, 1.05rem)",
+            fontSize: "clamp(0.85rem, 1.2vw, 1.05rem)",
             lineHeight: 1.7,
             opacity: 0.6,
             fontFamily: "var(--font-stack-body)",
@@ -86,8 +88,8 @@ export function BlogPage() {
             marginBottom: 0,
           }}
         >
-          Explore our latest insights on digital innovation, technology, and the
-          African startup ecosystem.
+          Explore our latest insights on human-centred marketing, brand strategy,
+          and building connections that drive real impact.
         </motion.p>
       </div>
 

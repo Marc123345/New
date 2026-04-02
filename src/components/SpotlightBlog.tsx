@@ -8,6 +8,7 @@ export interface SpotlightBlogPost {
   title: string;
   excerpt: string;
   content?: string;
+  sections?: { heading: string; content: string }[];
   author: string;
   date: string;
   readTime: string;

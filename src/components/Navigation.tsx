@@ -145,7 +145,7 @@ export function Navigation() {
           opacity: 1,
           pointerEvents: 'auto',
           transform: 'translateY(0)',
-          padding: "clamp(12px, 2vh, 20px) clamp(20px, 4vw, 56px)",
+          padding: "clamp(10px, 2vh, 20px) clamp(12px, 4vw, 56px)",
           backgroundColor: onDark ? "var(--color-primary)" : "#f0f0f0",
           backdropFilter: "blur(14px)",
           borderBottom: onDark ? "1px solid rgba(164,108,252,0.15)" : "1px solid rgba(0,0,0,0.08)",

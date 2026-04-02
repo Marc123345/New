@@ -230,8 +230,8 @@ export function EcosystemServices() {
 
       {/* ── ORBIT SYSTEM ── */}
       <div
-        className="relative z-20 flex items-center justify-center scale-[0.55] sm:scale-[0.7] md:scale-90 lg:scale-100 transition-transform duration-500"
-        style={{ width: ORBIT_DIAMETER + 140, height: ORBIT_DIAMETER + 140 }}
+        className="relative z-20 flex items-center justify-center scale-[0.48] xs:scale-[0.55] sm:scale-[0.7] md:scale-90 lg:scale-100 transition-transform duration-500"
+        style={{ width: ORBIT_DIAMETER + 140, height: ORBIT_DIAMETER + 140, marginTop: '-20px', marginBottom: '-20px' }}
       >
         <div className="relative flex items-center justify-center" style={{ width: ORBIT_DIAMETER + 140, height: ORBIT_DIAMETER + 140 }}>
           {/* Orbit rings */}

@@ -6,6 +6,13 @@ import { PrivacyPage } from "./pages/PrivacyPage.tsx";
 import { TermsPage } from "./pages/TermsPage.tsx";
 import "./index.css";
 
+// Mobile viewport height fix — accounts for browser chrome
+function setVh() {
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+setVh();
+window.addEventListener('resize', setVh, { passive: true });
+
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <Routes>

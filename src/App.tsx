@@ -75,137 +75,202 @@ function HeroLusion() {
   const founderUrl = 'https://ik.imagekit.io/qcvroy8xpd/IMG_9186%20(1).mp4?updatedAt=1772720484624'
 
   return (
-    <section
-      id="hero"
-      style={{
-        width: '100%',
-        height: 'calc(100vh + 30px)',
-        background: '#f0f0f0',
-        display: 'grid',
-        gridTemplateRows: 'auto 1fr',
-        gap: '3em',
-        padding: '3em 5em',
-        paddingTop: 'calc(70px + 2em)',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Tagline + video buttons stacked below */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <span style={{
-          fontFamily: 'var(--font-stack-heading)',
-          fontSize: 'clamp(0.85rem, 1.6vw, 1.5em)',
-          fontWeight: 700,
-          color: '#0a0a0a',
-          maxWidth: 500,
-          lineHeight: 1.2,
-        }}>
-          from B2B to H2H — Build a Brand People want to talk to.
-        </span>
+    <>
+      <section
+        id="hero"
+        className="hero-section"
+      >
+        {/* Tagline + video buttons stacked below */}
+        <div className="hero-top">
+          <span className="hero-tagline">
+            from B2B to H2H — Build a Brand People want to talk to.
+          </span>
 
-        <div style={{ display: 'flex', gap: '0.75em', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setActiveVideo(storyUrl)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '14px 24px', borderRadius: 8,
-              fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase',
-              fontFamily: 'var(--font-stack-heading)', fontWeight: 700,
-              border: '2px solid var(--color-secondary)',
-              background: 'var(--color-secondary)', color: '#ffffff',
-              cursor: 'pointer',
-              transition: 'background 0.25s ease, box-shadow 0.25s ease',
-              boxShadow: 'var(--shadow-button)',
-              whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button-hover)'; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button)'; }}
-          >
-            Hear Our Story
-          </button>
-          <button
-            onClick={() => setActiveVideo(founderUrl)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '14px 24px', borderRadius: 8,
-              fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase',
-              fontFamily: 'var(--font-stack-heading)', fontWeight: 700,
-              border: '2px solid var(--color-primary)',
-              background: 'var(--color-primary)', color: '#ffffff',
-              cursor: 'pointer',
-              transition: 'background 0.25s ease, box-shadow 0.25s ease',
-              boxShadow: 'var(--shadow-button)',
-              whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button-hover)'; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button)'; }}
-          >
-            Meet Our Founder
-          </button>
+          <div className="hero-buttons">
+            <button
+              onClick={() => setActiveVideo(storyUrl)}
+              className="hero-btn hero-btn--secondary"
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button-hover)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button)'; }}
+            >
+              Hear Our Story
+            </button>
+            <button
+              onClick={() => setActiveVideo(founderUrl)}
+              className="hero-btn hero-btn--primary"
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button-hover)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-button)'; }}
+            >
+              Meet Our Founder
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* ── 3D canvas — contained with rounded corners ── */}
-      <div style={{ borderRadius: 20, overflow: 'hidden', position: 'relative' }}>
-        <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
-          <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
-            <LusionConnectors />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-
-      {activeVideo && (
-        <div
-          onClick={() => setActiveVideo(null)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 99999,
-            background: 'rgba(0,0,0,0.92)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <button
-            onClick={(e) => { e.stopPropagation(); setActiveVideo(null) }}
-            style={{
-              position: 'absolute',
-              top: 24,
-              right: 24,
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              border: '1.5px solid rgba(255,255,255,0.3)',
-              background: 'rgba(255,255,255,0.08)',
-              color: '#fff',
-              fontSize: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 10,
-            }}
-          >
-            ✕
-          </button>
-          <video
-            src={activeVideo}
-            autoPlay
-            controls
-            playsInline
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              cursor: 'default',
-            }}
-          />
+        {/* ── 3D canvas — contained with rounded corners ── */}
+        <div className="hero-canvas">
+          <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
+            <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
+              <LusionConnectors />
+            </Suspense>
+          </ErrorBoundary>
         </div>
-      )}
-    </section>
+
+        {activeVideo && (
+          <div
+            onClick={() => setActiveVideo(null)}
+            className="hero-video-overlay"
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); setActiveVideo(null) }}
+              className="hero-video-close"
+            >
+              ✕
+            </button>
+            <video
+              src={activeVideo}
+              autoPlay
+              controls
+              playsInline
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                cursor: 'default',
+              }}
+            />
+          </div>
+        )}
+      </section>
+
+      <style>{`
+        .hero-section {
+          width: 100%;
+          height: calc(100vh + 30px);
+          background: #f0f0f0;
+          display: grid;
+          grid-template-rows: auto 1fr;
+          gap: clamp(1em, 3vw, 3em);
+          padding: clamp(1.25em, 3vw, 3em) clamp(1.25em, 5vw, 5em);
+          padding-top: calc(70px + clamp(1em, 2vw, 2em));
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+        .hero-top {
+          display: flex;
+          flex-direction: column;
+          gap: clamp(0.6em, 1.5vw, 1em);
+        }
+        .hero-tagline {
+          font-family: var(--font-stack-heading);
+          font-size: clamp(0.85rem, 1.6vw, 1.5em);
+          font-weight: 700;
+          color: #0a0a0a;
+          max-width: 500px;
+          line-height: 1.2;
+        }
+        .hero-buttons {
+          display: flex;
+          gap: clamp(0.5em, 1vw, 0.75em);
+          flex-wrap: wrap;
+        }
+        .hero-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2.5vw, 24px);
+          border-radius: 8px;
+          font-size: clamp(0.6rem, 1vw, 0.7rem);
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          font-family: var(--font-stack-heading);
+          font-weight: 700;
+          color: #ffffff;
+          cursor: pointer;
+          transition: background 0.25s ease, box-shadow 0.25s ease;
+          box-shadow: var(--shadow-button);
+          white-space: nowrap;
+        }
+        .hero-btn--secondary {
+          border: 2px solid var(--color-secondary);
+          background: var(--color-secondary);
+        }
+        .hero-btn--primary {
+          border: 2px solid var(--color-primary);
+          background: var(--color-primary);
+        }
+        .hero-canvas {
+          border-radius: clamp(12px, 2vw, 20px);
+          overflow: hidden;
+          position: relative;
+          min-height: 0;
+        }
+        .hero-video-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 99999;
+          background: rgba(0,0,0,0.92);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+        .hero-video-close {
+          position: absolute;
+          top: clamp(12px, 2vw, 24px);
+          right: clamp(12px, 2vw, 24px);
+          width: clamp(36px, 5vw, 48px);
+          height: clamp(36px, 5vw, 48px);
+          border-radius: 50%;
+          border: 1.5px solid rgba(255,255,255,0.3);
+          background: rgba(255,255,255,0.08);
+          color: #fff;
+          font-size: clamp(16px, 2vw, 20px);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+        }
+
+        /* ── Mobile hero adjustments ── */
+        @media (max-width: 768px) {
+          .hero-section {
+            height: calc(var(--vh, 1vh) * 100);
+            gap: 0.75em;
+            padding: 1em 1em;
+            padding-top: calc(60px + 0.75em);
+          }
+          .hero-tagline {
+            font-size: clamp(0.8rem, 3.5vw, 1.1rem);
+          }
+          .hero-btn {
+            padding: 10px 16px;
+            font-size: 0.58rem;
+          }
+          .hero-canvas {
+            border-radius: 12px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-section {
+            padding: 0.75em 0.75em;
+            padding-top: calc(56px + 0.5em);
+            gap: 0.5em;
+          }
+          .hero-tagline {
+            font-size: 0.82rem;
+            max-width: 280px;
+          }
+          .hero-btn {
+            padding: 8px 14px;
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+          }
+        }
+      `}</style>
+    </>
   )
 }
 

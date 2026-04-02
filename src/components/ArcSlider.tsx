@@ -646,8 +646,11 @@ export function ArcSlider() {
                       border: "2px solid rgba(255,255,255,0.12)",
                       borderRadius: "10px",
                       minHeight: "380px",
-                      boxShadow: i === activeIndex ? "8px 8px 0 rgba(164,108,252,0.5)" : "none",
-                      opacity: i === activeIndex ? 1 : 0.7,
+                      boxShadow: i === activeIndex
+                        ? "8px 8px 0 rgba(164,108,252,0.5), 0 0 30px rgba(164,108,252,0.2)"
+                        : "none",
+                      opacity: i === activeIndex ? 1 : 0.6,
+                      transform: i === activeIndex ? "scale(1)" : "scale(0.95)",
                     }}
                   >
                     <div className="flex justify-between items-start">
@@ -869,32 +872,59 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
       let scale: number;
       let opacity: number;
       let targetZIndex: number;
+      let blur: number;
 
       if (absOffset === 0) {
-        translateX = 0; rotateY = 0; translateZ = 0; scale = 1; opacity = 1; targetZIndex = 10;
+        translateX = 0; rotateY = 0; translateZ = 0; scale = 1; opacity = 1; targetZIndex = 10; blur = 0;
       } else if (absOffset === 1) {
-        translateX = offset * spreadStep1; rotateY = offset < 0 ? 28 : -28; translateZ = -100; scale = 0.83; opacity = 0.55; targetZIndex = 5;
+        translateX = offset * spreadStep1; rotateY = offset < 0 ? 32 : -32; translateZ = -120; scale = 0.82; opacity = 0.6; targetZIndex = 5; blur = 1.5;
       } else if (absOffset === 2) {
-        translateX = offset * spreadStep2; rotateY = offset < 0 ? 42 : -42; translateZ = -200; scale = 0.66; opacity = 0.2; targetZIndex = 2;
+        translateX = offset * spreadStep2; rotateY = offset < 0 ? 48 : -48; translateZ = -240; scale = 0.64; opacity = 0.2; targetZIndex = 2; blur = 4;
       } else {
-        translateX = offset * spreadStep3; rotateY = offset < 0 ? 52 : -52; translateZ = -300; scale = 0.5; opacity = 0; targetZIndex = 1;
+        translateX = offset * spreadStep3; rotateY = offset < 0 ? 55 : -55; translateZ = -350; scale = 0.5; opacity = 0; targetZIndex = 1; blur = 8;
       }
 
-      const shadow = absOffset === 0 ? "10px 10px 0 rgba(164,108,252,0.6)" : "none";
+      // Active card: purple glow + geometric shadow. Others: subtle depth shadow.
+      const shadow = absOffset === 0
+        ? "10px 10px 0 rgba(164,108,252,0.6), 0 0 40px rgba(164,108,252,0.25)"
+        : absOffset === 1
+        ? "0 8px 30px rgba(0,0,0,0.3)"
+        : "none";
 
       const transform = `translateX(${translateX}px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+      const filterVal = blur > 0 ? `blur(${blur}px)` : "none";
+
       if (animate) {
         card.style.zIndex = String(targetZIndex);
-        card.style.transition = "transform 0.7s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.7s ease, box-shadow 0.7s ease";
+        card.style.transition = "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, box-shadow 0.6s ease, filter 0.6s ease";
         card.style.transform = transform;
         card.style.opacity = String(opacity);
         card.style.boxShadow = shadow;
+        card.style.filter = filterVal;
+
+        // Trigger shimmer on the newly active card
+        if (absOffset === 0) {
+          const shimmer = card.querySelector('.card-shimmer') as HTMLElement;
+          if (shimmer) {
+            shimmer.style.transition = "none";
+            shimmer.style.transform = "translateX(-100%) skewX(-15deg)";
+            shimmer.style.opacity = "1";
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                shimmer.style.transition = "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease 0.6s";
+                shimmer.style.transform = "translateX(200%) skewX(-15deg)";
+                shimmer.style.opacity = "0";
+              });
+            });
+          }
+        }
       } else {
         card.style.transition = "none";
         card.style.transform = transform;
         card.style.opacity = String(opacity);
         card.style.zIndex = String(targetZIndex);
         card.style.boxShadow = shadow;
+        card.style.filter = filterVal;
       }
     });
   }, []);
@@ -1049,6 +1079,19 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
                 }}
                 onDragStart={(e) => e.preventDefault()}
               >
+                {/* Shimmer sweep effect on active card */}
+                <div
+                  className="card-shimmer"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    zIndex: 20,
+                    pointerEvents: "none",
+                    background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.12) 55%, transparent 60%)",
+                    transform: "translateX(-100%) skewX(-15deg)",
+                    opacity: 0,
+                  }}
+                />
                 <div className="flex justify-between items-start pointer-events-none">
                   <div>
                     <span

@@ -205,28 +205,7 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
               </div>
             </div>
 
-            <button
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "14px 24px",
-                fontSize: "0.7rem",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                fontFamily: "var(--font-stack-heading)",
-                fontWeight: 700,
-                border: "2px solid #1a1a2e",
-                background: hovered ? "var(--color-primary)" : "transparent",
-                color: hovered ? "#ffffff" : "var(--color-text-dark)",
-                cursor: "pointer",
-                transition: "background 0.25s ease, color 0.25s ease",
-                boxShadow: "var(--shadow-button)",
-              }}
-            >
-              Read Article
-              <ArrowUpRight size={14} />
-            </button>
+{/* Button removed per feedback */}
           </div>
         </div>
       </div>
@@ -592,20 +571,7 @@ function SecondaryCard({ post, index, onClick }: { post: SpotlightBlogPost; inde
             }}>
               <User size={11} /> {post.author}
             </span>
-            <div style={{
-              width: "34px", height: "34px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "1.5px solid #1a1a2e",
-              color: "#1a1a2e",
-              background: hovered ? "var(--color-primary)" : "transparent",
-              transition: "background 0.25s, color 0.25s",
-            }}
-              className={hovered ? "text-white" : ""}
-            >
-              <ArrowUpRight size={15} />
-            </div>
+{/* Arrow button removed per feedback */}
           </div>
         </div>
       </div>

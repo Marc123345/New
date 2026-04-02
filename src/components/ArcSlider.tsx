@@ -6,7 +6,7 @@ import { PenLine, Bot, Search, Palette, Video, ChartBar as BarChart2, User, Mess
 const SERVICES = [
   {
     id: 1,
-    title: "Copy Writing",
+    title: "Content Writing",
     fullTitle: "Voice & Ghostwriting",
     category: "Content",
     description:
@@ -96,7 +96,7 @@ const SERVICES = [
   },
   {
     id: 6,
-    title: "Social Media",
+    title: "Social Media Management",
     fullTitle: "Ecosystem Management",
     category: "Social",
     description:

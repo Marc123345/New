@@ -64,27 +64,24 @@ const CONTACTS = [
   },
 ];
 
-// Desktop card variants — vertical flip with rotateX
+// Desktop card variants — flip-over effect with rotateY
 const cardVariantsDesktop = {
   enter: (dir: number) => ({
     opacity: 0,
-    y: dir > 0 ? 56 : -56,
-    rotateX: dir > 0 ? -22 : 22,
-    scale: 0.93,
+    rotateY: dir > 0 ? 90 : -90,
+    scale: 0.9,
   }),
   center: {
     opacity: 1,
-    y: 0,
-    rotateX: 0,
+    rotateY: 0,
     scale: 1,
-    transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
   exit: (dir: number) => ({
     opacity: 0,
-    y: dir > 0 ? -56 : 56,
-    rotateX: dir > 0 ? 22 : -22,
-    scale: 0.93,
-    transition: { duration: 0.28, ease: [0.55, 0, 1, 0.45] },
+    rotateY: dir > 0 ? -90 : 90,
+    scale: 0.9,
+    transition: { duration: 0.35, ease: [0.55, 0, 1, 0.45] },
   }),
 };
 

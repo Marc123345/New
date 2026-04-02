@@ -8,11 +8,10 @@ const OCHRE = '#C8832A';
 const HEADING_COLOR = '#c9b3ff';
 
 const STEPS = [
-  { num: '01', title: 'From Brand Voice\nto Human Connection', body: 'At H2H we believe the most impactful brands are the ones that know how to connect — not just communicate. People don\'t want perfection. They want personality. They want brands that speak like humans and offer something meaningful.', titlePadRight: '30%' },
-  { num: '02', title: 'We Embed Ourselves\nin Your World', body: 'When you work with H2H, you get more than an agency. You get a partner — a flexible, responsive extension of your team. We adapt to your rhythm, align with your goals, and help you scale with clarity and purpose.', titlePadRight: '20%' },
-  { num: '03', title: 'Strategy First.\nAlways.', body: 'Every piece of content, every campaign, every decision is rooted in data, insight, and intent. We combine strategy, creativity, and cultural fluency to build brands that people actually care about.', titlePadRight: '30%' },
-  { num: '04', title: 'Creatives Who\nStop the Scroll', body: 'Ideas that stop the scroll. We craft visuals, copy, and experiences that feel native to each platform — because generic doesn\'t cut it. Your brand deserves content that makes people pause.', titlePadRight: '35%' },
-  { num: '05', title: 'Building Brand Ecosystems\nThat Actually Work', body: 'We don\'t just manage your social media. We build the entire ecosystem — content strategy, community management, paid amplification, creative production, and performance analytics. Everything connected. Everything measured. Everything human.', titlePadRight: '25%' },
+  { num: '01', title: 'From Brand Voice\nto Human Connection', body: 'At H2H, we believe powerful brands are built on connection. It is not enough to be polished. You also need to be relevant, distinctive, and meaningful to the people you want to reach. Your brand needs a personality!', titlePadRight: '30%' },
+  { num: '02', title: 'We Embed Ourselves\nin Your World', body: 'Working with H2H means gaining a partner that plugs into your team, understands your priorities, and helps drive the work forward. We adapt quickly, align closely, and support your growth with focus and purpose.', titlePadRight: '20%' },
+  { num: '03', title: 'Strong Communication\nDrives ROI', body: 'H2H Social works alongside your internal team as an extra engine behind the brand, helping you build stronger relationships, generate better leads, and tell your company\'s story with more clarity and impact. Great communication makes you visible. It makes you credible. And it makes you worth choosing.', titlePadRight: '25%' },
+  { num: '04', title: 'Building Brand Ecosystems\nThat Actually Work', body: 'Managing social media is easy. We do more than that! We build the full ecosystem around it, from content strategy and community management to paid amplification, creative production, and performance analytics. Every part works together. Every move has a purpose. And every touchpoint feels human.', titlePadRight: '25%' },
 ];
 
 /* ── Blob background data (Figma African geography exports) ── */
@@ -116,13 +115,12 @@ const v5 = {
   haze: 'https://www.figma.com/api/mcp/asset/f2062bdd-7eb8-4bb2-8d89-895445c2ea11',
 };
 
-/* ── Animal spirit images — one per step ── */
-const ANIMALS = [
-  'https://ik.imagekit.io/qcvroy8xpd/Lion%202.png',
-  'https://ik.imagekit.io/qcvroy8xpd/Bull.png',
-  'https://ik.imagekit.io/qcvroy8xpd/Elephant.png',
-  'https://ik.imagekit.io/qcvroy8xpd/Grizzly%20Bear.png',
-  'https://ik.imagekit.io/qcvroy8xpd/Monkey.png',
+/* ── City skyline / nebula background images — one per step ── */
+const SKYLINES = [
+  'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=1200&q=80', // Johannesburg skyline
+  'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=1200&q=80', // Nairobi skyline
+  'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1200&q=80', // Purple nebula/stars
+  'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1200&q=80', // Purple nebula/stars 2
 ];
 
 // Helper for image positioning (1440×900 base)
@@ -204,78 +202,36 @@ export function AboutSection() {
     <div ref={sectionRef} id="about" className="about-section" data-bg="1">
       {/* Fixed backgrounds — crossfade between 5 variants */}
       <div className="about-fixed-wrapper">
-        {/* V1 — Continent Silhouette (images) + Lion */}
+        {/* V1 — Johannesburg skyline */}
         <div className="about-bg-layer about-bg-layer--1">
           <div style={ip(-397, -200, 900, 700, 8)}><img src={v1.ellipse} style={{ width: '100%', height: '100%' }} /></div>
           <div style={ip(700, 330, 800, 600, -5)}><img src={v1.ellipse1} style={{ width: '100%', height: '100%' }} /></div>
           <img src={v1.vector} style={ip(239, 24, 518, 738)} />
           <img src={v1.vector1} style={ip(189, 0, 627, 852)} />
-          <div style={ip(831, 220, 200, 130, 22)}><img src={v1.ellipse2} style={{ width: '100%', height: '100%' }} /></div>
-          <img src={v1.ellipse3} style={ip(345, 25, 260, 100)} />
-          <img src={v1.ellipse4} style={ip(628, 730, 110, 80)} />
-          <img src={ANIMALS[0]} alt="" className="about-animal about-animal--1" />
+          <img src={SKYLINES[0]} alt="" className="about-skyline" />
         </div>
 
-        {/* V2 — Nile River Path (images) */}
+        {/* V2 — Nairobi skyline */}
         <div className="about-bg-layer about-bg-layer--2">
           <img src={v2.ellipse} style={ip(-100, -200, 1000, 600)} />
           <img src={v2.ellipse1} style={ip(200, 500, 1000, 600)} />
-          <div style={ip(-200, -4, 600, 700, -10)}><img src={v2.ellipse2} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(817, 50, 500, 600, 8)}><img src={v2.ellipse3} style={{ width: '100%', height: '100%' }} /></div>
-          {[v2.nileGlow, v2.nileMid, v2.nileBright, v2.nileHair].map((src, i) => (
+          {[v2.nileGlow, v2.nileMid, v2.nileBright].map((src, i) => (
             <img key={i} src={src} style={ip(580, -20, 180, 940)} />
           ))}
-          <img src={v2.delta1} style={ip(298, 825, 244, 97)} />
-          <img src={v2.delta2} style={ip(478, 825, 64, 97)} />
-          <img src={v2.delta3} style={ip(542, 825, 70, 97)} />
-          <img src={v2.delta4} style={ip(542, 825, 200, 97)} />
-          <img src={v2.source} style={ip(685, -62, 130, 95)} />
-          <img src={v2.sourceGlow} style={ip(692, -52, 95, 68)} />
-          <img src={ANIMALS[1]} alt="" className="about-animal about-animal--2" />
+          <img src={SKYLINES[1]} alt="" className="about-skyline" />
         </div>
 
-        {/* V3 — Sahara Dune Arc (CSS gradient blobs) + Elephant */}
+        {/* V3 — Purple nebula */}
         <div className="about-bg-layer about-bg-layer--3">
           {BLOB_SETS_V3[0].map((b, i) => <div key={i} style={blobStyle(b)} />)}
-          <img src={ANIMALS[2]} alt="" className="about-animal about-animal--3" />
+          <img src={SKYLINES[2]} alt="" className="about-skyline" />
         </div>
 
-        {/* V4 — Great Rift Valley (images) */}
+        {/* V4 — Purple stars */}
         <div className="about-bg-layer about-bg-layer--4">
           <div style={ip(-453, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} /></div>
           <div style={ip(447, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} /></div>
-          {v4.rift.map((src, i) => <img key={i} src={src} style={ip(602, -20, 218, 942)} />)}
-          <div style={ip(675, 122, 58, 128, 12)}><img src={v4.lake1} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(693, 312, 52, 108, 10)}><img src={v4.lake2} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(658, 522, 50, 98, 8)}><img src={v4.lake3} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(354, 50, 200, 800, 12)}><img src={v4.escarp} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(654, 50, 200, 800, 12)}><img src={v4.escarp} style={{ width: '100%', height: '100%' }} /></div>
-          <img src={ANIMALS[3]} alt="" className="about-animal about-animal--4" />
-        </div>
-
-        {/* V5 — Congo Basin (images) */}
-        <div className="about-bg-layer about-bg-layer--5">
-          <img src={v5.canopy} style={ip(-200, -200, 1800, 1300)} />
-          <img src={v5.basin} style={ip(180, 100, 1080, 700)} />
-          <img src={v5.rim} style={ip(198, 60, 1045, 821)} />
-          <img src={v5.rimLine} style={ip(198, 60, 1045, 821)} />
-          {v5.tribs.map(([src, w, h, l, t], i) => <img key={i} src={src as string} style={ip(l, t, w, h)} />)}
-          <img src={v5.tribBright1} style={ip(338, 222, 382, 228)} />
-          <img src={v5.tribBright2} style={ip(618, 82, 102, 368)} />
-          <img src={v5.riverMain} style={ip(158, 450, 562, 72)} />
-          <img src={v5.riverBright} style={ip(158, 450, 562, 72)} />
-          {v5.canopyBlobs.map(([src, w, h, l, t, rot], i) => (
-            <div key={i} style={ip(l, t, w, h, rot)}>
-              <img src={src as string} style={{ width: '100%', height: '100%' }} />
-            </div>
-          ))}
-          <img src={v5.haze} style={ip(100, 350, 1200, 250)} />
-          <img
-            src="https://ik.imagekit.io/qcvroy8xpd/download.jpeg?updatedAt=1774888389369"
-            alt=""
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.06, mixBlendMode: 'luminosity', pointerEvents: 'none' }}
-          />
-          <img src={ANIMALS[4]} alt="" className="about-animal about-animal--5" />
+          <img src={SKYLINES[3]} alt="" className="about-skyline" />
         </div>
       </div>
 
@@ -390,26 +346,19 @@ export function AboutSection() {
         .about-section[data-bg="2"] .about-bg-layer--2 { opacity: 1; }
         .about-section[data-bg="3"] .about-bg-layer--3 { opacity: 1; }
         .about-section[data-bg="4"] .about-bg-layer--4 { opacity: 1; }
-        .about-section[data-bg="5"] .about-bg-layer--5 { opacity: 1; }
 
-        /* ── Animal spirit images ── */
-        .about-animal {
+        /* ── City skyline / nebula background images ── */
+        .about-skyline {
           position: absolute;
-          bottom: 0;
-          right: 5%;
-          height: 75%;
-          width: auto;
-          object-fit: contain;
-          opacity: 0.06;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0.08;
           mix-blend-mode: luminosity;
           pointer-events: none;
           user-select: none;
         }
-        .about-animal--1 { right: 3%;  height: 80%; }
-        .about-animal--2 { right: 5%;  height: 70%; }
-        .about-animal--3 { right: 4%;  height: 78%; }
-        .about-animal--4 { right: 6%;  height: 72%; }
-        .about-animal--5 { right: 3%;  height: 75%; }
 
         /* ── Structure ── */
         .about-steps { position: relative; }

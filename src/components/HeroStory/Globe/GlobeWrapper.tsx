@@ -179,10 +179,20 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
         .height(h);
 
       if (hideArcs) {
-        // Testimonial mode — no dots, just atmosphere glow that builds
+        // Testimonial mode — static globe, focused on Africa, heat map per country
         globe
           .atmosphereColor('rgba(164,108,252,0.55)')
-          .atmosphereAltitude(0.15);
+          .atmosphereAltitude(0.18);
+
+        // Purple heat map points for testimonial countries
+        globe
+          .pointLat('lat')
+          .pointLng('lng')
+          .pointColor('color')
+          .pointAltitude('alt')
+          .pointRadius('size')
+          .pointsMerge(false)
+          .pointsTransitionDuration(600);
       } else {
         // City points — configured for non-testimonial mode
         globe
@@ -217,13 +227,18 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
       }
 
       const controls = globe.controls();
-      controls.autoRotate = true;
+      controls.autoRotate = !hideArcs; // Static in testimonial mode
       controls.autoRotateSpeed = mobile ? 0.3 : 0.4;
       controls.enableZoom = false;
       controls.enablePan = false;
       controls.enableRotate = false;
 
-      globe.pointOfView({ lat: 5, lng: 20, altitude: mobile ? 2.8 : 2.2 });
+      // Focus on Africa in testimonial mode, default view otherwise
+      if (hideArcs) {
+        globe.pointOfView({ lat: 2, lng: 22, altitude: mobile ? 2.4 : 1.9 });
+      } else {
+        globe.pointOfView({ lat: 5, lng: 20, altitude: mobile ? 2.8 : 2.2 });
+      }
 
       const renderer = globe.renderer?.();
       if (renderer) {
@@ -283,33 +298,62 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
   useEffect(() => {
     if (!globeRef.current) return;
     const controls = globeRef.current.controls();
-    if (controls) controls.autoRotate = isVisible;
-  }, [isVisible]);
+    if (controls) controls.autoRotate = hideArcs ? false : isVisible;
+  }, [isVisible, hideArcs]);
 
-  // Testimonial mode — grow atmosphere glow + intensify light per step
+  // Testimonial mode — static globe, purple heat map lights up per country
   useEffect(() => {
     if (!hideArcs || !globeRef.current) return;
     const globe = globeRef.current;
     const t = activeCityIndex / (TESTIMONIAL_CITIES.length - 1); // 0 → 1
 
-    // Atmosphere grows with each testimonial
-    globe.atmosphereAltitude(0.15 + t * 0.35);
-    globe.atmosphereColor(`rgba(164,108,252,${(0.4 + t * 0.45).toFixed(2)})`);
+    // Atmosphere grows subtly with each testimonial
+    globe.atmosphereAltitude(0.18 + t * 0.2);
+    globe.atmosphereColor(`rgba(164,108,252,${(0.45 + t * 0.3).toFixed(2)})`);
+
+    // Build heat map points — all visited cities glow, active one glows brightest
+    const points = TESTIMONIAL_CITIES.slice(0, activeCityIndex + 1).map((city, i) => ({
+      lat: city.lat,
+      lng: city.lng,
+      size: i === activeCityIndex ? 1.8 : 0.9,
+      alt: i === activeCityIndex ? 0.06 : 0.02,
+      color: i === activeCityIndex ? 'rgba(164,108,252,1)' : 'rgba(164,108,252,0.5)',
+    }));
+
+    // Add surrounding glow points for the active city
+    const activeCity = TESTIMONIAL_CITIES[activeCityIndex];
+    if (activeCity) {
+      for (let r = 0; r < 3; r++) {
+        for (let a = 0; a < 6; a++) {
+          const angle = (a / 6) * Math.PI * 2;
+          const radius = (r + 1) * 1.5;
+          points.push({
+            lat: activeCity.lat + Math.cos(angle) * radius,
+            lng: activeCity.lng + Math.sin(angle) * radius,
+            size: 0.6 - r * 0.15,
+            alt: 0.01,
+            color: `rgba(164,108,252,${(0.35 - r * 0.1).toFixed(2)})`,
+          });
+        }
+      }
+    }
+
+    globe.pointsData(points);
 
     // Intensify the scene lights
     const scene = globe.scene?.();
     if (scene) {
       scene.traverse((obj: any) => {
-        if (obj.isDirectionalLight) obj.intensity = 1.8 + t * 2.0;
-        if (obj.isPointLight) obj.intensity = 0.8 + t * 1.5;
-        if (obj.isAmbientLight) obj.intensity = 0.4 + t * 0.6;
+        if (obj.isDirectionalLight) obj.intensity = 1.8 + t * 1.5;
+        if (obj.isPointLight) obj.intensity = 0.8 + t * 1.0;
+        if (obj.isAmbientLight) obj.intensity = 0.4 + t * 0.4;
       });
     }
 
-    // Rotate to face the active city
+    // Pan to the active city (no rotation, just reposition)
     const city = TESTIMONIAL_CITIES[activeCityIndex];
     if (city) {
-      globe.pointOfView({ lat: city.lat, lng: city.lng, altitude: globe.pointOfView().altitude }, 800);
+      globe.pointOfView({ lat: city.lat, lng: city.lng, altitude: globe.pointOfView().altitude }, 1000);
     }
   }, [activeCityIndex, hideArcs]);
 

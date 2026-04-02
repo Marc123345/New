@@ -178,16 +178,7 @@ export function MagneticBlogCard({ post, index, onClick }: MagneticBlogCardProps
             >
               {post.author}
             </span>
-            <div
-              className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:bg-[var(--color-primary)] group-hover:text-white"
-              style={{
-                border: "1px solid #1a1a2e",
-                borderRadius: 8,
-                color: "#1a1a2e",
-              }}
-            >
-              <ArrowUpRight size={14} />
-            </div>
+{/* Button removed per feedback */}
           </div>
         </div>
       </div>

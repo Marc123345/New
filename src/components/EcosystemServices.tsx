@@ -247,7 +247,7 @@ export function EcosystemServices() {
             }} />
           </div>
 
-          {/* Center: Laptop */}
+          {/* Center: Purple iPad */}
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
             <motion.div
               animate={{ y: [0, -12, 0] }}
@@ -255,48 +255,67 @@ export function EcosystemServices() {
               style={{ filter: 'drop-shadow(0 30px 60px rgba(0,0,0,0.8)) drop-shadow(0 0 50px rgba(164,108,252,0.35))' }}
             >
               <div style={{
-                width: 240,
+                width: 200,
+                height: 270,
                 background: 'linear-gradient(160deg, #1a1030, #0d0820)',
-                borderRadius: '12px 12px 2px 2px',
+                borderRadius: 16,
                 border: '2px solid rgba(164,108,252,0.5)',
-                padding: '10px 10px 8px',
+                padding: '14px 10px',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}>
+                {/* Camera dot */}
                 <div style={{
-                  background: '#050310', borderRadius: 6, overflow: 'hidden',
-                  border: '1px solid rgba(164,108,252,0.25)',
-                  boxShadow: '0 0 24px rgba(164,108,252,0.2) inset',
-                }}>
-                  <img
-                    src="https://ik.imagekit.io/qcvroy8xpd/unnamed%20(2)%201.png?updatedAt=1773188163565"
-                    alt="H2H Platform" draggable={false}
-                    style={{ width: '100%', height: 'auto', display: 'block' }}
-                  />
-                </div>
-                <div style={{
-                  position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)',
+                  position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)',
                   width: 4, height: 4, borderRadius: '50%',
                   background: 'var(--color-secondary)', boxShadow: '0 0 8px var(--color-secondary)',
                 }} />
-              </div>
-              <div style={{
-                width: 240, height: 5,
-                background: 'linear-gradient(to bottom, rgba(164,108,252,0.35), rgba(80,40,140,0.5))',
-                borderLeft: '2px solid rgba(164,108,252,0.35)',
-                borderRight: '2px solid rgba(164,108,252,0.35)',
-              }} />
-              <div style={{
-                width: 260, marginLeft: -10, height: 22,
-                background: 'linear-gradient(to bottom, #1c1035, #110c28)',
-                border: '2px solid rgba(164,108,252,0.4)', borderTop: 'none',
-                borderRadius: '0 0 8px 8px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
+                {/* Screen */}
                 <div style={{
-                  width: 60, height: 10,
-                  background: 'rgba(164,108,252,0.06)',
-                  border: '1px solid rgba(164,108,252,0.2)', borderRadius: 3,
-                }} />
+                  flex: 1, width: '100%', borderRadius: 8, overflow: 'hidden',
+                  background: '#050310',
+                  border: '1px solid rgba(164,108,252,0.25)',
+                  boxShadow: '0 0 24px rgba(164,108,252,0.2) inset',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  gap: 10, padding: 16,
+                }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 0 20px rgba(164,108,252,0.4)',
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                  </div>
+                  <span style={{
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: '0.55rem',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: '#ffffff',
+                    textAlign: 'center',
+                    lineHeight: 1.4,
+                    fontWeight: 700,
+                  }}>
+                    Website /<br />Digital Content Hub
+                  </span>
+                  <span style={{
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: '0.4rem',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-secondary)',
+                    textAlign: 'center',
+                  }}>
+                    Click to explore
+                  </span>
+                </div>
               </div>
             </motion.div>
           </div>

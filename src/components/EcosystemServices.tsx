@@ -99,18 +99,35 @@ export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const isMobile = useIsMobile();
 
+  const sectionRef = useRef<HTMLElement>(null);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
   const orbitAngleRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef(0);
+  const visibleRef = useRef(false);
 
   const nodeRefCallbacks = useMemo(
     () => PILLARS.map((_, i) => (el: HTMLDivElement | null) => { nodeRefs.current[i] = el; }),
     []
   );
 
+  // Pause orbit rAF when section is off-screen
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { visibleRef.current = entry.isIntersecting; },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const tick = (now: number) => {
+      rafRef.current = requestAnimationFrame(tick);
+      if (!visibleRef.current) { lastTimeRef.current = null; return; }
+
       if (lastTimeRef.current !== null) {
         orbitAngleRef.current += ((now - lastTimeRef.current) / ORBIT_DURATION) * 2 * Math.PI;
       }
@@ -125,8 +142,6 @@ export function EcosystemServices() {
         const y = Math.sin(a) * ORBIT_RADIUS;
         el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
       });
-
-      rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
@@ -137,6 +152,7 @@ export function EcosystemServices() {
 
   return (
     <section
+      ref={sectionRef}
       id="ecosystem"
       className="relative w-full flex flex-col items-center justify-center overflow-hidden"
       style={{

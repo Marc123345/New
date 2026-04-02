@@ -98,7 +98,7 @@ export function SpotlightBlogModal({
               {selectedPost > 0 && (
                 <button
                   onClick={() => onNavigate(selectedPost - 1)}
-                  className="w-10 h-10 flex items-center justify-center transition-colors duration-200"
+                  className="w-11 h-11 flex items-center justify-center transition-colors duration-200"
                   style={{
                     border: "1px solid rgba(255,255,255,0.15)",
                     background: "rgba(255,255,255,0.06)",
@@ -113,7 +113,7 @@ export function SpotlightBlogModal({
               {selectedPost < posts.length - 1 && (
                 <button
                   onClick={() => onNavigate(selectedPost + 1)}
-                  className="w-10 h-10 flex items-center justify-center transition-colors duration-200"
+                  className="w-11 h-11 flex items-center justify-center transition-colors duration-200"
                   style={{
                     border: "1px solid rgba(255,255,255,0.15)",
                     background: "rgba(255,255,255,0.06)",

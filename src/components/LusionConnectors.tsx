@@ -298,10 +298,51 @@ function Scene({ accent }: { accent: number }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export function LusionConnectors() {
+  const [isMobile] = useState(() =>
+    typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent))
+  )
+
   const [accent, cycleAccent] = useReducer(
     (s: number) => (s + 1) % ACCENTS.length,
     0,
   )
+
+  // Mobile: show static fallback instead of loading 2 MB R3F/physics
+  if (isMobile) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(160deg, #141622 0%, #1e1535 50%, #141622 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(circle at 50% 40%, rgba(164,108,252,0.15) 0%, transparent 60%)',
+        }} />
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center',
+          padding: '20px', maxWidth: 280, position: 'relative', zIndex: 1,
+        }}>
+          {FACE_URLS.map((url, i) => (
+            <div key={i} style={{
+              width: 56, height: 56, borderRadius: 10, overflow: 'hidden',
+              border: '2px solid rgba(164,108,252,0.4)',
+              boxShadow: '0 4px 20px rgba(164,108,252,0.2)',
+            }}>
+              <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Canvas

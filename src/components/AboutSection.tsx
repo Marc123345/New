@@ -204,34 +204,34 @@ export function AboutSection() {
       <div className="about-fixed-wrapper">
         {/* V1 — Johannesburg skyline */}
         <div className="about-bg-layer about-bg-layer--1">
-          <div style={ip(-397, -200, 900, 700, 8)}><img src={v1.ellipse} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(700, 330, 800, 600, -5)}><img src={v1.ellipse1} style={{ width: '100%', height: '100%' }} /></div>
-          <img src={v1.vector} style={ip(239, 24, 518, 738)} />
-          <img src={v1.vector1} style={ip(189, 0, 627, 852)} />
-          <img src={SKYLINES[0]} alt="" className="about-skyline" />
+          <div style={ip(-397, -200, 900, 700, 8)}><img src={v1.ellipse} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
+          <div style={ip(700, 330, 800, 600, -5)}><img src={v1.ellipse1} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
+          <img src={v1.vector} style={ip(239, 24, 518, 738)} loading="lazy" decoding="async" />
+          <img src={v1.vector1} style={ip(189, 0, 627, 852)} loading="lazy" decoding="async" />
+          <img src={SKYLINES[0]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 
         {/* V2 — Nairobi skyline */}
         <div className="about-bg-layer about-bg-layer--2">
-          <img src={v2.ellipse} style={ip(-100, -200, 1000, 600)} />
-          <img src={v2.ellipse1} style={ip(200, 500, 1000, 600)} />
+          <img src={v2.ellipse} style={ip(-100, -200, 1000, 600)} loading="lazy" decoding="async" />
+          <img src={v2.ellipse1} style={ip(200, 500, 1000, 600)} loading="lazy" decoding="async" />
           {[v2.nileGlow, v2.nileMid, v2.nileBright].map((src, i) => (
             <img key={i} src={src} style={ip(580, -20, 180, 940)} />
           ))}
-          <img src={SKYLINES[1]} alt="" className="about-skyline" />
+          <img src={SKYLINES[1]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 
         {/* V3 — Purple nebula */}
         <div className="about-bg-layer about-bg-layer--3">
           {BLOB_SETS_V3[0].map((b, i) => <div key={i} style={blobStyle(b)} />)}
-          <img src={SKYLINES[2]} alt="" className="about-skyline" />
+          <img src={SKYLINES[2]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 
         {/* V4 — Purple stars */}
         <div className="about-bg-layer about-bg-layer--4">
-          <div style={ip(-453, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} /></div>
-          <div style={ip(447, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} /></div>
-          <img src={SKYLINES[3]} alt="" className="about-skyline" />
+          <div style={ip(-453, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
+          <div style={ip(447, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
+          <img src={SKYLINES[3]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
       </div>
 
@@ -592,6 +592,17 @@ export function AboutSection() {
           .about-step-title { padding-right: 15% !important; }
           .about-step-h3 { margin-left: -1em; }
           .about-end-sticky { padding: 2em 1.25em; }
+
+          /* Hide heavy bg layers on mobile — save memory + GPU */
+          .about-fixed-wrapper { display: none; }
+
+          /* Disable per-word stagger on mobile — show all text at once */
+          .about-ub-word {
+            opacity: 1 !important;
+            filter: none !important;
+            transform: none !important;
+            transition: none !important;
+          }
         }
 
         @media screen and (max-width: 479px) {

@@ -12,6 +12,7 @@ function setVh() {
 }
 setVh();
 window.addEventListener('resize', setVh, { passive: true });
+window.addEventListener('orientationchange', () => setTimeout(setVh, 150));
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>

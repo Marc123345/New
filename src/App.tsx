@@ -146,7 +146,7 @@ function HeroLusion() {
       <style>{`
         .hero-section {
           width: 100%;
-          height: calc(100vh + 30px);
+          height: calc(var(--vh, 1vh) * 100 + 30px);
           background: #f0f0f0;
           display: grid;
           grid-template-rows: auto 1fr;

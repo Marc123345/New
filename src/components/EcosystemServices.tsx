@@ -309,28 +309,6 @@ export function EcosystemServices() {
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                     </svg>
                   </div>
-                  <span style={{
-                    fontFamily: 'var(--font-stack-heading)',
-                    fontSize: '0.55rem',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    color: '#ffffff',
-                    textAlign: 'center',
-                    lineHeight: 1.4,
-                    fontWeight: 700,
-                  }}>
-                    Website /<br />Digital Content Hub
-                  </span>
-                  <span style={{
-                    fontFamily: 'var(--font-stack-heading)',
-                    fontSize: '0.4rem',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    color: 'var(--color-secondary)',
-                    textAlign: 'center',
-                  }}>
-                    Click to explore
-                  </span>
                 </div>
               </div>
             </motion.div>

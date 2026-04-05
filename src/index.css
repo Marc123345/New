@@ -39,19 +39,29 @@ html {
   scroll-behavior: smooth;
   /* Mobile viewport height fix — updated by JS */
   --vh: 1vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
+  /* Rubber-band/overscroll shows whatever is behind html. Default is white —
+     paint it the app's dark background so iOS tugs never flash a white edge. */
+  background: var(--color-background-light);
 }
 
 body {
   font-family: var(--font-stack-body);
   color: var(--color-text-dark);
   line-height: 1.75;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
   position: relative;
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-x: none;
+  background: var(--color-background-light);
+}
+
+#root {
+  overflow-x: clip;
+  max-width: 100vw;
+  background: var(--color-background-light);
 }
 
 ::selection {

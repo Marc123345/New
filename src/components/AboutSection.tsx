@@ -335,9 +335,7 @@ export function AboutSection() {
         }
         .about-bg-layer {
           position: fixed;
-          top: 0; left: 0;
-          width: 100vw;
-          height: 100vh;
+          inset: 0;
           opacity: 0;
           transition: opacity 1.5s ease;
         }

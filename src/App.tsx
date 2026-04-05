@@ -163,7 +163,7 @@ function HeroLusion() {
 function AppContent() {
 
   return (
-    <main className="min-h-screen bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
+    <main className="min-h-screen w-full max-w-full overflow-x-clip bg-[var(--color-background-light)] selection:bg-[var(--color-primary)] selection:text-white">
       <CursorTrail />
       <Navigation />
       <ScrollProgress />

@@ -190,7 +190,7 @@ export function Navigation() {
       </header>
 
       <div
-        className={`fixed inset-0 z-[110] transition-opacity duration-700 ${
+        className={`fixed inset-0 z-[110] overflow-hidden transition-opacity duration-700 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         style={{ backgroundColor: "var(--color-background-light, #0e0b1f)" }}

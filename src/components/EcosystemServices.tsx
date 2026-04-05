@@ -22,7 +22,7 @@ const OrbitNode = memo(({ item, index, onSelect, containerRef }: OrbitNodeProps)
   return (
     <div
       ref={containerRef}
-      className="absolute z-30"
+      className="absolute z-30 pointer-events-auto"
       style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
     >
       <button
@@ -416,8 +416,10 @@ export function EcosystemServices() {
             </motion.div>
           </div>
 
-          {/* Orbiting Nodes */}
-          <div className="absolute inset-0 z-30">
+          {/* Orbiting Nodes — wrapper is click-through so the iPad button
+              behind it stays reachable. Individual orbit nodes re-enable
+              pointer events on themselves. */}
+          <div className="absolute inset-0 z-30 pointer-events-none">
             {PILLARS.map((pillar, i) => (
               <OrbitNode key={i} item={pillar} index={i} onSelect={handleSelect} containerRef={nodeRefCallbacks[i]} />
             ))}

@@ -187,7 +187,7 @@ function AppContent() {
       </Section>
 
       {/* ═══ TESTIMONIALS ═══ */}
-      <Section id="testimonials" className="bg-[var(--color-background-light)]">
+      <Section id="testimonials" className="bg-[var(--color-background-light)]" noPadding={true}>
         <Testimonials />
       </Section>
 

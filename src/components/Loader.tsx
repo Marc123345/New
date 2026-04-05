@@ -11,9 +11,9 @@ const ICONS = [
   { text: '▶', bg: '#FF0000' },
   { text: '𝕏', bg: '#000' },
   { text: 'G',  bg: '#4285F4' },
-  { text: '⚛', bg: '#222222', fg: '#61DAFB' },
-  { text: '', bg: '#000000', svg: 'tiktok' },
-  { text: '', bg: 'ig-gradient', svg: 'instagram' },
+  { text: '',   bg: '#20232a', svg: 'react' },
+  { text: '',   bg: '#000000', svg: 'tiktok' },
+  { text: '',   bg: 'ig-gradient', svg: 'instagram' },
 ];
 
 const TIKTOK_PATH = 'M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z';
@@ -70,10 +70,28 @@ export function Loader({ onComplete }: LoaderProps) {
   const isBurst = phase === 'burst' || phase === 'exit';
   const isExit = phase === 'exit';
 
-  // Orbit radius responsive to viewport
-  const orbitRadius = typeof window !== 'undefined'
-    ? Math.min(window.innerWidth, window.innerHeight) * 0.22
-    : 160;
+  // Viewport-aware sizing — captured once on mount (the loader only runs once)
+  const [dims] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        orbitRadius: 160, cubeSize: 44, iconFontSize: 15, svgSize: 16,
+        logoHeight: 76, barWidth: 180, isNarrow: false,
+      };
+    }
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const isNarrow = w < 640;
+    return {
+      orbitRadius: Math.min(w, h) * (isNarrow ? 0.28 : 0.22),
+      cubeSize: isNarrow ? 36 : 44,
+      iconFontSize: isNarrow ? 13 : 15,
+      svgSize: isNarrow ? 14 : 16,
+      logoHeight: isNarrow ? 52 : 76,
+      barWidth: isNarrow ? 148 : 180,
+      isNarrow,
+    };
+  });
+  const { orbitRadius, cubeSize, iconFontSize, svgSize, logoHeight, barWidth, isNarrow } = dims;
 
   return (
     <div
@@ -171,8 +189,8 @@ export function Loader({ onComplete }: LoaderProps) {
               key={i}
               style={{
                 position: 'absolute',
-                width: 44,
-                height: 44,
+                width: cubeSize,
+                height: cubeSize,
                 borderRadius: 10,
                 // Position along orbit, converge to center
                 transform: isConverge
@@ -184,10 +202,10 @@ export function Loader({ onComplete }: LoaderProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '15px',
+                fontSize: `${iconFontSize}px`,
                 fontWeight: 800,
                 fontFamily: 'system-ui, -apple-system, sans-serif',
-                color: visible ? (icon.fg || '#fff') : 'transparent',
+                color: visible ? '#fff' : 'transparent',
                 transition: isConverge
                   ? `transform 0.6s cubic-bezier(0.6,0,0.2,1) ${i * 0.05}s, background 0.3s, color 0.3s`
                   : `transform 0.5s cubic-bezier(0.22,1,0.36,1) ${i * 0.08}s, background 0.4s, color 0.4s`,
@@ -197,12 +215,27 @@ export function Loader({ onComplete }: LoaderProps) {
               }}
             >
               {icon.svg === 'tiktok' ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill={visible ? '#fff' : 'transparent'}>
+                <svg width={svgSize} height={svgSize} viewBox="0 0 24 24" fill={visible ? '#fff' : 'transparent'}>
                   <path d={TIKTOK_PATH}/>
                 </svg>
               ) : icon.svg === 'instagram' ? (
-                <svg width="16" height="16" viewBox="0 0 132 132" fill={visible ? '#fff' : 'transparent'}>
+                <svg width={svgSize} height={svgSize} viewBox="0 0 132 132" fill={visible ? '#fff' : 'transparent'}>
                   <path d={IG_PATH}/>
+                </svg>
+              ) : icon.svg === 'react' ? (
+                <svg
+                  width={svgSize + 6}
+                  height={svgSize + 6}
+                  viewBox="-11.5 -10.23174 23 20.46348"
+                  fill="none"
+                  style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.3s' }}
+                >
+                  <circle cx="0" cy="0" r="2.05" fill="#61dafb" />
+                  <g stroke="#61dafb" strokeWidth="1" fill="none">
+                    <ellipse rx="11" ry="4.2" />
+                    <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                    <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                  </g>
                 </svg>
               ) : (
                 icon.text
@@ -276,7 +309,7 @@ export function Loader({ onComplete }: LoaderProps) {
             filter: `drop-shadow(0 0 ${20 + progress * 0.4}px rgba(164,108,252,${0.3 + progress * 0.005}))`,
           }}
         >
-          <H2HLogo height={76} />
+          <H2HLogo height={logoHeight} />
         </div>
 
         {/* Tagline */}
@@ -300,7 +333,7 @@ export function Loader({ onComplete }: LoaderProps) {
         {/* Progress bar */}
         <div
           style={{
-            width: 180,
+            width: barWidth,
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
@@ -347,28 +380,31 @@ export function Loader({ onComplete }: LoaderProps) {
       <div
         style={{
           position: 'absolute',
-          bottom: 32,
+          bottom: isNarrow ? 20 : 32,
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
+          gap: isNarrow ? 6 : 10,
           opacity: isBurst ? 0 : 0.35,
           transition: 'opacity 0.4s',
+          maxWidth: 'calc(100vw - 32px)',
+          padding: '0 16px',
+          boxSizing: 'border-box',
         }}
       >
-        <div style={{ width: 20, height: 1, background: 'rgba(164,108,252,0.35)' }} />
+        <div style={{ width: isNarrow ? 12 : 20, height: 1, background: 'rgba(164,108,252,0.35)', flexShrink: 0 }} />
         <span style={{
           fontFamily: 'var(--font-stack-heading)',
-          fontSize: '0.4rem',
-          letterSpacing: '0.4em',
+          fontSize: isNarrow ? '0.45rem' : '0.4rem',
+          letterSpacing: isNarrow ? '0.2em' : '0.4em',
           textTransform: 'uppercase',
           color: 'rgba(232,226,255,0.25)',
           whiteSpace: 'nowrap',
         }}>
-          Build a Brand People Want to Talk To
+          {isNarrow ? 'Build a Brand People Talk About' : 'Build a Brand People Want to Talk To'}
         </span>
-        <div style={{ width: 20, height: 1, background: 'rgba(164,108,252,0.35)' }} />
+        <div style={{ width: isNarrow ? 12 : 20, height: 1, background: 'rgba(164,108,252,0.35)', flexShrink: 0 }} />
       </div>
 
       <style>{`

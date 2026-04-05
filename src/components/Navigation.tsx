@@ -219,7 +219,7 @@ export function Navigation() {
         />
 
         <div className="absolute inset-0 flex flex-col lg:flex-row">
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center px-6 sm:px-8 md:px-16 lg:px-24 pt-14 sm:pt-16 lg:pt-0 overflow-y-auto">
+          <div className="flex-1 lg:w-[60%] flex flex-col justify-center pl-6 pr-24 sm:pl-8 sm:pr-28 md:pl-16 md:pr-32 lg:px-24 pt-14 sm:pt-16 lg:pt-0 overflow-y-auto">
             <nav
               className="flex flex-col"
               onMouseLeave={() => setActiveIndex(null)}

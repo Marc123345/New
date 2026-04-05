@@ -607,7 +607,7 @@ export function AboutSection() {
           .about-section { font-size: 4vw; }
           .about-step { min-height: 75vh; }
           .about-heading { padding-bottom: 7.5em; }
-          .about-step-h3 { font-size: 3em; }
+          .about-step-h3 { font-size: 3em; margin-left: 0; }
           .about-end-heading h3 { font-size: 2em; }
           .about-end-tagline p { font-size: 1.5em; }
           .about-end-body p { font-size: 1em; }

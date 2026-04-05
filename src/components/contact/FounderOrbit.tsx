@@ -1,5 +1,5 @@
-import { motion, useInView } from "motion/react";
-import { useState, useEffect, useRef } from "react";
+import { motion } from "motion/react";
+import { useState, useEffect } from "react";
 
 const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg";
 
@@ -53,15 +53,8 @@ const ORBIT_DURATION = 22; // seconds for one full rotation
 
 export function FounderOrbit() {
   const isNarrow = useIsNarrow();
-  // Pause all orbit animations when the contact section is off-screen. The 17
-  // concurrent framer-motion animations on desktop (ring rotation + 8
-  // counter-rotations + 8 bobs) keep running otherwise, burning GPU cycles
-  // while the user is scrolled to a different section.
-  const rootRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(rootRef, { margin: "120px 0px" });
   return (
     <div
-      ref={rootRef}
       style={{
         position: "absolute",
         inset: 0,
@@ -89,7 +82,7 @@ export function FounderOrbit() {
       />
 
       {/* ── Pulsing atmosphere — animated on desktop, static ring on mobile ── */}
-      {isNarrow || !inView ? (
+      {isNarrow ? (
         <div
           style={{
             position: "absolute",
@@ -177,12 +170,8 @@ export function FounderOrbit() {
 
       {/* ── Rotating orbit with social icons ── */}
       <motion.div
-        animate={inView ? { rotate: 360 } : { rotate: 0 }}
-        transition={
-          inView
-            ? { duration: ORBIT_DURATION, repeat: Infinity, ease: "linear" }
-            : { duration: 0 }
-        }
+        animate={{ rotate: 360 }}
+        transition={{ duration: ORBIT_DURATION, repeat: Infinity, ease: "linear" }}
         style={{
           position: "absolute",
           top: "50%",
@@ -256,7 +245,7 @@ export function FounderOrbit() {
             </>
           );
 
-          if (isNarrow || !inView) {
+          if (isNarrow) {
             return (
               <div key={icon.label} aria-label={icon.label} style={positionStyle}>
                 <div style={chipStyle}>{chipContent}</div>
@@ -292,12 +281,8 @@ export function FounderOrbit() {
 
       {/* ── Center: Shannon photo with glow ── */}
       <motion.div
-        animate={inView ? { y: [0, -6, 0] } : { y: 0 }}
-        transition={
-          inView
-            ? { duration: 4.5, repeat: Infinity, ease: "easeInOut" }
-            : { duration: 0 }
-        }
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
         style={{
           position: "relative",
           zIndex: 5,

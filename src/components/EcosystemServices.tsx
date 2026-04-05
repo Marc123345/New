@@ -95,9 +95,28 @@ const OrbitNode = memo(({ item, index, onSelect, containerRef }: OrbitNodeProps)
 
 const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
+const ABOUT_H2H_VIDEO =
+  'https://ik.imagekit.io/qcvroy8xpd/H2H%20ANIMATON%20VIDEO%20FINAL.mp4';
+
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
+  const [aboutVideoOpen, setAboutVideoOpen] = useState(false);
   const isMobile = useIsMobile();
+
+  // Body scroll lock + Esc close for the About H2H video modal
+  useEffect(() => {
+    if (!aboutVideoOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAboutVideoOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [aboutVideoOpen]);
 
   const sectionRef = useRef<HTMLElement>(null);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
@@ -273,25 +292,44 @@ export function EcosystemServices() {
             }} />
           </div>
 
-          {/* Center: Purple iPad */}
+          {/* Center: Purple iPad — click opens the About H2H video */}
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
             <motion.div
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
               style={{ filter: 'drop-shadow(0 30px 60px rgba(0,0,0,0.8)) drop-shadow(0 0 50px rgba(164,108,252,0.35))' }}
             >
-              <div style={{
-                width: 200,
-                height: 270,
-                background: 'linear-gradient(160deg, #1a1030, #0d0820)',
-                borderRadius: 16,
-                border: '2px solid rgba(164,108,252,0.5)',
-                padding: '14px 10px',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}>
+              <button
+                type="button"
+                aria-label="Play About H2H video"
+                onClick={() => setAboutVideoOpen(true)}
+                style={{
+                  width: 200,
+                  height: 270,
+                  background: 'linear-gradient(160deg, #1a1030, #0d0820)',
+                  borderRadius: 16,
+                  border: '2px solid rgba(164,108,252,0.5)',
+                  padding: '14px 10px',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
+                  outline: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.04)';
+                  e.currentTarget.style.borderColor = 'rgba(164,108,252,0.9)';
+                  e.currentTarget.style.boxShadow = '0 0 60px rgba(164,108,252,0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.borderColor = 'rgba(164,108,252,0.5)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
                 {/* Camera dot */}
                 <div style={{
                   position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)',
@@ -374,7 +412,7 @@ export function EcosystemServices() {
                     Click to explore
                   </div>
                 </div>
-              </div>
+              </button>
             </motion.div>
           </div>
 
@@ -388,6 +426,119 @@ export function EcosystemServices() {
       </div>
 
       <PillarOverlay pillarIndex={selectedService} onClose={handleClose} onNavigate={handleSelect} />
+
+      {/* ── About H2H video modal — opened by clicking the iPad ── */}
+      {aboutVideoOpen && (
+        <div
+          onClick={() => setAboutVideoOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="About H2H video"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10000,
+            background: 'rgba(6, 3, 18, 0.92)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 'clamp(12px, 3vw, 32px)',
+            animation: 'h2hAboutFade 0.3s ease-out',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: 960,
+              background: '#1a1040',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 16,
+              boxShadow: '0 24px 80px rgba(0,0,0,0.6), var(--shadow-geometric, 10px 10px 0 #a46cfc)',
+              overflow: 'hidden',
+            }}
+          >
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => setAboutVideoOpen(false)}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                border: '1.5px solid rgba(255,255,255,0.25)',
+                background: 'rgba(255,255,255,0.08)',
+                color: '#ffffff',
+                fontSize: 18,
+                lineHeight: 1,
+                cursor: 'pointer',
+                zIndex: 5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              ✕
+            </button>
+
+            <div
+              style={{
+                padding: 'clamp(18px, 2.5vw, 24px) clamp(16px, 2.5vw, 28px)',
+                paddingRight: 64,
+                borderBottom: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  color: '#ffffff',
+                  fontFamily: 'var(--font-stack-heading, system-ui, sans-serif)',
+                  fontSize: 'clamp(0.85rem, 1.3vw, 1rem)',
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  paddingBottom: 6,
+                  borderBottom: '3px solid var(--color-secondary, #a46cfc)',
+                }}
+              >
+                About H2H
+              </span>
+            </div>
+
+            <div
+              style={{
+                background: '#000',
+                aspectRatio: '16 / 9',
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <video
+                src={ABOUT_H2H_VIDEO}
+                controls
+                autoPlay
+                playsInline
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+              />
+            </div>
+          </div>
+
+          <style>{`
+            @keyframes h2hAboutFade {
+              from { opacity: 0; }
+              to   { opacity: 1; }
+            }
+          `}</style>
+        </div>
+      )}
 
     </section>
   );

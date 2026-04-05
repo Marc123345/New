@@ -1,34 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
 const SHANNON_AVATAR = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg";
-const H2H_LOGO = "https://ik.imagekit.io/qcvroy8xpd/h2h%20logo%20WHITE%20.png";
 const VIDEO_FOUNDER =
   "https://ik.imagekit.io/qcvroy8xpd/H2H%20SHANNON%20INTRODUCTION%20VIDEO%20FINAL%20V1.mp4";
-const VIDEO_ABOUT =
-  "https://ik.imagekit.io/qcvroy8xpd/H2H%20ANIMATON%20VIDEO%20FINAL.mp4";
-
-const PHASES = [
-  { key: "founder", label: "Meet our founder", img: SHANNON_AVATAR, fit: "cover" as const },
-  { key: "about",   label: "About H2H",        img: H2H_LOGO,       fit: "contain" as const },
-];
-const PHASE_INTERVAL_MS = 20000;
-
-type Tab = "founder" | "about";
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>("founder");
-  const [phase, setPhase] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  // Cycle the FAB avatar + tooltip every 20s (paused while the overlay is open)
-  useEffect(() => {
-    if (open) return;
-    const id = window.setInterval(() => {
-      setPhase((p) => (p + 1) % PHASES.length);
-    }, PHASE_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, [open]);
 
   // Lock body scroll while the overlay is open
   useEffect(() => {
@@ -50,48 +28,42 @@ export function ChatWidget() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Pause & reset video when switching tabs or closing
+  // Pause & reset video when closing
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    v.pause();
-    v.currentTime = 0;
-  }, [tab, open]);
-
-  const videoSrc = tab === "founder" ? VIDEO_FOUNDER : VIDEO_ABOUT;
+    if (!open) {
+      v.pause();
+      v.currentTime = 0;
+    }
+  }, [open]);
 
   return (
     <>
       {/* ── Floating circular button + tooltip ── */}
       <div className="h2h-chat-wrap">
         <div
-          key={`tip-${phase}`}
           className="h2h-chat-tooltip"
           role="status"
           aria-live="polite"
         >
-          {PHASES[phase].label}
+          Meet our founder
           <span className="h2h-chat-tooltip__arrow" aria-hidden />
         </div>
 
         <button
           type="button"
-          aria-label={`${PHASES[phase].label} — open chat`}
-          onClick={() => {
-            // Opening from tooltip should jump straight to the matching tab
-            setTab(PHASES[phase].key as Tab);
-            setOpen(true);
-          }}
+          aria-label="Meet our founder — play video"
+          onClick={() => setOpen(true)}
           className="h2h-chat-fab"
         >
           <span className="h2h-chat-fab__ring" aria-hidden />
           <span className="h2h-chat-fab__pulse" aria-hidden />
           <img
-            key={`img-${phase}`}
-            src={PHASES[phase].img}
+            src={SHANNON_AVATAR}
             alt=""
-            className={`h2h-chat-fab__img is-${PHASES[phase].key}`}
-            style={{ objectFit: PHASES[phase].fit }}
+            className="h2h-chat-fab__img is-founder"
+            style={{ objectFit: "cover" }}
           />
           <span className="h2h-chat-fab__dot" aria-hidden />
         </button>
@@ -104,7 +76,7 @@ export function ChatWidget() {
           onClick={() => setOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Meet the founder and learn about H2H"
+          aria-label="Meet the founder"
         >
           <div
             className="h2h-chat-modal"
@@ -119,34 +91,16 @@ export function ChatWidget() {
               ✕
             </button>
 
-            {/* Tabs */}
-            <div className="h2h-chat-tabs" role="tablist">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === "founder"}
-                className={`h2h-chat-tab ${tab === "founder" ? "is-active" : ""}`}
-                onClick={() => setTab("founder")}
-              >
-                Meet the Founder
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === "about"}
-                className={`h2h-chat-tab ${tab === "about" ? "is-active" : ""}`}
-                onClick={() => setTab("about")}
-              >
-                About H2H
-              </button>
+            {/* Single-tab header — clean label instead of tab row */}
+            <div className="h2h-chat-header">
+              <span className="h2h-chat-header__label">Meet the Founder</span>
             </div>
 
-            {/* Video stage — remount on tab change so the right src loads */}
+            {/* Video stage */}
             <div className="h2h-chat-stage">
               <video
-                key={tab}
                 ref={videoRef}
-                src={videoSrc}
+                src={VIDEO_FOUNDER}
                 controls
                 autoPlay
                 playsInline
@@ -345,36 +299,22 @@ export function ChatWidget() {
           transform: rotate(90deg);
         }
 
-        /* ── Tabs ── */
-        .h2h-chat-tabs {
-          display: flex;
-          gap: 0;
-          padding: clamp(16px, 2vw, 22px) clamp(16px, 2.5vw, 28px) 0;
+        /* ── Header label (single "Meet the Founder" title) ── */
+        .h2h-chat-header {
+          padding: clamp(18px, 2.5vw, 24px) clamp(16px, 2.5vw, 28px);
           padding-right: 64px; /* leave room for close button */
           border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .h2h-chat-tab {
-          flex: 1;
-          padding: 14px 18px;
-          background: transparent;
-          border: none;
-          border-bottom: 3px solid transparent;
-          color: rgba(255,255,255,0.55);
-          font-family: var(--font-stack-heading, system-ui, sans-serif);
-          font-size: clamp(0.8rem, 1.2vw, 0.95rem);
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: color 0.2s ease, border-color 0.2s ease;
-          white-space: nowrap;
-        }
-        .h2h-chat-tab:hover {
-          color: rgba(255,255,255,0.85);
-        }
-        .h2h-chat-tab.is-active {
+        .h2h-chat-header__label {
+          display: inline-block;
           color: #ffffff;
-          border-bottom-color: var(--color-secondary, #a46cfc);
+          font-family: var(--font-stack-heading, system-ui, sans-serif);
+          font-size: clamp(0.85rem, 1.3vw, 1rem);
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          padding-bottom: 6px;
+          border-bottom: 3px solid var(--color-secondary, #a46cfc);
         }
 
         /* ── Video stage ── */
@@ -407,14 +347,13 @@ export function ChatWidget() {
             max-width: 100%;
             border-radius: 14px;
           }
-          .h2h-chat-tabs {
-            padding: 14px 12px 0;
+          .h2h-chat-header {
+            padding: 14px 12px;
             padding-right: 52px;
           }
-          .h2h-chat-tab {
-            padding: 12px 8px;
-            font-size: 0.7rem;
-            letter-spacing: 0.06em;
+          .h2h-chat-header__label {
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
           }
           .h2h-chat-close {
             top: 8px;

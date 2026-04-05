@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Mail, User, MessageSquare, Send } from "lucide-react";
-import { DancingPhone } from "./contact/DancingPhone";
+import { FounderOrbit } from "./contact/FounderOrbit";
 
 export function ContactForm() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -52,7 +52,7 @@ export function ContactForm() {
         }}
         className="contact-grid"
       >
-        {/* LEFT: 3D Dancing Phone */}
+        {/* LEFT: Founder orbit — Shannon at the centre of the social ecosystem */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -72,10 +72,10 @@ export function ContactForm() {
             border: "3px solid var(--color-text-dark)",
             borderRadius: 16,
             boxShadow: "8px 8px 0 var(--color-surface-dark)",
-            background: "linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 50%, #0a1a0d 100%)",
+            background: "radial-gradient(ellipse at 50% 40%, #1a1040 0%, #0e0b1f 55%, #06030f 100%)",
             overflow: "hidden",
           }}>
-            <DancingPhone />
+            <FounderOrbit />
           </div>
         </motion.div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
-import { motion } from 'motion/react';
+import { motion, useInView } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS } from '../constants/ecosystem';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -119,6 +119,9 @@ export function EcosystemServices() {
   }, [aboutVideoOpen]);
 
   const sectionRef = useRef<HTMLElement>(null);
+  // Pause the three infinite motion animations (CTA badge bob, iPad float,
+  // iPad screen glow orb) when the section is off-screen.
+  const sectionInView = useInView(sectionRef, { margin: "120px 0px" });
   const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
   const orbitAngleRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
@@ -256,8 +259,8 @@ export function EcosystemServices() {
       {/* ── CTA BADGE ── */}
       <motion.div
         className="relative z-10 mb-6 sm:mb-8"
-        animate={{ y: [0, -4, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        animate={sectionInView ? { y: [0, -4, 0] } : { y: 0 }}
+        transition={sectionInView ? { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
       >
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -295,8 +298,8 @@ export function EcosystemServices() {
           {/* Center: Purple iPad — click opens the About H2H video */}
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
             <motion.div
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+              animate={sectionInView ? { y: [0, -12, 0] } : { y: 0 }}
+              transition={sectionInView ? { duration: 4.5, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
               style={{ filter: 'drop-shadow(0 30px 60px rgba(0,0,0,0.8)) drop-shadow(0 0 50px rgba(164,108,252,0.35))' }}
             >
               <button
@@ -348,8 +351,8 @@ export function EcosystemServices() {
                 }}>
                   {/* Animated glow orb behind the text */}
                   <motion.div
-                    animate={{ opacity: [0.55, 1, 0.55], scale: [0.9, 1.1, 0.9] }}
-                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                    animate={sectionInView ? { opacity: [0.55, 1, 0.55], scale: [0.9, 1.1, 0.9] } : { opacity: 0.7, scale: 1 }}
+                    transition={sectionInView ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
                     style={{
                       position: 'absolute', top: '18%', left: '50%',
                       width: 44, height: 44, borderRadius: '50%',

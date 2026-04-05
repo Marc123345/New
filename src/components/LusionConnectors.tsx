@@ -314,6 +314,24 @@ export function LusionConnectors() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
+  // Visibility gating — when the hero scrolls off-screen, switch the Canvas
+  // frameloop to "demand" so R3F stops scheduling rAF work. This halts the
+  // Rapier physics stepping, the postprocessing pass, and the per-frame
+  // useFrame loops entirely until the user scrolls back. Biggest single perf
+  // win on the site since the hero runs ~14 rigid bodies continuously.
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [isVisible, setIsVisible] = useState(true)
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: '120px 0px', threshold: 0 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   const [accent, cycleAccent] = useReducer(
     (s: number) => (s + 1) % ACCENTS.length,
     0,
@@ -326,26 +344,29 @@ export function LusionConnectors() {
   const cameraConfig = { position: [0, 0, 15] as [number, number, number], fov: 17.5, near: 1, far: 20 }
 
   return (
-    <Canvas
-      onClick={cycleAccent}
-      shadows={!isMobile}
-      dpr={isMobile ? [1, 1.25] : [1, 1.5]}
-      gl={{ antialias: false, powerPreference: 'high-performance' }}
-      camera={cameraConfig}
-      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
-    >
-      <color attach="background" args={['#141622']} />
-      <ambientLight intensity={0.4} />
-      <spotLight
-        position={[10, 10, 10]}
-        angle={0.15}
-        penumbra={1}
-        intensity={1}
-        castShadow={!isMobile}
-      />
-      <Suspense fallback={null}>
-        <Scene accent={accent} isMobile={isMobile} />
-      </Suspense>
-    </Canvas>
+    <div ref={wrapRef} style={{ width: '100%', height: '100%' }}>
+      <Canvas
+        onClick={cycleAccent}
+        shadows={!isMobile}
+        dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        camera={cameraConfig}
+        frameloop={isVisible ? 'always' : 'demand'}
+        style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
+      >
+        <color attach="background" args={['#141622']} />
+        <ambientLight intensity={0.4} />
+        <spotLight
+          position={[10, 10, 10]}
+          angle={0.15}
+          penumbra={1}
+          intensity={1}
+          castShadow={!isMobile}
+        />
+        <Suspense fallback={null}>
+          <Scene accent={accent} isMobile={isMobile} />
+        </Suspense>
+      </Canvas>
+    </div>
   )
 }

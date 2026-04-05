@@ -35,6 +35,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Accessibility: kill all non-essential motion for users who've asked for it.
+   Applies to every CSS animation + transition site-wide. Framer-motion and
+   GSAP also read this preference themselves, so per-component logic that
+   already respects prefers-reduced-motion still runs. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   /* Mobile viewport height fix — updated by JS */

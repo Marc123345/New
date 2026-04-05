@@ -115,7 +115,7 @@ function HeroLusion() {
           font-family: var(--font-stack-heading);
           font-size: 48px;
           font-weight: 800;
-          color: var(--color-secondary, #a46cfc);
+          color: #5b21b6;
           max-width: min(90%, 1100px);
           line-height: 1.1;
           letter-spacing: -0.02em;

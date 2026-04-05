@@ -1,17 +1,34 @@
 import { useState, useEffect, useRef } from "react";
 
 const SHANNON_AVATAR = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg";
+const H2H_LOGO = "https://ik.imagekit.io/qcvroy8xpd/h2h%20logo%20WHITE%20.png";
 const VIDEO_FOUNDER =
   "https://ik.imagekit.io/qcvroy8xpd/H2H%20SHANNON%20INTRODUCTION%20VIDEO%20FINAL%20V1.mp4";
 const VIDEO_ABOUT =
   "https://ik.imagekit.io/qcvroy8xpd/H2H%20ANIMATON%20VIDEO%20FINAL.mp4";
+
+const PHASES = [
+  { key: "founder", label: "Meet our founder", img: SHANNON_AVATAR, fit: "cover" as const },
+  { key: "about",   label: "About H2H",        img: H2H_LOGO,       fit: "contain" as const },
+];
+const PHASE_INTERVAL_MS = 20000;
 
 type Tab = "founder" | "about";
 
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("founder");
+  const [phase, setPhase] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Cycle the FAB avatar + tooltip every 20s (paused while the overlay is open)
+  useEffect(() => {
+    if (open) return;
+    const id = window.setInterval(() => {
+      setPhase((p) => (p + 1) % PHASES.length);
+    }, PHASE_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [open]);
 
   // Lock body scroll while the overlay is open
   useEffect(() => {
@@ -45,18 +62,40 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* ── Floating circular button ── */}
-      <button
-        type="button"
-        aria-label="Chat with Shannon — meet the founder"
-        onClick={() => setOpen(true)}
-        className="h2h-chat-fab"
-      >
-        <span className="h2h-chat-fab__ring" aria-hidden />
-        <span className="h2h-chat-fab__pulse" aria-hidden />
-        <img src={SHANNON_AVATAR} alt="" className="h2h-chat-fab__img" />
-        <span className="h2h-chat-fab__dot" aria-hidden />
-      </button>
+      {/* ── Floating circular button + tooltip ── */}
+      <div className="h2h-chat-wrap">
+        <div
+          key={`tip-${phase}`}
+          className="h2h-chat-tooltip"
+          role="status"
+          aria-live="polite"
+        >
+          {PHASES[phase].label}
+          <span className="h2h-chat-tooltip__arrow" aria-hidden />
+        </div>
+
+        <button
+          type="button"
+          aria-label={`${PHASES[phase].label} — open chat`}
+          onClick={() => {
+            // Opening from tooltip should jump straight to the matching tab
+            setTab(PHASES[phase].key as Tab);
+            setOpen(true);
+          }}
+          className="h2h-chat-fab"
+        >
+          <span className="h2h-chat-fab__ring" aria-hidden />
+          <span className="h2h-chat-fab__pulse" aria-hidden />
+          <img
+            key={`img-${phase}`}
+            src={PHASES[phase].img}
+            alt=""
+            className={`h2h-chat-fab__img is-${PHASES[phase].key}`}
+            style={{ objectFit: PHASES[phase].fit }}
+          />
+          <span className="h2h-chat-fab__dot" aria-hidden />
+        </button>
+      </div>
 
       {/* ── Overlay modal ── */}
       {open && (
@@ -119,11 +158,54 @@ export function ChatWidget() {
       )}
 
       <style>{`
-        /* ── Floating button ── */
-        .h2h-chat-fab {
+        /* ── Wrapper so the tooltip can sit beside the FAB ── */
+        .h2h-chat-wrap {
           position: fixed;
           right: clamp(16px, 2.5vw, 28px);
           bottom: clamp(16px, 2.5vw, 28px);
+          z-index: 9998;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          pointer-events: none;
+        }
+        .h2h-chat-wrap > * { pointer-events: auto; }
+
+        /* ── Tooltip bubble ── */
+        .h2h-chat-tooltip {
+          position: relative;
+          background: #ffffff;
+          color: var(--color-primary, #291e56);
+          font-family: var(--font-stack-heading, system-ui, sans-serif);
+          font-weight: 700;
+          font-size: 13px;
+          letter-spacing: 0.02em;
+          padding: 10px 16px;
+          border-radius: 999px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(164,108,252,0.25);
+          white-space: nowrap;
+          animation: h2hTipIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+          max-width: 180px;
+        }
+        .h2h-chat-tooltip__arrow {
+          position: absolute;
+          right: -6px;
+          top: 50%;
+          transform: translateY(-50%) rotate(45deg);
+          width: 12px;
+          height: 12px;
+          background: #ffffff;
+          box-shadow: 1px -1px 0 rgba(164,108,252,0.25);
+        }
+        @keyframes h2hTipIn {
+          0%   { opacity: 0; transform: translateX(12px) scale(0.9); }
+          60%  { opacity: 1; transform: translateX(-2px) scale(1.02); }
+          100% { opacity: 1; transform: translateX(0)    scale(1); }
+        }
+
+        /* ── Floating button ── */
+        .h2h-chat-fab {
+          position: relative;
           width: clamp(64px, 8vw, 78px);
           height: clamp(64px, 8vw, 78px);
           border-radius: 50%;
@@ -131,10 +213,10 @@ export function ChatWidget() {
           padding: 0;
           background: var(--color-primary, #291e56);
           cursor: pointer;
-          z-index: 9998;
           box-shadow: 0 10px 30px rgba(0,0,0,0.35), 0 0 0 4px rgba(164,108,252,0.25);
           transition: transform 0.25s ease, box-shadow 0.25s ease;
           overflow: visible;
+          flex-shrink: 0;
         }
         .h2h-chat-fab:hover {
           transform: translateY(-3px) scale(1.04);
@@ -149,10 +231,18 @@ export function ChatWidget() {
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: cover;
           border-radius: 50%;
           display: block;
           pointer-events: none;
+          animation: h2hImgSwap 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .h2h-chat-fab__img.is-about {
+          padding: 14px;
+          background: var(--color-primary, #291e56);
+        }
+        @keyframes h2hImgSwap {
+          0%   { opacity: 0; transform: scale(0.85) rotate(-8deg); }
+          100% { opacity: 1; transform: scale(1)    rotate(0); }
         }
         .h2h-chat-fab__ring {
           position: absolute;
@@ -305,6 +395,14 @@ export function ChatWidget() {
 
         /* ── Mobile tweaks ── */
         @media (max-width: 640px) {
+          .h2h-chat-tooltip {
+            font-size: 11px;
+            padding: 8px 12px;
+            max-width: 140px;
+          }
+          .h2h-chat-wrap {
+            gap: 8px;
+          }
           .h2h-chat-modal {
             max-width: 100%;
             border-radius: 14px;

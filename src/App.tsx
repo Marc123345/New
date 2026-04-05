@@ -175,11 +175,13 @@ function AppContent() {
       <AboutSection />
 
       {/* ═══ 3-PILLAR ECOSYSTEM ═══ */}
-      <LazySection>
-        <Suspense fallback={<SectionLoader />}>
-          <EcosystemServices />
-        </Suspense>
-      </LazySection>
+      <div id="ecosystem">
+        <LazySection>
+          <Suspense fallback={<SectionLoader />}>
+            <EcosystemServices />
+          </Suspense>
+        </LazySection>
+      </div>
 
       {/* ═══ SERVICES ═══ */}
       <Section id="services" className="bg-[var(--color-background-light)]" noPadding={true}>

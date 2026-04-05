@@ -153,7 +153,6 @@ export function EcosystemServices() {
   return (
     <section
       ref={sectionRef}
-      id="ecosystem"
       className="relative w-full flex flex-col items-center justify-center overflow-hidden"
       style={{
         background: 'linear-gradient(160deg, #0e0820 0%, var(--color-primary) 40%, #120a2a 70%, #0a0612 100%)',

@@ -14,95 +14,13 @@ const STEPS = [
   { num: '04', title: 'Strong Communication\nDrives ROI', body: 'H2H Social works alongside your internal team as an extra engine behind the brand, helping you build stronger relationships, generate better leads, and tell your company\'s story with more clarity and impact. Great communication makes you visible. It makes you credible. And it makes you worth choosing.', titlePadRight: '25%' },
 ];
 
-/* ── Blob background data (Figma African geography exports) ── */
-interface Blob { x: number; y: number; w: number; h: number; rot?: number; g: string; opacity: number }
-
-// Design base: 1440×900
-const pct = (px: number, base: number) => `${(px / base) * 100}%`;
-const blobStyle = (b: Blob): React.CSSProperties => ({
-  position: 'absolute',
-  left: pct(b.x, 1440),
-  top: pct(b.y, 900),
-  width: pct(b.w, 1440),
-  height: pct(b.h, 900),
-  borderRadius: '50%',
-  background: b.g,
-  transform: b.rot ? `rotate(${b.rot}deg)` : undefined,
-  transformOrigin: '0 0',
-  opacity: b.opacity,
-});
-
-
-// V3 — Sahara Dune Arc (step 3)
-const V3: Blob[] = [
-  { x: -200, y: -300, w: 1800, h: 700, g: 'radial-gradient(100% 100% at 0% 0%, rgba(33,33,36,0.9), rgba(33,33,36,0.6) 60%, rgba(33,33,36,0))', opacity: 0.8 },
-  { x: -300, y: 500, w: 2000, h: 700, g: 'radial-gradient(100% 100% at 0% 0%, rgba(56,54,59,0.6), rgba(56,54,59,0.4) 60%, rgba(56,54,59,0))', opacity: 0.9 },
-  { x: -100, y: 480, w: 700, h: 450, rot: 5, g: 'radial-gradient(100% 100% at 0% 0%, #1a1535, rgba(87,84,92,0.26) 60%, rgba(87,84,92,0))', opacity: 0.7 },
-  { x: 800, y: 460, w: 700, h: 450, rot: -5, g: 'radial-gradient(100% 100% at 0% 0%, #1a1535, rgba(87,84,92,0.26) 60%, rgba(87,84,92,0))', opacity: 0.7 },
-  { x: 300, y: 520, w: 800, h: 380, g: 'radial-gradient(100% 100% at 0% 0%, #1a1535, rgba(56,54,59,0.32) 60%, rgba(56,54,59,0))', opacity: 0.65 },
-  { x: 200, y: 80, w: 1000, h: 300, rot: -2, g: 'radial-gradient(100% 100% at 0% 0%, rgba(87,84,92,0.15), rgba(87,84,92,0.09) 60%, rgba(87,84,92,0))', opacity: 0.6 },
-  { x: 642, y: 492, w: 158, h: 76, g: 'radial-gradient(100% 100% at 0% 0%, rgba(235,232,240,0.18), rgba(235,232,240,0.11) 60%, rgba(235,232,240,0))', opacity: 0.9 },
-];
-
-const BLOB_SETS_V3 = [V3]; // V3 is CSS gradients; V1,V2,V4,V5 are image-based
-
-/* ── V4 — Great Rift Valley (step 4, Figma image assets) ── */
-const v4 = {
-  plate:  'https://www.figma.com/api/mcp/asset/6ce79fda-5815-4e40-9cc8-a4067c9f603f',
-  rift:   ['https://www.figma.com/api/mcp/asset/7be415fd-58ed-43d0-a12d-379582ad42cb','https://www.figma.com/api/mcp/asset/00d5c801-0cf6-4c00-b729-102fb1b2524e','https://www.figma.com/api/mcp/asset/325617d5-d331-4e2d-8988-d4a99c736dfc','https://www.figma.com/api/mcp/asset/93d6c8cd-3c62-4b7a-82a7-ad920a4fe58a'],
-  lake1:  'https://www.figma.com/api/mcp/asset/992a1a8c-62ab-4fdc-b0c1-fcec3f765da0',
-  lake2:  'https://www.figma.com/api/mcp/asset/97ad7c81-d062-4baa-a8d7-2fd8908e9ed1',
-  lake3:  'https://www.figma.com/api/mcp/asset/de1e3093-dfc7-4051-b3c7-305c70285438',
-  escarp: 'https://www.figma.com/api/mcp/asset/594d3c1d-599c-4305-a3cb-b4cbc9ff8c60',
-};
-
-/* ── V5 — Congo Basin (step 5, Figma image assets) ── */
-const v5 = {
-  canopy:     'https://www.figma.com/api/mcp/asset/bafe8b60-ef41-4e29-a138-1726ddaadeb4',
-  basin:      'https://www.figma.com/api/mcp/asset/2b61f93f-82a4-4883-bfe3-f4b3e343e49f',
-  rim:        'https://www.figma.com/api/mcp/asset/d64b3f7b-8c9c-4907-b456-93f07fecaef7',
-  rimLine:    'https://www.figma.com/api/mcp/asset/20e38843-f7ac-4444-b8f5-0d9e1b8b37f7',
-  tribs: [
-    ['https://www.figma.com/api/mcp/asset/4bcb091b-9a35-499c-b815-dfa6c3a4a79f',338,222,382,228],
-    ['https://www.figma.com/api/mcp/asset/234e4b4c-6b47-489b-a0e4-f862b3d1272a',618,82,102,368],
-    ['https://www.figma.com/api/mcp/asset/8282b450-3e1d-4e70-a811-bd04eaf70d2c',720,82,182,368],
-    ['https://www.figma.com/api/mcp/asset/d09ffd14-ae57-469b-9110-49c6d9ffa2c6',720,242,402,208],
-    ['https://www.figma.com/api/mcp/asset/cf7bf4bd-429d-4020-877f-0caf7d5e8a13',720,450,382,152],
-    ['https://www.figma.com/api/mcp/asset/f6e6512d-dfa4-4541-8bde-1b619b7d5016',542,450,178,332],
-    ['https://www.figma.com/api/mcp/asset/78f0ce15-4e58-4da0-a292-fbbb21f58278',278,450,442,172],
-    ['https://www.figma.com/api/mcp/asset/8c1e5c81-2d2b-4b92-996d-d881600734e6',238,382,482,68],
-  ] as [string,number,number,number,number][],
-  tribBright1:'https://www.figma.com/api/mcp/asset/eef03c6f-6b72-4b6b-b319-71ee7fd957e1',
-  tribBright2:'https://www.figma.com/api/mcp/asset/df74a4dc-1306-4c2d-9b27-117059592620',
-  riverMain:  'https://www.figma.com/api/mcp/asset/4d54db44-0c8f-40a1-9b3e-db015b35f8c5',
-  riverBright:'https://www.figma.com/api/mcp/asset/9ba88f6c-1dde-4f9b-9b19-876b4494b337',
-  canopyBlobs: [
-    ['https://www.figma.com/api/mcp/asset/26730ebb-c28f-4549-bfe8-19f5d2b7eb1f',320,240,80,-23,-15],
-    ['https://www.figma.com/api/mcp/asset/f5f61059-aeb7-4768-bd25-2f6dcf90906c',360,260,846,40,12],
-    ['https://www.figma.com/api/mcp/asset/d5b7c2b3-cf6e-43ff-9fc7-b9c506a4f86f',340,260,4,600,8],
-    ['https://www.figma.com/api/mcp/asset/fee3f649-b7b1-4c7a-8d2d-fb4a72c1e4ec',320,240,1000,524,-10],
-    ['https://www.figma.com/api/mcp/asset/c6b51e47-33c8-478b-bfac-97cdbfe61ead',200,300,-50,283,-5],
-    ['https://www.figma.com/api/mcp/asset/a8d627e9-31c2-4ac6-9c33-97ea6365c7f1',220,300,1254,280,5],
-  ] as [string,number,number,number,number,number][],
-  haze: 'https://www.figma.com/api/mcp/asset/f2062bdd-7eb8-4bb2-8d89-895445c2ea11',
-};
-
-/* ── City skyline / nebula background images — one per step ── */
+/* ── African city skylines — one per step, no Egypt, no nebulas ── */
 const SKYLINES = [
-  'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=1200&q=80', // Johannesburg skyline
-  'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=1200&q=80', // Nairobi skyline
-  'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1200&q=80', // Purple nebula/stars
-  'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1200&q=80', // Purple nebula/stars 2
+  'https://images.unsplash.com/photo-1577948000111-9c970dfe3743?w=1200&q=80', // 01 Johannesburg
+  'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=1200&q=80', // 02 Nairobi
+  'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=1200&q=80', // 03 Cape Town
+  'https://images.unsplash.com/photo-1618828665011-0abd973f7bb8?w=1200&q=80', // 04 Lagos
 ];
-
-// Helper for image positioning (1440×900 base)
-const ip = (x: number, y: number, w: number, h: number, rot?: number): React.CSSProperties => ({
-  position: 'absolute',
-  left: pct(x, 1440), top: pct(y, 900),
-  width: pct(w, 1440), height: pct(h, 900),
-  transform: rot ? `rotate(${rot}deg)` : undefined,
-  transformOrigin: '0 0',
-});
 
 export function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -184,16 +102,13 @@ export function AboutSection() {
           <img src={SKYLINES[1]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 
-        {/* V3 — Purple nebula */}
+        {/* V3 — Cape Town skyline (clean: skyline photo only, no overlays) */}
         <div className="about-bg-layer about-bg-layer--3">
-          {BLOB_SETS_V3[0].map((b, i) => <div key={i} style={blobStyle(b)} />)}
           <img src={SKYLINES[2]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 
-        {/* V4 — Purple stars */}
+        {/* V4 — Lagos skyline (clean: skyline photo only, no overlays) */}
         <div className="about-bg-layer about-bg-layer--4">
-          <div style={ip(-453, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
-          <div style={ip(447, -100, 1100, 1100, 8)}><img src={v4.plate} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
           <img src={SKYLINES[3]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
       </div>

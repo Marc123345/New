@@ -2,17 +2,16 @@ import { motion } from "motion/react";
 
 const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg";
 
-// Brand-coloured social media icons. X and TikTok aren't in lucide-react
-// (Twitter rebranded, TikTok pulled over trademark) so we inline them as
-// SVG paths alongside the ones that do exist — keeps visual weight consistent
-// across all six icons.
+// Eight social / platform logos orbiting around Shannon. Same set + chip style
+// as the Loader component so the contact hero reads as a larger, slower version
+// of the same visual language.
 interface Social {
   label: string;
   bg: string;
   svg: React.ReactNode;
 }
 
-const ICON_SIZE = 20;
+const ICON_SIZE = 22;
 
 const SOCIALS: Social[] = [
   {
@@ -69,9 +68,27 @@ const SOCIALS: Social[] = [
       </svg>
     ),
   },
+  {
+    label: "WhatsApp",
+    bg: "#25D366",
+    svg: (
+      <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="#fff">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Threads",
+    bg: "#1a1a1a",
+    svg: (
+      <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="#fff">
+        <path d="M17.83 11.13a9.05 9.05 0 00-.36-.14c-.19-3.63-2.17-5.71-5.49-5.73h-.05c-1.99 0-3.64.85-4.67 2.39l1.83 1.26c.77-1.17 1.97-1.42 2.84-1.42h.03c1.09 0 1.91.32 2.44.94.39.46.65 1.1.78 1.9-.95-.16-1.97-.21-3.07-.15-3.08.18-5.05 1.97-4.92 4.46.07 1.26.7 2.35 1.77 3.05.91.59 2.09.88 3.31.82 1.61-.09 2.88-.7 3.76-1.83.67-.85 1.09-1.96 1.28-3.34.75.45 1.3 1.05 1.61 1.77.53 1.22.56 3.23-1.08 4.87-1.44 1.43-3.17 2.05-5.78 2.07-2.9-.02-5.09-.95-6.52-2.76C5.21 17.61 4.52 15.31 4.5 12.5c.02-2.81.71-5.11 2.04-6.84C7.97 3.85 10.16 2.92 13.06 2.9c2.92.02 5.15.95 6.63 2.77.72.89 1.27 2.01 1.63 3.32l2.11-.56c-.44-1.62-1.12-3.02-2.03-4.17C19.46 1.92 16.73.78 13.07.76h-.01C9.4.78 6.7 1.92 4.87 4.24 3.24 6.31 2.39 9.19 2.37 12.5v.01c.02 3.31.87 6.19 2.5 8.26 1.82 2.32 4.53 3.46 8.19 3.48h.01c3.25-.02 5.54-.87 7.43-2.76 2.47-2.47 2.39-5.56 1.58-7.46-.59-1.37-1.71-2.49-3.25-3.25zm-5.56 4.59c-1.36.08-2.76-.54-2.83-1.88-.05-.99.71-2.1 2.91-2.22.25-.01.5-.02.74-.02.8 0 1.55.08 2.23.23-.25 3.14-1.73 3.83-3.05 3.89z" />
+      </svg>
+    ),
+  },
 ];
 
-const ORBIT_DURATION = 28; // seconds for one full rotation
+const ORBIT_DURATION = 22; // seconds for one full rotation
 
 export function FounderOrbit() {
   return (
@@ -120,36 +137,55 @@ export function FounderOrbit() {
         }}
       />
 
-      {/* ── Orbit guide rings (static, subtle) ── */}
+      {/* ── Orbit guide rings + spokes — matches the Loader's geometry ── */}
       <svg
         viewBox="0 0 400 400"
         style={{
           position: "absolute",
           top: "50%",
           left: "50%",
-          width: "90%",
+          width: "92%",
           aspectRatio: "1",
           transform: "translate(-50%, -50%)",
           pointerEvents: "none",
+          opacity: 0.45,
         }}
       >
+        {/* Primary ring */}
         <circle
           cx="200"
           cy="200"
-          r="165"
+          r="160"
           fill="none"
-          stroke="rgba(164,108,252,0.18)"
+          stroke="rgba(164,108,252,0.5)"
+          strokeWidth="1"
+        />
+        {/* Dashed outer ring */}
+        <circle
+          cx="200"
+          cy="200"
+          r="185"
+          fill="none"
+          stroke="rgba(164,108,252,0.28)"
           strokeWidth="0.8"
-          strokeDasharray="2 6"
+          strokeDasharray="2 8"
         />
-        <circle
-          cx="200"
-          cy="200"
-          r="140"
-          fill="none"
-          stroke="rgba(164,108,252,0.08)"
-          strokeWidth="0.5"
-        />
+        {/* Spokes from centre to each icon position */}
+        {SOCIALS.map((_, i) => {
+          const angle = (i / SOCIALS.length) * Math.PI * 2 - Math.PI / 2;
+          return (
+            <line
+              key={i}
+              x1={200}
+              y1={200}
+              x2={200 + Math.cos(angle) * 160}
+              y2={200 + Math.sin(angle) * 160}
+              stroke="rgba(164,108,252,0.22)"
+              strokeWidth="0.5"
+              strokeDasharray="3 5"
+            />
+          );
+        })}
       </svg>
 
       {/* ── Rotating orbit with social icons ── */}
@@ -160,10 +196,10 @@ export function FounderOrbit() {
           position: "absolute",
           top: "50%",
           left: "50%",
-          width: "82%",
+          width: "92%",
           aspectRatio: "1",
-          marginLeft: "-41%",
-          marginTop: "-41%",
+          marginLeft: "-46%",
+          marginTop: "-46%",
           pointerEvents: "none",
         }}
       >
@@ -179,11 +215,11 @@ export function FounderOrbit() {
                 position: "absolute",
                 top: "50%",
                 left: "50%",
-                width: 46,
-                height: 46,
-                marginLeft: -23,
-                marginTop: -23,
-                transform: `rotate(${angle}deg) translateY(-170%) rotate(${-angle}deg)`,
+                width: 52,
+                height: 52,
+                marginLeft: -26,
+                marginTop: -26,
+                transform: `rotate(${angle}deg) translateY(-176%) rotate(${-angle}deg)`,
                 pointerEvents: "auto",
               }}
             >
@@ -193,17 +229,17 @@ export function FounderOrbit() {
                   duration: 2 + (i % 3) * 0.4,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: i * 0.2,
+                  delay: i * 0.25,
                 }}
                 aria-label={social.label}
                 style={{
                   width: "100%",
                   height: "100%",
-                  borderRadius: 12,
+                  borderRadius: 10,
                   background: social.bg,
-                  border: "2px solid rgba(255,255,255,0.22)",
+                  border: "2px solid rgba(255,255,255,0.25)",
                   boxShadow:
-                    "0 6px 18px rgba(0,0,0,0.45), 0 0 22px rgba(164,108,252,0.35)",
+                    "0 8px 22px rgba(0,0,0,0.5), 0 0 28px rgba(164,108,252,0.45)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

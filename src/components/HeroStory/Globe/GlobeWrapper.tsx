@@ -10,13 +10,12 @@ interface GlobeWrapperProps {
   activeCityIndex?: number;
 }
 
-// Testimonial cities — used for camera tracking
+// Testimonial cities — ordered to match CONTACTS in Testimonials.tsx
 const TESTIMONIAL_CITIES = [
-  { lat: 6.5244,   lng: 3.3792,   name: 'Lagos' },
-  { lat: 5.6037,   lng: -0.1870,  name: 'Accra' },
-  { lat: -1.2921,  lng: 36.8219,  name: 'Nairobi' },
-  { lat: -26.2041, lng: 28.0473,  name: 'Johannesburg' },
-  { lat: 14.7167,  lng: -17.4677, name: 'Dakar' },
+  { lat: -26.2041, lng: 28.0473,  name: 'Johannesburg' }, // Stallion Integrated (ZA)
+  { lat: -17.8252, lng: 31.0335,  name: 'Harare' },       // Untapped Africa (ZW)
+  { lat: 6.5244,   lng: 3.3792,   name: 'Lagos' },        // YDPay (NG)
+  { lat: -25.8560, lng: 28.1880,  name: 'Centurion' },    // ICE Tech (ZA)
 ];
 
 const TOP_CITIES = worldPopulationData.slice(0, 18);

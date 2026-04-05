@@ -8,59 +8,48 @@ const GlobeWrapper = lazy(() =>
 
 const CONTACTS = [
   {
-    id: "c1",
-    name: "Amara Okafor",
-    country: "Nigeria",
-    city: "Lagos",
-    role: "CEO",
-    service: "Leadership Branding",
-    countryCode: "NG",
-    avatar: "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&h=200&fit=crop",
-    quote: "H2H Social didn't just build a platform; they built a digital ecosystem that understands the heartbeat of Lagos markets. Their expertise in African fintech is unmatched.",
-  },
-  {
-    id: "c2",
-    name: "Kwame Mensah",
-    country: "Ghana",
-    city: "Accra",
-    role: "Founder",
-    service: "Ecosystem Management",
-    countryCode: "GH",
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop",
-    quote: "The level of creativity exceeded our expectations. Our transaction volume tripled within three months. H2H brought world-class execution to West Africa.",
-  },
-  {
-    id: "c3",
-    name: "Zainab Hassan",
-    country: "Kenya",
-    city: "Nairobi",
-    role: "Director",
-    service: "Authority Discovery",
-    countryCode: "KE",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop",
-    quote: "A game-changer for education. They delivered a world-class learning platform that truly resonates with our students and scales across East Africa beautifully.",
-  },
-  {
-    id: "c4",
-    name: "Thabo Nkosi",
+    id: "stallion",
+    name: "Brad Soekoe",
+    company: "Stallion Integrated",
     country: "South Africa",
-    city: "Johannesburg",
-    role: "Managing Director",
-    service: "AI Humanization",
     countryCode: "ZA",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",
-    quote: "From the first pixel to the final line of code, the execution was flawless. H2H is the partner you dream of — combining global standards with African insight.",
+    role: "CEO",
+    service: "Rebrand Communications",
+    logo: "/logos/stallion.png",
+    quote: "H2H Social played a pivotal role in leading Stallion's rebrand communications. Their expertise helped us deliver our message with clarity, confidence, and in a way that set a benchmark for industry communications.",
   },
   {
-    id: "c5",
-    name: "Fatima Diallo",
-    country: "Senegal",
-    city: "Dakar",
-    role: "Co-Founder",
-    service: "Cross-Border Strategy",
-    countryCode: "SN",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop",
-    quote: "Their expertise in e-commerce and digital payments helped us scale rapidly across Francophone Africa. The results speak for themselves.",
+    id: "untapped",
+    name: "Gabriel Sher",
+    company: "Untapped Africa",
+    country: "Zimbabwe",
+    countryCode: "ZW",
+    role: "CEO",
+    service: "Brand Identity",
+    logo: null as string | null,
+    quote: "Before H2H Social, we had the vision, but we hadn't yet realized how powerful communication could be. They gave us the language, identity, and clarity to express what we were building, and in doing so, they shaped our brand. This deepened belief in the impact we were created to make.",
+  },
+  {
+    id: "ydpay",
+    name: "Chike Okonkwo",
+    company: "YDPay",
+    country: "Nigeria",
+    countryCode: "NG",
+    role: "Head of Business Development & Marketing",
+    service: "Community Growth",
+    logo: "/logos/ydpay.svg",
+    quote: "H2H social agency has been a valuable agency partner to YDPay, consistently delivering on community growth and user engagement. We've seen firsthand their professionalism, creativity, and commitment to execution, making them a reliable partner for any brand looking to grow.",
+  },
+  {
+    id: "icetech",
+    name: "Myles Donnolley",
+    company: "ICE Tech",
+    country: "South Africa",
+    countryCode: "ZA",
+    role: "Head of Sales & Marketing",
+    service: "Social Media Strategy",
+    logo: "/logos/icetech.png",
+    quote: "H2H has been instrumental in elevating ICE Tech's social media presence. Their ability to clearly communicate our brand and message has helped us reach a wider audience and strengthen our online identity.",
   },
 ];
 
@@ -277,37 +266,51 @@ export function Testimonials() {
                     }}
                   >
                     <div className="relative flex flex-col gap-4 md:gap-6 overflow-hidden">
-                      <div
-                        className="self-start text-[9px] sm:text-[10px] tracking-[0.25em] uppercase px-2 py-1"
-                        style={{ fontFamily: "var(--font-stack-heading)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "4px", color: "rgba(255,255,255,0.7)" }}
-                      >
-                        {contact.service}
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div
+                          className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase px-2 py-1"
+                          style={{ fontFamily: "var(--font-stack-heading)", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "4px", color: "rgba(255,255,255,0.7)" }}
+                        >
+                          {contact.service}
+                        </div>
+                        {contact.logo && (
+                          <div
+                            className="avatar-pulse flex items-center justify-center bg-white shrink-0"
+                            style={{
+                              height: "clamp(32px, 5vw, 44px)",
+                              padding: "0 clamp(8px, 1.5vw, 14px)",
+                              borderRadius: "6px",
+                              border: "1px solid rgba(255,255,255,0.25)",
+                            }}
+                          >
+                            <img
+                              src={contact.logo}
+                              alt={`${contact.company} logo`}
+                              className="h-full w-auto object-contain"
+                              style={{ maxHeight: "clamp(20px, 3.5vw, 30px)" }}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        )}
                       </div>
 
                       <blockquote
                         className="leading-relaxed tracking-tight"
-                        style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(1rem, 3.5vw, 1.65rem)", color: "#ffffff", margin: 0 }}
+                        style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(0.95rem, 3vw, 1.5rem)", color: "#ffffff", margin: 0 }}
                       >
                         "{contact.quote}"
                       </blockquote>
 
-                      <div className="flex items-center gap-3 md:gap-4 mt-auto pt-2">
-                        <div
-                          className="avatar-pulse shrink-0 rounded-full overflow-hidden border-2 border-white/30"
-                          style={{ width: "clamp(36px, 6vw, 56px)", height: "clamp(36px, 6vw, 56px)" }}
-                        >
-                          <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                      <div className="flex flex-col gap-1.5 mt-auto pt-2 min-w-0">
+                        <div className="leading-none truncate" style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic", fontSize: "clamp(0.9rem, 2.5vw, 1.4rem)", color: "#FBFBFC" }}>
+                          {contact.name}
                         </div>
-                        <div className="min-w-0">
-                          <div className="leading-none mb-1 truncate" style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic", fontSize: "clamp(0.9rem, 2.5vw, 1.4rem)", color: "#FBFBFC" }}>
-                            {contact.name}
-                          </div>
-                          <div
-                            className="inline-block bg-[var(--color-secondary)] px-2 py-0.5 md:px-3 md:py-1 tracking-widest"
-                            style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(8px, 1.5vw, 11px)", borderRadius: "4px", color: "var(--color-background-light)", whiteSpace: "nowrap" }}
-                          >
-                            {contact.role} · {contact.city}
-                          </div>
+                        <div
+                          className="self-start bg-[var(--color-secondary)] px-2 py-0.5 md:px-3 md:py-1 tracking-widest max-w-full truncate"
+                          style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(8px, 1.5vw, 11px)", borderRadius: "4px", color: "var(--color-background-light)" }}
+                        >
+                          {contact.role} · {contact.company}
                         </div>
                       </div>
                     </div>

@@ -491,6 +491,9 @@ export function AboutSection() {
           position: relative;
           top: -0.4em;
           margin: 0;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          hyphens: auto;
         }
 
         /* Every second step heading is stroke */
@@ -587,8 +590,9 @@ export function AboutSection() {
             padding-top: 1.5em;
           }
           .about-step-content { font-size: 1em; line-height: 1.2; }
-          .about-step-title { padding-right: 15% !important; }
-          .about-step-h3 { margin-left: -1em; }
+          /* Tighter padding so long titles have room to breathe */
+          .about-step-title { padding-right: 0 !important; }
+          .about-step-h3 { margin-left: -0.25em; font-size: 2.6em; line-height: 0.95; }
           .about-end-sticky { padding: 2em 1.25em; }
 
           /* Hide heavy bg layers on mobile — save memory + GPU */
@@ -607,7 +611,32 @@ export function AboutSection() {
           .about-section { font-size: 4vw; }
           .about-step { min-height: 75vh; }
           .about-heading { padding-bottom: 7.5em; }
-          .about-step-h3 { font-size: 3em; margin-left: 0; }
+          /* Collapse the 1fr 4fr split into a single column so long titles
+             get the full viewport width instead of being squeezed next to
+             the index number */
+          .about-step-heading {
+            grid-template-columns: 1fr;
+            gap: 0.5em;
+          }
+          .about-step-index {
+            padding-right: 0;
+            transform: none;
+          }
+          .about-step-container {
+            grid-template-columns: 1fr;
+            padding-bottom: 6em;
+          }
+          .about-step-content {
+            grid-column: 1;
+            padding-right: 0;
+          }
+          .about-step-title { padding-right: 0 !important; }
+          .about-step-h3 {
+            font-size: 2em;
+            line-height: 1;
+            margin-left: 0;
+            top: 0;
+          }
           .about-end-heading h3 { font-size: 2em; }
           .about-end-tagline p { font-size: 1.5em; }
           .about-end-body p { font-size: 1em; }

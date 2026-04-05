@@ -196,39 +196,14 @@ function LogoCube({ logo, size = CUBE_SIZE }: { logo: LogoDef; size?: number }) 
 
 // ─── Pointer ──────────────────────────────────────────────────────────────────
 
-function Pointer({ isMobile }: { isMobile: boolean }) {
+function Pointer() {
   const ref = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
-  const touchActiveRef = useRef(!isMobile) // desktop: always "active", mobile: only while touching
-
-  // On mobile, only consider the pointer active while a touch is happening.
-  // When idle we park it far behind the camera so it can't collide with the
-  // cubes and can't act as a collapse point for the centripetal pull. This
-  // matches the Lusion.io reference where the cubes float freely at rest.
-  useEffect(() => {
-    if (!isMobile) return
-    const onTouchStart = () => { touchActiveRef.current = true }
-    const onTouchEnd = () => { touchActiveRef.current = false }
-    window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchend', onTouchEnd, { passive: true })
-    window.addEventListener('touchcancel', onTouchEnd, { passive: true })
-    return () => {
-      window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchend', onTouchEnd)
-      window.removeEventListener('touchcancel', onTouchEnd)
-    }
-  }, [isMobile])
 
   useFrame(({ mouse, viewport }) => {
-    if (!ref.current) return
-    if (touchActiveRef.current) {
-      ref.current.setNextKinematicTranslation(
-        vec.set((mouse.x * viewport.width) / 2, (mouse.y * viewport.height) / 2, 0),
-      )
-    } else {
-      // Park off-screen so the sphere can't interact with any cube
-      ref.current.setNextKinematicTranslation(vec.set(0, 0, -80))
-    }
+    ref.current?.setNextKinematicTranslation(
+      vec.set((mouse.x * viewport.width) / 2, (mouse.y * viewport.height) / 2, 0),
+    )
   })
 
   return (
@@ -246,14 +221,12 @@ function Connector({
   logo,
   accent = false,
   accentColor,
-  centripetalStrength = 0.2,
 }: {
   position?: [number, number, number]
   faceUrl?: string
   logo?: LogoDef
   accent?: boolean
   accentColor?: string
-  centripetalStrength?: number
 }) {
   const api = useRef<RapierRigidBody>(null)
   const vec = useMemo(() => new THREE.Vector3(), [])
@@ -266,7 +239,7 @@ function Connector({
   useFrame(() => {
     if (!api.current) return
     api.current.applyImpulse(
-      vec.copy(api.current.translation() as unknown as THREE.Vector3).negate().multiplyScalar(centripetalStrength),
+      vec.copy(api.current.translation() as unknown as THREE.Vector3).negate().multiplyScalar(0.2),
       true,
     )
   })
@@ -295,20 +268,15 @@ function Connector({
 function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
   const accentColor = ACCENTS[accent]
 
-  // On mobile the user isn't constantly moving a cursor to push cubes outward,
-  // so the centripetal pull needs to be much gentler to prevent the cubes from
-  // collapsing into a pile at origin. Desktop stays at the reference 0.2.
-  const centripetal = isMobile ? 0.06 : 0.2
-
   return (
     <Physics gravity={[0, 0, 0]}>
-      <Pointer isMobile={isMobile} />
+      <Pointer />
 
       {FACE_URLS.map((url, i) => (
-        <Connector key={`f${i}`} faceUrl={url} accent={i >= FACE_URLS.length - 2} accentColor={accentColor} centripetalStrength={centripetal} />
+        <Connector key={`f${i}`} faceUrl={url} accent={i >= FACE_URLS.length - 2} accentColor={accentColor} />
       ))}
       {LOGOS.map((logo, i) => (
-        <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} centripetalStrength={centripetal} />
+        <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} />
       ))}
 
       {/* Postprocessing is expensive on mobile GPUs — skip it there */}
@@ -364,7 +332,7 @@ export function LusionConnectors() {
       dpr={isMobile ? [1, 1.25] : [1, 1.5]}
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       camera={cameraConfig}
-      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none' }}
+      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
     >
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />

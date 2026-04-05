@@ -1,6 +1,24 @@
 import { motion } from "motion/react";
+import { useState, useEffect } from "react";
 
 const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg";
+
+// Collapse ~17 concurrent framer-motion animations to just 2 on mobile
+// (ring rotation + Shannon breathing). Pulsing atmosphere, per-icon
+// counter-rotation, and per-icon bob loops run desktop-only.
+function useIsNarrow() {
+  const [isNarrow, setIsNarrow] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const handler = (e: MediaQueryListEvent) => setIsNarrow(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isNarrow;
+}
 
 // Exact same 8-icon set as the Loader component (ICONS array there) — same
 // order, same background colours, same text-or-SVG rendering pattern. Keeps
@@ -34,6 +52,7 @@ const ICONS: Icon[] = [
 const ORBIT_DURATION = 22; // seconds for one full rotation
 
 export function FounderOrbit() {
+  const isNarrow = useIsNarrow();
   return (
     <div
       style={{
@@ -62,23 +81,41 @@ export function FounderOrbit() {
         }}
       />
 
-      {/* ── Pulsing atmosphere ── */}
-      <motion.div
-        animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "70%",
-          aspectRatio: "1",
-          transform: "translate(-50%, -50%)",
-          borderRadius: "50%",
-          border: "1px solid rgba(164,108,252,0.3)",
-          boxShadow: "0 0 60px rgba(164,108,252,0.25)",
-          pointerEvents: "none",
-        }}
-      />
+      {/* ── Pulsing atmosphere — animated on desktop, static ring on mobile ── */}
+      {isNarrow ? (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "70%",
+            aspectRatio: "1",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "50%",
+            border: "1px solid rgba(164,108,252,0.3)",
+            boxShadow: "0 0 60px rgba(164,108,252,0.25)",
+            pointerEvents: "none",
+            opacity: 0.55,
+          }}
+        />
+      ) : (
+        <motion.div
+          animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "70%",
+            aspectRatio: "1",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "50%",
+            border: "1px solid rgba(164,108,252,0.3)",
+            boxShadow: "0 0 60px rgba(164,108,252,0.25)",
+            pointerEvents: "none",
+          }}
+        />
+      )}
 
       {/* ── Orbit guide rings + spokes — matches the Loader's geometry ── */}
       <svg
@@ -148,23 +185,81 @@ export function FounderOrbit() {
       >
         {ICONS.map((icon, i) => {
           const angle = (i / ICONS.length) * 360;
+          // On mobile: a plain div at the anchor position, no counter-rotation,
+          // no bob loop. The whole ring still rotates so icons will tumble with
+          // the ring, which matches the Loader's behaviour on mobile too.
+          // On desktop: counter-rotate + individual bob for that alive feel.
+          const positionStyle = {
+            position: "absolute" as const,
+            top: "50%",
+            left: "50%",
+            width: 52,
+            height: 52,
+            marginLeft: -26,
+            marginTop: -26,
+            transform: `rotate(${angle}deg) translateY(-176%) rotate(${-angle}deg)`,
+            pointerEvents: "auto" as const,
+          };
+
+          const chipStyle = {
+            width: "100%",
+            height: "100%",
+            borderRadius: 10,
+            background: icon.bg,
+            border: "2px solid rgba(255,255,255,0.25)",
+            boxShadow:
+              "0 8px 22px rgba(0,0,0,0.5), 0 0 28px rgba(164,108,252,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            // Text icons (in, f, ▶, 𝕏, G) use the same treatment as the Loader
+            fontSize: 22,
+            fontWeight: 800,
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            color: "#ffffff",
+            lineHeight: 1,
+          } as const;
+
+          const chipContent = (
+            <>
+              {icon.svg === "tiktok" ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff">
+                  <path d={TIKTOK_PATH} />
+                </svg>
+              ) : icon.svg === "instagram" ? (
+                <svg width="22" height="22" viewBox="0 0 132 132" fill="#fff">
+                  <path d={IG_PATH} />
+                </svg>
+              ) : icon.svg === "react" ? (
+                <svg width="26" height="26" viewBox="-11.5 -10.23174 23 20.46348" fill="none">
+                  <circle cx="0" cy="0" r="2.05" fill="#61dafb" />
+                  <g stroke="#61dafb" strokeWidth="1" fill="none">
+                    <ellipse rx="11" ry="4.2" />
+                    <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                    <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                  </g>
+                </svg>
+              ) : (
+                icon.text
+              )}
+            </>
+          );
+
+          if (isNarrow) {
+            return (
+              <div key={icon.label} aria-label={icon.label} style={positionStyle}>
+                <div style={chipStyle}>{chipContent}</div>
+              </div>
+            );
+          }
+
           return (
             <motion.div
               key={icon.label}
               // Counter-rotate so each icon stays upright while the ring spins
               animate={{ rotate: -360 }}
               transition={{ duration: ORBIT_DURATION, repeat: Infinity, ease: "linear" }}
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                width: 52,
-                height: 52,
-                marginLeft: -26,
-                marginTop: -26,
-                transform: `rotate(${angle}deg) translateY(-176%) rotate(${-angle}deg)`,
-                pointerEvents: "auto",
-              }}
+              style={positionStyle}
             >
               <motion.div
                 animate={{ y: [0, -4, 0] }}
@@ -175,45 +270,9 @@ export function FounderOrbit() {
                   delay: i * 0.25,
                 }}
                 aria-label={icon.label}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: 10,
-                  background: icon.bg,
-                  border: "2px solid rgba(255,255,255,0.25)",
-                  boxShadow:
-                    "0 8px 22px rgba(0,0,0,0.5), 0 0 28px rgba(164,108,252,0.45)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  // Text icons (in, f, ▶, 𝕏, G) use the same treatment as the Loader
-                  fontSize: 22,
-                  fontWeight: 800,
-                  fontFamily: "system-ui, -apple-system, sans-serif",
-                  color: "#ffffff",
-                  lineHeight: 1,
-                }}
+                style={chipStyle}
               >
-                {icon.svg === "tiktok" ? (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff">
-                    <path d={TIKTOK_PATH} />
-                  </svg>
-                ) : icon.svg === "instagram" ? (
-                  <svg width="22" height="22" viewBox="0 0 132 132" fill="#fff">
-                    <path d={IG_PATH} />
-                  </svg>
-                ) : icon.svg === "react" ? (
-                  <svg width="26" height="26" viewBox="-11.5 -10.23174 23 20.46348" fill="none">
-                    <circle cx="0" cy="0" r="2.05" fill="#61dafb" />
-                    <g stroke="#61dafb" strokeWidth="1" fill="none">
-                      <ellipse rx="11" ry="4.2" />
-                      <ellipse rx="11" ry="4.2" transform="rotate(60)" />
-                      <ellipse rx="11" ry="4.2" transform="rotate(120)" />
-                    </g>
-                  </svg>
-                ) : (
-                  icon.text
-                )}
+                {chipContent}
               </motion.div>
             </motion.div>
           );

@@ -103,7 +103,9 @@ export function ChatWidget() {
                 src={VIDEO_FOUNDER}
                 controls
                 autoPlay
+                muted
                 playsInline
+                preload="auto"
                 className="h2h-chat-video"
               />
             </div>
@@ -241,18 +243,26 @@ export function ChatWidget() {
         }
 
         /* ── Overlay ── */
+        /* Mobile gets a solid backdrop; desktop gets the blur. iOS Safari's
+           backdrop-filter triggers a layer-recomposite on every fade-in frame
+           which stutters the modal open. */
         .h2h-chat-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(6, 3, 18, 0.88);
-          backdrop-filter: blur(6px);
-          -webkit-backdrop-filter: blur(6px);
+          background: rgba(6, 3, 18, 0.96);
           z-index: 9999;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: clamp(12px, 3vw, 32px);
           animation: h2hChatFade 0.25s ease-out;
+        }
+        @media (min-width: 769px) {
+          .h2h-chat-overlay {
+            background: rgba(6, 3, 18, 0.88);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+          }
         }
         @keyframes h2hChatFade {
           from { opacity: 0; }

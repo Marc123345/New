@@ -436,19 +436,7 @@ export function EcosystemServices() {
           role="dialog"
           aria-modal="true"
           aria-label="About H2H video"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 10000,
-            background: 'rgba(6, 3, 18, 0.92)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 'clamp(12px, 3vw, 32px)',
-            animation: 'h2hAboutFade 0.3s ease-out',
-          }}
+          className="h2h-about-overlay"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -527,13 +515,36 @@ export function EcosystemServices() {
                 src={ABOUT_H2H_VIDEO}
                 controls
                 autoPlay
+                muted
                 playsInline
+                preload="auto"
                 style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
               />
             </div>
           </div>
 
           <style>{`
+            /* Desktop: soft blur backdrop. Mobile: solid color backdrop —
+               iOS Safari's backdrop-filter: blur causes layer-recomposite jank
+               during the fade-in animation, visibly stuttering the modal open. */
+            .h2h-about-overlay {
+              position: fixed;
+              inset: 0;
+              z-index: 10000;
+              background: rgba(6, 3, 18, 0.96);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: clamp(12px, 3vw, 32px);
+              animation: h2hAboutFade 0.3s ease-out;
+            }
+            @media (min-width: 769px) {
+              .h2h-about-overlay {
+                background: rgba(6, 3, 18, 0.92);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+              }
+            }
             @keyframes h2hAboutFade {
               from { opacity: 0; }
               to   { opacity: 1; }

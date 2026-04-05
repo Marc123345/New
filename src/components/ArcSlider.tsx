@@ -320,25 +320,10 @@ function ServiceOverlay({ service, onClose }: OverlayProps) {
                       className="absolute inset-0"
                       style={{ background: `linear-gradient(to top, rgba(4,4,8,0.95) 0%, transparent 55%, ${service.bgColor}55 100%)` }}
                     />
-                    <div className="absolute bottom-4 left-5 flex items-center gap-3 font-mono tracking-tighter uppercase text-xs" style={{ color: service.color }}>
-                      <span className="h-px w-8 inline-block" style={{ backgroundColor: service.color }} />
-                      {service.category}
-                    </div>
                   </motion.div>
                 )}
 
                 <div>
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.08, duration: 0.4 }}
-                    className="block text-[10px] uppercase tracking-[0.35em] mb-5"
-                    style={{ color: service.color, fontFamily: "var(--font-stack-heading)" }}
-                  >
-                    <span className="inline-block w-4 h-[1px] mr-2 align-middle" style={{ background: service.color }} />
-                    {service.category} &mdash; Service {String(service.id).padStart(2, "0")}
-                  </motion.span>
-
                   <motion.h2
                     id="service-card-title"
                     initial={{ opacity: 0, y: 20 }}
@@ -664,33 +649,7 @@ export function ArcSlider() {
                       transform: i === activeIndex ? "scale(1)" : "scale(0.95)",
                     }}
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <span
-                          className="block font-semibold"
-                          style={{
-                            fontFamily: "var(--font-stack-heading)",
-                            fontSize: "0.6rem",
-                            letterSpacing: "0.3em",
-                            textTransform: "uppercase",
-                            color: "rgba(255,255,255,0.9)",
-                            marginBottom: "4px",
-                          }}
-                        >
-                          SERVICE {String(service.id).padStart(2, "0")}
-                        </span>
-                        <span
-                          className="block font-medium uppercase"
-                          style={{
-                            fontFamily: "var(--font-stack-heading)",
-                            fontSize: "0.6rem",
-                            letterSpacing: "0.15em",
-                            color: "rgba(255,255,255,0.85)",
-                          }}
-                        >
-                          {service.category}
-                        </span>
-                      </div>
+                    <div className="flex justify-end items-start">
                       <div
                         className="w-10 h-10 flex items-center justify-center opacity-25"
                         style={{ color: "#fff" }}
@@ -1206,33 +1165,7 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService,
                     opacity: 0,
                   }}
                 />
-                <div className="flex justify-between items-start pointer-events-none">
-                  <div>
-                    <span
-                      className="block font-semibold"
-                      style={{
-                        fontFamily: "var(--font-stack-heading)",
-                        fontSize: "0.6rem",
-                        letterSpacing: "0.3em",
-                        textTransform: "uppercase",
-                        color: "rgba(255,255,255,0.9)",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      SERVICE {String(service.id).padStart(2, "0")}
-                    </span>
-                    <span
-                      className="block font-medium uppercase"
-                      style={{
-                        fontFamily: "var(--font-stack-heading)",
-                        fontSize: "0.6rem",
-                        letterSpacing: "0.15em",
-                        color: "rgba(255,255,255,0.85)",
-                      }}
-                    >
-                      {service.category}
-                    </span>
-                  </div>
+                <div className="flex justify-end items-start pointer-events-none">
                   <div
                     className="w-10 h-10 flex items-center justify-center opacity-20"
                     style={{ color: "#fff" }}

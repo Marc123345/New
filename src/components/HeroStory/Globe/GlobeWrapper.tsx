@@ -10,12 +10,13 @@ interface GlobeWrapperProps {
   activeCityIndex?: number;
 }
 
-// Testimonial cities — ordered to match CONTACTS in Testimonials.tsx
+// Testimonial cities — ordered to match CONTACTS in Testimonials.tsx.
+// iso is the country code used to highlight the matching polygon on the globe.
 const TESTIMONIAL_CITIES = [
-  { lat: -26.2041, lng: 28.0473,  name: 'Johannesburg' }, // Stallion Integrated (ZA)
-  { lat: -17.8252, lng: 31.0335,  name: 'Harare' },       // Untapped Africa (ZW)
-  { lat: 6.5244,   lng: 3.3792,   name: 'Lagos' },        // YDPay (NG)
-  { lat: -25.8560, lng: 28.1880,  name: 'Centurion' },    // ICE Tech (ZA)
+  { lat: -26.2041, lng: 28.0473,  name: 'Johannesburg', iso: 'ZA' }, // Stallion Integrated
+  { lat: -17.8252, lng: 31.0335,  name: 'Harare',       iso: 'ZW' }, // Untapped Africa
+  { lat: 6.5244,   lng: 3.3792,   name: 'Lagos',        iso: 'NG' }, // YDPay
+  { lat: -25.8560, lng: 28.1880,  name: 'Centurion',    iso: 'ZA' }, // ICE Tech
 ];
 
 const TOP_CITIES = worldPopulationData.slice(0, 18);
@@ -192,6 +193,26 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
           .pointRadius('size')
           .pointsMerge(false)
           .pointsTransitionDuration(600);
+
+        // African country polygons — active testimonial's country lights up
+        // purple, others get a very faint hint so the continent shape reads.
+        globe
+          .polygonCapColor(() => 'rgba(164,108,252,0.05)')
+          .polygonSideColor(() => 'rgba(107,47,250,0.08)')
+          .polygonStrokeColor(() => 'rgba(164,108,252,0.25)')
+          .polygonAltitude(0.004)
+          .polygonsTransitionDuration(700);
+
+        // Fetch the Africa GeoJSON bundled in /public and feed it in
+        fetch('/africa.geo.json')
+          .then((r) => r.json())
+          .then((geo: { features: Array<{ properties: { ISO_A2: string; NAME: string } }> }) => {
+            if (destroyedRef.current || !globeRef.current) return;
+            globeRef.current.polygonsData(geo.features);
+          })
+          .catch(() => {
+            // Fail silently — the heat-spot points still work without polygons
+          });
       } else {
         // City points — configured for non-testimonial mode
         globe
@@ -302,7 +323,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
     if (controls) controls.autoRotate = hideArcs ? false : isVisible;
   }, [isVisible, hideArcs]);
 
-  // Testimonial mode — static globe, purple heat map lights up per country
+  // Testimonial mode — static globe, purple heat map + country polygon per city
   useEffect(() => {
     if (!hideArcs || !globeRef.current) return;
     const globe = globeRef.current;
@@ -341,6 +362,40 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
 
     globe.pointsData(points);
 
+    // Highlight the active testimonial's country polygon in brand purple.
+    // All previously-visited countries get a softer fill so the trail is
+    // visible; unvisited stays faint. The active country lifts slightly and
+    // takes the strongest fill — that's the "heat map bloom on the country
+    // shape" the design calls for.
+    const activeIso = activeCity?.iso;
+    const visitedIsos = new Set(
+      TESTIMONIAL_CITIES.slice(0, activeCityIndex + 1).map((c) => c.iso),
+    );
+    globe.polygonCapColor((feat: { properties: { ISO_A2: string } }) => {
+      const iso = feat.properties.ISO_A2;
+      if (iso === activeIso) return 'rgba(164,108,252,0.62)';
+      if (visitedIsos.has(iso)) return 'rgba(164,108,252,0.22)';
+      return 'rgba(164,108,252,0.05)';
+    });
+    globe.polygonSideColor((feat: { properties: { ISO_A2: string } }) => {
+      const iso = feat.properties.ISO_A2;
+      return iso === activeIso
+        ? 'rgba(107,47,250,0.55)'
+        : 'rgba(107,47,250,0.08)';
+    });
+    globe.polygonStrokeColor((feat: { properties: { ISO_A2: string } }) => {
+      const iso = feat.properties.ISO_A2;
+      return iso === activeIso
+        ? 'rgba(216,180,254,0.9)'
+        : 'rgba(164,108,252,0.2)';
+    });
+    globe.polygonAltitude((feat: { properties: { ISO_A2: string } }) => {
+      const iso = feat.properties.ISO_A2;
+      if (iso === activeIso) return 0.018;
+      if (visitedIsos.has(iso)) return 0.008;
+      return 0.004;
+    });
+
     // Intensify the scene lights
     const scene = globe.scene?.();
     if (scene) {
@@ -352,7 +407,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
     }
 
     // Static camera — DO NOT pan to the active city. Africa stays framed and
-    // the heat spots above light up the country as each testimonial cycles.
+    // the heat spots + country polygon above light up as each testimonial cycles.
   }, [activeCityIndex, hideArcs]);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {

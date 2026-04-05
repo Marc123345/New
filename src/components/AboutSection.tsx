@@ -32,34 +32,6 @@ const blobStyle = (b: Blob): React.CSSProperties => ({
   opacity: b.opacity,
 });
 
-/* ── V1 — Continent Silhouette (step 1, Figma image assets) ── */
-const v1 = {
-  ellipse:  'https://www.figma.com/api/mcp/asset/13b2e926-6146-42fa-bd80-b7a11e77c525',
-  ellipse1: 'https://www.figma.com/api/mcp/asset/26354e42-1bb8-4155-990d-d5b86589eef0',
-  vector:   'https://www.figma.com/api/mcp/asset/d58d7406-6db8-44f4-a9a5-8921e4f0776e',
-  vector1:  'https://www.figma.com/api/mcp/asset/2e318e55-67cd-425b-9c30-c8b1f264ac56',
-  ellipse2: 'https://www.figma.com/api/mcp/asset/25bb5fa1-b37e-44ad-a4a1-ced757964800',
-  ellipse3: 'https://www.figma.com/api/mcp/asset/1d499dce-2ef6-4874-978e-e2203b21ef0b',
-  ellipse4: 'https://www.figma.com/api/mcp/asset/d3b024a8-83fe-4c95-b278-56a2559fe4c0',
-};
-
-/* ── V2 — Nile River Path (step 2, Figma image assets) ── */
-const v2 = {
-  ellipse:    'https://www.figma.com/api/mcp/asset/08546c87-8dfa-4f09-8882-bb360314f1aa',
-  ellipse1:   'https://www.figma.com/api/mcp/asset/a2ecb4cc-51ce-4621-b2aa-7dd8598a1073',
-  ellipse2:   'https://www.figma.com/api/mcp/asset/0e711af9-3ecb-437a-97b3-309135537271',
-  ellipse3:   'https://www.figma.com/api/mcp/asset/022e83e3-f9c0-49e0-bf11-dbc498fe0cdf',
-  nileGlow:   'https://www.figma.com/api/mcp/asset/4e8e906e-19b8-4cd4-a8ba-d31a6bd4300f',
-  nileMid:    'https://www.figma.com/api/mcp/asset/4942f4a3-3afe-4fe1-83ff-82b52c8c3438',
-  nileBright: 'https://www.figma.com/api/mcp/asset/3e80c3f4-dfc9-437d-9b84-d3c769685c94',
-  nileHair:   'https://www.figma.com/api/mcp/asset/d98c6b35-aae0-453f-8a41-c4a3c8cd4f12',
-  delta1:     'https://www.figma.com/api/mcp/asset/68a7a46f-3137-4cc0-b304-4af0110da548',
-  delta2:     'https://www.figma.com/api/mcp/asset/b149e625-d853-4104-843e-c5e3ee5f8924',
-  delta3:     'https://www.figma.com/api/mcp/asset/2969cd62-1ebc-4dd4-9266-819f9863b52f',
-  delta4:     'https://www.figma.com/api/mcp/asset/ff4b56a9-3d35-44b4-b71b-f0cae102656a',
-  source:     'https://www.figma.com/api/mcp/asset/e3482ea6-3389-4eb2-b512-effb2f9eeafd',
-  sourceGlow: 'https://www.figma.com/api/mcp/asset/dc301bf1-8f47-4e10-bb1b-53bbe3221935',
-};
 
 // V3 — Sahara Dune Arc (step 3)
 const V3: Blob[] = [
@@ -202,22 +174,13 @@ export function AboutSection() {
     <div ref={sectionRef} id="about" className="about-section" data-bg="1">
       {/* Fixed backgrounds — crossfade between 5 variants */}
       <div className="about-fixed-wrapper">
-        {/* V1 — Johannesburg skyline */}
+        {/* V1 — Johannesburg skyline (clean: skyline photo only, no overlays) */}
         <div className="about-bg-layer about-bg-layer--1">
-          <div style={ip(-397, -200, 900, 700, 8)}><img src={v1.ellipse} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
-          <div style={ip(700, 330, 800, 600, -5)}><img src={v1.ellipse1} style={{ width: '100%', height: '100%' }} loading="lazy" decoding="async" /></div>
-          <img src={v1.vector} style={ip(239, 24, 518, 738)} loading="lazy" decoding="async" />
-          <img src={v1.vector1} style={ip(189, 0, 627, 852)} loading="lazy" decoding="async" />
           <img src={SKYLINES[0]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 
-        {/* V2 — Nairobi skyline */}
+        {/* V2 — Nairobi skyline (clean: skyline photo only, no overlays) */}
         <div className="about-bg-layer about-bg-layer--2">
-          <img src={v2.ellipse} style={ip(-100, -200, 1000, 600)} loading="lazy" decoding="async" />
-          <img src={v2.ellipse1} style={ip(200, 500, 1000, 600)} loading="lazy" decoding="async" />
-          {[v2.nileGlow, v2.nileMid, v2.nileBright].map((src, i) => (
-            <img key={i} src={src} style={ip(580, -20, 180, 940)} />
-          ))}
           <img src={SKYLINES[1]} alt="" className="about-skyline" loading="lazy" decoding="async" />
         </div>
 

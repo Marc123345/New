@@ -7,7 +7,7 @@ const SERVICES = [
   {
     id: 1,
     title: "Content Writing",
-    fullTitle: "Voice & Ghostwriting",
+    fullTitle: "Content Writing",
     category: "Content",
     description:
       "In a digital landscape saturated with AI-generated content, authenticity matters more than ever. Search engines and social platforms are increasingly sophisticated at detecting generic, automated writing, and often limiting its reach and impact. Our professional copywriters craft content that feels human, nuanced, and strategically aligned with your brand voice. The result is compelling storytelling that builds trust, drives organic engagement across platforms.",
@@ -25,7 +25,7 @@ const SERVICES = [
   {
     id: 2,
     title: "Agentic AI",
-    fullTitle: "AI Humanization",
+    fullTitle: "Agentic AI",
     category: "Automation",
     description:
       "AI agents are transforming how businesses operate by moving beyond simple automation into intelligent, goal-driven execution. We design and deploy AI agents tailored to specific use cases, whether it's automated lead qualification and follow-ups, personalized customer support, content research and generation, sales outreach, internal workflow optimization, or real-time data analysis.",
@@ -43,7 +43,7 @@ const SERVICES = [
   {
     id: 3,
     title: "SEO & AEO",
-    fullTitle: "Authority Discovery",
+    fullTitle: "SEO & AEO",
     category: "Search",
     description:
       "Search has evolved beyond keywords. We help your brand rank across traditional search engines and the new wave of AI answer engines. From technical audits to structured content strategy, we ensure your business is found — and trusted — wherever your audience is looking.",
@@ -97,7 +97,7 @@ const SERVICES = [
   {
     id: 6,
     title: "Social Media Management",
-    fullTitle: "Ecosystem Management",
+    fullTitle: "Social Media Management",
     category: "Social",
     description:
       "Effective social media requires strategy, consistency, and performance-driven execution. We manage your platforms end-to-end, developing content calendars, publishing optimized posts, engaging audiences, and analyzing results. Our approach ensures your brand remains relevant and aligned with clear business objectives.",
@@ -437,6 +437,7 @@ export function ArcSlider() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [overlayService, setOverlayService] = useState<Service | null>(null);
   const dragRef = useRef({ startX: 0, hasMoved: false, isDragging: false });
+  const sliderApiRef = useRef<SliderApi | null>(null);
 
   const navigateTo = useCallback((index: number) => {
     const clamped = Math.max(0, Math.min(SERVICES.length - 1, index));
@@ -515,8 +516,15 @@ export function ArcSlider() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (overlayService) return;
-      if (e.key === "ArrowLeft") navigateTo(activeIndex - 1);
-      if (e.key === "ArrowRight") navigateTo(activeIndex + 1);
+      const api = sliderApiRef.current;
+      if (e.key === "ArrowLeft") {
+        if (api) api.animateNavigate(-1);
+        else navigateTo(activeIndex - 1);
+      }
+      if (e.key === "ArrowRight") {
+        if (api) api.animateNavigate(1);
+        else navigateTo(activeIndex + 1);
+      }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -578,7 +586,10 @@ export function ArcSlider() {
               ref={(el) => (tabRefs.current[i] = el)}
               role="tab"
               aria-selected={i === activeIndex}
-              onClick={() => navigateTo(i)}
+              onClick={() => {
+                if (sliderApiRef.current) sliderApiRef.current.animateNavigateTo(i);
+                else navigateTo(i);
+              }}
               className="flex-shrink-0 transition-all duration-300 font-semibold"
               style={{
                 fontFamily: "var(--font-stack-heading)",
@@ -743,7 +754,10 @@ export function ArcSlider() {
         <div className="relative">
           {/* Left arrow — pinned to left edge */}
           <button
-            onClick={() => navigateTo(activeIndex - 1)}
+            onClick={() => {
+              if (sliderApiRef.current) sliderApiRef.current.animateNavigate(-1);
+              else navigateTo(activeIndex - 1);
+            }}
             disabled={activeIndex === 0}
             aria-label="Previous service"
             className="hidden md:flex"
@@ -777,11 +791,15 @@ export function ArcSlider() {
             navigateTo={navigateTo}
             dragRef={dragRef}
             setOverlayService={setOverlayService}
+            apiRef={sliderApiRef}
           />
 
           {/* Right arrow — pinned to right edge */}
           <button
-            onClick={() => navigateTo(activeIndex + 1)}
+            onClick={() => {
+              if (sliderApiRef.current) sliderApiRef.current.animateNavigate(1);
+              else navigateTo(activeIndex + 1);
+            }}
             disabled={activeIndex === SERVICES.length - 1}
             aria-label="Next service"
             className="hidden md:flex"
@@ -814,7 +832,10 @@ export function ArcSlider() {
           {SERVICES.map((_, i) => (
             <button
               key={i}
-              onClick={() => navigateTo(i)}
+              onClick={() => {
+                if (sliderApiRef.current) sliderApiRef.current.animateNavigateTo(i);
+                else navigateTo(i);
+              }}
               className="transition-all duration-300"
               aria-label={`Go to service ${i + 1}`}
               style={{
@@ -841,16 +862,23 @@ export function ArcSlider() {
   );
 }
 
+type SliderApi = {
+  animateNavigate: (dir: 1 | -1) => void;
+  animateNavigateTo: (targetIndex: number) => void;
+};
+
 interface DesktopArcSliderProps {
   activeIndex: number;
   navigateTo: (index: number) => void;
   dragRef: React.MutableRefObject<{ startX: number; hasMoved: boolean; isDragging: boolean }>;
   setOverlayService: (s: Service | null) => void;
+  apiRef?: React.MutableRefObject<SliderApi | null>;
 }
 
-function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService }: DesktopArcSliderProps) {
+function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService, apiRef }: DesktopArcSliderProps) {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const driftTimerRef = useRef<number | null>(null);
 
   const positionCards = useCallback((index: number, animate: boolean) => {
     const containerWidth = containerRef.current?.offsetWidth ?? 900;
@@ -952,6 +980,79 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [positionCards]);
+
+  // Arrow / keyboard / tab / dot navigation — simulates the "drift then settle"
+  // feel of a swipe release by first pushing all cards ~44px in the direction
+  // of travel with a short 0.18s transition, then calling navigateTo which
+  // triggers the main 0.8s settle transition. Matches the two-phase look of
+  // releasing a finger swipe on the carousel.
+  const animateNavigateTo = useCallback((targetIndex: number) => {
+    const clamped = Math.max(0, Math.min(SERVICES.length - 1, targetIndex));
+    if (clamped === activeIndex) return;
+
+    const dir = clamped > activeIndex ? 1 : -1;
+    const containerWidth = containerRef.current?.offsetWidth ?? 900;
+    const cardWidth = Math.min(380, Math.max(260, containerWidth * 0.55));
+    const spreadStep1 = cardWidth * 0.82;
+    const spreadStep2 = cardWidth * 1.3;
+    const spreadStep3 = cardWidth * 1.75;
+
+    // Forward (dir=1) → cards drift LEFT; back (dir=-1) → cards drift RIGHT.
+    // Scale drift slightly with jump distance so jumping multiple slides feels
+    // a touch more forceful without overdoing it.
+    const jump = Math.min(3, Math.abs(clamped - activeIndex));
+    const drift = (dir === 1 ? -44 : 44) * (1 + (jump - 1) * 0.25);
+
+    SERVICES.forEach((_, i) => {
+      const card = cardsRef.current[i];
+      if (!card) return;
+      const offset = i - activeIndex;
+      const absOffset = Math.abs(offset);
+
+      let baseX: number;
+      if (absOffset === 0) baseX = 0;
+      else if (absOffset === 1) baseX = offset * spreadStep1;
+      else if (absOffset === 2) baseX = offset * spreadStep2;
+      else baseX = offset * spreadStep3;
+
+      const rotateY = absOffset === 0 ? 0 : absOffset === 1 ? (offset < 0 ? 28 : -28) : absOffset === 2 ? (offset < 0 ? 42 : -42) : (offset < 0 ? 52 : -52);
+      const translateZ = absOffset === 0 ? 0 : absOffset === 1 ? -100 : absOffset === 2 ? -200 : -300;
+      const scale = absOffset === 0 ? 1 : absOffset === 1 ? 0.83 : absOffset === 2 ? 0.66 : 0.5;
+
+      // Quick drift — shallow ease-out to feel like a finger flick
+      card.style.transition = "transform 0.18s cubic-bezier(0.22, 0.6, 0.36, 1)";
+      card.style.transform = `translateX(${baseX + drift}px) rotateY(${rotateY}deg) translateZ(${translateZ}px) scale(${scale})`;
+    });
+
+    // Commit the navigation once the drift phase has had a chance to render.
+    if (driftTimerRef.current) window.clearTimeout(driftTimerRef.current);
+    driftTimerRef.current = window.setTimeout(() => {
+      driftTimerRef.current = null;
+      navigateTo(clamped);
+    }, 170);
+  }, [activeIndex, navigateTo]);
+
+  const animateNavigate = useCallback((dir: 1 | -1) => {
+    animateNavigateTo(activeIndex + dir);
+  }, [activeIndex, animateNavigateTo]);
+
+  // Expose both methods to the parent so every navigation entry point
+  // (arrows, keyboard, tab bar, dots) can trigger the swipe-style drift
+  // instead of a raw navigateTo.
+  useEffect(() => {
+    if (!apiRef) return;
+    apiRef.current = { animateNavigate, animateNavigateTo };
+    return () => {
+      apiRef.current = null;
+    };
+  }, [apiRef, animateNavigate, animateNavigateTo]);
+
+  // Clear any pending drift timer on unmount
+  useEffect(() => {
+    return () => {
+      if (driftTimerRef.current) window.clearTimeout(driftTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;

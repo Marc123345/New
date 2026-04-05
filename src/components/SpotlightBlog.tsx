@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowUpRight, Clock, Calendar, User } from "lucide-react";
 import { SpotlightBlogModal } from "./SpotlightBlogModal";
@@ -216,26 +216,15 @@ function FeaturedHeroCard({ post, onClick }: { post: SpotlightBlogPost; onClick:
 
 export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps) {
   const [selectedPost, setSelectedPost] = useState<number | null>(null);
-  const [activeCategory, setActiveCategory] = useState("All");
-
-  const categories = useMemo(
-    () => ["All", ...new Set(posts.map((p) => p.category))],
-    [posts]
-  );
-
-  const filtered =
-    activeCategory === "All"
-      ? posts
-      : posts.filter((p) => p.category === activeCategory);
 
   const openPost = (post: SpotlightBlogPost) => {
     const idx = posts.indexOf(post);
     setSelectedPost(idx >= 0 ? idx : 0);
   };
 
-  const featuredPost = filtered[0];
-  const secondaryPosts = filtered.slice(1, 3);
-  const gridPosts = filtered.slice(3);
+  const featuredPost = posts[0];
+  const secondaryPosts = posts.slice(1, 3);
+  const gridPosts = posts.slice(3);
 
   return (
     <section
@@ -257,58 +246,24 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <div style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            gap: "24px",
-          }}>
-            {!hideHeader && (
-              <div>
-                <h2
-                  style={{
-                    fontSize: "clamp(2.4rem, 5vw, 4rem)",
-                    fontWeight: 900,
-                    fontFamily: "var(--font-stack-heading)",
-                    color: "#1a1a2e",
-                    lineHeight: 1,
-                    letterSpacing: "-0.03em",
-                    margin: 0,
-                  }}
-                >
-                  Latest{" "}
-                  <span style={{ fontStyle: "italic", fontWeight: 400 }}>Insights</span>
-                </h2>
-              </div>
-            )}
-
-            {/* Category filters */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  style={{
-                    padding: "6px 12px",
-                    fontSize: "0.6rem",
-                    letterSpacing: "0.15em",
-                    textTransform: "uppercase",
-                    fontFamily: "var(--font-stack-heading)",
-                    border: "1.5px solid rgba(164,108,252,0.4)",
-                    borderRadius: 8,
-                    background: activeCategory === cat ? "#a46cfc" : "transparent",
-                    color: activeCategory === cat ? "#ffffff" : "#a46cfc",
-                    cursor: "pointer",
-                    transition: "background 0.2s, color 0.2s",
-                    boxShadow: activeCategory === cat ? "var(--shadow-button)" : "none",
-                  }}
-                >
-                  {cat}
-                </button>
-              ))}
+          {!hideHeader && (
+            <div>
+              <h2
+                style={{
+                  fontSize: "clamp(2.4rem, 5vw, 4rem)",
+                  fontWeight: 900,
+                  fontFamily: "var(--font-stack-heading)",
+                  color: "#1a1a2e",
+                  lineHeight: 1,
+                  letterSpacing: "-0.03em",
+                  margin: 0,
+                }}
+              >
+                Latest{" "}
+                <span style={{ fontStyle: "italic", fontWeight: 400 }}>Insights</span>
+              </h2>
             </div>
-          </div>
+          )}
 
           <motion.div
             style={{
@@ -325,37 +280,8 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
         </motion.div>
 
         <AnimatePresence mode="wait">
-          {filtered.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ textAlign: "center", padding: "80px 0" }}
-            >
-              <p style={{ opacity: 0.75, marginBottom: "24px", fontFamily: "var(--font-stack-body)" }}>
-                No articles in this category.
-              </p>
-              <button
-                onClick={() => setActiveCategory("All")}
-                style={{
-                  padding: "12px 24px",
-                  fontSize: "0.7rem",
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  fontFamily: "var(--font-stack-heading)",
-                  background: "var(--color-primary)",
-                  color: "#ffffff",
-                  border: "2px solid #1a1a2e",
-                  cursor: "pointer",
-                  boxShadow: "var(--shadow-button)",
-                }}
-              >
-                Show All
-              </button>
-            </motion.div>
-          ) : (
-            <motion.div key={activeCategory} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          {posts.length > 0 && (
+            <motion.div key="posts" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
 
               {/* Featured hero */}
               {featuredPost && (

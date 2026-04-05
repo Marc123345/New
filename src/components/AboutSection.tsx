@@ -500,7 +500,12 @@ export function AboutSection() {
         @media screen and (max-width: 479px) {
           .about-section { font-size: 4vw; }
           .about-step { min-height: 75vh; }
-          .about-heading { padding-bottom: 7.5em; }
+          .about-heading {
+            padding-bottom: 7.5em;
+            /* Clear the vertical side line so the top-left corner decoration
+               sits flush with the line, not on top of body text below it */
+            padding-left: 0;
+          }
           /* Collapse the 1fr 4fr split into a single column so long titles
              get the full viewport width instead of being squeezed next to
              the index number */
@@ -511,16 +516,27 @@ export function AboutSection() {
           .about-step-index {
             padding-right: 0;
             transform: none;
+            /* Index keeps zero left padding so its horizontal tick line still
+               touches the vertical side line — that's the intended timeline
+               tick design */
           }
           .about-step-container {
             grid-template-columns: 1fr;
             padding-bottom: 6em;
           }
+          /* Pad ONLY the title text and body text away from the vertical side
+             line. ~1.5em gives ~22px clearance on a 375px phone so text never
+             touches the line. The index row above remains flush so its tick
+             still reads as part of the timeline. */
+          .about-step-title {
+            padding-right: 0 !important;
+            padding-left: 1.5em;
+          }
           .about-step-content {
             grid-column: 1;
             padding-right: 0;
+            padding-left: 1.5em;
           }
-          .about-step-title { padding-right: 0 !important; }
           .about-step-h3 {
             font-size: 2em;
             line-height: 1;

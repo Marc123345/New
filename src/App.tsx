@@ -113,11 +113,11 @@ function HeroLusion() {
         }
         .hero-tagline {
           font-family: var(--font-stack-heading);
-          font-size: clamp(1.75rem, 4.8vw, 4.25rem);
+          font-size: 48px;
           font-weight: 800;
-          color: #0a0a0a;
+          color: var(--color-secondary, #a46cfc);
           max-width: min(90%, 1100px);
-          line-height: 1.05;
+          line-height: 1.1;
           letter-spacing: -0.02em;
           margin: 0;
         }
@@ -137,7 +137,7 @@ function HeroLusion() {
             padding-top: calc(60px + 0.75em);
           }
           .hero-tagline {
-            font-size: clamp(1.5rem, 7vw, 2.5rem);
+            font-size: 32px;
             max-width: 100%;
           }
           .hero-canvas {
@@ -152,7 +152,7 @@ function HeroLusion() {
             gap: 0.5em;
           }
           .hero-tagline {
-            font-size: 1.55rem;
+            font-size: 26px;
           }
         }
       `}</style>

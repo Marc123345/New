@@ -76,7 +76,14 @@ function HeroLusion() {
         id="hero"
         className="hero-section"
       >
-        {/* ── 3D canvas — fills the entire hero like Lusion ── */}
+        {/* Tagline */}
+        <div className="hero-top">
+          <h1 className="hero-tagline">
+            from B2B to H2H — Build a Brand People want to talk to.
+          </h1>
+        </div>
+
+        {/* ── 3D canvas — contained with rounded corners ── */}
         <div className="hero-canvas">
           <ErrorBoundary fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
             <Suspense fallback={<div style={{ width: '100%', height: '100%', background: '#141622' }} />}>
@@ -84,70 +91,65 @@ function HeroLusion() {
             </Suspense>
           </ErrorBoundary>
         </div>
-
-        {/* Tagline floats on top of the canvas */}
-        <div className="hero-top">
-          <h1 className="hero-tagline">
-            from B2B to H2H — Build a Brand People want to talk to.
-          </h1>
-        </div>
       </section>
 
       <style>{`
-        /* Hero is a single dark viewport — the 3D canvas fills it edge to edge
-           and the tagline overlays on top. Matches Lusion's full-screen hero
-           pattern instead of the old "cream section with a framed canvas" box. */
         .hero-section {
           width: 100%;
           height: calc(var(--vh, 1vh) * 100 + 30px);
-          background: #141622;
-          position: relative;
+          background: #f0f0f0;
+          display: grid;
+          grid-template-rows: auto 1fr;
+          gap: clamp(1em, 3vw, 3em);
+          padding: clamp(1.25em, 3vw, 3em) clamp(1.25em, 5vw, 5em);
+          padding-top: calc(70px + clamp(1em, 2vw, 2em));
           box-sizing: border-box;
           overflow: hidden;
         }
-        .hero-canvas {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-        }
         .hero-top {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 2;
-          padding: calc(70px + clamp(1em, 2vw, 2em)) clamp(1.25em, 5vw, 5em) 0;
-          pointer-events: none;
+          display: flex;
+          flex-direction: column;
+          gap: clamp(0.6em, 1.5vw, 1em);
         }
         .hero-tagline {
           font-family: var(--font-stack-heading);
           font-size: 48px;
           font-weight: 800;
-          color: #ffffff;
+          color: #5b21b6;
           max-width: min(90%, 1100px);
           line-height: 1.1;
           letter-spacing: -0.02em;
           margin: 0;
-          text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55), 0 0 40px rgba(107, 47, 250, 0.35);
+        }
+        .hero-canvas {
+          border-radius: clamp(12px, 2vw, 20px);
+          overflow: hidden;
+          position: relative;
+          min-height: 0;
         }
 
         /* ── Mobile hero adjustments ── */
         @media (max-width: 768px) {
           .hero-section {
             height: calc(var(--vh, 1vh) * 100);
-          }
-          .hero-top {
-            padding: 104px 1em 0;
+            gap: 0.75em;
+            padding: 1em 1em;
+            padding-top: 104px;
           }
           .hero-tagline {
             font-size: 32px;
             max-width: 100%;
           }
+          .hero-canvas {
+            border-radius: 12px;
+          }
         }
 
         @media (max-width: 480px) {
-          .hero-top {
-            padding: 92px 0.75em 0;
+          .hero-section {
+            padding: 0.75em 0.75em;
+            padding-top: 92px;
+            gap: 0.5em;
           }
           .hero-tagline {
             font-size: 26px;

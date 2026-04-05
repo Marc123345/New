@@ -265,7 +265,7 @@ function Connector({
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
-function Scene({ accent }: { accent: number }) {
+function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
   const accentColor = ACCENTS[accent]
 
   return (
@@ -279,11 +279,14 @@ function Scene({ accent }: { accent: number }) {
         <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} />
       ))}
 
-      <EffectComposer disableNormalPass multisampling={8}>
-        <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
-      </EffectComposer>
+      {/* Postprocessing is expensive on mobile GPUs — skip it there */}
+      {!isMobile && (
+        <EffectComposer disableNormalPass multisampling={8}>
+          <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
+        </EffectComposer>
+      )}
 
-      <Environment resolution={256}>
+      <Environment resolution={isMobile ? 128 : 256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
           <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
@@ -298,60 +301,38 @@ function Scene({ accent }: { accent: number }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export function LusionConnectors() {
-  const [isMobile] = useState(() =>
-    typeof window !== 'undefined' && (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent))
+  // Narrow-viewport flag is only used to tune the scene (camera FOV, DPR,
+  // postprocessing) — the 3D canvas itself renders on every breakpoint.
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 768,
   )
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(max-width: 767px)')
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const [accent, cycleAccent] = useReducer(
     (s: number) => (s + 1) % ACCENTS.length,
     0,
   )
 
-  // Mobile: show static fallback instead of loading 2 MB R3F/physics
-  if (isMobile) {
-    return (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(160deg, #141622 0%, #1e1535 50%, #141622 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'radial-gradient(circle at 50% 40%, rgba(164,108,252,0.15) 0%, transparent 60%)',
-        }} />
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center',
-          padding: '20px', maxWidth: 280, position: 'relative', zIndex: 1,
-        }}>
-          {FACE_URLS.map((url, i) => (
-            <div key={i} style={{
-              width: 56, height: 56, borderRadius: 10, overflow: 'hidden',
-              border: '2px solid rgba(164,108,252,0.4)',
-              boxShadow: '0 4px 20px rgba(164,108,252,0.2)',
-            }}>
-              <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
+  // Mobile: wider FOV + camera pulled back so all 14 cubes stay framed
+  // inside the narrow rounded container without clipping on the sides.
+  const cameraConfig = isMobile
+    ? { position: [0, 0, 22] as [number, number, number], fov: 30, near: 1, far: 30 }
+    : { position: [0, 0, 15] as [number, number, number], fov: 17.5, near: 1, far: 20 }
 
   return (
     <Canvas
       onClick={cycleAccent}
-      shadows
-      dpr={[1, 1.5]}
-      gl={{ antialias: false }}
-      camera={{ position: [0, 0, 15], fov: 17.5, near: 1, far: 20 }}
-      style={{ width: '100%', height: '100%', cursor: 'grab' }}
+      shadows={!isMobile}
+      dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+      gl={{ antialias: false, powerPreference: 'high-performance' }}
+      camera={cameraConfig}
+      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none' }}
     >
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />
@@ -360,10 +341,10 @@ export function LusionConnectors() {
         angle={0.15}
         penumbra={1}
         intensity={1}
-        castShadow
+        castShadow={!isMobile}
       />
       <Suspense fallback={null}>
-        <Scene accent={accent} />
+        <Scene accent={accent} isMobile={isMobile} />
       </Suspense>
     </Canvas>
   )

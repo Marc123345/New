@@ -53,8 +53,8 @@ const CONTACTS = [
   },
 ];
 
-// Desktop card variants — flip-over effect with rotateY
-const cardVariantsDesktop = {
+// Card variants — flip-over effect with rotateY on every breakpoint
+const cardVariants = {
   enter: (dir: number) => ({
     opacity: 0,
     rotateY: dir > 0 ? 90 : -90,
@@ -71,17 +71,6 @@ const cardVariantsDesktop = {
     rotateY: dir > 0 ? -90 : 90,
     scale: 0.9,
     transition: { duration: 0.35, ease: [0.55, 0, 1, 0.45] },
-  }),
-};
-
-// Mobile card variants — horizontal slide only (no 3D transforms — cheaper on mobile GPU)
-const cardVariantsMobile = {
-  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 50 : -50 }),
-  center: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
-  exit: (dir: number) => ({
-    opacity: 0,
-    x: dir > 0 ? -50 : 50,
-    transition: { duration: 0.22, ease: [0.55, 0, 1, 0.45] },
   }),
 };
 
@@ -244,13 +233,13 @@ export function Testimonials() {
             >
               <div
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"
-                style={{ perspective: isMobile.current ? undefined : "1000px" }}
+                style={{ perspective: "1000px" }}
               >
                 <AnimatePresence custom={directionRef.current} mode="popLayout">
                   <motion.div
                     key={contact.id}
                     custom={directionRef.current}
-                    variants={isMobile.current ? cardVariantsMobile : cardVariantsDesktop}
+                    variants={cardVariants}
                     initial="enter"
                     animate="center"
                     exit="exit"

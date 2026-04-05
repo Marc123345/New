@@ -929,16 +929,29 @@ function DesktopArcSlider({ activeIndex, navigateTo, dragRef, setOverlayService 
     });
   }, []);
 
+  // Keep the latest activeIndex in a ref so the resize handler below can read
+  // it without having to re-subscribe (and without clobbering the animated
+  // transition that the next effect sets).
+  const activeIndexRef = useRef(activeIndex);
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
+  // Animated positioning — runs on every index change, sets the 0.8s transition
   useEffect(() => {
     positionCards(activeIndex, true);
   }, [activeIndex, positionCards]);
 
+  // Mount-only setup: place cards immediately (no animation) and wire up resize.
+  // Critically, this effect has NO activeIndex dependency, so it does not
+  // re-run on navigation and cannot wipe the transition set by the effect
+  // above. The resize handler reads activeIndexRef to stay current.
   useEffect(() => {
-    positionCards(activeIndex, false);
-    const handleResize = () => positionCards(activeIndex, false);
+    positionCards(activeIndexRef.current, false);
+    const handleResize = () => positionCards(activeIndexRef.current, false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [positionCards, activeIndex]);
+  }, [positionCards]);
 
   useEffect(() => {
     const container = containerRef.current;

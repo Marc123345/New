@@ -234,7 +234,9 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
 
       // Focus on Africa in testimonial mode, default view otherwise
       if (hideArcs) {
-        globe.pointOfView({ lat: 2, lng: 22, altitude: mobile ? 2.4 : 1.9 });
+        // Centred on sub-Saharan Africa so all 4 testimonial countries
+        // (ZA, ZW, NG, KE region) fit comfortably in frame without panning
+        globe.pointOfView({ lat: -5, lng: 25, altitude: mobile ? 2.1 : 1.75 });
       } else {
         globe.pointOfView({ lat: 5, lng: 20, altitude: mobile ? 2.8 : 2.2 });
       }
@@ -349,11 +351,8 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
       });
     }
 
-    // Pan to the active city (no rotation, just reposition)
-    const city = TESTIMONIAL_CITIES[activeCityIndex];
-    if (city) {
-      globe.pointOfView({ lat: city.lat, lng: city.lng, altitude: globe.pointOfView().altitude }, 1000);
-    }
+    // Static camera — DO NOT pan to the active city. Africa stays framed and
+    // the heat spots above light up the country as each testimonial cycles.
   }, [activeCityIndex, hideArcs]);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {

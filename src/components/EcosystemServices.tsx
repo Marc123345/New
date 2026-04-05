@@ -220,6 +220,17 @@ export function EcosystemServices() {
           >
             Built for real connection. Designed for measurable growth.
           </p>
+
+          <p
+            className="text-xs sm:text-sm md:text-base max-w-3xl mx-auto mt-6"
+            style={{ color: 'rgba(209,213,219,0.72)', lineHeight: 1.7, fontFamily: 'var(--font-stack-body)', fontWeight: 400 }}
+          >
+            Most companies treat their website like a box to tick. We don't.
+            At H2H, we build digital homes — modern, high-impact websites with sharp design,
+            smart movement, and a polished user experience. Then we turn them into content hubs,
+            filled with thought leadership blogs, white papers, infographics, videos, and interviews
+            that bring your brand to life and give people a reason to stay.
+          </p>
         </motion.div>
       </div>
 
@@ -290,23 +301,77 @@ export function EcosystemServices() {
                 {/* Screen */}
                 <div style={{
                   flex: 1, width: '100%', borderRadius: 8, overflow: 'hidden',
-                  background: '#050310',
+                  background: 'linear-gradient(165deg, #0a0618 0%, #14092a 50%, #0a0618 100%)',
                   border: '1px solid rgba(164,108,252,0.25)',
                   boxShadow: '0 0 24px rgba(164,108,252,0.2) inset',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  gap: 10, padding: 16,
+                  gap: 10, padding: '12px 10px',
+                  position: 'relative',
                 }}>
+                  {/* Animated glow orb behind the text */}
+                  <motion.div
+                    animate={{ opacity: [0.55, 1, 0.55], scale: [0.9, 1.1, 0.9] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{
+                      position: 'absolute', top: '18%', left: '50%',
+                      width: 44, height: 44, borderRadius: '50%',
+                      marginLeft: -22,
+                      background: 'radial-gradient(circle, rgba(164,108,252,0.65) 0%, rgba(164,108,252,0.1) 55%, transparent 75%)',
+                      filter: 'blur(6px)',
+                    }}
+                  />
+
+                  {/* Icon */}
                   <div style={{
-                    width: 36, height: 36, borderRadius: '50%',
+                    position: 'relative',
+                    width: 30, height: 30, borderRadius: '50%',
                     background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 0 20px rgba(164,108,252,0.4)',
+                    boxShadow: '0 0 16px rgba(164,108,252,0.5)',
+                    zIndex: 1,
                   }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
                       <line x1="2" y1="12" x2="22" y2="12" />
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                     </svg>
+                  </div>
+
+                  {/* Title */}
+                  <div style={{
+                    position: 'relative',
+                    textAlign: 'center',
+                    zIndex: 1,
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: 8,
+                    fontWeight: 900,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: '#ffffff',
+                    lineHeight: 1.2,
+                    textShadow: '0 0 10px rgba(164,108,252,0.5)',
+                    marginTop: 2,
+                  }}>
+                    Website /<br />Digital Content Hub
+                  </div>
+
+                  {/* Click to explore pill */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    fontFamily: 'var(--font-stack-heading)',
+                    fontSize: 6,
+                    fontWeight: 700,
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-secondary)',
+                    padding: '3px 8px',
+                    border: '1px solid rgba(164,108,252,0.5)',
+                    borderRadius: 999,
+                    background: 'rgba(164,108,252,0.08)',
+                    marginTop: 4,
+                  }}>
+                    Click to explore
                   </div>
                 </div>
               </div>

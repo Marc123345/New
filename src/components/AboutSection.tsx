@@ -10,8 +10,8 @@ const HEADING_COLOR = '#c9b3ff';
 const STEPS = [
   { num: '01', title: 'From Brand Voice\nto Human Connection', body: 'At H2H, we believe powerful brands are built on connection. It is not enough to be polished. You also need to be relevant, distinctive, and meaningful to the people you want to reach. Your brand needs a personality!', titlePadRight: '30%' },
   { num: '02', title: 'We Embed Ourselves\nin Your World', body: 'Working with H2H means gaining a partner that plugs into your team, understands your priorities, and helps drive the work forward. We adapt quickly, align closely, and support your growth with focus and purpose.', titlePadRight: '20%' },
-  { num: '03', title: 'Strong Communication\nDrives ROI', body: 'H2H Social works alongside your internal team as an extra engine behind the brand, helping you build stronger relationships, generate better leads, and tell your company\'s story with more clarity and impact. Great communication makes you visible. It makes you credible. And it makes you worth choosing.', titlePadRight: '25%' },
-  { num: '04', title: 'Building Brand Ecosystems\nThat Actually Work', body: 'Managing social media is easy. We do more than that! We build the full ecosystem around it, from content strategy and community management to paid amplification, creative production, and performance analytics. Every part works together. Every move has a purpose. And every touchpoint feels human.', titlePadRight: '25%' },
+  { num: '03', title: 'Building Brand Ecosystems\nThat Actually Work', body: 'Managing social media is easy. We do more than that! We build the full ecosystem around it, from content strategy and community management to paid amplification, creative production, and performance analytics. Every part works together. Every move has a purpose. And every touchpoint feels human.', titlePadRight: '25%' },
+  { num: '04', title: 'Strong Communication\nDrives ROI', body: 'H2H Social works alongside your internal team as an extra engine behind the brand, helping you build stronger relationships, generate better leads, and tell your company\'s story with more clarity and impact. Great communication makes you visible. It makes you credible. And it makes you worth choosing.', titlePadRight: '25%' },
 ];
 
 /* ── Blob background data (Figma African geography exports) ── */
@@ -352,10 +352,22 @@ export function AboutSection() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          opacity: 0.08;
-          mix-blend-mode: luminosity;
+          opacity: 0.32;
+          mix-blend-mode: screen;
+          filter: saturate(0.6) hue-rotate(260deg) brightness(0.9);
           pointer-events: none;
           user-select: none;
+        }
+        /* Gradient overlay to tint skylines purple and match brand */
+        .about-bg-layer::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg,
+            rgba(14, 11, 31, 0.55) 0%,
+            rgba(41, 30, 86, 0.35) 50%,
+            rgba(14, 11, 31, 0.75) 100%);
+          pointer-events: none;
         }
 
         /* ── Structure ── */

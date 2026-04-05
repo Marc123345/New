@@ -98,10 +98,54 @@ const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 const ABOUT_H2H_VIDEO =
   'https://ik.imagekit.io/qcvroy8xpd/H2H%20ANIMATON%20VIDEO%20FINAL.mp4';
 
+// Tell TS about the iOS-only webkitEnterFullscreen + the element-level
+// webkitRequestFullscreen used by older Safari.
+interface WebkitVideoElement extends HTMLVideoElement {
+  webkitEnterFullscreen?: () => void;
+  webkitRequestFullscreen?: () => Promise<void> | void;
+}
+
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [aboutVideoOpen, setAboutVideoOpen] = useState(false);
   const isMobile = useIsMobile();
+
+  // Hidden <video> element that lives in the DOM from first paint. On mobile,
+  // the iPad click handler calls play() + webkitEnterFullscreen() on this
+  // element synchronously, preserving the user-gesture chain iOS Safari
+  // requires to enter its native fullscreen player. On desktop we fall back
+  // to the in-page modal.
+  const fullscreenVideoRef = useRef<WebkitVideoElement>(null);
+  const handleIpadClick = () => {
+    if (isMobile) {
+      const v = fullscreenVideoRef.current;
+      if (!v) return;
+      try {
+        v.muted = false; // user tapped, sound is allowed now
+        const playPromise = v.play();
+        // Safari iPhone: webkitEnterFullscreen (takes over the whole screen).
+        // Chrome Android + desktop: standard requestFullscreen on the element.
+        if (typeof v.webkitEnterFullscreen === 'function') {
+          v.webkitEnterFullscreen();
+        } else if (typeof v.requestFullscreen === 'function') {
+          // Some Androids resolve play() before allowing fullscreen — wait
+          if (playPromise && typeof playPromise.then === 'function') {
+            playPromise.then(() => v.requestFullscreen?.()).catch(() => {});
+          } else {
+            v.requestFullscreen();
+          }
+        } else if (typeof v.webkitRequestFullscreen === 'function') {
+          v.webkitRequestFullscreen();
+        }
+      } catch {
+        // If anything throws (e.g. not in a user gesture), fall back to modal
+        setAboutVideoOpen(true);
+      }
+      return;
+    }
+    // Desktop: keep the existing in-page modal
+    setAboutVideoOpen(true);
+  };
 
   // Body scroll lock + Esc close for the About H2H video modal
   useEffect(() => {
@@ -182,6 +226,26 @@ export function EcosystemServices() {
         paddingBottom: 'clamp(60px, 8vh, 100px)',
       }}
     >
+      {/* Hidden About H2H video — present from first paint so the iPad click
+          handler on mobile can call play() + webkitEnterFullscreen() inside
+          the original user-gesture, which iOS Safari requires to trigger its
+          native fullscreen player. preload="none" keeps it from downloading
+          until playback is actually requested. */}
+      <video
+        ref={fullscreenVideoRef}
+        src={ABOUT_H2H_VIDEO}
+        playsInline
+        preload="none"
+        style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          opacity: 0,
+          pointerEvents: 'none',
+          left: -9999,
+        }}
+      />
+
       {/* Background Video */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {!isMobile && (
@@ -305,7 +369,7 @@ export function EcosystemServices() {
               <button
                 type="button"
                 aria-label="Play About H2H video"
-                onClick={() => setAboutVideoOpen(true)}
+                onClick={handleIpadClick}
                 style={{
                   width: 200,
                   height: 270,

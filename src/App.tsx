@@ -134,7 +134,7 @@ function HeroLusion() {
             height: calc(var(--vh, 1vh) * 100);
             gap: 0.75em;
             padding: 1em 1em;
-            padding-top: calc(60px + 0.75em);
+            padding-top: 104px;
           }
           .hero-tagline {
             font-size: 32px;
@@ -148,7 +148,7 @@ function HeroLusion() {
         @media (max-width: 480px) {
           .hero-section {
             padding: 0.75em 0.75em;
-            padding-top: calc(56px + 0.5em);
+            padding-top: 92px;
             gap: 0.5em;
           }
           .hero-tagline {

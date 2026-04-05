@@ -332,7 +332,7 @@ export function LusionConnectors() {
       dpr={isMobile ? [1, 1.25] : [1, 1.5]}
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       camera={cameraConfig}
-      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none' }}
+      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
     >
       <color attach="background" args={['#141622']} />
       <ambientLight intensity={0.4} />

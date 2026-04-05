@@ -319,11 +319,11 @@ export function LusionConnectors() {
     0,
   )
 
-  // Mobile: wider FOV + camera pulled back so all 14 cubes stay framed
-  // inside the narrow rounded container without clipping on the sides.
-  const cameraConfig = isMobile
-    ? { position: [0, 0, 22] as [number, number, number], fov: 30, near: 1, far: 30 }
-    : { position: [0, 0, 15] as [number, number, number], fov: 17.5, near: 1, far: 20 }
+  // Same camera on every breakpoint — the user wants mobile cubes to feel as
+  // close as desktop. R3F automatically adapts frustum width to the canvas
+  // aspect, so the narrower mobile canvas just shows a tighter horizontal
+  // slice of the same scene at the same apparent cube size.
+  const cameraConfig = { position: [0, 0, 15] as [number, number, number], fov: 17.5, near: 1, far: 20 }
 
   return (
     <Canvas

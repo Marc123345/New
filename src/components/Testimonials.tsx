@@ -169,10 +169,10 @@ export function Testimonials() {
 
             {/* LEFT: Globe Panel — desktop only */}
             <div
-              className="hidden lg:flex w-[400px] flex-col items-center justify-between py-12 px-8 text-white relative shrink-0 bg-[#1A1040]"
+              className="hidden lg:flex w-[400px] flex-col items-center justify-start gap-4 py-6 px-8 text-white relative shrink-0 bg-[#1A1040]"
               style={{ border: "4px solid var(--color-secondary)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)" }}
             >
-              <div className="text-center z-10 mt-4">
+              <div className="text-center z-10 mt-1">
                 <p className="text-lg leading-tight" style={{ fontFamily: "var(--font-stack-heading)" }}>
                   <span style={{ color: "var(--color-secondary)" }}>Trusted</span>
                   <br />Across Africa

@@ -216,11 +216,6 @@ export function Testimonials() {
                 </div>
               </div>
 
-              <div className="z-10 relative text-center mb-4">
-                <p className="text-3xl leading-[0.8] tracking-wide -rotate-2" style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic", color: "var(--color-secondary)" }}>
-                  H2H's Global<br />Community
-                </p>
-              </div>
             </div>
 
             {/* RIGHT: Single active card via AnimatePresence */}

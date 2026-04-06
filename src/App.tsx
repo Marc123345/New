@@ -179,11 +179,12 @@ function HeroLusion() {
         .hero-top {
           display: flex;
           flex-direction: column;
-          gap: clamp(0.6em, 1.5vw, 1em);
+          gap: clamp(0.5em, 1vw, 0.75em);
+          overflow: hidden;
         }
         .hero-tagline {
           font-family: var(--font-stack-heading);
-          font-size: 48px;
+          font-size: clamp(26px, 4vw, 48px);
           font-weight: 800;
           color: #5b21b6;
           max-width: min(90%, 1100px);
@@ -207,7 +208,6 @@ function HeroLusion() {
             padding-top: 104px;
           }
           .hero-tagline {
-            font-size: 32px;
             max-width: 100%;
           }
           .hero-canvas {
@@ -220,9 +220,6 @@ function HeroLusion() {
             padding: 0.75em 0.75em;
             padding-top: 92px;
             gap: 0.5em;
-          }
-          .hero-tagline {
-            font-size: 26px;
           }
           .hero-story-btn {
             font-size: 12px;

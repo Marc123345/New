@@ -253,28 +253,32 @@ export function FounderOrbit() {
             );
           }
 
+          // Desktop: positioning lives on a PLAIN div so the CSS transform
+          // (rotate + translateY + counter-rotate) isn't overwritten by
+          // framer-motion. Counter-rotation and bob animate on nested
+          // motion.divs that only control their own transform axis.
           return (
-            <motion.div
-              key={icon.label}
-              // Counter-rotate so each icon stays upright while the ring spins
-              animate={{ rotate: -360 }}
-              transition={{ duration: ORBIT_DURATION, repeat: Infinity, ease: "linear" }}
-              style={positionStyle}
-            >
+            <div key={icon.label} style={positionStyle}>
               <motion.div
-                animate={{ y: [0, -4, 0] }}
-                transition={{
-                  duration: 2 + (i % 3) * 0.4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.25,
-                }}
-                aria-label={icon.label}
-                style={chipStyle}
+                // Counter-rotate so each icon stays upright while the ring spins
+                animate={{ rotate: -360 }}
+                transition={{ duration: ORBIT_DURATION, repeat: Infinity, ease: "linear" }}
               >
-                {chipContent}
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{
+                    duration: 2 + (i % 3) * 0.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: i * 0.25,
+                  }}
+                  aria-label={icon.label}
+                  style={chipStyle}
+                >
+                  {chipContent}
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </div>
           );
         })}
       </motion.div>

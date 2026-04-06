@@ -169,17 +169,17 @@ export function Testimonials() {
 
             {/* LEFT: Globe Panel — desktop only */}
             <div
-              className="hidden lg:flex w-[400px] flex-col items-center justify-start gap-4 py-6 px-8 text-white relative shrink-0 bg-[#1A1040]"
+              className="hidden lg:flex w-[340px] flex-col items-center justify-center gap-3 py-4 px-6 text-white relative shrink-0 bg-[#1A1040]"
               style={{ border: "4px solid var(--color-secondary)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)" }}
             >
-              <div className="text-center z-10 mt-1">
-                <p className="text-lg leading-tight" style={{ fontFamily: "var(--font-stack-heading)" }}>
+              <div className="text-center z-10">
+                <p className="text-base leading-tight" style={{ fontFamily: "var(--font-stack-heading)" }}>
                   <span style={{ color: "var(--color-secondary)" }}>Trusted</span>
                   <br />Across Africa
                 </p>
               </div>
 
-              <div className="relative w-[340px] h-[340px] flex-shrink-0">
+              <div className="relative w-[260px] h-[260px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>
@@ -221,7 +221,7 @@ export function Testimonials() {
             {/* RIGHT: Single active card via AnimatePresence */}
             <div
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
-              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(360px, 60vh, 600px)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(320px, 50vh, 480px)" }}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >

@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 
-const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg";
+const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg?tr=f-auto,q-80";
 
 // Collapse ~17 concurrent framer-motion animations to just 2 on mobile
 // (ring rotation + Shannon breathing). Pulsing atmosphere, per-icon

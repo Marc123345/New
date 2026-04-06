@@ -26,6 +26,16 @@
   --shadow-button-hover: 6px 6px 0 var(--color-secondary);
 }
 
+/* Force font-display: swap on the externally loaded Aeonik font. The CSS
+   from fonts.cdnfonts.com uses font-display: block by default, which causes
+   invisible text (FOIT) until the font loads. Swap shows a fallback
+   immediately and swaps once Aeonik arrives — perceived-faster first paint. */
+@font-face {
+  font-family: "Aeonik";
+  font-display: swap;
+  src: local("Aeonik");
+}
+
 /* ─── Base ───────────────────────────────────────────────────────────────── */
 *,
 *::before,

@@ -1,7 +1,7 @@
 import React from "react";
 
-const LOGO_WHITE = "https://ik.imagekit.io/qcvroy8xpd/h2h%20logo%20WHITE%20.png";
-const LOGO_BLACK = "https://ik.imagekit.io/qcvroy8xpd/h2h%20logo%20black%20text.png";
+const LOGO_WHITE = "https://ik.imagekit.io/qcvroy8xpd/h2h%20logo%20WHITE%20.png?tr=f-auto,q-80";
+const LOGO_BLACK = "https://ik.imagekit.io/qcvroy8xpd/h2h%20logo%20black%20text.png?tr=f-auto,q-80";
 
 interface H2HLogoProps {
   height?: number;

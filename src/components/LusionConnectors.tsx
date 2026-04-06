@@ -28,11 +28,11 @@ const ACCENTS = ['#a46cfc', '#7c3aed', '#c084fc', '#9333ea'] as const
 
 // Face images served from /public — same origin, zero CORS issues.
 const FACE_URLS = [
-  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%206.png?updatedAt=1769949025784',
-  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%205.png?updatedAt=1769949025733',
-  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%202.png?updatedAt=1769949025746',
-  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%203.png?updatedAt=1769949025608',
-  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%204.png?updatedAt=1769949025655',
+  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%206.png?updatedAt=1769949025784&tr=f-auto,q-80',
+  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%205.png?updatedAt=1769949025733&tr=f-auto,q-80',
+  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%202.png?updatedAt=1769949025746&tr=f-auto,q-80',
+  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%203.png?updatedAt=1769949025608&tr=f-auto,q-80',
+  'https://ik.imagekit.io/qcvroy8xpd/Ellipse%204.png?updatedAt=1769949025655&tr=f-auto,q-80',
 ]
 
 interface LogoDef { text: string; bg: string; fg: string; svgPath?: string; svgVB?: number }

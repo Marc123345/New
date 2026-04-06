@@ -143,11 +143,10 @@ export function Testimonials() {
           50%      { box-shadow: 0 0 18px 4px rgba(164,108,252,0.4); }
         }
         .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; }
-
       `}</style>
 
       <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#13082A]">
-        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0">
+        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0" style={{ contain: 'layout style paint' }}>
 
           <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
             <div
@@ -183,7 +182,7 @@ export function Testimonials() {
               <div className="relative w-[340px] h-[340px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
-                  <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]">
+                  <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>
                     <circle cx="190" cy="190" r="189" stroke="white" strokeWidth="1" strokeDasharray="2 10" opacity="0.2" />
                   </svg>
                   <svg viewBox="0 0 380 380" className="absolute inset-0 w-full h-full -rotate-90">
@@ -323,7 +322,7 @@ export function Testimonials() {
                   </div>
                   <div className="flex gap-1.5 shrink-0">
                     {CONTACTS.map((_, i) => (
-                      <div key={i} className="transition-all duration-300" style={{ width: i === activeIndex ? 20 : 6, height: 4, borderRadius: 2, background: i === activeIndex ? "var(--color-secondary)" : "rgba(255,255,255,0.2)" }} />
+                      <div key={i} style={{ width: i === activeIndex ? 20 : 6, height: 4, borderRadius: 2, background: i === activeIndex ? "var(--color-secondary)" : "rgba(255,255,255,0.2)", transition: "width 0.3s ease, background 0.3s ease" }} />
                     ))}
                   </div>
                 </div>
@@ -333,8 +332,8 @@ export function Testimonials() {
                   {CONTACTS.map((c, i) => (
                     <div
                       key={c.id}
-                      className="flex items-center shrink-0 gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200"
-                      style={{ border: i === activeIndex ? "1px solid var(--color-secondary)" : "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent" }}
+                      className="flex items-center shrink-0 gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5"
+                      style={{ border: i === activeIndex ? "1px solid var(--color-secondary)" : "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", background: i === activeIndex ? "rgba(164,108,252,0.12)" : "transparent", transition: "border-color 0.2s ease, background 0.2s ease" }}
                     >
                       <img
                         src={`https://flagcdn.com/20x15/${c.countryCode.toLowerCase()}.png`}

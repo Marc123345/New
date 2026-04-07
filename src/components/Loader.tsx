@@ -402,7 +402,7 @@ export function Loader({ onComplete }: LoaderProps) {
           color: 'rgba(232,226,255,0.25)',
           whiteSpace: 'nowrap',
         }}>
-          {isNarrow ? 'Build a Brand People Talk About' : 'Build a Brand People Want to Talk To'}
+          Build a Brand People Want to Talk To
         </span>
         <div style={{ width: isNarrow ? 12 : 20, height: 1, background: 'rgba(164,108,252,0.35)', flexShrink: 0 }} />
       </div>

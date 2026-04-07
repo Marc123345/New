@@ -3,7 +3,7 @@ import { motion, useInView } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { LaptopShowcase } from './LaptopShowcase';
 import { PILLARS } from '../constants/ecosystem';
-import { useIsMobile } from '../hooks/useIsMobile';
+
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
 
@@ -99,8 +99,6 @@ const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [showcaseOpen, setShowcaseOpen] = useState(false);
-  const isMobile = useIsMobile();
-
   const handleIpadClick = useCallback(() => setShowcaseOpen(true), []);
   const handleShowcaseClose = useCallback(() => setShowcaseOpen(false), []);
 
@@ -172,7 +170,7 @@ export function EcosystemServices() {
       <div className="absolute inset-0 pointer-events-none z-0">
         <video
           autoPlay muted loop playsInline
-          preload={isMobile ? "none" : "auto"}
+          preload="auto"
           className="w-full h-full object-cover opacity-30"
           style={{ filter: 'brightness(0.6) contrast(1.1)' }}
         >

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
-import { isMobileDevice } from "../hooks/useIsMobile";
+
 
 const GlobeWrapper = lazy(() =>
   import("./HeroStory/Globe/GlobeWrapper").then((m) => ({ default: m.GlobeWrapper }))
@@ -81,7 +81,6 @@ export function Testimonials() {
   const [globeLoaded, setGlobeLoaded] = useState(false);
   const activeIndexRef = useRef(0);
   const directionRef = useRef(1);
-  const isMobile = useRef(isMobileDevice());
   const touchStartX = useRef<number | null>(null);
 
   const { scrollYProgress } = useScroll({

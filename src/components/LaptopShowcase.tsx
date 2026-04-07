@@ -528,13 +528,22 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
             /* ── Mobile adjustments ── */
             @media (max-width: 640px) {
               .laptop-screen {
-                width: 92vw;
-                border-width: 5px;
-                border-bottom-width: 3px;
+                width: 88vw;
+                max-height: 50vh;
+                aspect-ratio: 3 / 2;
+                border-width: 4px;
+                border-bottom-width: 2px;
               }
               .laptop-base {
-                height: 32px;
-                padding: 4px 10px;
+                height: 28px;
+                padding: 3px 8px;
+              }
+              .laptop-showcase-label {
+                top: 8px;
+              }
+              .laptop-showcase-label__tag {
+                font-size: 0.5rem;
+                padding: 4px 12px;
               }
               .laptop-camera {
                 width: 40px;

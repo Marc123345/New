@@ -241,7 +241,7 @@ export function Testimonials() {
                     style={{
                       width: "min(92%, 560px)",
                       maxHeight: "calc(100% - 1.5rem)",
-                      padding: "clamp(1.25rem, 4vw, 2.5rem)",
+                      padding: "clamp(1rem, 3.5vw, 2.5rem)",
                       border: "1px solid rgba(255,255,255,0.15)",
                       borderRadius: "10px",
                       boxShadow: "0 8px 32px rgba(0,0,0,0.3)",

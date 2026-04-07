@@ -144,7 +144,7 @@ export function Testimonials() {
         .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; }
       `}</style>
 
-      <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#13082A] mb-16 sm:mb-24">
+      <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#13082A]">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0" style={{ contain: 'layout style paint' }}>
 
           <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
@@ -354,6 +354,8 @@ export function Testimonials() {
           </div>
         </div>
       </div>
+      {/* Spacer between testimonials and next section */}
+      <div className="h-20 sm:h-28 lg:h-36 bg-[#13082A]" />
     </>
   );
 }

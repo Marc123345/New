@@ -1,4 +1,4 @@
-import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as S,a as r,d as I}from"./vendor-react-Bkc4rGZb.js";import{c as w,X as W}from"./index-C5K6Uz3o.js";import{M as H}from"./megaphone-DMbITemF.js";import"./vendor-three-BguZxXIH.js";/**
+import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as S,a as r,d as I}from"./vendor-react-Bkc4rGZb.js";import{c as w,X as W}from"./index-BjA6ymNX.js";import{M as H}from"./megaphone--Uqt_Yhd.js";import"./vendor-three-BguZxXIH.js";/**
  * @license lucide-react v0.487.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -128,8 +128,8 @@ import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as
               aspect-ratio: 16 / 10;
               background: #0a0612;
               border-radius: clamp(8px, 1.2vw, 14px) clamp(8px, 1.2vw, 14px) 0 0;
-              border: clamp(6px, 0.8vw, 10px) solid #1a1a2e;
-              border-bottom: clamp(3px, 0.4vw, 5px) solid #1a1a2e;
+              border: clamp(6px, 0.8vw, 10px) solid #2d2d35;
+              border-bottom: clamp(3px, 0.4vw, 5px) solid #2d2d35;
               overflow: hidden;
               box-shadow:
                 0 0 0 1px rgba(255,255,255,0.06),
@@ -146,7 +146,7 @@ import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as
               z-index: 20;
               width: clamp(50px, 8vw, 80px);
               height: clamp(12px, 1.5vw, 18px);
-              background: #1a1a2e;
+              background: #2d2d35;
               border-radius: 0 0 8px 8px;
               display: flex;
               align-items: center;
@@ -156,7 +156,7 @@ import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as
               width: 5px;
               height: 5px;
               border-radius: 50%;
-              background: #2a2a4e;
+              background: #4a4a58;
               box-shadow: 0 0 4px rgba(164,108,252,0.3);
             }
 
@@ -207,10 +207,10 @@ import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as
               width: calc(100% + clamp(16px, 2vw, 30px));
               margin-left: calc(clamp(-8px, -1vw, -15px));
               height: clamp(40px, 7vw, 80px);
-              background: linear-gradient(180deg, #1a1a2e 0%, #141428 100%);
+              background: linear-gradient(180deg, #35353e 0%, #2a2a32 100%);
               border-radius: 0 0 clamp(4px, 0.5vw, 6px) clamp(4px, 0.5vw, 6px);
-              border: 1px solid rgba(255,255,255,0.04);
-              border-top: 1px solid rgba(255,255,255,0.08);
+              border: 1px solid rgba(255,255,255,0.08);
+              border-top: 1px solid rgba(255,255,255,0.14);
               display: flex;
               flex-direction: column;
               align-items: center;
@@ -234,9 +234,9 @@ import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as
             .laptop-base__key {
               width: clamp(10px, 1.8vw, 22px);
               height: clamp(6px, 1vw, 12px);
-              background: rgba(255,255,255,0.04);
-              border-radius: 1.5px;
-              border: 0.5px solid rgba(255,255,255,0.06);
+              background: rgba(0,0,0,0.25);
+              border-radius: 2px;
+              border: 0.5px solid rgba(255,255,255,0.08);
             }
 
             .laptop-base__trackpad {
@@ -246,9 +246,9 @@ import{j as e,A as _,m as p,b as F}from"./vendor-motion-DmjuJuG3.js";import{R as
               transform: translateX(-50%);
               width: clamp(50px, 10vw, 120px);
               height: clamp(6px, 1vw, 10px);
-              background: rgba(255,255,255,0.03);
-              border-radius: 2px;
-              border: 0.5px solid rgba(255,255,255,0.06);
+              background: rgba(0,0,0,0.2);
+              border-radius: 3px;
+              border: 0.5px solid rgba(255,255,255,0.1);
             }
 
             /* ── Reflection under laptop ── */

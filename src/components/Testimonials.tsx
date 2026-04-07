@@ -354,8 +354,6 @@ export function Testimonials() {
           </div>
         </div>
       </div>
-      {/* Spacer between testimonials and next section */}
-      <div className="h-20 sm:h-28 lg:h-36 bg-[#13082A]" />
     </>
   );
 }

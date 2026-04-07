@@ -1,6 +1,5 @@
 import { memo } from "react";
 import { motion } from "motion/react";
-import { useIsMobile } from "../../hooks/useIsMobile";
 
 const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg?tr=f-auto,q-80";
 
@@ -36,7 +35,6 @@ const ICONS: Icon[] = [
 const ORBIT_DURATION = 22; // seconds for one full rotation
 
 export const FounderOrbit = memo(function FounderOrbit() {
-  const isNarrow = useIsMobile();
   return (
     <div
       style={{
@@ -65,41 +63,23 @@ export const FounderOrbit = memo(function FounderOrbit() {
         }}
       />
 
-      {/* ── Pulsing atmosphere — animated on desktop, static ring on mobile ── */}
-      {isNarrow ? (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            width: "70%",
-            aspectRatio: "1",
-            transform: "translate(-50%, -50%)",
-            borderRadius: "50%",
-            border: "1px solid rgba(164,108,252,0.3)",
-            boxShadow: "0 0 60px rgba(164,108,252,0.25)",
-            pointerEvents: "none",
-            opacity: 0.55,
-          }}
-        />
-      ) : (
-        <motion.div
-          animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            width: "70%",
-            aspectRatio: "1",
-            transform: "translate(-50%, -50%)",
-            borderRadius: "50%",
-            border: "1px solid rgba(164,108,252,0.3)",
-            boxShadow: "0 0 60px rgba(164,108,252,0.25)",
-            pointerEvents: "none",
-          }}
-        />
-      )}
+      {/* ── Pulsing atmosphere ── */}
+      <motion.div
+        animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: "70%",
+          aspectRatio: "1",
+          transform: "translate(-50%, -50%)",
+          borderRadius: "50%",
+          border: "1px solid rgba(164,108,252,0.3)",
+          boxShadow: "0 0 60px rgba(164,108,252,0.25)",
+          pointerEvents: "none",
+        }}
+      />
 
       {/* ── Orbit guide rings + spokes — matches the Loader's geometry ── */}
       <svg
@@ -230,22 +210,13 @@ export const FounderOrbit = memo(function FounderOrbit() {
             </>
           );
 
-          if (isNarrow) {
-            return (
-              <div key={icon.label} aria-label={icon.label} style={positionStyle}>
-                <div style={chipStyle}>{chipContent}</div>
-              </div>
-            );
-          }
-
-          // Desktop: positioning lives on a PLAIN div so the CSS transform
+          // Positioning lives on a PLAIN div so the CSS transform
           // (rotate + translateY + counter-rotate) isn't overwritten by
           // framer-motion. Counter-rotation and bob animate on nested
           // motion.divs that only control their own transform axis.
           return (
             <div key={icon.label} style={positionStyle}>
               <motion.div
-                // Counter-rotate so each icon stays upright while the ring spins
                 animate={{ rotate: -360 }}
                 transition={{ duration: ORBIT_DURATION, repeat: Infinity, ease: "linear" }}
               >

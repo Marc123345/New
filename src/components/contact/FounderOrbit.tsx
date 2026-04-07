@@ -165,6 +165,7 @@ export const FounderOrbit = memo(function FounderOrbit() {
           marginLeft: "-46%",
           marginTop: "-46%",
           pointerEvents: "none",
+          zIndex: 10,
         }}
       >
         {ICONS.map((icon, i) => {

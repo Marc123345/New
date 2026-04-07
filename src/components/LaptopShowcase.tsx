@@ -325,6 +325,7 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
               background: rgba(6, 3, 18, 0.96);
               cursor: pointer;
               overflow: hidden;
+              padding: 16px;
             }
             @media (min-width: 769px) {
               .laptop-showcase-overlay {
@@ -395,6 +396,12 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
               cursor: default;
               will-change: transform;
               z-index: 5;
+              flex-shrink: 0;
+              max-width: 90vw;
+              max-height: 70vh;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
             }
 
             .laptop-screen {
@@ -531,11 +538,12 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
               position: relative;
               z-index: 4;
               width: clamp(240px, 75vw, 640px);
-              height: clamp(30px, 5vw, 60px);
+              height: clamp(20px, 3vw, 40px);
               background: radial-gradient(ellipse at center, rgba(164,108,252,0.15) 0%, transparent 70%);
               filter: blur(10px);
-              margin-top: -10px;
+              margin-top: -6px;
               pointer-events: none;
+              flex-shrink: 0;
             }
 
           `}</style>

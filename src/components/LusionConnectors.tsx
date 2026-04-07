@@ -4,6 +4,7 @@
  */
 
 import { useRef, useReducer, useMemo, useState, useEffect, Suspense } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { Canvas, useFrame } from '@react-three/fiber'
 import {
   Environment,
@@ -301,18 +302,7 @@ function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export function LusionConnectors() {
-  // Narrow-viewport flag is only used to tune the scene (camera FOV, DPR,
-  // postprocessing) — the 3D canvas itself renders on every breakpoint.
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth < 768,
-  )
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(max-width: 767px)')
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  const isMobile = useIsMobile()
 
   // Visibility gating — when the hero scrolls off-screen, switch the Canvas
   // frameloop to "demand" so R3F stops scheduling rAF work. This halts the

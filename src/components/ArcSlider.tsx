@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useIsMobile, isMobileDevice } from "../hooks/useIsMobile";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { PenLine, Bot, Search, Palette, Video, ChartBar as BarChart2, User, MessageCircle, MousePointerClick, Megaphone, X } from "lucide-react";
@@ -433,8 +434,7 @@ export function ArcSlider() {
       tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     }
 
-    const isMobile = window.innerWidth < 768;
-    if (isMobile && sliderRef.current) {
+    if (isMobileDevice() && sliderRef.current) {
       const cardWidth = sliderRef.current.offsetWidth * 0.82;
       sliderRef.current.scrollTo({
         left: clamped * cardWidth,
@@ -447,8 +447,7 @@ export function ArcSlider() {
     const container = sliderRef.current;
     if (!container) return;
 
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) return;
+    if (isMobileDevice()) return;
 
     const onStart = (e: MouseEvent | TouchEvent) => {
       dragRef.current.isDragging = true;
@@ -515,7 +514,7 @@ export function ArcSlider() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [navigateTo, overlayService, activeIndex]);
 
-  const isMobileView = typeof window !== "undefined" && window.innerWidth < 768;
+  const isMobileView = useIsMobile();
 
   return (
     <>

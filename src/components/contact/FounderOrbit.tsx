@@ -1,24 +1,8 @@
+import { memo } from "react";
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 const SHANNON_PHOTO = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg?tr=f-auto,q-80";
-
-// Collapse ~17 concurrent framer-motion animations to just 2 on mobile
-// (ring rotation + Shannon breathing). Pulsing atmosphere, per-icon
-// counter-rotation, and per-icon bob loops run desktop-only.
-function useIsNarrow() {
-  const [isNarrow, setIsNarrow] = useState(
-    () => typeof window !== "undefined" && window.innerWidth < 768
-  );
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 767px)");
-    const handler = (e: MediaQueryListEvent) => setIsNarrow(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return isNarrow;
-}
 
 // Exact same 8-icon set as the Loader component (ICONS array there) — same
 // order, same background colours, same text-or-SVG rendering pattern. Keeps
@@ -51,8 +35,8 @@ const ICONS: Icon[] = [
 
 const ORBIT_DURATION = 22; // seconds for one full rotation
 
-export function FounderOrbit() {
-  const isNarrow = useIsNarrow();
+export const FounderOrbit = memo(function FounderOrbit() {
+  const isNarrow = useIsMobile();
   return (
     <div
       style={{
@@ -366,4 +350,4 @@ export function FounderOrbit() {
       </div>
     </div>
   );
-}
+});

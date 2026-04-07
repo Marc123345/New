@@ -218,8 +218,8 @@ export function Navigation() {
           }}
         />
 
-        <div className="absolute inset-0 flex flex-col lg:flex-row">
-          <div className="flex-1 lg:w-[60%] flex flex-col justify-center pl-6 pr-24 sm:pl-8 sm:pr-28 md:pl-16 md:pr-32 lg:px-24 pt-14 sm:pt-16 lg:pt-0 overflow-y-auto">
+        <div className="absolute inset-0 flex flex-col lg:flex-row overflow-y-auto">
+          <div className="shrink-0 lg:flex-1 lg:w-[60%] flex flex-col justify-center pl-6 pr-24 sm:pl-8 sm:pr-28 md:pl-16 md:pr-32 lg:px-24 pt-14 sm:pt-16 lg:pt-0">
             <nav
               className="flex flex-col"
               onMouseLeave={() => setActiveIndex(null)}
@@ -271,7 +271,7 @@ export function Navigation() {
                   </span>
 
                   <span
-                    className="relative z-10 hidden md:block text-xs tracking-widest uppercase transition-all duration-300"
+                    className="relative z-10 text-[10px] sm:text-xs tracking-widest uppercase transition-all duration-300"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.3)",
@@ -300,7 +300,7 @@ export function Navigation() {
           </div>
 
           <div
-            className="hidden lg:flex lg:w-[40%] flex-col justify-between py-24 px-16"
+            className="flex w-full lg:w-[40%] flex-col justify-between py-8 px-6 sm:py-12 sm:px-8 lg:py-24 lg:px-16"
             style={{
               borderLeft: "1px solid rgba(164,108,252,0.08)",
               transition: "opacity 0.8s ease, transform 0.8s ease",
@@ -405,7 +405,7 @@ export function Navigation() {
           >
             &copy; {new Date().getFullYear()} H2H Social
           </p>
-          <div className="flex lg:hidden gap-5">
+          <div className="flex gap-5">
             {SOCIAL.map((s) => (
               <a
                 key={s.label}

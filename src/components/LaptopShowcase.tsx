@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
-import { useIsMobile } from '../hooks/useIsMobile';
+
 
 /* ── Simulated website pages that scroll inside the laptop screen ── */
 const SHOWCASE_PAGES = [
@@ -111,7 +111,6 @@ interface LaptopShowcaseProps {
 }
 
 export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: LaptopShowcaseProps) {
-  const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
   const laptopRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -134,9 +133,23 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  // Mouse-follow 3D tilt (desktop only)
+  // Device orientation tilt for mobile (gyroscope)
+  useEffect(() => {
+    if (!open) return;
+    const onOrientation = (e: DeviceOrientationEvent) => {
+      const gamma = e.gamma ?? 0; // left-right tilt (-90 to 90)
+      const beta = e.beta ?? 0;   // front-back tilt (-180 to 180)
+      setTilt({
+        x: Math.max(-6, Math.min(6, (beta - 45) * 0.15)),
+        y: Math.max(-8, Math.min(8, gamma * 0.2)),
+      });
+    };
+    window.addEventListener('deviceorientation', onOrientation, { passive: true });
+    return () => window.removeEventListener('deviceorientation', onOrientation);
+  }, [open]);
+
+  // Mouse-follow 3D tilt for desktop
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (isMobile) return;
     const rect = laptopRef.current?.getBoundingClientRect();
     if (!rect) return;
     const cx = rect.left + rect.width / 2;
@@ -144,7 +157,7 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
     const px = (e.clientX - cx) / (rect.width / 2);
     const py = (e.clientY - cy) / (rect.height / 2);
     setTilt({ x: py * -4, y: px * 6 });
-  }, [isMobile]);
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     setTilt({ x: 0, y: 0 });

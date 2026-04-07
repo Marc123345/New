@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useIsMobile } from "../hooks/useIsMobile";
+
 import THREE from "../lib/three";
 
 const VERT = `
@@ -94,10 +94,8 @@ const GLOW_FRAG = `
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (isMobile) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -170,6 +168,19 @@ export function CursorTrail() {
       lastMoveTime = performance.now();
     };
 
+    const onTouchMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!t) return;
+      prevMouse.copy(mouse);
+      mouse.set(t.clientX / width, 1 - t.clientY / height);
+      hasEntered = true;
+      lastMoveTime = performance.now();
+    };
+
+    const onTouchEnd = () => {
+      hasEntered = false;
+    };
+
     const onMouseLeave = () => {
       hasEntered = false;
     };
@@ -225,6 +236,8 @@ export function CursorTrail() {
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
     document.addEventListener("mouseleave", onMouseLeave);
     window.addEventListener("resize", onResize, { passive: true });
     document.addEventListener("visibilitychange", onVisibilityChange);
@@ -232,6 +245,8 @@ export function CursorTrail() {
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
       document.removeEventListener("mouseleave", onMouseLeave);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
@@ -240,9 +255,7 @@ export function CursorTrail() {
       rtA.dispose();
       rtB.dispose();
     };
-  }, [isMobile]);
-
-  if (isMobile) return null;
+  }, []);
 
   return (
     <canvas

@@ -485,8 +485,7 @@ export function AboutSection() {
           .about-step-h3 { margin-left: -0.25em; font-size: 2.6em; line-height: 0.95; }
           .about-end-sticky { padding: 2em 1.25em; }
 
-          /* Hide heavy bg layers on mobile — save memory + GPU */
-          .about-fixed-wrapper { display: none; }
+          .about-fixed-wrapper { opacity: 0.7; }
 
           /* Disable per-word stagger on mobile — show all text at once */
           .about-ub-word {

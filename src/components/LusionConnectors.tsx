@@ -4,7 +4,7 @@
  */
 
 import { useRef, useReducer, useMemo, useState, useEffect, Suspense } from 'react'
-import { useIsMobile } from '../hooks/useIsMobile'
+
 import { Canvas, useFrame } from '@react-three/fiber'
 import {
   Environment,
@@ -266,7 +266,7 @@ function Connector({
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
-function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
+function Scene({ accent }: { accent: number }) {
   const accentColor = ACCENTS[accent]
 
   return (
@@ -280,7 +280,7 @@ function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
         <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} />
       ))}
 
-      <EffectComposer disableNormalPass multisampling={isMobile ? 4 : 8}>
+      <EffectComposer disableNormalPass multisampling={8}>
         <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
       </EffectComposer>
 
@@ -299,8 +299,6 @@ function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export function LusionConnectors() {
-  const isMobile = useIsMobile()
-
   // Visibility gating — when the hero scrolls off-screen, switch the Canvas
   // frameloop to "demand" so R3F stops scheduling rAF work. This halts the
   // Rapier physics stepping, the postprocessing pass, and the per-frame
@@ -351,7 +349,7 @@ export function LusionConnectors() {
           castShadow
         />
         <Suspense fallback={null}>
-          <Scene accent={accent} isMobile={isMobile} />
+          <Scene accent={accent} />
         </Suspense>
       </Canvas>
     </div>

@@ -386,7 +386,7 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
 
             .laptop-screen {
               position: relative;
-              width: clamp(300px, 62vw, 720px);
+              width: clamp(280px, 80vw, 720px);
               aspect-ratio: 16 / 10;
               background: #0a0612;
               border-radius: clamp(8px, 1.2vw, 14px) clamp(8px, 1.2vw, 14px) 0 0;
@@ -517,7 +517,7 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
             .laptop-showcase-reflection {
               position: relative;
               z-index: 4;
-              width: clamp(240px, 55vw, 640px);
+              width: clamp(240px, 75vw, 640px);
               height: clamp(30px, 5vw, 60px);
               background: radial-gradient(ellipse at center, rgba(164,108,252,0.15) 0%, transparent 70%);
               filter: blur(10px);
@@ -525,38 +525,6 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
               pointer-events: none;
             }
 
-            /* ── Mobile adjustments ── */
-            @media (max-width: 640px) {
-              .laptop-screen {
-                width: 88vw;
-                max-height: 50vh;
-                aspect-ratio: 3 / 2;
-                border-width: 4px;
-                border-bottom-width: 2px;
-              }
-              .laptop-base {
-                height: 28px;
-                padding: 3px 8px;
-              }
-              .laptop-showcase-label {
-                top: 8px;
-              }
-              .laptop-showcase-label__tag {
-                font-size: 0.5rem;
-                padding: 4px 12px;
-              }
-              .laptop-camera {
-                width: 40px;
-                height: 10px;
-              }
-              .laptop-camera__dot {
-                width: 4px;
-                height: 4px;
-              }
-              .laptop-showcase-label {
-                top: 10px;
-              }
-            }
           `}</style>
         </motion.div>
       )}

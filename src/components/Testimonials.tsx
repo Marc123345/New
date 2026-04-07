@@ -99,7 +99,7 @@ export function Testimonials() {
     }
   });
 
-  // Lazy-load globe on first visibility; never load on mobile (WebGL hidden but still runs)
+  // Lazy-load globe on first visibility
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -107,7 +107,7 @@ export function Testimonials() {
       ([entry]) => {
         const visible = entry.isIntersecting;
         setGlobeVisible(visible);
-        if (visible && !isMobile.current) setGlobeLoaded(true);
+        if (visible) setGlobeLoaded(true);
       },
       { threshold: 0.05 }
     );
@@ -165,21 +165,21 @@ export function Testimonials() {
             </h2>
           </div>
 
-          <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">
+          <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">
 
-            {/* LEFT: Globe Panel — desktop only */}
+            {/* LEFT: Globe Panel — visible on all screens */}
             <div
-              className="hidden lg:flex w-[340px] flex-col items-center justify-center gap-3 py-4 px-6 text-white relative shrink-0 bg-[#1A1040]"
+              className="flex lg:w-[340px] flex-row lg:flex-col items-center justify-center gap-3 py-3 lg:py-4 px-4 lg:px-6 text-white relative shrink-0 bg-[#1A1040]"
               style={{ border: "4px solid var(--color-secondary)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)" }}
             >
-              <div className="text-center z-10">
+              <div className="text-center z-10 lg:block hidden">
                 <p className="text-base leading-tight" style={{ fontFamily: "var(--font-stack-heading)" }}>
                   <span style={{ color: "var(--color-secondary)" }}>Trusted</span>
                   <br />Across Africa
                 </p>
               </div>
 
-              <div className="relative w-[260px] h-[260px] flex-shrink-0">
+              <div className="relative w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>
@@ -214,6 +214,14 @@ export function Testimonials() {
                     }}
                   />
                 </div>
+              </div>
+
+              {/* Mobile-only text beside globe */}
+              <div className="text-center z-10 lg:hidden">
+                <p className="text-sm leading-tight" style={{ fontFamily: "var(--font-stack-heading)" }}>
+                  <span style={{ color: "var(--color-secondary)" }}>Trusted</span>
+                  {" "}Across Africa
+                </p>
               </div>
 
             </div>

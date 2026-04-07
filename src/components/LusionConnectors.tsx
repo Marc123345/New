@@ -280,14 +280,11 @@ function Scene({ accent, isMobile }: { accent: number; isMobile: boolean }) {
         <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} />
       ))}
 
-      {/* Postprocessing is expensive on mobile GPUs — skip it there */}
-      {!isMobile && (
-        <EffectComposer disableNormalPass multisampling={8}>
-          <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
-        </EffectComposer>
-      )}
+      <EffectComposer disableNormalPass multisampling={isMobile ? 4 : 8}>
+        <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
+      </EffectComposer>
 
-      <Environment resolution={isMobile ? 128 : 256}>
+      <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
           <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
@@ -337,8 +334,8 @@ export function LusionConnectors() {
     <div ref={wrapRef} style={{ width: '100%', height: '100%' }}>
       <Canvas
         onClick={cycleAccent}
-        shadows={!isMobile}
-        dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+        shadows
+        dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance' }}
         camera={cameraConfig}
         frameloop={isVisible ? 'always' : 'demand'}
@@ -351,7 +348,7 @@ export function LusionConnectors() {
           angle={0.15}
           penumbra={1}
           intensity={1}
-          castShadow={!isMobile}
+          castShadow
         />
         <Suspense fallback={null}>
           <Scene accent={accent} isMobile={isMobile} />

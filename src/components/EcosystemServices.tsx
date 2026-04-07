@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { motion, useInView } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
+import { LaptopShowcase } from './LaptopShowcase';
 import { PILLARS } from '../constants/ecosystem';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -95,72 +96,13 @@ const OrbitNode = memo(({ item, index, onSelect, containerRef }: OrbitNodeProps)
 
 const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
-const ABOUT_H2H_VIDEO =
-  'https://ik.imagekit.io/qcvroy8xpd/H2H%20ANIMATON%20VIDEO%20FINAL.mp4';
-
-// Tell TS about the iOS-only webkitEnterFullscreen + the element-level
-// webkitRequestFullscreen used by older Safari.
-interface WebkitVideoElement extends HTMLVideoElement {
-  webkitEnterFullscreen?: () => void;
-  webkitRequestFullscreen?: () => Promise<void> | void;
-}
-
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
-  const [aboutVideoOpen, setAboutVideoOpen] = useState(false);
+  const [showcaseOpen, setShowcaseOpen] = useState(false);
   const isMobile = useIsMobile();
 
-  // Hidden <video> element that lives in the DOM from first paint. On mobile,
-  // the iPad click handler calls play() + webkitEnterFullscreen() on this
-  // element synchronously, preserving the user-gesture chain iOS Safari
-  // requires to enter its native fullscreen player. On desktop we fall back
-  // to the in-page modal.
-  const fullscreenVideoRef = useRef<WebkitVideoElement>(null);
-  const handleIpadClick = () => {
-    if (isMobile) {
-      const v = fullscreenVideoRef.current;
-      if (!v) return;
-      try {
-        v.muted = false; // user tapped, sound is allowed now
-        const playPromise = v.play();
-        // Safari iPhone: webkitEnterFullscreen (takes over the whole screen).
-        // Chrome Android + desktop: standard requestFullscreen on the element.
-        if (typeof v.webkitEnterFullscreen === 'function') {
-          v.webkitEnterFullscreen();
-        } else if (typeof v.requestFullscreen === 'function') {
-          // Some Androids resolve play() before allowing fullscreen — wait
-          if (playPromise && typeof playPromise.then === 'function') {
-            playPromise.then(() => v.requestFullscreen?.()).catch(() => {});
-          } else {
-            v.requestFullscreen();
-          }
-        } else if (typeof v.webkitRequestFullscreen === 'function') {
-          v.webkitRequestFullscreen();
-        }
-      } catch {
-        // If anything throws (e.g. not in a user gesture), fall back to modal
-        setAboutVideoOpen(true);
-      }
-      return;
-    }
-    // Desktop: keep the existing in-page modal
-    setAboutVideoOpen(true);
-  };
-
-  // Body scroll lock + Esc close for the About H2H video modal
-  useEffect(() => {
-    if (!aboutVideoOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setAboutVideoOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [aboutVideoOpen]);
+  const handleIpadClick = useCallback(() => setShowcaseOpen(true), []);
+  const handleShowcaseClose = useCallback(() => setShowcaseOpen(false), []);
 
   const sectionRef = useRef<HTMLElement>(null);
   // Pause the three infinite motion animations (CTA badge bob, iPad float,
@@ -226,26 +168,6 @@ export function EcosystemServices() {
         paddingBottom: 'clamp(60px, 8vh, 100px)',
       }}
     >
-      {/* Hidden About H2H video — present from first paint so the iPad click
-          handler on mobile can call play() + webkitEnterFullscreen() inside
-          the original user-gesture, which iOS Safari requires to trigger its
-          native fullscreen player. preload="none" keeps it from downloading
-          until playback is actually requested. */}
-      <video
-        ref={fullscreenVideoRef}
-        src={ABOUT_H2H_VIDEO}
-        playsInline
-        preload="none"
-        style={{
-          position: 'absolute',
-          width: 1,
-          height: 1,
-          opacity: 0,
-          pointerEvents: 'none',
-          left: -9999,
-        }}
-      />
-
       {/* Background Video */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {!isMobile && (
@@ -368,7 +290,7 @@ export function EcosystemServices() {
             >
               <button
                 type="button"
-                aria-label="Play About H2H video"
+                aria-label="Explore Website & Content Hub showcase"
                 onClick={handleIpadClick}
                 style={{
                   width: 200,
@@ -495,130 +417,7 @@ export function EcosystemServices() {
       </div>
 
       <PillarOverlay pillarIndex={selectedService} onClose={handleClose} onNavigate={handleSelect} />
-
-      {/* ── About H2H video modal — opened by clicking the iPad ── */}
-      {aboutVideoOpen && (
-        <div
-          onClick={() => setAboutVideoOpen(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="About H2H video"
-          className="h2h-about-overlay"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: 960,
-              background: '#1a1040',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 16,
-              boxShadow: '0 24px 80px rgba(0,0,0,0.6), var(--shadow-geometric, 10px 10px 0 #a46cfc)',
-              overflow: 'hidden',
-            }}
-          >
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={() => setAboutVideoOpen(false)}
-              style={{
-                position: 'absolute',
-                top: 12,
-                right: 12,
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                border: '1.5px solid rgba(255,255,255,0.25)',
-                background: 'rgba(255,255,255,0.08)',
-                color: '#ffffff',
-                fontSize: 18,
-                lineHeight: 1,
-                cursor: 'pointer',
-                zIndex: 5,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              ✕
-            </button>
-
-            <div
-              style={{
-                padding: 'clamp(18px, 2.5vw, 24px) clamp(16px, 2.5vw, 28px)',
-                paddingRight: 64,
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-block',
-                  color: '#ffffff',
-                  fontFamily: 'var(--font-stack-heading, system-ui, sans-serif)',
-                  fontSize: 'clamp(0.85rem, 1.3vw, 1rem)',
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  paddingBottom: 6,
-                  borderBottom: '3px solid var(--color-secondary, #a46cfc)',
-                }}
-              >
-                About H2H
-              </span>
-            </div>
-
-            <div
-              style={{
-                background: '#000',
-                aspectRatio: '16 / 9',
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <video
-                src={ABOUT_H2H_VIDEO}
-                controls
-                autoPlay
-                muted
-                playsInline
-                preload="auto"
-                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-              />
-            </div>
-          </div>
-
-          <style>{`
-            /* Desktop: soft blur backdrop. Mobile: solid color backdrop —
-               iOS Safari's backdrop-filter: blur causes layer-recomposite jank
-               during the fade-in animation, visibly stuttering the modal open. */
-            .h2h-about-overlay {
-              position: fixed;
-              inset: 0;
-              z-index: 10000;
-              background: rgba(6, 3, 18, 0.96);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              padding: clamp(12px, 3vw, 32px);
-              animation: h2hAboutFade 0.3s ease-out;
-            }
-            @media (min-width: 769px) {
-              .h2h-about-overlay {
-                background: rgba(6, 3, 18, 0.92);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-              }
-            }
-            @keyframes h2hAboutFade {
-              from { opacity: 0; }
-              to   { opacity: 1; }
-            }
-          `}</style>
-        </div>
-      )}
+      <LaptopShowcase open={showcaseOpen} onClose={handleShowcaseClose} />
 
     </section>
   );

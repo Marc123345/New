@@ -485,15 +485,9 @@ export function AboutSection() {
           .about-step-h3 { margin-left: -0.25em; font-size: 2.6em; line-height: 0.95; }
           .about-end-sticky { padding: 2em 1.25em; }
 
-          .about-fixed-wrapper { opacity: 0.7; }
+          /* Same skyline backgrounds as desktop */
 
-          /* Disable per-word stagger on mobile — show all text at once */
-          .about-ub-word {
-            opacity: 1 !important;
-            filter: none !important;
-            transform: none !important;
-            transition: none !important;
-          }
+          /* Same word stagger animation as desktop */
         }
 
         @media screen and (max-width: 479px) {

@@ -9,6 +9,7 @@ import { ScrollReveal } from "./components/ScrollReveal";
 import { Footer } from "./components/layout/Footer";
 import { ContactForm } from "./components/ContactForm";
 import { CursorTrail } from "./components/CursorTrail";
+import { ChatWidget } from "./components/ChatWidget";
 
 
 import { H2HLogo } from "./components/H2HLogo";
@@ -430,6 +431,9 @@ function AppContent() {
 
       {/* ═══ FOOTER ═══ */}
       <Footer />
+
+      {/* ═══ FLOATING CHAT WIDGET ═══ */}
+      <ChatWidget />
 
     </main>
   );

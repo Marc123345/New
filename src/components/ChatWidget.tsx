@@ -170,8 +170,9 @@ export function ChatWidget() {
         /* Overlay */
         .h2h-ov {
           position: fixed; inset: 0; background: rgba(6,3,18,0.96);
-          z-index: 9999; display: flex; align-items: center; justify-content: center;
-          padding: clamp(12px,3vw,32px); animation: fadeIn 0.25s ease-out; overflow-y: auto;
+          z-index: 9999; display: flex; align-items: flex-start; justify-content: center;
+          padding: clamp(12px,3vw,32px); padding-top: clamp(20px,4vw,48px);
+          animation: fadeIn 0.25s ease-out; overflow-y: auto;
         }
         @media (min-width:769px) { .h2h-ov { background:rgba(6,3,18,0.88); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); } }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -182,6 +183,7 @@ export function ChatWidget() {
           border-radius: 16px;
           box-shadow: 0 24px 80px rgba(0,0,0,0.6), var(--shadow-geometric, 10px 10px 0 #a46cfc);
           animation: popIn 0.35s cubic-bezier(0.22,1,0.36,1);
+          overflow: visible;
         }
         @keyframes popIn { from{opacity:0;transform:translateY(16px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
 

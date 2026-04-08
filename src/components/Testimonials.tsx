@@ -201,9 +201,9 @@ export function Testimonials() {
       `}</style>
 
       <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-white">
-        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/5 pt-16 pb-4 md:pt-20 md:pb-0" style={{ contain: 'layout style paint' }}>
+        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/5 pt-4 sm:pt-10 md:pt-16 pb-2 sm:pb-4 md:pb-0" style={{ contain: 'layout style paint' }}>
 
-          <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
+          <div className="text-center mb-2 sm:mb-4 md:mb-8 px-4 md:px-8">
             <div
               className="inline-block mb-3 md:mb-4 px-3 py-1.5 md:px-4 md:py-2"
               style={{ border: "2px solid var(--color-secondary)", borderRadius: "6px", boxShadow: "4px 4px 0 var(--color-secondary)" }}
@@ -221,7 +221,7 @@ export function Testimonials() {
           </div>
 
           {/* Client logo slider */}
-          <div className="w-full overflow-hidden mb-4 sm:mb-6 relative">
+          <div className="w-full overflow-hidden mb-2 sm:mb-4 md:mb-6 relative">
             <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
             <div className="logo-scroll-track gap-10 sm:gap-14 lg:gap-16">
@@ -268,7 +268,7 @@ export function Testimonials() {
                 </p>
               </div>
 
-              <div className="relative w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
+              <div className="relative w-[80px] h-[80px] sm:w-[140px] sm:h-[140px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>

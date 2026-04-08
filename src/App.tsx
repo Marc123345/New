@@ -235,6 +235,7 @@ function HeroLusion() {
           display: inline-flex;
           align-items: center;
           align-self: flex-start;
+          margin-top: 8px;
           gap: 10px;
           background: var(--color-primary, #291e56);
           color: #ffffff;

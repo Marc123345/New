@@ -41,11 +41,7 @@ export const SERVICES = [
     closingNote: "The result goes beyond individual visibility. It strengthens the company too, showing that your business is home to the voices, ideas, and people helping shape the industry.",
     deliverables: ["Leader Selection", "Voice & Narrative Dev", "Expertise Content", "Ghost-writing", "Thought Leadership", "Ongoing Coaching"],
     icon: React.createElement(Users, { size: 32 }),
-    stats: [
-      { label: "Profile Views", value: "+240%" },
-      { label: "Connection Growth", value: "5x" },
-      { label: "Content Reach", value: "+320%" },
-    ],
+    stats: [],
   },
   {
     type: 'core',
@@ -63,11 +59,7 @@ export const SERVICES = [
     closingNote: "The result is a stronger company message carried through a range of authentic voices. Your employees become advocates for the business while building their own personal brands at the same time.",
     deliverables: ["Advocacy Community", "Monthly Workshops", "Content Coaching", "Content Kits", "Ongoing Guidance", "Personal Brand Building"],
     icon: React.createElement(Megaphone, { size: 32 }),
-    stats: [
-      { label: "Employee Reach", value: "10x" },
-      { label: "Organic Amplification", value: "+560%" },
-      { label: "Team Participation", value: "78%" },
-    ],
+    stats: [],
   },
   {
     type: 'specialized',

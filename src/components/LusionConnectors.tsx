@@ -187,7 +187,7 @@ const CUBE_RADIUS = 0.12
 function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
   const texture = useFaceTexture(url)
   return (
-    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={IS_MOBILE ? 2 : 4} castShadow={!IS_MOBILE} receiveShadow={!IS_MOBILE}>
+    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
       <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
     </RoundedBox>
   )
@@ -196,7 +196,7 @@ function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
 function LogoCube({ logo, size = CUBE_SIZE }: { logo: LogoDef; size?: number }) {
   const texture = useMemo(() => createLogoTexture(logo), [logo])
   return (
-    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={IS_MOBILE ? 2 : 4} castShadow={!IS_MOBILE} receiveShadow={!IS_MOBILE}>
+    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
       <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
     </RoundedBox>
   )
@@ -280,8 +280,6 @@ function Connector({
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 
-const IS_MOBILE = typeof window !== 'undefined' && ('ontouchstart' in window || window.innerWidth < 768)
-
 function Scene({ accent }: { accent: number }) {
   const accentColor = ACCENTS[accent]
 
@@ -296,21 +294,15 @@ function Scene({ accent }: { accent: number }) {
         <Connector key={`l${i}`} logo={logo} accent={i >= LOGOS.length - 2} accentColor={accentColor} />
       ))}
 
-      {!IS_MOBILE && (
-        <EffectComposer disableNormalPass multisampling={8}>
-          <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
-        </EffectComposer>
-      )}
+      <EffectComposer disableNormalPass multisampling={8}>
+        <N8AO distanceFalloff={1} aoRadius={1} intensity={4} />
+      </EffectComposer>
 
-      <Environment resolution={IS_MOBILE ? 64 : 256}>
+      <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
-          {!IS_MOBILE && (
-            <>
-              <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
-              <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
-            </>
-          )}
+          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
+          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
           <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={8} />
         </group>
       </Environment>
@@ -354,8 +346,8 @@ export function LusionConnectors() {
     <div ref={wrapRef} style={{ width: '100%', height: '100%' }}>
       <Canvas
         onClick={cycleAccent}
-        shadows={!IS_MOBILE}
-        dpr={IS_MOBILE ? [1, 1] : [1, 1.5]}
+        shadows
+        dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance' }}
         camera={cameraConfig}
         frameloop={isVisible ? 'always' : 'demand'}
@@ -368,7 +360,7 @@ export function LusionConnectors() {
           angle={0.15}
           penumbra={1}
           intensity={1}
-          castShadow={!IS_MOBILE}
+          castShadow
         />
         <Suspense fallback={null}>
           <Scene accent={accent} />

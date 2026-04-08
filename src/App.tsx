@@ -182,7 +182,6 @@ function HeroLusion() {
           display: flex;
           flex-direction: column;
           gap: clamp(0.5em, 1vw, 0.75em);
-          overflow: hidden;
         }
         .hero-tagline {
           font-family: var(--font-stack-heading);

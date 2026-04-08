@@ -187,8 +187,11 @@ const CUBE_RADIUS = 0.12
 function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
   const texture = useFaceTexture(url)
   return (
-    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
-      <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
+    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={IS_MOBILE ? 2 : 4} castShadow={!IS_MOBILE} receiveShadow={!IS_MOBILE}>
+      {IS_MOBILE
+        ? <meshLambertMaterial map={texture} />
+        : <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
+      }
     </RoundedBox>
   )
 }
@@ -196,8 +199,11 @@ function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
 function LogoCube({ logo, size = CUBE_SIZE }: { logo: LogoDef; size?: number }) {
   const texture = useMemo(() => createLogoTexture(logo), [logo])
   return (
-    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={4} castShadow receiveShadow>
-      <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
+    <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={IS_MOBILE ? 2 : 4} castShadow={!IS_MOBILE} receiveShadow={!IS_MOBILE}>
+      {IS_MOBILE
+        ? <meshLambertMaterial map={texture} />
+        : <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
+      }
     </RoundedBox>
   )
 }
@@ -302,11 +308,15 @@ function Scene({ accent }: { accent: number }) {
         </EffectComposer>
       )}
 
-      <Environment resolution={IS_MOBILE ? 128 : 256}>
+      <Environment resolution={IS_MOBILE ? 64 : 256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
           <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
-          <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
+          {!IS_MOBILE && (
+            <>
+              <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
+              <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
+            </>
+          )}
           <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={8} />
         </group>
       </Environment>
@@ -358,7 +368,7 @@ export function LusionConnectors() {
         style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
       >
         <color attach="background" args={['#141622']} />
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={IS_MOBILE ? 0.7 : 0.4} />
         <spotLight
           position={[10, 10, 10]}
           angle={0.15}

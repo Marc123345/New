@@ -230,7 +230,8 @@ export function Testimonials() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-7 sm:h-10 md:h-14 w-auto object-contain opacity-80"
+                      className="h-7 sm:h-10 md:h-14 object-contain opacity-80"
+                      style={{ minWidth: 60, width: 'auto' }}
                       decoding="async"
                     />
                   </div>
@@ -242,7 +243,8 @@ export function Testimonials() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-7 sm:h-10 md:h-14 w-auto object-contain opacity-80"
+                      className="h-7 sm:h-10 md:h-14 object-contain opacity-80"
+                      style={{ minWidth: 60, width: 'auto' }}
                       decoding="async"
                     />
                   </div>

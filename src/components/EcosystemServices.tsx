@@ -226,16 +226,6 @@ export function EcosystemServices() {
             Built for real connection. Designed for measurable growth.
           </p>
 
-          <p
-            className="text-xs sm:text-sm md:text-base max-w-3xl mx-auto mt-6"
-            style={{ color: 'rgba(209,213,219,0.72)', lineHeight: 1.7, fontFamily: 'var(--font-stack-body)', fontWeight: 400 }}
-          >
-            Most companies treat their website like a box to tick. We don't.
-            At H2H, we build digital homes — modern, high-impact websites with sharp design,
-            smart movement, and a polished user experience. Then we turn them into content hubs,
-            filled with thought leadership blogs, white papers, infographics, videos, and interviews
-            that bring your brand to life and give people a reason to stay.
-          </p>
         </motion.div>
       </div>
 

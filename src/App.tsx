@@ -207,7 +207,7 @@ function HeroLusion() {
             height: calc(var(--vh, 1vh) * 100);
             gap: 0.75em;
             padding: 1em 1em;
-            padding-top: calc(var(--nav-h) + 16px);
+            padding-top: calc(var(--nav-h) + 28px);
           }
           .hero-tagline {
             max-width: 100%;
@@ -220,7 +220,7 @@ function HeroLusion() {
         @media (max-width: 480px) {
           .hero-section {
             padding: 0.75em 0.75em;
-            padding-top: calc(var(--nav-h) + 12px);
+            padding-top: calc(var(--nav-h) + 24px);
             gap: 0.5em;
           }
           .hero-story-btn {

@@ -48,7 +48,7 @@ const CONTACTS = [
     countryCode: "NG",
     role: "Head of Business Development & Marketing",
     service: "Community Growth",
-    logo: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094",
+    logo: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.52.jpeg?updatedAt=1775647107161",
     quote: "H2H social agency has been a valuable agency partner to YDPay, consistently delivering on community growth and user engagement. We've seen firsthand their professionalism, creativity, and commitment to execution, making them a reliable partner for any brand looking to grow.",
   },
   {

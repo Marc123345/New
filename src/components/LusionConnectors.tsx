@@ -368,7 +368,7 @@ export function LusionConnectors() {
         style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
       >
         <color attach="background" args={['#141622']} />
-        <ambientLight intensity={IS_MOBILE ? 0.7 : 0.4} />
+        <ambientLight intensity={0.4} />
         <spotLight
           position={[10, 10, 10]}
           angle={0.15}

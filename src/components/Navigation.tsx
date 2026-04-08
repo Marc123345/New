@@ -351,7 +351,7 @@ export function Navigation() {
                   onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-secondary)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(232,226,255,0.55)"; }}
                 >
-                  hello@h2hdigital.com
+                  shannon@h2hsocial.club
                 </a>
               </div>
 

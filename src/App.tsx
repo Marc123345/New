@@ -166,7 +166,7 @@ function HeroLusion() {
       <style>{`
         .hero-section {
           /* Nav height = 2×padding + logo + border ≈ clamp(55px, 9vw + 22px, 132px) */
-          --nav-h: calc(clamp(33px, 7vw, 90px) + clamp(20px, 4vh, 40px) + 1px);
+          --nav-h: calc(clamp(43px, 8vw, 90px) + clamp(20px, 4vh, 40px) + 1px);
           width: 100%;
           height: calc(var(--vh, 1vh) * 100 + 30px);
           background: #f0f0f0;

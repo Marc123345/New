@@ -1,20 +1,54 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { FounderOrbit } from "./contact/FounderOrbit";
 
-export function ContactForm() {
-  const formRef = useRef<HTMLDivElement>(null);
+type Tab = "form" | "agent";
 
+export function ContactForm() {
+  const [activeTab, setActiveTab] = useState<Tab>("form");
+  const formRef = useRef<HTMLDivElement>(null);
+  const agentRef = useRef<HTMLDivElement>(null);
+  const formLoaded = useRef(false);
+  const agentLoaded = useRef(false);
+
+  // Load JotForm contact form
   useEffect(() => {
-    if (!formRef.current) return;
-    // Load JotForm script
+    if (activeTab !== "form" || formLoaded.current || !formRef.current) return;
     const script = document.createElement("script");
     script.src = "https://form.jotform.com/jsform/260973737186066";
     script.type = "text/javascript";
     script.async = true;
     formRef.current.appendChild(script);
-    return () => { script.remove(); };
-  }, []);
+    formLoaded.current = true;
+  }, [activeTab]);
+
+  // Load AI agent
+  useEffect(() => {
+    if (activeTab !== "agent" || agentLoaded.current || !agentRef.current) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.id = "JotFormIFrame-019d6d549dcd7547a9afe8a31ffe982e36dc";
+    iframe.title = "Darius: Digital Marketing Consultant";
+    iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
+    iframe.style.cssText = "width:100%;height:688px;border:none;max-width:100%;";
+    iframe.setAttribute("allowtransparency", "true");
+    iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
+    iframe.scrolling = "no";
+    agentRef.current.appendChild(iframe);
+
+    const handler = document.createElement("script");
+    handler.src = "https://cdn.jotfor.ms/s/umd/87418c24ff6/for-form-embed-handler.js";
+    handler.onload = () => {
+      (window as any).jotformEmbedHandler?.(
+        "iframe[id='JotFormIFrame-019d6d549dcd7547a9afe8a31ffe982e36dc']",
+        "https://www.jotform.com"
+      );
+    };
+    document.body.appendChild(handler);
+    agentLoaded.current = true;
+
+    return () => { handler.remove(); };
+  }, [activeTab]);
 
   return (
     <section
@@ -39,7 +73,7 @@ export function ContactForm() {
         }}
         className="contact-grid"
       >
-        {/* LEFT: Founder orbit — Shannon at the centre of the social ecosystem */}
+        {/* LEFT: Founder orbit */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -66,8 +100,7 @@ export function ContactForm() {
           </div>
         </motion.div>
 
-        {/* RIGHT: Form */}
-        {/* RIGHT: JotForm */}
+        {/* RIGHT: Tabbed panel — Contact Form / AI Agent */}
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -82,6 +115,7 @@ export function ContactForm() {
             overflow: "hidden",
           }}
         >
+          {/* Header */}
           <div style={{
             padding: "clamp(20px, 4vw, 40px) clamp(20px, 4vw, 40px) 0",
           }}>
@@ -102,12 +136,71 @@ export function ContactForm() {
               opacity: 0.5,
               lineHeight: 1.6,
               fontFamily: "var(--font-stack-heading)",
+              marginBottom: "20px",
             }}>
-              We&apos;d love to hear more about your brand, your goals, and how we can help.
+              Send us a message or chat with our AI consultant.
             </p>
+
+            {/* Tab switcher */}
+            <div style={{
+              display: "flex",
+              gap: "4px",
+              background: "rgba(0,0,0,0.06)",
+              borderRadius: 10,
+              padding: 4,
+            }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab("form")}
+                style={{
+                  flex: 1,
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-stack-heading)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  transition: "all 0.25s ease",
+                  background: activeTab === "form" ? "var(--color-text-dark)" : "transparent",
+                  color: activeTab === "form" ? "var(--color-background-light)" : "var(--color-text-dark)",
+                  boxShadow: activeTab === "form" ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
+                }}
+              >
+                Contact Form
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("agent")}
+                style={{
+                  flex: 1,
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-stack-heading)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  transition: "all 0.25s ease",
+                  background: activeTab === "agent" ? "var(--color-secondary)" : "transparent",
+                  color: activeTab === "agent" ? "#ffffff" : "var(--color-text-dark)",
+                  boxShadow: activeTab === "agent" ? "0 2px 8px rgba(164,108,252,0.3)" : "none",
+                }}
+              >
+                Chat with Darius
+              </button>
+            </div>
           </div>
 
-          <div ref={formRef} style={{ minHeight: 400 }} />
+          {/* Tab content */}
+          <div style={{ minHeight: 400 }}>
+            <div ref={formRef} style={{ display: activeTab === "form" ? "block" : "none" }} />
+            <div ref={agentRef} style={{ display: activeTab === "agent" ? "block" : "none", padding: "8px" }} />
+          </div>
         </motion.div>
       </div>
 

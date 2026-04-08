@@ -220,7 +220,7 @@ export function Testimonials() {
               className="tracking-tight font-bold"
               style={{ fontSize: "clamp(1.5rem, 4vw, 3rem)", fontFamily: "var(--font-stack-heading)", color: "var(--color-primary)" }}
             >
-              Impact Across the Continent
+              Testimonials
             </h2>
           </div>
 

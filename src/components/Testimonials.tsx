@@ -199,6 +199,7 @@ export function Testimonials() {
           animation: scrollLogos 35s linear infinite;
           display: flex;
           width: max-content;
+          will-change: transform;
         }
         .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>
@@ -227,18 +228,33 @@ export function Testimonials() {
           <div className="w-full overflow-hidden mb-4 sm:mb-6 relative">
             <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-[#1E1245] to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-[#1E1245] to-transparent z-10 pointer-events-none" />
-            <div className="logo-scroll-track items-center gap-10 sm:gap-14 lg:gap-16">
-              {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((logo, i) => (
-                <div key={i} className="flex-shrink-0 transition-all duration-300 hover:scale-110">
-                  <img
-                    src={logo.src}
-                    alt={logo.alt}
-                    className="h-10 sm:h-12 md:h-14 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-              ))}
+            <div className="logo-scroll-track gap-10 sm:gap-14 lg:gap-16">
+              <div className="flex items-center gap-10 sm:gap-14 lg:gap-16">
+                {CLIENT_LOGOS.map((logo, i) => (
+                  <div key={`original-${i}`} className="flex-shrink-0 transition-all duration-300 hover:scale-110">
+                    <img
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="h-10 sm:h-12 md:h-14 w-auto object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-10 sm:gap-14 lg:gap-16" aria-hidden="true">
+                {CLIENT_LOGOS.map((logo, i) => (
+                  <div key={`duplicate-${i}`} className="flex-shrink-0 transition-all duration-300 hover:scale-110">
+                    <img
+                      src={logo.src}
+                      alt={logo.alt}
+                      className="h-10 sm:h-12 md:h-14 w-auto object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

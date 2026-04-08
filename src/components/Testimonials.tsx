@@ -7,14 +7,14 @@ const GlobeWrapper = lazy(() =>
 );
 
 const CLIENT_LOGOS = [
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.52.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.52.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg?tr=e-removedotbg", alt: "Client" },
 ];
 
 const CONTACTS = [

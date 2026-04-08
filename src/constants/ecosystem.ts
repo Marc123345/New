@@ -19,11 +19,7 @@ export const SERVICES = [
     closingNote: null,
     deliverables: ["Channel Audit", "Platform Strategy", "Communication Guidelines", "Graphic Templates", "Always-on Content", "Community Engagement", "Brand Consistency"],
     icon: React.createElement(Building2, { size: 32 }),
-    stats: [
-      { label: "Avg. Engagement Lift", value: "3.2x" },
-      { label: "Brand Impressions", value: "+180%" },
-      { label: "Follower Growth", value: "+45%" },
-    ],
+    stats: [],
   },
   {
     type: 'core',

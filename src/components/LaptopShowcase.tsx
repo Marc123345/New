@@ -3,107 +3,43 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 
 
-/* ── Simulated website pages that scroll inside the laptop screen ── */
-const SHOWCASE_PAGES = [
-  {
-    id: 'hero',
-    render: () => (
-      <div style={{ minHeight: 420, background: 'linear-gradient(165deg, #0e0820 0%, #1a1040 50%, #291e56 100%)', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', padding: '60px 32px', position: 'relative' as const, overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '20%', left: '50%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(164,108,252,0.3) 0%, transparent 70%)', transform: 'translateX(-50%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
-        <div style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase' as const, color: '#a46cfc', marginBottom: 16, fontWeight: 700 }}>Your Digital Home</div>
-        <div style={{ fontSize: 36, fontWeight: 900, color: '#fff', textAlign: 'center' as const, lineHeight: 1.05, letterSpacing: '-0.03em', maxWidth: 400 }}>
-          Websites That<br />
-          <span style={{ background: 'linear-gradient(135deg, #a46cfc, #7B2FF2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Work Harder.</span>
-        </div>
-        <div style={{ marginTop: 20, fontSize: 12, color: 'rgba(255,255,255,0.55)', textAlign: 'center' as const, maxWidth: 320, lineHeight: 1.7 }}>
-          Built for engagement. Optimised for search. Designed to convert visitors into conversations.
-        </div>
-        <div style={{ marginTop: 28, display: 'flex', gap: 12 }}>
-          <div style={{ padding: '10px 24px', background: 'linear-gradient(135deg, #a46cfc, #7B2FF2)', borderRadius: 6, fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Get Started</div>
-          <div style={{ padding: '10px 24px', border: '1px solid rgba(164,108,252,0.4)', borderRadius: 6, fontSize: 10, fontWeight: 700, color: '#a46cfc', letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>Learn More</div>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'blog-grid',
-    render: () => (
-      <div style={{ padding: '40px 24px', background: '#0c0618' }}>
-        <div style={{ fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#a46cfc', marginBottom: 6, fontWeight: 700 }}>Content Hub</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 24, letterSpacing: '-0.02em' }}>Latest Insights</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {[
-            { tag: 'Strategy', title: 'Why B2B Brands Need Human Stories', img: 'linear-gradient(135deg, #1a1040, #3b2470)' },
-            { tag: 'LinkedIn', title: 'Employee Advocacy: The Untapped Channel', img: 'linear-gradient(135deg, #291e56, #4a2d8a)' },
-            { tag: 'Leadership', title: 'Building Thought Leadership That Lasts', img: 'linear-gradient(135deg, #0e0820, #291e56)' },
-            { tag: 'Content', title: 'The Content Hub Framework', img: 'linear-gradient(135deg, #1a1040, #0e0820)' },
-          ].map((post) => (
-            <div key={post.title} style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(164,108,252,0.15)', background: '#0e0a1f' }}>
-              <div style={{ height: 80, background: post.img, position: 'relative' }}>
-                <div style={{ position: 'absolute', bottom: 6, left: 8, fontSize: 7, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: '#a46cfc', fontWeight: 700, padding: '2px 6px', background: 'rgba(10,6,18,0.8)', borderRadius: 3 }}>{post.tag}</div>
-              </div>
-              <div style={{ padding: '10px 10px 12px' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#fff', lineHeight: 1.4 }}>{post.title}</div>
-                <div style={{ marginTop: 6, fontSize: 8, color: 'rgba(255,255,255,0.4)' }}>Read more →</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'services',
-    render: () => (
-      <div style={{ padding: '40px 24px', background: 'linear-gradient(180deg, #0c0618 0%, #0e0820 100%)' }}>
-        <div style={{ fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#a46cfc', marginBottom: 6, fontWeight: 700 }}>What We Build</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 24, letterSpacing: '-0.02em' }}>Full-Stack Digital</div>
-        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
-          {[
-            { icon: '🌐', title: 'Website Design', desc: 'Responsive, fast, SEO-optimised' },
-            { icon: '✍️', title: 'Content Strategy', desc: 'Blogs, whitepapers, video scripts' },
-            { icon: '📊', title: 'Analytics & SEO', desc: 'Data-driven optimisation' },
-            { icon: '🎥', title: 'Video Production', desc: 'Brand films, interviews, reels' },
-          ].map((s) => (
-            <div key={s.title} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 8, border: '1px solid rgba(164,108,252,0.12)', background: 'rgba(26,16,64,0.3)' }}>
-              <div style={{ fontSize: 18, width: 36, height: 36, borderRadius: 8, background: 'rgba(164,108,252,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{s.icon}</div>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>{s.title}</div>
-                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{s.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'stats',
-    render: () => (
-      <div style={{ padding: '40px 24px 60px', background: '#0e0820' }}>
-        <div style={{ fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#a46cfc', marginBottom: 6, fontWeight: 700 }}>Impact</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 24, letterSpacing: '-0.02em' }}>Built to Perform</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-          {[
-            { val: '95+', label: 'SEO Score' },
-            { val: '<2s', label: 'Load Time' },
-            { val: '3.2x', label: 'Engagement' },
-          ].map((s) => (
-            <div key={s.label} style={{ textAlign: 'center' as const, padding: '16px 8px', borderRadius: 8, border: '1px solid rgba(164,108,252,0.2)', background: 'rgba(26,16,64,0.2)' }}>
-              <div style={{ fontSize: 24, fontWeight: 900, color: '#a46cfc', letterSpacing: '-0.02em' }}>{s.val}</div>
-              <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' as const }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: 28, textAlign: 'center' as const }}>
-          <div style={{ display: 'inline-block', padding: '12px 32px', background: 'linear-gradient(135deg, #a46cfc, #7B2FF2)', borderRadius: 8, fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '0.15em', textTransform: 'uppercase' as const, boxShadow: '0 8px 32px rgba(164,108,252,0.35)' }}>
-            Start Your Project
-          </div>
-        </div>
-      </div>
-    ),
-  },
-];
+/* ── Content displayed inside the laptop screen ── */
+const SHOWCASE_CONTENT = () => (
+  <div style={{
+    minHeight: '100%',
+    background: 'linear-gradient(165deg, #0e0820 0%, #1a1040 50%, #291e56 100%)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 'clamp(32px, 6vw, 60px) clamp(24px, 5vw, 48px)',
+    position: 'relative' as const,
+    overflow: 'hidden',
+  }}>
+    <div style={{ position: 'absolute', top: '15%', left: '50%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(164,108,252,0.25) 0%, transparent 70%)', transform: 'translateX(-50%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
+    <div style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase' as const, color: '#a46cfc', marginBottom: 20, fontWeight: 700, position: 'relative' as const, zIndex: 1 }}>Website / Digital Content Hub</div>
+    <div style={{ fontSize: 'clamp(20px, 4vw, 32px)', fontWeight: 900, color: '#fff', textAlign: 'center' as const, lineHeight: 1.1, letterSpacing: '-0.02em', maxWidth: 480, position: 'relative' as const, zIndex: 1 }}>
+      Your Digital{' '}
+      <span style={{ background: 'linear-gradient(135deg, #a46cfc, #7B2FF2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Home.</span>
+    </div>
+    <p style={{
+      marginTop: 24,
+      fontSize: 'clamp(11px, 1.8vw, 14px)',
+      color: 'rgba(255,255,255,0.7)',
+      textAlign: 'center' as const,
+      maxWidth: 440,
+      lineHeight: 1.8,
+      position: 'relative' as const,
+      zIndex: 1,
+    }}>
+      Most companies treat their website like a box to tick. We don&apos;t.
+      At H2H, we build digital homes — modern, high-impact websites with sharp design,
+      smart movement, and a polished user experience. Then we turn them into content hubs,
+      filled with thought leadership blogs, white papers, infographics, videos, and interviews
+      that bring your brand to life and give people a reason to stay.
+    </p>
+  </div>
+);
 
 interface LaptopShowcaseProps {
   open: boolean;
@@ -114,8 +50,6 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
   const scrollRef = useRef<HTMLDivElement>(null);
   const laptopRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const rafRef = useRef(0);
-  const scrollAnimRef = useRef(0);
 
   // Body scroll lock
   useEffect(() => {
@@ -163,48 +97,6 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
     setTilt({ x: 0, y: 0 });
   }, []);
 
-  // Auto-scroll the website content inside the laptop.
-  // Stops permanently on first user touch so it never fights manual scrolling.
-  const autoScrollStopped = useRef(false);
-
-  useEffect(() => {
-    if (!open) { autoScrollStopped.current = false; return; }
-    const el = scrollRef.current;
-    if (!el) return;
-
-    // Stop auto-scroll permanently on any touch/mouse interaction
-    const stopForever = () => {
-      autoScrollStopped.current = true;
-      cancelAnimationFrame(scrollAnimRef.current);
-    };
-    el.addEventListener('touchstart', stopForever, { passive: true, once: true });
-    el.addEventListener('mousedown', stopForever, { once: true });
-    el.addEventListener('wheel', stopForever, { passive: true, once: true });
-
-    const startDelay = setTimeout(() => {
-      if (autoScrollStopped.current) return;
-      let scrollPos = 0;
-      const speed = 0.4;
-
-      const tick = () => {
-        if (autoScrollStopped.current) return;
-        scrollPos += speed;
-        const maxScroll = el.scrollHeight - el.clientHeight;
-        if (scrollPos >= maxScroll) return; // stop at bottom
-        el.scrollTop = scrollPos;
-        scrollAnimRef.current = requestAnimationFrame(tick);
-      };
-      scrollAnimRef.current = requestAnimationFrame(tick);
-    }, 800);
-
-    return () => {
-      clearTimeout(startDelay);
-      cancelAnimationFrame(scrollAnimRef.current);
-      el.removeEventListener('touchstart', stopForever);
-      el.removeEventListener('mousedown', stopForever);
-      el.removeEventListener('wheel', stopForever);
-    };
-  }, [open]);
 
   return (
     <AnimatePresence>
@@ -267,14 +159,12 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
                 <div className="laptop-camera__dot" />
               </div>
 
-              {/* Website content — auto-scrolling */}
+              {/* Website content */}
               <div
                 ref={scrollRef}
                 className="laptop-content"
               >
-                {SHOWCASE_PAGES.map((page) => (
-                  <div key={page.id}>{page.render()}</div>
-                ))}
+                <SHOWCASE_CONTENT />
               </div>
 
               {/* Screen reflection overlay */}

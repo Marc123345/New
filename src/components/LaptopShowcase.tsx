@@ -163,47 +163,48 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
     setTilt({ x: 0, y: 0 });
   }, []);
 
-  // Auto-scroll the website content inside the laptop
+  // Auto-scroll the website content inside the laptop.
+  // Stops permanently on first user touch so it never fights manual scrolling.
+  const autoScrollStopped = useRef(false);
+
   useEffect(() => {
-    if (!open) return;
+    if (!open) { autoScrollStopped.current = false; return; }
     const el = scrollRef.current;
     if (!el) return;
 
-    // Wait for mount animation to finish
+    // Stop auto-scroll permanently on any touch/mouse interaction
+    const stopForever = () => {
+      autoScrollStopped.current = true;
+      cancelAnimationFrame(scrollAnimRef.current);
+    };
+    el.addEventListener('touchstart', stopForever, { passive: true, once: true });
+    el.addEventListener('mousedown', stopForever, { once: true });
+    el.addEventListener('wheel', stopForever, { passive: true, once: true });
+
     const startDelay = setTimeout(() => {
+      if (autoScrollStopped.current) return;
       let scrollPos = 0;
-      const speed = 0.35; // px per frame
+      const speed = 0.4;
 
       const tick = () => {
+        if (autoScrollStopped.current) return;
         scrollPos += speed;
         const maxScroll = el.scrollHeight - el.clientHeight;
-
-        if (scrollPos >= maxScroll) {
-          // Pause at bottom, then reset
-          setTimeout(() => {
-            el.scrollTo({ top: 0, behavior: 'smooth' });
-            scrollPos = 0;
-          }, 2000);
-          return;
-        }
-
+        if (scrollPos >= maxScroll) return; // stop at bottom
         el.scrollTop = scrollPos;
         scrollAnimRef.current = requestAnimationFrame(tick);
       };
-
       scrollAnimRef.current = requestAnimationFrame(tick);
-    }, 1200);
+    }, 800);
 
     return () => {
       clearTimeout(startDelay);
       cancelAnimationFrame(scrollAnimRef.current);
+      el.removeEventListener('touchstart', stopForever);
+      el.removeEventListener('mousedown', stopForever);
+      el.removeEventListener('wheel', stopForever);
     };
   }, [open]);
-
-  // Pause auto-scroll on user interaction, resume after
-  const handleScreenInteraction = useCallback(() => {
-    cancelAnimationFrame(scrollAnimRef.current);
-  }, []);
 
   return (
     <AnimatePresence>
@@ -270,8 +271,6 @@ export const LaptopShowcase = memo(function LaptopShowcase({ open, onClose }: La
               <div
                 ref={scrollRef}
                 className="laptop-content"
-                onTouchStart={handleScreenInteraction}
-                onMouseDown={handleScreenInteraction}
               >
                 {SHOWCASE_PAGES.map((page) => (
                   <div key={page.id}>{page.render()}</div>

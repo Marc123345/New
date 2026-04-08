@@ -201,7 +201,7 @@ export function GlobeWrapper({ scrollYProgress, isVisible = true, hideArcs = fal
           .polygonSideColor(() => 'rgba(107,47,250,0.08)')
           .polygonStrokeColor(() => 'rgba(164,108,252,0.25)')
           .polygonAltitude(0.004)
-          .polygonsTransitionDuration(700);
+          .polygonsTransitionDuration(1200);
 
         // Fetch the Africa GeoJSON bundled in /public and feed it in
         fetch('/africa.geo.json')

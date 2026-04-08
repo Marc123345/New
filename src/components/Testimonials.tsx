@@ -68,20 +68,20 @@ const CONTACTS = [
 const cardVariants = {
   enter: (dir: number) => ({
     opacity: 0,
-    rotateY: dir > 0 ? 90 : -90,
-    scale: 0.9,
+    rotateY: dir > 0 ? 45 : -45,
+    scale: 0.92,
   }),
   center: {
     opacity: 1,
     rotateY: 0,
     scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   },
   exit: (dir: number) => ({
     opacity: 0,
-    rotateY: dir > 0 ? -90 : 90,
-    scale: 0.9,
-    transition: { duration: 0.35, ease: [0.55, 0, 1, 0.45] },
+    rotateY: dir > 0 ? -45 : 45,
+    scale: 0.92,
+    transition: { duration: 0.5, ease: [0.55, 0, 1, 0.45] },
   }),
 };
 
@@ -204,7 +204,7 @@ export function Testimonials() {
         .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>
 
-      <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#1E1245]">
+      <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-[#1E1245]">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0" style={{ contain: 'layout style paint' }}>
 
           <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">

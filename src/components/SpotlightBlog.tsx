@@ -230,7 +230,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
     <section
       className="relative"
       style={{
-        background: "#ffffff",
+        background: "var(--color-primary)",
         paddingTop: "clamp(60px, 8vw, 100px)",
         paddingBottom: "clamp(80px, 8vw, 120px)",
         overflow: "clip",
@@ -253,7 +253,7 @@ export function SpotlightBlog({ posts, hideHeader = false }: SpotlightBlogProps)
                   fontSize: "clamp(2.4rem, 5vw, 4rem)",
                   fontWeight: 900,
                   fontFamily: "var(--font-stack-heading)",
-                  color: "#1a1a2e",
+                  color: "#ffffff",
                   lineHeight: 1,
                   letterSpacing: "-0.03em",
                   margin: 0,

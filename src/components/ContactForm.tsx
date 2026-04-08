@@ -11,15 +11,16 @@ export function ContactForm() {
   const agentLoaded = useRef(false);
 
   // Load JotForm contact form
+  // Load contact form eagerly on mount (not on tab click) so it's ready when user scrolls down
   useEffect(() => {
-    if (activeTab !== "form" || formLoaded.current || !formRef.current) return;
+    if (formLoaded.current || !formRef.current) return;
     const script = document.createElement("script");
     script.src = "https://form.jotform.com/jsform/260973737186066";
     script.type = "text/javascript";
     script.async = true;
     formRef.current.appendChild(script);
     formLoaded.current = true;
-  }, [activeTab]);
+  }, []);
 
   // Load AI agent
   useEffect(() => {
@@ -163,14 +164,32 @@ export function ContactForm() {
           }}
         >
           {/* Contact Form */}
-          <div ref={formRef} style={{ display: activeTab === "form" ? "block" : "none" }} />
+          <div ref={formRef} style={{ display: activeTab === "form" ? "block" : "none", minHeight: 200, position: "relative" }}>
+            <div className="contact-loader">Loading form...</div>
+          </div>
 
           {/* AI Agent */}
-          <div ref={agentRef} style={{ display: activeTab === "agent" ? "block" : "none", padding: "8px" }} />
+          <div ref={agentRef} style={{ display: activeTab === "agent" ? "block" : "none", padding: "8px", minHeight: 200, position: "relative" }}>
+            <div className="contact-loader">Loading assistant...</div>
+          </div>
         </motion.div>
       </div>
 
       <style>{`
+        .contact-loader {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--color-text-dark);
+          opacity: 0.3;
+          font-family: var(--font-stack-heading);
+          font-size: 0.8rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          pointer-events: none;
+        }
         @media (max-width: 480px) {
           .contact-tab-switcher button {
             padding: 12px 12px !important;

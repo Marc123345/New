@@ -30,7 +30,7 @@ export function ContactForm() {
     iframe.id = "JotFormIFrame-019d6d549dcd7547a9afe8a31ffe982e36dc";
     iframe.title = "Darius: Digital Marketing Consultant";
     iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
-    iframe.style.cssText = "width:100%;height:688px;border:none;max-width:100%;";
+    iframe.style.cssText = "width:100%;height:min(688px, 70vh);border:none;max-width:100%;";
     iframe.setAttribute("allowtransparency", "true");
     iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
     iframe.scrolling = "no";
@@ -69,13 +69,12 @@ export function ContactForm() {
         }}
       >
         {/* Tab switcher — full width at top */}
-        <div style={{
+        <div className="contact-tab-switcher" style={{
           display: "flex",
           gap: "4px",
           background: "rgba(0,0,0,0.06)",
           borderRadius: 12,
           padding: 4,
-          marginBottom: "clamp(24px, 4vw, 48px)",
           maxWidth: 480,
           margin: "0 auto clamp(24px, 4vw, 48px)",
         }}>
@@ -169,6 +168,7 @@ export function ContactForm() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
+              className="contact-form-card"
               style={{
                 border: "3px solid var(--color-text-dark)",
                 borderRadius: 16,
@@ -178,9 +178,9 @@ export function ContactForm() {
                 overflow: "hidden",
               }}
             >
-              <div style={{ padding: "clamp(20px, 4vw, 40px) clamp(20px, 4vw, 40px) 0" }}>
+              <div style={{ padding: "clamp(16px, 4vw, 40px) clamp(16px, 4vw, 40px) 0" }}>
                 <h2 style={{
-                  fontSize: "clamp(1.6rem, 3.5vw, 2.5rem)",
+                  fontSize: "clamp(1.4rem, 3.5vw, 2.5rem)",
                   fontWeight: 700,
                   color: "var(--color-text-dark)",
                   marginBottom: "12px",
@@ -208,6 +208,7 @@ export function ContactForm() {
         {/* AI AGENT VIEW */}
         <div style={{ display: activeTab === "agent" ? "block" : "none" }}>
           <div
+            className="contact-agent-box"
             style={{
               maxWidth: 720,
               margin: "0 auto",
@@ -253,6 +254,31 @@ export function ContactForm() {
           .contact-phone-box {
             aspect-ratio: 4 / 3 !important;
             max-height: 320px;
+          }
+        }
+        @media (max-width: 480px) {
+          .contact-tab-switcher {
+            max-width: 100% !important;
+          }
+          .contact-tab-switcher button {
+            padding: 12px 12px !important;
+            font-size: 0.7rem !important;
+            letter-spacing: 0.05em !important;
+          }
+          .contact-agent-box {
+            border-width: 2px !important;
+            box-shadow: 4px 4px 0 var(--color-surface-dark) !important;
+            border-radius: 12px !important;
+          }
+          .contact-form-card {
+            border-width: 2px !important;
+            box-shadow: 4px 4px 0 var(--color-surface-dark) !important;
+            border-radius: 12px !important;
+          }
+          .contact-phone-box {
+            border-width: 2px !important;
+            box-shadow: 4px 4px 0 var(--color-surface-dark) !important;
+            border-radius: 12px !important;
           }
         }
       `}</style>

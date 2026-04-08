@@ -262,7 +262,7 @@ export function Testimonials() {
 
             {/* LEFT: Globe Panel — hidden on mobile, visible on sm+ */}
             <div
-              className="hidden sm:flex lg:w-[340px] flex-row lg:flex-col items-center justify-center gap-3 py-3 lg:py-4 px-4 lg:px-6 text-white relative shrink-0 bg-[#1A1040]"
+              className="flex lg:w-[340px] flex-row lg:flex-col items-center justify-center gap-3 py-2 sm:py-3 lg:py-4 px-3 sm:px-4 lg:px-6 text-white relative shrink-0 bg-[#1A1040]"
               style={{ border: "4px solid var(--color-secondary)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)" }}
             >
               <div className="text-center z-10 lg:block hidden">
@@ -272,7 +272,7 @@ export function Testimonials() {
                 </p>
               </div>
 
-              <div className="relative w-[150px] h-[150px] sm:w-[140px] sm:h-[140px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
+              <div className="relative w-[70px] h-[70px] sm:w-[120px] sm:h-[120px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>
@@ -323,7 +323,7 @@ export function Testimonials() {
             <div
               ref={cardRef}
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
-              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(280px, 45vh, 480px)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(240px, 40vh, 480px)" }}
             >
               <div
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"

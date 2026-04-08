@@ -20,6 +20,7 @@
     build: {
       target: 'esnext',
       outDir: 'dist',
+      chunkSizeWarningLimit: 3000,
       rollupOptions: {
         output: {
           manualChunks: {

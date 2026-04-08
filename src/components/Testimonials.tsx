@@ -196,6 +196,9 @@ export function Testimonials() {
           width: max-content;
           will-change: transform;
         }
+        @media (max-width: 640px) {
+          .logo-scroll-track { animation-duration: 50s; }
+        }
         .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>
 

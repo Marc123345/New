@@ -122,38 +122,53 @@ export function Testimonials() {
     setActiveIndex(clamped);
   };
 
-  // Touch swipe — navigate cards on horizontal swipe
+  // Touch swipe — native event listeners so preventDefault works (React registers passive)
+  const cardRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number | null>(null);
   const swiping = useRef(false);
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    swiping.current = false;
-  };
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
-    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
-    // If horizontal movement dominates, prevent page scroll
-    if (dx > dy && dx > 15) {
-      swiping.current = true;
-      e.preventDefault();
-    }
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
-    touchStartY.current = null;
-    if (!swiping.current && Math.abs(delta) < 40) return;
-    const newDir = delta < 0 ? 1 : -1;
-    const newIdx = Math.max(0, Math.min(CONTACTS.length - 1, activeIndexRef.current + newDir));
-    if (newIdx !== activeIndexRef.current) {
-      directionRef.current = newDir;
-      activeIndexRef.current = newIdx;
-      setActiveIndex(newIdx);
-    }
-  };
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+
+    const onStart = (e: TouchEvent) => {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+      swiping.current = false;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (touchStartX.current === null || touchStartY.current === null) return;
+      const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+      const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+      if (dx > dy && dx > 15) {
+        swiping.current = true;
+        e.preventDefault();
+      }
+    };
+    const onEnd = (e: TouchEvent) => {
+      if (touchStartX.current === null) return;
+      const delta = e.changedTouches[0].clientX - touchStartX.current;
+      touchStartX.current = null;
+      touchStartY.current = null;
+      if (!swiping.current && Math.abs(delta) < 40) return;
+      const newDir = delta < 0 ? 1 : -1;
+      const newIdx = Math.max(0, Math.min(CONTACTS.length - 1, activeIndexRef.current + newDir));
+      if (newIdx !== activeIndexRef.current) {
+        directionRef.current = newDir;
+        activeIndexRef.current = newIdx;
+        setActiveIndex(newIdx);
+      }
+    };
+
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
+    el.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onStart);
+      el.removeEventListener('touchmove', onMove);
+      el.removeEventListener('touchend', onEnd);
+    };
+  }, []);
 
   const contact = CONTACTS[activeIndex];
 
@@ -250,11 +265,9 @@ export function Testimonials() {
 
             {/* RIGHT: Single active card via AnimatePresence */}
             <div
+              ref={cardRef}
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
               style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(320px, 50vh, 480px)" }}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
             >
               <div
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"

@@ -278,8 +278,8 @@ export function EcosystemServices() {
             }} />
           </div>
 
-          {/* Center: Purple iPad — click opens the About H2H video */}
-          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          {/* Center: Purple iPad — click opens the laptop showcase */}
+          <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
             <motion.div
               animate={sectionInView ? { y: [0, -12, 0] } : { y: 0 }}
               transition={sectionInView ? { duration: 4.5, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}

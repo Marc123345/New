@@ -165,12 +165,18 @@ export function ContactForm() {
         >
           {/* Contact Form */}
           <div ref={formRef} style={{ display: activeTab === "form" ? "block" : "none", minHeight: 200, position: "relative" }}>
-            <div className="contact-loader">Loading form...</div>
+            <div className="contact-loader">
+              <div className="contact-loader__ring" />
+              <span className="contact-loader__text">Connecting</span>
+            </div>
           </div>
 
           {/* AI Agent */}
           <div ref={agentRef} style={{ display: activeTab === "agent" ? "block" : "none", padding: "8px", minHeight: 200, position: "relative" }}>
-            <div className="contact-loader">Loading assistant...</div>
+            <div className="contact-loader">
+              <div className="contact-loader__ring" />
+              <span className="contact-loader__text">Connecting</span>
+            </div>
           </div>
         </motion.div>
       </div>
@@ -180,16 +186,29 @@ export function ContactForm() {
           position: absolute;
           inset: 0;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          color: var(--color-text-dark);
-          opacity: 0.3;
-          font-family: var(--font-stack-heading);
-          font-size: 0.8rem;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
+          gap: 16px;
           pointer-events: none;
         }
+        .contact-loader__ring {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 2px solid rgba(164,108,252,0.1);
+          border-top-color: #a46cfc;
+          animation: loaderSpin 0.8s linear infinite;
+          box-shadow: 0 0 12px rgba(164,108,252,0.15);
+        }
+        .contact-loader__text {
+          font-family: var(--font-stack-heading);
+          font-size: 0.5rem;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: rgba(164,108,252,0.4);
+        }
+        @keyframes loaderSpin { to { transform: rotate(360deg); } }
         @media (max-width: 480px) {
           .contact-tab-switcher button {
             padding: 12px 12px !important;

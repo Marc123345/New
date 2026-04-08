@@ -244,11 +244,11 @@ function HeroLusion() {
           border: 2px solid var(--color-secondary, #a46cfc);
           cursor: pointer;
           transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-          box-shadow: 0 4px 20px rgba(164,108,252,0.25);
+          box-shadow: 0 2px 12px rgba(164,108,252,0.2);
         }
         .hero-story-btn:hover {
-          transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 8px 32px rgba(164,108,252,0.4);
+          transform: scale(1.03);
+          box-shadow: 0 4px 16px rgba(164,108,252,0.3);
           background: var(--color-secondary, #a46cfc);
         }
         .hero-story-btn:focus-visible {

@@ -22,12 +22,15 @@ export function ContactForm() {
     script.async = true;
     formRef.current.appendChild(script);
     formLoaded.current = true;
-    // Watch for JotForm iframe to appear
+    // Watch for JotForm to inject its content (form or iframe)
     const obs = new MutationObserver(() => {
-      if (formRef.current?.querySelector("iframe")) { setFormReady(true); obs.disconnect(); }
+      const el = formRef.current;
+      if (el && el.children.length > 1) { setFormReady(true); obs.disconnect(); }
     });
     obs.observe(formRef.current, { childList: true, subtree: true });
-    return () => obs.disconnect();
+    // Fallback — hide loader after 6s regardless
+    const fallback = setTimeout(() => setFormReady(true), 6000);
+    return () => { obs.disconnect(); clearTimeout(fallback); };
   }, []);
 
   // Load AI agent
@@ -44,6 +47,8 @@ export function ContactForm() {
     iframe.setAttribute("frameborder", "0");
     iframe.scrolling = "no";
     iframe.onload = () => setAgentReady(true);
+    // Fallback in case onload doesn't fire (embed handler may replace iframe)
+    setTimeout(() => setAgentReady(true), 5000);
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");

@@ -47,6 +47,7 @@ export function ChatWidget() {
     iframe.src = `https://agent.jotform.com/${AGENT_ID}?embedMode=iframe&autofocus=0&background=1&shadow=1`;
     iframe.style.cssText = "max-width:100%;height:688px;border:none;width:100%;";
     iframe.onload = () => setAgentReady(true);
+    setTimeout(() => setAgentReady(true), 5000);
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");

@@ -40,7 +40,7 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* ── Floating circular button + tooltip ── */}
+      {/* ── Floating buttons ── */}
       <div className="h2h-chat-wrap">
         <div
           className="h2h-chat-tooltip"
@@ -51,22 +51,43 @@ export function ChatWidget() {
           <span className="h2h-chat-tooltip__arrow" aria-hidden />
         </div>
 
-        <button
-          type="button"
-          aria-label="Meet our founder — play video"
-          onClick={() => setOpen(true)}
-          className="h2h-chat-fab"
-        >
-          <span className="h2h-chat-fab__ring" aria-hidden />
-          <span className="h2h-chat-fab__pulse" aria-hidden />
-          <img
-            src={SHANNON_AVATAR}
-            alt=""
-            className="h2h-chat-fab__img is-founder"
-            style={{ objectFit: "cover" }}
-          />
-          <span className="h2h-chat-fab__dot" aria-hidden />
-        </button>
+        <div className="h2h-chat-stack">
+          {/* Chat with Us button */}
+          <button
+            type="button"
+            aria-label="Chat with Darius — AI consultant"
+            onClick={() => {
+              const contactEl = document.getElementById("contact");
+              if (contactEl) contactEl.scrollIntoView({ behavior: "smooth" });
+              // Switch to agent tab after scroll
+              setTimeout(() => {
+                const agentBtn = document.querySelector<HTMLButtonElement>(".contact-tab-switcher button:last-child");
+                agentBtn?.click();
+              }, 600);
+            }}
+            className="h2h-chat-us"
+          >
+            Chat with Us
+          </button>
+
+          {/* Meet our founder FAB */}
+          <button
+            type="button"
+            aria-label="Meet our founder — play video"
+            onClick={() => setOpen(true)}
+            className="h2h-chat-fab"
+          >
+            <span className="h2h-chat-fab__ring" aria-hidden />
+            <span className="h2h-chat-fab__pulse" aria-hidden />
+            <img
+              src={SHANNON_AVATAR}
+              alt=""
+              className="h2h-chat-fab__img is-founder"
+              style={{ objectFit: "cover" }}
+            />
+            <span className="h2h-chat-fab__dot" aria-hidden />
+          </button>
+        </div>
       </div>
 
       {/* ── Overlay modal ── */}
@@ -125,6 +146,35 @@ export function ChatWidget() {
           pointer-events: none;
         }
         .h2h-chat-wrap > * { pointer-events: auto; }
+
+        .h2h-chat-stack {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .h2h-chat-us {
+          background: var(--color-secondary, #a46cfc);
+          color: #ffffff;
+          font-family: var(--font-stack-heading, system-ui, sans-serif);
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          padding: 10px 18px;
+          border-radius: 999px;
+          border: 2px solid rgba(255,255,255,0.25);
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(164,108,252,0.35);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          white-space: nowrap;
+          animation: h2hTipIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .h2h-chat-us:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 24px rgba(164,108,252,0.5);
+        }
 
         /* ── Tooltip bubble ── */
         .h2h-chat-tooltip {

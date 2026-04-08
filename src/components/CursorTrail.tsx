@@ -40,7 +40,7 @@ const FLUID_FRAG = `
     vec2 force = vel * strength * 8.0;
     vec2 color = prev.rg + force;
 
-    color *= 0.88;
+    color *= 0.82;
 
     gl_FragColor = vec4(color, 0.0, 1.0);
   }

@@ -207,9 +207,9 @@ export function Testimonials() {
       <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-white">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/5 pt-4 sm:pt-10 md:pt-16 pb-2 sm:pb-4 md:pb-0" style={{ contain: 'layout style paint' }}>
 
-          <div className="text-center mb-2 sm:mb-4 md:mb-8 px-4 md:px-8">
+          <div className="text-center mb-1 sm:mb-4 md:mb-8 px-4 md:px-8">
             <div
-              className="inline-block mb-3 md:mb-4 px-3 py-1.5 md:px-4 md:py-2"
+              className="inline-block mb-1 sm:mb-3 md:mb-4 px-3 py-1 sm:py-1.5 md:px-4 md:py-2"
               style={{ border: "2px solid var(--color-secondary)", borderRadius: "6px", boxShadow: "4px 4px 0 var(--color-secondary)" }}
             >
               <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase" style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}>
@@ -258,11 +258,11 @@ export function Testimonials() {
             </div>
           </div>
 
-          <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">
+          <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-6 px-3 sm:px-5 md:px-8">
 
-            {/* LEFT: Globe Panel — visible on all screens */}
+            {/* LEFT: Globe Panel — hidden on mobile, visible on sm+ */}
             <div
-              className="flex lg:w-[340px] flex-row lg:flex-col items-center justify-center gap-3 py-3 lg:py-4 px-4 lg:px-6 text-white relative shrink-0 bg-[#1A1040]"
+              className="hidden sm:flex lg:w-[340px] flex-row lg:flex-col items-center justify-center gap-3 py-3 lg:py-4 px-4 lg:px-6 text-white relative shrink-0 bg-[#1A1040]"
               style={{ border: "4px solid var(--color-secondary)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)" }}
             >
               <div className="text-center z-10 lg:block hidden">
@@ -272,7 +272,7 @@ export function Testimonials() {
                 </p>
               </div>
 
-              <div className="relative w-[150px] h-[150px] sm:w-[180px] sm:h-[180px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
+              <div className="relative w-[150px] h-[150px] sm:w-[140px] sm:h-[140px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>
@@ -323,7 +323,7 @@ export function Testimonials() {
             <div
               ref={cardRef}
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
-              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(320px, 50vh, 480px)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(280px, 45vh, 480px)" }}
             >
               <div
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"

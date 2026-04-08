@@ -14,9 +14,7 @@ import { ChatWidget } from "./components/ChatWidget";
 
 import { H2HLogo } from "./components/H2HLogo";
 import { AboutSection } from "./components/AboutSection";
-// Eager-start the download but lazy-render so the app shell paints immediately
-const lusionPromise = import("./components/LusionConnectors");
-const LusionConnectors = lazy(() => lusionPromise.then((m) => ({ default: m.LusionConnectors })));
+import { LusionConnectors } from "./components/LusionConnectors";
 const EcosystemServices = lazy(() =>
   import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),
 );

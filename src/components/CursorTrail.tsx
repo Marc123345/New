@@ -40,7 +40,7 @@ const FLUID_FRAG = `
     vec2 force = vel * strength * 8.0;
     vec2 color = prev.rg + force;
 
-    color *= 0.965;
+    color *= 0.92;
 
     gl_FragColor = vec4(color, 0.0, 1.0);
   }
@@ -82,8 +82,8 @@ const GLOW_FRAG = `
     vec3 trailColor = vec3(0.644, 0.424, 0.988);
     vec3 headColor = vec3(0.486, 0.016, 0.988);
 
-    float trailAlpha = smoothstep(0.0, 0.18, len) * 0.7;
-    float headAlpha = head * 0.85;
+    float trailAlpha = smoothstep(0.0, 0.18, len) * 0.4;
+    float headAlpha = head * 0.55;
 
     float alpha = max(trailAlpha, headAlpha);
     vec3 col = mix(trailColor, headColor, head);

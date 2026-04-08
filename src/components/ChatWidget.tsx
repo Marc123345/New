@@ -103,7 +103,6 @@ export function ChatWidget() {
                 src={VIDEO_FOUNDER}
                 controls
                 autoPlay
-                muted
                 playsInline
                 preload="auto"
                 className="h2h-chat-video"

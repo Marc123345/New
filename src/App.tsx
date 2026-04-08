@@ -152,7 +152,6 @@ function HeroLusion() {
                 src={BRAND_VIDEO}
                 controls
                 autoPlay
-                muted
                 playsInline
                 preload="auto"
                 className="hero-video-player"

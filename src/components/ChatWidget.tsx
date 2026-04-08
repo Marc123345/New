@@ -10,6 +10,7 @@ type Tab = "video" | "chat";
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("video");
+  const [agentReady, setAgentReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const agentRef = useRef<HTMLDivElement>(null);
   const agentLoaded = useRef(false);
@@ -45,6 +46,7 @@ export function ChatWidget() {
     iframe.setAttribute("scrolling", "no");
     iframe.src = `https://agent.jotform.com/${AGENT_ID}?embedMode=iframe&autofocus=0&background=1&shadow=1`;
     iframe.style.cssText = "max-width:100%;height:688px;border:none;width:100%;";
+    iframe.onload = () => setAgentReady(true);
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");
@@ -121,7 +123,14 @@ export function ChatWidget() {
             </div>
 
             {/* Agent */}
-            <div ref={agentRef} style={{ display: tab === "chat" ? "block" : "none" }} />
+            <div ref={agentRef} style={{ display: tab === "chat" ? "block" : "none", position: "relative", minHeight: 200 }}>
+              {!agentReady && (
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, pointerEvents: "none" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", border: "2px solid rgba(164,108,252,0.1)", borderTopColor: "#a46cfc", animation: "loaderSpin 0.8s linear infinite", boxShadow: "0 0 12px rgba(164,108,252,0.15)" }} />
+                  <span style={{ fontFamily: "var(--font-stack-heading)", fontSize: "0.5rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(164,108,252,0.4)" }}>Connecting</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -176,6 +185,7 @@ export function ChatWidget() {
         }
         @media (min-width:769px) { .h2h-ov { background:rgba(6,3,18,0.88); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); } }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes loaderSpin { to{transform:rotate(360deg)} }
 
         .h2h-ov__modal {
           position: relative; width: 100%; max-width: 960px;

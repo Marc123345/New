@@ -5,6 +5,8 @@ type Tab = "form" | "agent";
 
 export function ContactForm() {
   const [activeTab, setActiveTab] = useState<Tab>("form");
+  const [formReady, setFormReady] = useState(false);
+  const [agentReady, setAgentReady] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const agentRef = useRef<HTMLDivElement>(null);
   const formLoaded = useRef(false);
@@ -20,6 +22,12 @@ export function ContactForm() {
     script.async = true;
     formRef.current.appendChild(script);
     formLoaded.current = true;
+    // Watch for JotForm iframe to appear
+    const obs = new MutationObserver(() => {
+      if (formRef.current?.querySelector("iframe")) { setFormReady(true); obs.disconnect(); }
+    });
+    obs.observe(formRef.current, { childList: true, subtree: true });
+    return () => obs.disconnect();
   }, []);
 
   // Load AI agent
@@ -35,6 +43,7 @@ export function ContactForm() {
     iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
     iframe.setAttribute("frameborder", "0");
     iframe.scrolling = "no";
+    iframe.onload = () => setAgentReady(true);
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");
@@ -165,18 +174,22 @@ export function ContactForm() {
         >
           {/* Contact Form */}
           <div ref={formRef} style={{ display: activeTab === "form" ? "block" : "none", minHeight: 200, position: "relative" }}>
-            <div className="contact-loader">
-              <div className="contact-loader__ring" />
-              <span className="contact-loader__text">Connecting</span>
-            </div>
+            {!formReady && (
+              <div className="contact-loader">
+                <div className="contact-loader__ring" />
+                <span className="contact-loader__text">Connecting</span>
+              </div>
+            )}
           </div>
 
           {/* AI Agent */}
           <div ref={agentRef} style={{ display: activeTab === "agent" ? "block" : "none", padding: "8px", minHeight: 200, position: "relative" }}>
-            <div className="contact-loader">
-              <div className="contact-loader__ring" />
-              <span className="contact-loader__text">Connecting</span>
-            </div>
+            {!agentReady && (
+              <div className="contact-loader">
+                <div className="contact-loader__ring" />
+                <span className="contact-loader__text">Connecting</span>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

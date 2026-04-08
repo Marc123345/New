@@ -233,7 +233,7 @@ function Connector({
   const vec = useMemo(() => new THREE.Vector3(), [])
   const r = THREE.MathUtils.randFloatSpread
   const pos = useMemo<[number, number, number]>(
-    () => position ?? [r(10), r(10), r(10)],
+    () => position ?? [r(4), r(4), r(2)],
     [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
@@ -249,8 +249,8 @@ function Connector({
     <RigidBody
       ref={api}
       position={pos}
-      linearDamping={4}
-      angularDamping={1}
+      linearDamping={3}
+      angularDamping={0.8}
       friction={0.1}
       colliders={false}
     >

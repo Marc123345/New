@@ -220,31 +220,29 @@ export function Testimonials() {
           </div>
 
           {/* Client logo slider */}
-          <div className="w-full overflow-hidden mb-2 sm:mb-4 md:mb-6 relative">
-            <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-            <div className="logo-scroll-track gap-10 sm:gap-14 lg:gap-16">
-              <div className="flex items-center gap-10 sm:gap-14 lg:gap-16">
+          <div className="w-full overflow-hidden mb-1 sm:mb-3 md:mb-6 relative shrink-0" style={{ height: 'clamp(36px, 6vw, 56px)' }}>
+            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+            <div className="logo-scroll-track gap-6 sm:gap-10 lg:gap-16">
+              <div className="flex items-center gap-6 sm:gap-10 lg:gap-16">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`original-${i}`} className="flex-shrink-0 transition-all duration-300 hover:scale-110">
+                  <div key={`original-${i}`} className="flex-shrink-0">
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-10 sm:h-12 md:h-14 w-auto object-contain opacity-70 hover:opacity-100 transition-all duration-300"
-                      loading="lazy"
+                      className="h-7 sm:h-10 md:h-14 w-auto object-contain opacity-80"
                       decoding="async"
                     />
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-10 sm:gap-14 lg:gap-16" aria-hidden="true">
+              <div className="flex items-center gap-6 sm:gap-10 lg:gap-16" aria-hidden="true">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`duplicate-${i}`} className="flex-shrink-0 transition-all duration-300 hover:scale-110">
+                  <div key={`duplicate-${i}`} className="flex-shrink-0">
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-10 sm:h-12 md:h-14 w-auto object-contain opacity-70 hover:opacity-100 transition-all duration-300"
-                      loading="lazy"
+                      className="h-7 sm:h-10 md:h-14 w-auto object-contain opacity-80"
                       decoding="async"
                     />
                   </div>

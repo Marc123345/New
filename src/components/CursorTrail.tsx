@@ -94,8 +94,10 @@ const GLOW_FRAG = `
 
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isMobile = typeof window !== 'undefined' && ('ontouchstart' in window || window.innerWidth < 768);
 
   useEffect(() => {
+    if (isMobile) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -254,7 +256,9 @@ export function CursorTrail() {
       rtA.dispose();
       rtB.dispose();
     };
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) return null;
 
   return (
     <canvas

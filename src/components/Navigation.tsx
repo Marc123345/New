@@ -179,10 +179,10 @@ export function Navigation() {
               >
                 Menu
               </span>
-              <div className="flex flex-col gap-[5px] w-5">
-                <span className="block h-[1.5px] w-full transition-colors duration-400" style={{ backgroundColor: inkColor }} />
-                <span className="block h-[1.5px] w-3/4 transition-colors duration-400" style={{ backgroundColor: inkColor }} />
-                <span className="block h-[1.5px] w-1/2 transition-colors duration-400" style={{ backgroundColor: inkColor }} />
+              <div className="flex flex-col gap-[6px] w-7 sm:w-5">
+                <span className="block h-[2px] sm:h-[1.5px] w-full transition-colors duration-400" style={{ backgroundColor: inkColor }} />
+                <span className="block h-[2px] sm:h-[1.5px] w-3/4 transition-colors duration-400" style={{ backgroundColor: inkColor }} />
+                <span className="block h-[2px] sm:h-[1.5px] w-1/2 transition-colors duration-400" style={{ backgroundColor: inkColor }} />
               </div>
             </button>
           </div>

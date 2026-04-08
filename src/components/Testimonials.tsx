@@ -114,15 +114,38 @@ export function Testimonials() {
     return () => observer.disconnect();
   }, []);
 
-  // Touch swipe — navigate cards without needing to scroll 300vh
+  const navigateTo = (idx: number) => {
+    const clamped = Math.max(0, Math.min(CONTACTS.length - 1, idx));
+    if (clamped === activeIndexRef.current) return;
+    directionRef.current = clamped > activeIndexRef.current ? 1 : -1;
+    activeIndexRef.current = clamped;
+    setActiveIndex(clamped);
+  };
+
+  // Touch swipe — navigate cards on horizontal swipe
+  const touchStartY = useRef<number | null>(null);
+  const swiping = useRef(false);
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    swiping.current = false;
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+    // If horizontal movement dominates, prevent page scroll
+    if (dx > dy && dx > 15) {
+      swiping.current = true;
+      e.preventDefault();
+    }
   };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const delta = e.changedTouches[0].clientX - touchStartX.current;
     touchStartX.current = null;
-    if (Math.abs(delta) < 40) return;
+    touchStartY.current = null;
+    if (!swiping.current && Math.abs(delta) < 40) return;
     const newDir = delta < 0 ? 1 : -1;
     const newIdx = Math.max(0, Math.min(CONTACTS.length - 1, activeIndexRef.current + newDir));
     if (newIdx !== activeIndexRef.current) {
@@ -230,6 +253,7 @@ export function Testimonials() {
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
               style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(320px, 50vh, 480px)" }}
               onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
               <div
@@ -322,9 +346,18 @@ export function Testimonials() {
                       {contact.name.split(" ")[0]} · {contact.country}
                     </span>
                   </div>
-                  <div className="flex gap-1.5 shrink-0">
+                  <div className="flex gap-2 shrink-0">
                     {CONTACTS.map((_, i) => (
-                      <div key={i} style={{ width: i === activeIndex ? 20 : 6, height: 4, borderRadius: 2, background: i === activeIndex ? "var(--color-secondary)" : "rgba(255,255,255,0.2)", transition: "width 0.3s ease, background 0.3s ease" }} />
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`Testimonial ${i + 1}`}
+                        onClick={() => navigateTo(i)}
+                        className="flex items-center justify-center"
+                        style={{ minWidth: 44, minHeight: 44, padding: 0, background: "none", border: "none", cursor: "pointer" }}
+                      >
+                        <div style={{ width: i === activeIndex ? 20 : 6, height: 5, borderRadius: 3, background: i === activeIndex ? "var(--color-secondary)" : "rgba(255,255,255,0.2)", transition: "width 0.3s ease, background 0.3s ease" }} />
+                      </button>
                     ))}
                   </div>
                 </div>

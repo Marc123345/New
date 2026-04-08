@@ -89,7 +89,7 @@ export function Testimonials() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [globeVisible, setGlobeVisible] = useState(false);
-  const [globeLoaded, setGlobeLoaded] = useState(false);
+  const [globeLoaded, setGlobeLoaded] = useState(true);
   const activeIndexRef = useRef(0);
   const directionRef = useRef(1);
   const touchStartX = useRef<number | null>(null);
@@ -109,17 +109,13 @@ export function Testimonials() {
     }
   });
 
-  // Lazy-load globe on first visibility
+  // Track globe visibility for animation pausing
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        const visible = entry.isIntersecting;
-        setGlobeVisible(visible);
-        if (visible) setGlobeLoaded(true);
-      },
-      { threshold: 0.05 }
+      ([entry]) => setGlobeVisible(entry.isIntersecting),
+      { rootMargin: "200px 0px", threshold: 0 }
     );
     observer.observe(el);
     return () => observer.disconnect();

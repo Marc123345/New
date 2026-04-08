@@ -14,9 +14,7 @@ import { ChatWidget } from "./components/ChatWidget";
 
 import { H2HLogo } from "./components/H2HLogo";
 import { AboutSection } from "./components/AboutSection";
-const LusionConnectors = lazy(() =>
-  import("./components/LusionConnectors").then((m) => ({ default: m.LusionConnectors })),
-);
+import { LusionConnectors } from "./components/LusionConnectors";
 const EcosystemServices = lazy(() =>
   import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),
 );

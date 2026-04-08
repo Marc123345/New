@@ -26,7 +26,7 @@ const CONTACTS = [
     countryCode: "ZA",
     role: "CEO",
     service: "Rebrand Communications",
-    logo: "https://ik.imagekit.io/qcvroy8xpd/b94fce2d-89dd-415a-b597-5158a6129386.jpeg?tr=f-auto,q-80",
+    logo: "https://ik.imagekit.io/qcvroy8xpd/ab26609e-ee55-4995-9d50-f1c5ae2fcb8d.jpeg",
     quote: "H2H Social played a pivotal role in leading Stallion's rebrand communications. Their expertise helped us deliver our message with clarity, confidence, and in a way that set a benchmark for industry communications.",
   },
   {

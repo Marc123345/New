@@ -98,6 +98,7 @@ export function CursorTrail() {
   const isMobile = typeof window !== 'undefined' && ('ontouchstart' in window || window.innerWidth < 768);
 
   useEffect(() => {
+    if (isMobile) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -258,6 +259,8 @@ export function CursorTrail() {
       rtB.dispose();
     };
   }, [isMobile]);
+
+  if (isMobile) return null;
 
   return (
     <canvas

@@ -165,6 +165,8 @@ function HeroLusion() {
 
       <style>{`
         .hero-section {
+          /* Nav height = 2×padding + logo + border ≈ clamp(55px, 9vw + 22px, 132px) */
+          --nav-h: calc(clamp(33px, 7vw, 90px) + clamp(20px, 4vh, 40px) + 1px);
           width: 100%;
           height: calc(var(--vh, 1vh) * 100 + 30px);
           background: #f0f0f0;
@@ -172,7 +174,7 @@ function HeroLusion() {
           grid-template-rows: auto 1fr;
           gap: clamp(1em, 3vw, 3em);
           padding: clamp(1.25em, 3vw, 3em) clamp(1.25em, 5vw, 5em);
-          padding-top: calc(clamp(70px, 12vw, 132px) + clamp(1em, 2vw, 2em));
+          padding-top: calc(var(--nav-h) + 20px);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -205,7 +207,7 @@ function HeroLusion() {
             height: calc(var(--vh, 1vh) * 100);
             gap: 0.75em;
             padding: 1em 1em;
-            padding-top: calc(clamp(70px, 12vw, 110px) + 16px);
+            padding-top: calc(var(--nav-h) + 16px);
           }
           .hero-tagline {
             max-width: 100%;
@@ -218,7 +220,7 @@ function HeroLusion() {
         @media (max-width: 480px) {
           .hero-section {
             padding: 0.75em 0.75em;
-            padding-top: calc(clamp(60px, 10vw, 80px) + 16px);
+            padding-top: calc(var(--nav-h) + 12px);
             gap: 0.5em;
           }
           .hero-story-btn {

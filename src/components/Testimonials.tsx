@@ -272,7 +272,7 @@ export function Testimonials() {
                 </p>
               </div>
 
-              <div className="relative w-[70px] h-[70px] sm:w-[120px] sm:h-[120px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
+              <div className="relative w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] lg:w-[260px] lg:h-[260px] flex-shrink-0">
                 {/* SVG rings */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
                   <svg viewBox="0 0 380 380" fill="none" className="w-full h-full animate-[spin_60s_linear_infinite]" style={{ animationPlayState: globeVisible ? 'running' : 'paused' }}>

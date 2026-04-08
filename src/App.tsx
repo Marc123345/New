@@ -408,12 +408,12 @@ function AppContent() {
       </Section>
 
       {/* ═══ TESTIMONIALS ═══ */}
-      <Section id="testimonials" className="bg-[#13082A]" noPadding={true}>
+      <Section id="testimonials" className="bg-[#1E1245]" noPadding={true}>
         <Testimonials />
       </Section>
 
       {/* Spacer between testimonials and blog */}
-      <div className="h-20 sm:h-28 lg:h-36 bg-[#13082A]" />
+      <div className="h-20 sm:h-28 lg:h-36 bg-[#1E1245]" />
 
       {/* ═══ BLOG ═══ */}
       <div id="blog">

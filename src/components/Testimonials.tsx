@@ -231,7 +231,7 @@ export function Testimonials() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-10 sm:h-12 md:h-14 w-auto object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                      className="h-10 sm:h-12 md:h-14 w-auto object-contain opacity-70 hover:opacity-100 transition-all duration-300"
                       loading="lazy"
                       decoding="async"
                     />
@@ -244,7 +244,7 @@ export function Testimonials() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-10 sm:h-12 md:h-14 w-auto object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                      className="h-10 sm:h-12 md:h-14 w-auto object-contain opacity-70 hover:opacity-100 transition-all duration-300"
                       loading="lazy"
                       decoding="async"
                     />

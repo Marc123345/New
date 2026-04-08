@@ -16,7 +16,7 @@ export function H2HLogo({ height = 60, className, style, onDark = true }: H2HLog
       src={onDark ? LOGO_WHITE : LOGO_BLACK}
       alt="H2H Social Logo"
       className={className}
-      style={{ height, width: "auto", flexShrink: 0, objectFit: "contain", ...style }}
+      style={{ height: style?.height ?? height, width: "auto", flexShrink: 0, objectFit: "contain", ...style }}
     />
   );
 }

@@ -172,7 +172,7 @@ function HeroLusion() {
           grid-template-rows: auto 1fr;
           gap: clamp(1em, 3vw, 3em);
           padding: clamp(1.25em, 3vw, 3em) clamp(1.25em, 5vw, 5em);
-          padding-top: calc(70px + clamp(2em, 4vw, 4em));
+          padding-top: calc(clamp(70px, 12vw, 132px) + clamp(1em, 2vw, 2em));
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -205,7 +205,7 @@ function HeroLusion() {
             height: calc(var(--vh, 1vh) * 100);
             gap: 0.75em;
             padding: 1em 1em;
-            padding-top: 120px;
+            padding-top: calc(clamp(70px, 12vw, 110px) + 16px);
           }
           .hero-tagline {
             max-width: 100%;
@@ -218,7 +218,7 @@ function HeroLusion() {
         @media (max-width: 480px) {
           .hero-section {
             padding: 0.75em 0.75em;
-            padding-top: 108px;
+            padding-top: calc(clamp(60px, 10vw, 80px) + 16px);
             gap: 0.5em;
           }
           .hero-story-btn {

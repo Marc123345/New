@@ -200,8 +200,8 @@ export function Testimonials() {
         .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>
 
-      <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-[#1E1245]">
-        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-white/10 pt-16 pb-4 md:pt-20 md:pb-0" style={{ contain: 'layout style paint' }}>
+      <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-white">
+        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/5 pt-16 pb-4 md:pt-20 md:pb-0" style={{ contain: 'layout style paint' }}>
 
           <div className="text-center mb-4 sm:mb-5 md:mb-8 px-4 md:px-8">
             <div
@@ -214,7 +214,7 @@ export function Testimonials() {
             </div>
             <h2
               className="tracking-tight font-bold"
-              style={{ fontSize: "clamp(1.5rem, 4vw, 3rem)", fontFamily: "var(--font-stack-heading)", color: "#ffffff" }}
+              style={{ fontSize: "clamp(1.5rem, 4vw, 3rem)", fontFamily: "var(--font-stack-heading)", color: "var(--color-primary)" }}
             >
               Impact Across the Continent
             </h2>
@@ -222,8 +222,8 @@ export function Testimonials() {
 
           {/* Client logo slider */}
           <div className="w-full overflow-hidden mb-4 sm:mb-6 relative">
-            <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-[#1E1245] to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-[#1E1245] to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
             <div className="logo-scroll-track gap-10 sm:gap-14 lg:gap-16">
               <div className="flex items-center gap-10 sm:gap-14 lg:gap-16">
                 {CLIENT_LOGOS.map((logo, i) => (

@@ -14,6 +14,8 @@ const CLIENT_LOGOS = [
   { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg?tr=e-removedotbg", alt: "Client" },
   { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg?tr=e-removedotbg", alt: "Client" },
   { src: "https://ik.imagekit.io/qcvroy8xpd/GOLD%20TEXT%20LOGO%20NO%20GLOW%20EFFECT%20ADDED%201.png?updatedAt=1748753342858", alt: "Untapped Africa" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094", alt: "YDPay" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/ab26609e-ee55-4995-9d50-f1c5ae2fcb8d.jpeg", alt: "Stallion Integrated" },
 ];
 
 const CONTACTS = [

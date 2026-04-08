@@ -29,13 +29,15 @@ export function ContactForm() {
     iframe.id = "JotFormIFrame-019d6d549dcd7547a9afe8a31ffe982e36dc";
     iframe.title = "Darius: Digital Marketing Consultant";
     iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
-    iframe.style.cssText = "width:100%;border:none;display:block;";
+    iframe.style.cssText = "max-width:100%;height:688px;border:none;width:100%;";
     iframe.setAttribute("allowtransparency", "true");
     iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
+    iframe.setAttribute("frameborder", "0");
+    iframe.scrolling = "no";
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");
-    handler.src = "https://cdn.jotfor.ms/s/umd/87418c24ff6/for-form-embed-handler.js";
+    handler.src = "https://cdn.jotfor.ms/s/umd/33c1343dc9e/for-form-embed-handler.js";
     handler.onload = () => {
       (window as any).jotformEmbedHandler?.(
         "iframe[id='JotFormIFrame-019d6d549dcd7547a9afe8a31ffe982e36dc']",
@@ -157,7 +159,7 @@ export function ContactForm() {
             borderRadius: 16,
             background: "var(--color-background-light)",
             boxShadow: "8px 8px 0 var(--color-surface-dark)",
-            overflow: "hidden",
+            overflow: "visible",
           }}
         >
           {/* Contact Form */}

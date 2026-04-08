@@ -42,13 +42,15 @@ export function ChatWidget() {
     iframe.id = "JotFormIFrame-widget-agent";
     iframe.title = "Darius: Digital Marketing Consultant";
     iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
-    iframe.style.cssText = "width:100%;border:none;display:block;height:100%;";
+    iframe.style.cssText = "max-width:100%;height:688px;border:none;width:100%;";
     iframe.setAttribute("allowtransparency", "true");
     iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
+    iframe.setAttribute("frameborder", "0");
+    iframe.scrolling = "no";
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");
-    handler.src = "https://cdn.jotfor.ms/s/umd/87418c24ff6/for-form-embed-handler.js";
+    handler.src = "https://cdn.jotfor.ms/s/umd/33c1343dc9e/for-form-embed-handler.js";
     handler.onload = () => {
       (window as any).jotformEmbedHandler?.(
         "iframe[id='JotFormIFrame-widget-agent']",
@@ -294,28 +296,21 @@ export function ChatWidget() {
         }
         .h2h-overlay__video { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-        /* ── Chat modal — FULL screen ── */
+        /* ── Chat modal ── */
         .h2h-overlay__chat {
           position: relative;
           width: 100%;
-          height: 100%;
           max-width: 700px;
-          max-height: calc(100vh - 32px);
           background: #1a1040;
           border: 1px solid rgba(255,255,255,0.15);
           border-radius: 16px;
           box-shadow: 0 24px 80px rgba(0,0,0,0.6), var(--shadow-geometric, 10px 10px 0 #a46cfc);
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
+          overflow: visible;
           animation: popIn 0.35s cubic-bezier(0.22,1,0.36,1);
         }
         .h2h-overlay__agent {
-          flex: 1;
-          min-height: 0;
-          overflow: hidden;
+          overflow: visible;
         }
-        .h2h-overlay__agent iframe { height: 100% !important; }
 
         @keyframes popIn {
           from { opacity:0; transform: translateY(16px) scale(0.97); }
@@ -328,7 +323,7 @@ export function ChatWidget() {
           .h2h-chat-wrap { gap: 8px; }
           .h2h-chat-us { font-size: 10px; padding: 8px 14px; }
           .h2h-overlay__modal { border-radius: 14px; }
-          .h2h-overlay__chat { max-width: 100%; max-height: 100%; border-radius: 14px; }
+          .h2h-overlay__chat { max-width: 100%; border-radius: 14px; }
           .h2h-overlay__header { padding: 14px 12px; padding-right: 52px; }
           .h2h-overlay__label { font-size: 0.72rem; letter-spacing: 0.1em; }
           .h2h-overlay__close { top: 8px; right: 8px; width: 36px; height: 36px; font-size: 16px; }

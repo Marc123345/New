@@ -4,9 +4,14 @@ const SHANNON_AVATAR = "https://ik.imagekit.io/qcvroy8xpd/1770306949175.jpeg?tr=
 const VIDEO_FOUNDER =
   "https://ik.imagekit.io/qcvroy8xpd/H2H%20SHANNON%20INTRODUCTION%20VIDEO%20FINAL%20V1.mp4";
 
+type OverlayTab = "video" | "chat";
+
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<OverlayTab>("video");
   const videoRef = useRef<HTMLVideoElement>(null);
+  const agentRef = useRef<HTMLDivElement>(null);
+  const agentLoaded = useRef(false);
 
   // Lock body scroll while the overlay is open
   useEffect(() => {
@@ -28,15 +33,47 @@ export function ChatWidget() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Pause & reset video when closing
+  // Pause & reset video when closing or switching tabs
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (!open) {
+    if (!open || tab !== "video") {
       v.pause();
       v.currentTime = 0;
     }
-  }, [open]);
+  }, [open, tab]);
+
+  // Load agent iframe when chat tab is first selected
+  useEffect(() => {
+    if (tab !== "chat" || agentLoaded.current || !agentRef.current || !open) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.id = "JotFormIFrame-widget-agent";
+    iframe.title = "Darius: Digital Marketing Consultant";
+    iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
+    iframe.style.cssText = "width:100%;height:100%;border:none;";
+    iframe.setAttribute("allowtransparency", "true");
+    iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
+    agentRef.current.appendChild(iframe);
+
+    const handler = document.createElement("script");
+    handler.src = "https://cdn.jotfor.ms/s/umd/87418c24ff6/for-form-embed-handler.js";
+    handler.onload = () => {
+      (window as any).jotformEmbedHandler?.(
+        "iframe[id='JotFormIFrame-widget-agent']",
+        "https://www.jotform.com"
+      );
+    };
+    document.body.appendChild(handler);
+    agentLoaded.current = true;
+
+    return () => { handler.remove(); };
+  }, [tab, open]);
+
+  const openTo = (t: OverlayTab) => {
+    setTab(t);
+    setOpen(true);
+  };
 
   return (
     <>
@@ -55,16 +92,8 @@ export function ChatWidget() {
           {/* Chat with Us button */}
           <button
             type="button"
-            aria-label="Chat with Darius — AI consultant"
-            onClick={() => {
-              const contactEl = document.getElementById("contact");
-              if (contactEl) contactEl.scrollIntoView({ behavior: "smooth" });
-              // Switch to agent tab after scroll
-              setTimeout(() => {
-                const agentBtn = document.querySelector<HTMLButtonElement>(".contact-tab-switcher button:last-child");
-                agentBtn?.click();
-              }, 600);
-            }}
+            aria-label="Chat with Darius"
+            onClick={() => openTo("chat")}
             className="h2h-chat-us"
           >
             Chat with Us
@@ -74,7 +103,7 @@ export function ChatWidget() {
           <button
             type="button"
             aria-label="Meet our founder — play video"
-            onClick={() => setOpen(true)}
+            onClick={() => openTo("video")}
             className="h2h-chat-fab"
           >
             <span className="h2h-chat-fab__ring" aria-hidden />
@@ -90,14 +119,14 @@ export function ChatWidget() {
         </div>
       </div>
 
-      {/* ── Overlay modal ── */}
+      {/* ── Overlay modal with tabs ── */}
       {open && (
         <div
           className="h2h-chat-overlay"
           onClick={() => setOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Meet the founder"
+          aria-label={tab === "video" ? "Meet the founder" : "Chat with Darius"}
         >
           <div
             className="h2h-chat-modal"
@@ -112,23 +141,43 @@ export function ChatWidget() {
               ✕
             </button>
 
-            {/* Single-tab header — clean label instead of tab row */}
+            {/* Tab row */}
             <div className="h2h-chat-header">
-              <span className="h2h-chat-header__label">Meet the Founder</span>
+              <button
+                type="button"
+                className={`h2h-chat-tab ${tab === "video" ? "h2h-chat-tab--active" : ""}`}
+                onClick={() => setTab("video")}
+              >
+                Meet the Founder
+              </button>
+              <button
+                type="button"
+                className={`h2h-chat-tab ${tab === "chat" ? "h2h-chat-tab--active" : ""}`}
+                onClick={() => setTab("chat")}
+              >
+                Chat with Us
+              </button>
             </div>
 
             {/* Video stage */}
-            <div className="h2h-chat-stage">
+            <div className="h2h-chat-stage" style={{ display: tab === "video" ? "flex" : "none" }}>
               <video
                 ref={videoRef}
                 src={VIDEO_FOUNDER}
                 controls
-                autoPlay
+                autoPlay={tab === "video"}
                 playsInline
                 preload="auto"
                 className="h2h-chat-video"
               />
             </div>
+
+            {/* Agent stage */}
+            <div
+              ref={agentRef}
+              className="h2h-chat-stage"
+              style={{ display: tab === "chat" ? "flex" : "none", minHeight: "min(600px, 65vh)" }}
+            />
           </div>
         </div>
       )}
@@ -241,10 +290,6 @@ export function ChatWidget() {
           pointer-events: none;
           animation: h2hImgSwap 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .h2h-chat-fab__img.is-about {
-          padding: 14px;
-          background: var(--color-primary, #291e56);
-        }
         @keyframes h2hImgSwap {
           0%   { opacity: 0; transform: scale(0.85) rotate(-8deg); }
           100% { opacity: 1; transform: scale(1)    rotate(0); }
@@ -277,9 +322,7 @@ export function ChatWidget() {
           box-shadow: 0 0 0 0 rgba(34,197,94,0.6);
           animation: h2hChatDot 2s ease-out infinite;
         }
-        @keyframes h2hChatSpin {
-          to { transform: rotate(360deg); }
-        }
+        @keyframes h2hChatSpin { to { transform: rotate(360deg); } }
         @keyframes h2hChatPulse {
           0%   { box-shadow: 0 0 0 0   rgba(164,108,252,0.55); }
           70%  { box-shadow: 0 0 0 22px rgba(164,108,252,0); }
@@ -292,9 +335,6 @@ export function ChatWidget() {
         }
 
         /* ── Overlay ── */
-        /* Mobile gets a solid backdrop; desktop gets the blur. iOS Safari's
-           backdrop-filter triggers a layer-recomposite on every fade-in frame
-           which stutters the modal open. */
         .h2h-chat-overlay {
           position: fixed;
           inset: 0;
@@ -329,6 +369,7 @@ export function ChatWidget() {
           flex-direction: column;
           overflow: hidden;
           animation: h2hChatPop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          max-height: calc(100vh - 40px);
         }
         @keyframes h2hChatPop {
           from { opacity: 0; transform: translateY(16px) scale(0.97); }
@@ -358,38 +399,53 @@ export function ChatWidget() {
           transform: rotate(90deg);
         }
 
-        /* ── Header label (single "Meet the Founder" title) ── */
+        /* ── Tab header ── */
         .h2h-chat-header {
-          padding: clamp(18px, 2.5vw, 24px) clamp(16px, 2.5vw, 28px);
-          padding-right: 64px; /* leave room for close button */
+          display: flex;
+          gap: 0;
           border-bottom: 1px solid rgba(255,255,255,0.1);
+          padding-right: 56px;
         }
-        .h2h-chat-header__label {
-          display: inline-block;
-          color: #ffffff;
+        .h2h-chat-tab {
+          flex: 1;
+          padding: clamp(14px, 2.5vw, 20px) clamp(12px, 2vw, 24px);
+          background: none;
+          border: none;
+          color: rgba(255,255,255,0.4);
           font-family: var(--font-stack-heading, system-ui, sans-serif);
-          font-size: clamp(0.85rem, 1.3vw, 1rem);
+          font-size: clamp(0.7rem, 1.3vw, 0.85rem);
           font-weight: 700;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          padding-bottom: 6px;
-          border-bottom: 3px solid var(--color-secondary, #a46cfc);
+          cursor: pointer;
+          transition: color 0.2s, border-color 0.2s;
+          border-bottom: 3px solid transparent;
+          margin-bottom: -1px;
+        }
+        .h2h-chat-tab:hover {
+          color: rgba(255,255,255,0.7);
+        }
+        .h2h-chat-tab--active {
+          color: #ffffff;
+          border-bottom-color: var(--color-secondary, #a46cfc);
         }
 
-        /* ── Video stage ── */
+        /* ── Content stage ── */
         .h2h-chat-stage {
           background: #000;
-          aspect-ratio: 16 / 9;
           width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex: 1;
+          min-height: 0;
         }
         .h2h-chat-video {
           width: 100%;
           height: 100%;
           object-fit: contain;
           display: block;
+          aspect-ratio: 16 / 9;
         }
 
         /* ── Mobile tweaks ── */
@@ -406,13 +462,10 @@ export function ChatWidget() {
             max-width: 100%;
             border-radius: 14px;
           }
-          .h2h-chat-header {
-            padding: 14px 12px;
-            padding-right: 52px;
-          }
-          .h2h-chat-header__label {
-            font-size: 0.72rem;
-            letter-spacing: 0.1em;
+          .h2h-chat-tab {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            padding: 12px 8px;
           }
           .h2h-chat-close {
             top: 8px;
@@ -420,6 +473,10 @@ export function ChatWidget() {
             width: 34px;
             height: 34px;
             font-size: 16px;
+          }
+          .h2h-chat-us {
+            font-size: 10px;
+            padding: 8px 14px;
           }
         }
       `}</style>

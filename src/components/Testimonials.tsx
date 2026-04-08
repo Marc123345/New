@@ -199,7 +199,7 @@ export function Testimonials() {
           will-change: transform;
         }
         @media (max-width: 640px) {
-          .logo-scroll-track { animation-duration: 50s; }
+          .logo-scroll-track { animation-duration: 20s; }
         }
         .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>

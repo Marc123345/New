@@ -301,49 +301,6 @@ export function Navigation() {
 
         </div>
 
-        <div
-          className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 md:px-16 py-4 sm:py-5 flex items-center justify-between"
-          style={{
-            borderTop: "1px solid rgba(164,108,252,0.08)",
-            transition: "opacity 0.8s ease",
-            transitionDelay: mounted ? "350ms" : "0ms",
-            opacity: mounted ? 1 : 0,
-          }}
-        >
-          <p
-            className="text-[10px] uppercase tracking-[0.4em]"
-            style={{
-              fontFamily: "var(--font-stack-heading)",
-              color: "rgba(232,226,255,0.3)",
-            }}
-          >
-            &copy; {new Date().getFullYear()} H2H Social
-          </p>
-          <div className="flex gap-5">
-            {SOCIAL.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                className="text-[10px] uppercase tracking-widest transition-colors duration-300"
-                style={{
-                  fontFamily: "var(--font-stack-heading)",
-                  color: "rgba(232,226,255,0.3)",
-                }}
-              >
-                {s.label}
-              </a>
-            ))}
-          </div>
-          <p
-            className="hidden sm:block text-[10px] uppercase tracking-[0.4em]"
-            style={{
-              fontFamily: "var(--font-stack-heading)",
-              color: "rgba(232,226,255,0.3)",
-            }}
-          >
-            Nairobi &middot; Cape Town
-          </p>
-        </div>
 
         <button
           onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}

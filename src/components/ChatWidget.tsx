@@ -51,7 +51,7 @@ export function ChatWidget() {
     iframe.id = "JotFormIFrame-widget-agent";
     iframe.title = "Darius: Digital Marketing Consultant";
     iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
-    iframe.style.cssText = "width:100%;border:none;height:calc(100vh - 120px);";
+    iframe.style.cssText = "width:100%;border:none;display:block;";
     iframe.setAttribute("allowtransparency", "true");
     iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
     agentRef.current.appendChild(iframe);
@@ -175,7 +175,6 @@ export function ChatWidget() {
             {/* Agent stage */}
             <div
               ref={agentRef}
-              className="h2h-chat-stage"
               style={{ display: tab === "chat" ? "block" : "none" }}
             />
           </div>
@@ -369,7 +368,6 @@ export function ChatWidget() {
           flex-direction: column;
           overflow: hidden;
           animation: h2hChatPop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-          max-height: calc(100vh - 40px);
         }
         @keyframes h2hChatPop {
           from { opacity: 0; transform: translateY(16px) scale(0.97); }

@@ -6,6 +6,17 @@ const GlobeWrapper = lazy(() =>
   import("./HeroStory/Globe/GlobeWrapper").then((m) => ({ default: m.GlobeWrapper }))
 );
 
+const CLIENT_LOGOS = [
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.52.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg", alt: "Client" },
+];
+
 const CONTACTS = [
   {
     id: "stallion",
@@ -180,6 +191,16 @@ export function Testimonials() {
           50%      { box-shadow: 0 0 18px 4px rgba(164,108,252,0.4); }
         }
         .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; }
+        @keyframes scrollLogos {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .logo-scroll-track {
+          animation: scrollLogos 35s linear infinite;
+          display: flex;
+          width: max-content;
+        }
+        .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>
 
       <div ref={containerRef} className="relative h-[200vh] sm:h-[250vh] lg:h-[300vh] bg-[#13082A]">
@@ -200,6 +221,25 @@ export function Testimonials() {
             >
               Impact Across the Continent
             </h2>
+          </div>
+
+          {/* Client logo slider */}
+          <div className="w-full overflow-hidden mb-4 sm:mb-6 relative">
+            <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-[#13082A] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-[#13082A] to-transparent z-10 pointer-events-none" />
+            <div className="logo-scroll-track items-center gap-10 sm:gap-14 lg:gap-16">
+              {[...CLIENT_LOGOS, ...CLIENT_LOGOS].map((logo, i) => (
+                <div key={i} className="flex-shrink-0 transition-all duration-300 hover:scale-110">
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    className="h-10 sm:h-12 md:h-14 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-4 sm:gap-6 px-3 sm:px-5 md:px-8">

@@ -29,10 +29,9 @@ export function ContactForm() {
     iframe.id = "JotFormIFrame-019d6d549dcd7547a9afe8a31ffe982e36dc";
     iframe.title = "Darius: Digital Marketing Consultant";
     iframe.src = "https://agent.jotform.com/019d6d549dcd7547a9afe8a31ffe982e36dc?embedMode=iframe&autofocus=0&background=1&shadow=1";
-    iframe.style.cssText = "width:100%;border:none;max-width:100%;";
+    iframe.style.cssText = "width:100%;border:none;display:block;";
     iframe.setAttribute("allowtransparency", "true");
     iframe.setAttribute("allow", "geolocation; microphone; camera; fullscreen");
-    iframe.scrolling = "no";
     agentRef.current.appendChild(iframe);
 
     const handler = document.createElement("script");

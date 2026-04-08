@@ -188,10 +188,7 @@ function FaceCube({ url, size = CUBE_SIZE }: { url: string; size?: number }) {
   const texture = useFaceTexture(url)
   return (
     <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={IS_MOBILE ? 2 : 4} castShadow={!IS_MOBILE} receiveShadow={!IS_MOBILE}>
-      {IS_MOBILE
-        ? <meshLambertMaterial map={texture} />
-        : <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
-      }
+      <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
     </RoundedBox>
   )
 }
@@ -200,10 +197,7 @@ function LogoCube({ logo, size = CUBE_SIZE }: { logo: LogoDef; size?: number }) 
   const texture = useMemo(() => createLogoTexture(logo), [logo])
   return (
     <RoundedBox args={[size, size, size]} radius={CUBE_RADIUS} smoothness={IS_MOBILE ? 2 : 4} castShadow={!IS_MOBILE} receiveShadow={!IS_MOBILE}>
-      {IS_MOBILE
-        ? <meshLambertMaterial map={texture} />
-        : <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
-      }
+      <meshStandardMaterial map={texture} metalness={0.05} roughness={0.3} envMapIntensity={0.5} />
     </RoundedBox>
   )
 }

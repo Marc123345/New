@@ -71,7 +71,7 @@ const CONTACTS = [
     countryCode: "ZA",
     role: "Head of Marketing",
     service: "Brand Strategy",
-    logo: null as string | null,
+    logo: "https://ik.imagekit.io/qcvroy8xpd/downloads/Ask_Africa_logo_website_1_kbp13c.png",
     quote: "Representing and building the African narrative is not a small task. As the brand was already going through large-scale shifts, H2H could not have showed up at a better time.",
   },
 ];

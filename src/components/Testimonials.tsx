@@ -7,11 +7,11 @@ const GlobeWrapper = lazy(() =>
 );
 
 const CLIENT_LOGOS = [
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg?tr=e-removedotbg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg?tr=e-removedotbg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg?tr=e-removedotbg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg?tr=e-removedotbg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg?tr=e-removedotbg", alt: "Client" },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
+  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: true },
   { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg?tr=e-removedotbg", alt: "Client" },
   { src: "https://ik.imagekit.io/qcvroy8xpd/GOLD%20TEXT%20LOGO%20NO%20GLOW%20EFFECT%20ADDED%201.png?updatedAt=1748753342858", alt: "Untapped Africa" },
   { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094", alt: "YDPay" },
@@ -227,7 +227,7 @@ export function Testimonials() {
             <div className="logo-scroll-track">
               <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`original-${i}`} className="flex-shrink-0 flex items-center justify-center" style={{ width: 56, height: 24 }}>
+                  <div key={`original-${i}`} className={`flex-shrink-0 flex items-center justify-center${logo.mobileHide ? ' hidden sm:flex' : ''}`} style={{ width: 56, height: 24 }}>
                     <img
                       src={logo.src}
                       alt={logo.alt}
@@ -240,7 +240,7 @@ export function Testimonials() {
               </div>
               <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16" aria-hidden="true">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`duplicate-${i}`} className="flex-shrink-0 flex items-center justify-center" style={{ width: 56, height: 24 }}>
+                  <div key={`duplicate-${i}`} className={`flex-shrink-0 flex items-center justify-center${logo.mobileHide ? ' hidden sm:flex' : ''}`} style={{ width: 56, height: 24 }}>
                     <img
                       src={logo.src}
                       alt={logo.alt}

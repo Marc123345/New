@@ -370,12 +370,12 @@ export function Testimonials() {
                       </blockquote>
 
                       <div className="flex flex-col gap-1.5 mt-auto pt-2 min-w-0">
-                        <div className="leading-none truncate" style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic", fontSize: "clamp(0.9rem, 2.5vw, 1.4rem)", color: "#FBFBFC" }}>
+                        <div className="leading-tight" style={{ fontFamily: "var(--font-stack-body)", fontStyle: "italic", fontSize: "clamp(1rem, 2.5vw, 1.4rem)", color: "#FBFBFC" }}>
                           {contact.name}
                         </div>
                         <div
-                          className="self-start bg-[var(--color-secondary)] px-2 py-0.5 md:px-3 md:py-1 tracking-widest max-w-full truncate"
-                          style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(8px, 1.5vw, 11px)", borderRadius: "4px", color: "var(--color-background-light)" }}
+                          className="self-start bg-[var(--color-secondary)] px-2 py-1 md:px-3 md:py-1 tracking-widest"
+                          style={{ fontFamily: "var(--font-stack-heading)", fontSize: "clamp(9px, 1.8vw, 11px)", borderRadius: "4px", color: "var(--color-background-light)", lineHeight: 1.4 }}
                         >
                           {contact.role} · {contact.company}
                         </div>

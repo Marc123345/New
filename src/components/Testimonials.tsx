@@ -306,7 +306,7 @@ export function Testimonials() {
             <div
               ref={cardRef}
               className="flex-1 bg-[#1A1040] relative overflow-hidden flex flex-col min-w-0"
-              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(240px, 40vh, 480px)" }}
+              style={{ border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", boxShadow: "var(--shadow-geometric)", minHeight: "clamp(280px, 50vh, 560px)" }}
             >
               <div
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"
@@ -320,7 +320,7 @@ export function Testimonials() {
                     initial="enter"
                     animate="center"
                     exit="exit"
-                    className="absolute bg-[var(--color-primary)] text-white flex flex-col"
+                    className="absolute bg-[var(--color-primary)] text-white flex flex-col overflow-y-auto"
                     style={{
                       width: "min(92%, 560px)",
                       maxHeight: "calc(100% - 1.5rem)",

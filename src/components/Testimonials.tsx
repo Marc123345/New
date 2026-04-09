@@ -224,8 +224,8 @@ export function Testimonials() {
           <div className="w-full overflow-hidden mb-1 sm:mb-3 md:mb-6 relative shrink-0" style={{ height: 'clamp(44px, 8vw, 56px)' }}>
             <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-            <div className="logo-scroll-track gap-8 sm:gap-12 lg:gap-16">
-              <div className="flex items-center gap-8 sm:gap-12 lg:gap-16">
+            <div className="logo-scroll-track">
+              <div className="flex shrink-0 items-center gap-8 sm:gap-12 lg:gap-16 pr-8 sm:pr-12 lg:pr-16">
                 {CLIENT_LOGOS.map((logo, i) => (
                   <div key={`original-${i}`} className="flex-shrink-0 px-3 sm:px-2">
                     <img
@@ -238,7 +238,7 @@ export function Testimonials() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-8 sm:gap-12 lg:gap-16" aria-hidden="true">
+              <div className="flex shrink-0 items-center gap-8 sm:gap-12 lg:gap-16 pr-8 sm:pr-12 lg:pr-16" aria-hidden="true">
                 {CLIENT_LOGOS.map((logo, i) => (
                   <div key={`duplicate-${i}`} className="flex-shrink-0 px-3 sm:px-2">
                     <img

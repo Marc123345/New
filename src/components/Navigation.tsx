@@ -217,8 +217,8 @@ export function Navigation() {
           }}
         />
 
-        <div className="absolute inset-0 flex flex-col lg:flex-row overflow-y-auto">
-          <div className="shrink-0 lg:flex-1 lg:w-[60%] flex flex-col justify-center pl-6 pr-24 sm:pl-8 sm:pr-28 md:pl-16 md:pr-32 lg:px-24 pt-14 sm:pt-16 lg:pt-0">
+        <div className="absolute inset-0 flex flex-col overflow-y-auto">
+          <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 md:px-16 lg:px-24 pt-20 sm:pt-24 pb-8 max-w-5xl">
             <nav
               className="flex flex-col"
               onMouseLeave={() => setActiveIndex(null)}
@@ -229,7 +229,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   onMouseEnter={() => setActiveIndex(i)}
-                  className="group relative flex items-center py-2.5 sm:py-3 md:py-4 overflow-hidden"
+                  className="group relative flex items-center gap-4 py-3 sm:py-4 md:py-5 overflow-hidden"
                   style={{
                     borderBottom: "1px solid rgba(164,108,252,0.08)",
                     transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
@@ -247,17 +247,18 @@ export function Navigation() {
                   />
 
                   <span
-                    className="relative z-10 w-10 text-xs mr-6 transition-colors duration-300"
+                    className="relative z-10 text-xs shrink-0 transition-colors duration-300"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.25)",
+                      width: 28,
                     }}
                   >
                     {link.id}
                   </span>
 
                   <span
-                    className="relative z-10 flex-1 text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase"
+                    className="relative z-10 flex-1 text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter uppercase min-w-0"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex !== null && activeIndex !== i
@@ -270,7 +271,7 @@ export function Navigation() {
                   </span>
 
                   <span
-                    className="relative z-10 text-[10px] sm:text-xs tracking-widest uppercase transition-all duration-300"
+                    className="relative z-10 text-[9px] sm:text-[10px] md:text-xs tracking-widest uppercase transition-all duration-300 shrink-0 hidden sm:block"
                     style={{
                       fontFamily: "var(--font-stack-heading)",
                       color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.3)",
@@ -281,7 +282,7 @@ export function Navigation() {
                   </span>
 
                   <svg
-                    className="relative z-10 ml-4 w-5 h-5 transition-all duration-300"
+                    className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 shrink-0 transition-all duration-300"
                     style={{
                       color: activeIndex === i ? "var(--color-secondary)" : "rgba(232,226,255,0.15)",
                       transform: activeIndex === i ? "translateX(4px)" : "translateX(0)",
@@ -296,8 +297,36 @@ export function Navigation() {
                 </a>
               ))}
             </nav>
-          </div>
 
+            {/* Social links */}
+            <div
+              className="flex items-center gap-6 mt-8 sm:mt-12"
+              style={{
+                transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
+                transitionDelay: mounted ? `${NAV_LINKS.length * 60 + 100}ms` : "0ms",
+                transform: mounted ? "translateY(0)" : "translateY(20px)",
+                opacity: mounted ? 1 : 0,
+              }}
+            >
+              {SOCIAL.filter(s => s.href !== "#").map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] sm:text-xs uppercase tracking-[0.2em] transition-colors duration-300"
+                  style={{
+                    fontFamily: "var(--font-stack-heading)",
+                    color: "rgba(232,226,255,0.4)",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-secondary)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(232,226,255,0.4)"; }}
+                >
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
 

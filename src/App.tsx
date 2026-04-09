@@ -26,6 +26,9 @@ const EcosystemServices = lazy(() =>
 const ArcSlider = lazy(() =>
   import("./components/ArcSlider").then((m) => ({ default: m.ArcSlider })),
 );
+const Testimonials = lazy(() =>
+  import("./components/Testimonials").then((m) => ({ default: m.Testimonials })),
+);
 const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
 );
@@ -413,8 +416,13 @@ function AppContent() {
         <ArcSlider />
       </Section>
 
+      {/* ═══ TESTIMONIALS ═══ */}
+      <Section id="testimonials" className="bg-white" noPadding={true}>
+        <Testimonials />
+      </Section>
+
       {/* Spacer before blog */}
-      <div className="h-20 sm:h-28 lg:h-36 bg-[var(--color-background-light)]" />
+      <div className="h-20 sm:h-28 lg:h-36 bg-white" />
 
       {/* ═══ BLOG ═══ */}
       <div id="blog">

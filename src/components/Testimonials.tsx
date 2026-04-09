@@ -63,6 +63,17 @@ const CONTACTS = [
     logo: "/logos/icetech.png",
     quote: "H2H has been instrumental in elevating ICE Tech's social media presence. Their ability to clearly communicate our brand and message has helped us reach a wider audience and strengthen our online identity.",
   },
+  {
+    id: "askafrica",
+    name: "Anoushka Rademeyer",
+    company: "Ask Africa",
+    country: "South Africa",
+    countryCode: "ZA",
+    role: "Head of Marketing",
+    service: "Brand Strategy",
+    logo: null as string | null,
+    quote: "Representing and building the African narrative is not a small task. As the brand was already going through large-scale shifts, H2H could not have showed up at a better time.",
+  },
 ];
 
 // Card variants — flip-over effect with rotateY on every breakpoint

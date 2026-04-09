@@ -7,7 +7,8 @@ const NAV_LINKS = [
   { label: "About", href: "#about", id: "02", sub: "Our story" },
   { label: "Three Pillars", href: "#ecosystem", id: "03", sub: "Core framework" },
   { label: "Services", href: "#services", id: "04", sub: "What we offer" },
-  { label: "Blog", href: "/blog", id: "05", sub: "Insights & ideas" },
+  { label: "Testimonials", href: "#testimonials", id: "05", sub: "Client voices" },
+  { label: "Blog", href: "/blog", id: "06", sub: "Insights & ideas" },
 ];
 
 const SOCIAL = [

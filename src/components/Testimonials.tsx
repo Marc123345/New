@@ -325,7 +325,7 @@ export function Testimonials() {
                 className="relative w-full flex-1 flex items-center justify-center min-h-0 overflow-hidden"
                 style={{ perspective: "1000px" }}
               >
-                <AnimatePresence custom={directionRef.current} mode="popLayout">
+                <AnimatePresence custom={directionRef.current} mode="wait">
                   <motion.div
                     key={contact.id}
                     custom={directionRef.current}
@@ -354,10 +354,11 @@ export function Testimonials() {
                         </div>
                         {contact.logo && (
                           <div
-                            className="avatar-pulse flex items-center justify-center bg-white shrink-0"
+                            className="flex items-center justify-center bg-white shrink-0 overflow-hidden"
                             style={{
-                              height: "clamp(32px, 5vw, 44px)",
-                              padding: "0 clamp(8px, 1.5vw, 14px)",
+                              height: "clamp(28px, 4vw, 40px)",
+                              maxWidth: "clamp(80px, 20vw, 140px)",
+                              padding: "0 clamp(6px, 1vw, 12px)",
                               borderRadius: "6px",
                               border: "1px solid rgba(255,255,255,0.25)",
                             }}
@@ -365,8 +366,8 @@ export function Testimonials() {
                             <img
                               src={contact.logo}
                               alt={`${contact.company} logo`}
-                              className="h-full w-auto object-contain"
-                              style={{ maxHeight: "clamp(20px, 3.5vw, 30px)", maxWidth: "clamp(60px, 15vw, 120px)" }}
+                              className="w-auto object-contain"
+                              style={{ maxHeight: "clamp(16px, 3vw, 26px)", maxWidth: "100%" }}
                               loading="lazy"
                               decoding="async"
                             />

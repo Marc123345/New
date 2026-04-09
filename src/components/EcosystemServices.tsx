@@ -102,9 +102,22 @@ export function EcosystemServices() {
   const handleDigitalHomeClose = useCallback(() => setDigitalHomeOpen(false), []);
 
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   // Pause the three infinite motion animations (CTA badge bob, iPad float,
   // iPad screen glow orb) when the section is off-screen.
   const sectionInView = useInView(sectionRef, { margin: "120px 0px" });
+
+  // Force video play when section becomes visible — mobile Safari needs this
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (sectionInView) {
+      v.muted = true;
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+    }
+  }, [sectionInView]);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
   const orbitAngleRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
@@ -168,14 +181,14 @@ export function EcosystemServices() {
       {/* Background Video */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <video
-          ref={(el) => { if (el) { el.muted = true; el.play().catch(() => {}); } }}
+          ref={videoRef}
           autoPlay
           muted
           loop
           playsInline
           // @ts-ignore — needed for older iOS
           webkit-playsinline=""
-          preload="auto"
+          preload="metadata"
           src={VIDEO_URL}
           className="w-full h-full object-cover opacity-30"
           style={{ filter: 'brightness(0.6) contrast(1.1)' }}

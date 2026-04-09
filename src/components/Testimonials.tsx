@@ -227,12 +227,12 @@ export function Testimonials() {
             <div className="logo-scroll-track">
               <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`original-${i}`} className="flex-shrink-0 overflow-hidden" style={{ width: 60, maxWidth: 60 }}>
+                  <div key={`original-${i}`} className="flex-shrink-0 flex items-center justify-center" style={{ width: 56, height: 24 }}>
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-6 sm:h-10 md:h-14 object-contain opacity-80"
-                      style={{ width: '100%', maxWidth: 60 }}
+                      className="object-contain opacity-80"
+                      style={{ maxWidth: 56, maxHeight: 24 }}
                       decoding="async"
                     />
                   </div>
@@ -240,12 +240,12 @@ export function Testimonials() {
               </div>
               <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16" aria-hidden="true">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`duplicate-${i}`} className="flex-shrink-0 overflow-hidden" style={{ width: 60, maxWidth: 60 }}>
+                  <div key={`duplicate-${i}`} className="flex-shrink-0 flex items-center justify-center" style={{ width: 56, height: 24 }}>
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="h-6 sm:h-10 md:h-14 object-contain opacity-80"
-                      style={{ width: '100%', maxWidth: 60 }}
+                      className="object-contain opacity-80"
+                      style={{ maxWidth: 56, maxHeight: 24 }}
                       decoding="async"
                     />
                   </div>

@@ -218,22 +218,6 @@ export function Testimonials() {
       <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-white">
         <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden border-t border-black/5 pt-4 sm:pt-10 md:pt-16 pb-2 sm:pb-4 md:pb-0" style={{ contain: 'layout style paint' }}>
 
-          <div className="text-center mb-1 sm:mb-4 md:mb-8 px-4 md:px-8">
-            <div
-              className="inline-block mb-1 sm:mb-3 md:mb-4 px-3 py-1 sm:py-1.5 md:px-4 md:py-2"
-              style={{ border: "2px solid var(--color-secondary)", borderRadius: "6px", boxShadow: "4px 4px 0 var(--color-secondary)" }}
-            >
-              <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase" style={{ fontFamily: "var(--font-stack-heading)", color: "var(--color-secondary)" }}>
-                Human Stories, Proven Results
-              </span>
-            </div>
-            <h2
-              className="tracking-tight font-bold"
-              style={{ fontSize: "clamp(1.5rem, 4vw, 3rem)", fontFamily: "var(--font-stack-heading)", color: "var(--color-primary)" }}
-            >
-              Testimonials
-            </h2>
-          </div>
 
           {/* Client logo slider */}
           <div className="w-full overflow-hidden mb-1 sm:mb-3 md:mb-6 relative shrink-0" style={{ height: 'clamp(36px, 6vw, 56px)' }}>

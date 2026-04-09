@@ -17,7 +17,6 @@ const CLIENT_LOGOS = [
   { name: "Untapped Africa", url: "https://ik.imagekit.io/qcvroy8xpd/GOLD%20TEXT%20LOGO%20NO%20GLOW%20EFFECT%20ADDED%201.png?updatedAt=1748753342858" },
   { name: "YDPay", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094" },
   { name: "Stallion Integrated", url: "https://ik.imagekit.io/qcvroy8xpd/2610dfc9-72f0-4a52-89b0-d277a1dc13c4.jpeg?updatedAt=1775656772352" },
-  { name: "Stallion Security", url: "https://www.stallion.co.za/wp-content/uploads/2025/03/Stallion-Integrated-Logo-RGB_FC-Horizontal-Black.png" },
 ];
 
 function InfiniteLogoSlider({ logos }: { logos: typeof CLIENT_LOGOS }) {

@@ -17,6 +17,7 @@ import { AboutSection } from "./components/AboutSection";
 // Eager-start the download but lazy-render so the app shell paints immediately
 const lusionPromise = import("./components/LusionConnectors");
 const LusionConnectors = lazy(() => lusionPromise.then((m) => ({ default: m.LusionConnectors })));
+import { ClientLogos } from "./components/ClientLogos";
 const EcosystemServices = lazy(() =>
   import("./components/EcosystemServices").then((m) => ({ default: m.EcosystemServices })),
 );
@@ -24,9 +25,6 @@ const EcosystemServices = lazy(() =>
 
 const ArcSlider = lazy(() =>
   import("./components/ArcSlider").then((m) => ({ default: m.ArcSlider })),
-);
-const Testimonials = lazy(() =>
-  import("./components/Testimonials").then((m) => ({ default: m.Testimonials })),
 );
 const BlogSection = lazy(() =>
   import("./components/BlogSection").then((m) => ({ default: m.BlogSection })),
@@ -398,6 +396,9 @@ function AppContent() {
       {/* ═══ ABOUT ═══ */}
       <AboutSection />
 
+      {/* ═══ CLIENT LOGOS ═══ */}
+      <ClientLogos />
+
       {/* ═══ 3-PILLAR ECOSYSTEM ═══ */}
       <div id="ecosystem">
         <LazySection>
@@ -412,13 +413,8 @@ function AppContent() {
         <ArcSlider />
       </Section>
 
-      {/* ═══ TESTIMONIALS ═══ */}
-      <Section id="testimonials" className="bg-white" noPadding={true}>
-        <Testimonials />
-      </Section>
-
-      {/* Spacer between testimonials and blog */}
-      <div className="h-20 sm:h-28 lg:h-36 bg-white" />
+      {/* Spacer before blog */}
+      <div className="h-20 sm:h-28 lg:h-36 bg-[var(--color-background-light)]" />
 
       {/* ═══ BLOG ═══ */}
       <div id="blog">

@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { motion, useInView } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
-import { LaptopShowcase } from './LaptopShowcase';
-import { PILLARS } from '../constants/ecosystem';
+import { PILLARS, DIGITAL_HOME } from '../constants/ecosystem';
 
 
 const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
@@ -98,9 +97,9 @@ const ORBIT_DIAMETER = ORBIT_RADIUS * 2;
 
 export function EcosystemServices() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
-  const [showcaseOpen, setShowcaseOpen] = useState(false);
-  const handleIpadClick = useCallback(() => setShowcaseOpen(true), []);
-  const handleShowcaseClose = useCallback(() => setShowcaseOpen(false), []);
+  const [digitalHomeOpen, setDigitalHomeOpen] = useState(false);
+  const handleIpadClick = useCallback(() => setDigitalHomeOpen(true), []);
+  const handleDigitalHomeClose = useCallback(() => setDigitalHomeOpen(false), []);
 
   const sectionRef = useRef<HTMLElement>(null);
   // Pause the three infinite motion animations (CTA badge bob, iPad float,
@@ -404,7 +403,7 @@ export function EcosystemServices() {
       </div>
 
       <PillarOverlay pillarIndex={selectedService} onClose={handleClose} onNavigate={handleSelect} />
-      <LaptopShowcase open={showcaseOpen} onClose={handleShowcaseClose} />
+      <PillarOverlay pillarIndex={null} onClose={handleDigitalHomeClose} onNavigate={() => {}} standalone={digitalHomeOpen ? DIGITAL_HOME : null} />
 
     </section>
   );

@@ -124,3 +124,27 @@ export const SERVICES = [
 
 export const PILLARS = SERVICES.filter(s => s.type === 'core');
 export const SECONDARY_SERVICES = SERVICES.filter(s => s.type === 'specialized');
+
+export const DIGITAL_HOME = {
+  type: 'digital-home' as const,
+  subtitle: "Your Digital Home",
+  title: "Website / Digital Content Hub",
+  description: "Most companies treat their website like a box to tick. We don't. At H2H, we build digital homes — modern, high-impact websites with sharp design, smart movement, and a polished user experience. Then we turn them into content hubs, filled with thought leadership blogs, white papers, infographics, videos, and interviews that bring your brand to life and give people a reason to stay.",
+  whatWeDo: [
+    "Strategic Design & Copywriting",
+    "Responsive Build (Mobile-first)",
+    "SEO Fundamentals baked in from day one",
+    "Blog & Content Hub Setup",
+    "Thought leadership content production",
+    "White papers, infographics & video content",
+  ],
+  closingNote: "Your website is often your company's virtual home. We make sure it's the right one.",
+  deliverables: ["Strategic Design", "Responsive Build", "SEO", "Content Hub", "Thought Leadership", "Multi-format Content"],
+  icon: React.createElement(Globe, { size: 32 }),
+  image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800",
+  stats: [
+    { label: "Avg. Load Time", value: "<2s" },
+    { label: "SEO Score", value: "95+" },
+    { label: "Mobile Performance", value: "100%" },
+  ],
+};

@@ -14,19 +14,24 @@ interface PillarOverlayProps {
   pillarIndex: number | null;
   onClose: () => void;
   onNavigate: (index: number) => void;
+  /** When set, renders a standalone item (no navigation). pillarIndex is ignored when this is truthy. */
+  standalone?: typeof PILLARS[number] | null;
 }
 
-export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverlayProps) {
+export function PillarOverlay({ pillarIndex, onClose, onNavigate, standalone }: PillarOverlayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+
+  const isStandalone = !!standalone;
+  const isOpen = isStandalone ? true : pillarIndex !== null;
 
   const activeIndexRef = useRef<number | null>(null);
   if (pillarIndex !== null) {
     activeIndexRef.current = pillarIndex;
   }
 
-  const displayIndex = pillarIndex !== null ? pillarIndex : activeIndexRef.current;
-  const displayService = displayIndex !== null ? PILLARS[displayIndex] : null;
+  const displayIndex = isStandalone ? null : (pillarIndex !== null ? pillarIndex : activeIndexRef.current);
+  const displayService = isStandalone ? standalone : (displayIndex !== null ? PILLARS[displayIndex] : null);
   const accent = displayIndex !== null ? PILLAR_ACCENTS[displayIndex] : PILLAR_ACCENTS[0];
 
   useEffect(() => {
@@ -34,13 +39,13 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
   }, []);
 
   useEffect(() => {
-    if (pillarIndex !== null) {
+    if (isOpen) {
       document.body.style.overflow = 'hidden';
 
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
-        if (e.key === 'ArrowRight' && displayIndex !== null && displayIndex < PILLARS.length - 1) onNavigate(displayIndex + 1);
-        if (e.key === 'ArrowLeft' && displayIndex !== null && displayIndex > 0) onNavigate(displayIndex - 1);
+        if (!isStandalone && e.key === 'ArrowRight' && displayIndex !== null && displayIndex < PILLARS.length - 1) onNavigate(displayIndex + 1);
+        if (!isStandalone && e.key === 'ArrowLeft' && displayIndex !== null && displayIndex > 0) onNavigate(displayIndex - 1);
       };
       window.addEventListener('keydown', handleKeyDown);
 
@@ -51,13 +56,13 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
     } else {
       document.body.style.overflow = 'unset';
     }
-  }, [pillarIndex, onClose, displayIndex, onNavigate]);
+  }, [isOpen, isStandalone, onClose, displayIndex, onNavigate]);
 
   if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>
-      {pillarIndex !== null && displayService && (
+      {isOpen && displayService && (
         <motion.div
           key="pillar-overlay-backdrop"
           initial={{ opacity: 0 }}
@@ -235,8 +240,8 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
               </div>
             </div>
 
-            {/* FIXED: Footer Navigation */}
-            <div className="relative z-20 px-4 py-3 sm:p-6 border-t border-white/10 bg-[#080a0e] flex justify-between items-center shrink-0">
+            {/* Footer Navigation — hidden in standalone mode */}
+            {!isStandalone && <div className="relative z-20 px-4 py-3 sm:p-6 border-t border-white/10 bg-[#080a0e] flex justify-between items-center shrink-0">
               <button
                 type="button"
                 disabled={displayIndex === 0}
@@ -316,7 +321,7 @@ export function PillarOverlay({ pillarIndex, onClose, onNavigate }: PillarOverla
               >
                 <span className="hidden sm:inline">Next</span> <ArrowRight size={16} />
               </button>
-            </div>
+            </div>}
           </motion.div>
         </motion.div>
       )}

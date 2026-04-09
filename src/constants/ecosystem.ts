@@ -142,9 +142,5 @@ export const DIGITAL_HOME = {
   deliverables: ["Strategic Design", "Responsive Build", "SEO", "Content Hub", "Thought Leadership", "Multi-format Content"],
   icon: React.createElement(Globe, { size: 32 }),
   image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800",
-  stats: [
-    { label: "Avg. Load Time", value: "<2s" },
-    { label: "SEO Score", value: "95+" },
-    { label: "Mobile Performance", value: "100%" },
-  ],
+  stats: [],
 };

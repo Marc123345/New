@@ -399,9 +399,6 @@ function AppContent() {
       {/* ═══ ABOUT ═══ */}
       <AboutSection />
 
-      {/* ═══ CLIENT LOGOS ═══ */}
-      <ClientLogos />
-
       {/* ═══ 3-PILLAR ECOSYSTEM ═══ */}
       <div id="ecosystem">
         <LazySection>

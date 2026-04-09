@@ -225,27 +225,27 @@ export function Testimonials() {
             <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
             <div className="logo-scroll-track">
-              <div className="flex shrink-0 items-center gap-8 sm:gap-12 lg:gap-16 pr-8 sm:pr-12 lg:pr-16">
+              <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`original-${i}`} className="flex-shrink-0 px-3 sm:px-2">
+                  <div key={`original-${i}`} className="flex-shrink-0 overflow-hidden" style={{ width: 60, maxWidth: 60 }}>
                     <img
                       src={logo.src}
                       alt={logo.alt}
                       className="h-6 sm:h-10 md:h-14 object-contain opacity-80"
-                      style={{ maxWidth: 80, width: 'auto' }}
+                      style={{ width: '100%', maxWidth: 60 }}
                       decoding="async"
                     />
                   </div>
                 ))}
               </div>
-              <div className="flex shrink-0 items-center gap-8 sm:gap-12 lg:gap-16 pr-8 sm:pr-12 lg:pr-16" aria-hidden="true">
+              <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16" aria-hidden="true">
                 {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`duplicate-${i}`} className="flex-shrink-0 px-3 sm:px-2">
+                  <div key={`duplicate-${i}`} className="flex-shrink-0 overflow-hidden" style={{ width: 60, maxWidth: 60 }}>
                     <img
                       src={logo.src}
                       alt={logo.alt}
                       className="h-6 sm:h-10 md:h-14 object-contain opacity-80"
-                      style={{ maxWidth: 80, width: 'auto' }}
+                      style={{ width: '100%', maxWidth: 60 }}
                       decoding="async"
                     />
                   </div>

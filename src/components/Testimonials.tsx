@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 
 const GlobeWrapper = lazy(() =>
@@ -7,17 +8,48 @@ const GlobeWrapper = lazy(() =>
 );
 
 const CLIENT_LOGOS = [
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: false },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg?tr=e-removedotbg", alt: "Client", mobileHide: true },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg?tr=e-removedotbg", alt: "Client" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/GOLD%20TEXT%20LOGO%20NO%20GLOW%20EFFECT%20ADDED%201.png?updatedAt=1748753342858", alt: "Untapped Africa" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094", alt: "YDPay" },
-  { src: "https://ik.imagekit.io/qcvroy8xpd/2610dfc9-72f0-4a52-89b0-d277a1dc13c4.jpeg?updatedAt=1775656772352", alt: "Stallion Integrated" },
-  { src: "https://www.stallion.co.za/wp-content/uploads/2025/03/Stallion-Integrated-Logo-RGB_FC-Horizontal-Black.png", alt: "Stallion Security" },
+  { name: "Client", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.06.jpeg?tr=e-removedotbg" },
+  { name: "Client", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.00.jpeg?tr=e-removedotbg" },
+  { name: "Client", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.48.18.jpeg?tr=e-removedotbg" },
+  { name: "Client", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.37.jpeg?tr=e-removedotbg" },
+  { name: "Client", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.15.jpeg?tr=e-removedotbg" },
+  { name: "Client", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.46.58.jpeg?tr=e-removedotbg" },
+  { name: "Untapped Africa", url: "https://ik.imagekit.io/qcvroy8xpd/GOLD%20TEXT%20LOGO%20NO%20GLOW%20EFFECT%20ADDED%201.png?updatedAt=1748753342858" },
+  { name: "YDPay", url: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094" },
+  { name: "Stallion Integrated", url: "https://ik.imagekit.io/qcvroy8xpd/2610dfc9-72f0-4a52-89b0-d277a1dc13c4.jpeg?updatedAt=1775656772352" },
+  { name: "Stallion Security", url: "https://www.stallion.co.za/wp-content/uploads/2025/03/Stallion-Integrated-Logo-RGB_FC-Horizontal-Black.png" },
 ];
+
+function InfiniteLogoSlider({ logos }: { logos: typeof CLIENT_LOGOS }) {
+  const isMobile = useIsMobile();
+  const duplicated = [...logos, ...logos, ...logos, ...logos];
+
+  return (
+    <div className="relative w-full overflow-hidden py-4">
+      <motion.div
+        className="flex flex-nowrap gap-6 items-center w-max"
+        animate={{ x: "-50%" }}
+        transition={{ ease: "linear", duration: isMobile ? 20 : 40, repeat: Infinity }}
+        style={{ willChange: "transform" }}
+      >
+        {duplicated.map((logo, i) => (
+          <div
+            key={`${logo.name}-${i}`}
+            className="flex-shrink-0 bg-white p-4 md:p-6 rounded-xl shadow-sm border border-black/5 flex items-center justify-center min-w-[140px] md:min-w-[180px] h-24 hover:border-[var(--color-secondary)] transition-colors duration-300"
+          >
+            <img
+              src={logo.url}
+              alt={logo.name}
+              className="w-auto h-8 md:h-10 object-contain opacity-80 hover:opacity-100 transition-opacity duration-500"
+            />
+          </div>
+        ))}
+      </motion.div>
+      <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+    </div>
+  );
+}
 
 const CONTACTS = [
   {
@@ -200,20 +232,6 @@ export function Testimonials() {
           50%      { box-shadow: 0 0 18px 4px rgba(164,108,252,0.4); }
         }
         .avatar-pulse { animation: avatarPulse 2.5s ease-in-out infinite; }
-        @keyframes scrollLogos {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .logo-scroll-track {
-          animation: scrollLogos 35s linear infinite;
-          display: flex;
-          width: max-content;
-          will-change: transform;
-        }
-        @media (max-width: 640px) {
-          .logo-scroll-track { animation-duration: 12s; }
-        }
-        .logo-scroll-track:hover { animation-play-state: paused; }
       `}</style>
 
       <div ref={containerRef} className="relative h-[300vh] sm:h-[300vh] lg:h-[350vh] bg-white">
@@ -221,37 +239,8 @@ export function Testimonials() {
 
 
           {/* Client logo slider */}
-          <div className="w-full overflow-hidden mb-1 sm:mb-3 md:mb-6 relative shrink-0" style={{ height: 'clamp(44px, 8vw, 56px)' }}>
-            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-            <div className="logo-scroll-track">
-              <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16">
-                {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`original-${i}`} className={`flex-shrink-0 flex items-center justify-center${logo.mobileHide ? ' hidden sm:flex' : ''}`} style={{ width: 56, height: 24 }}>
-                    <img
-                      src={logo.src}
-                      alt={logo.alt}
-                      className="object-contain opacity-80"
-                      style={{ maxWidth: 56, maxHeight: 24 }}
-                      decoding="async"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="flex shrink-0 items-center gap-10 sm:gap-12 lg:gap-16 pr-10 sm:pr-12 lg:pr-16" aria-hidden="true">
-                {CLIENT_LOGOS.map((logo, i) => (
-                  <div key={`duplicate-${i}`} className={`flex-shrink-0 flex items-center justify-center${logo.mobileHide ? ' hidden sm:flex' : ''}`} style={{ width: 56, height: 24 }}>
-                    <img
-                      src={logo.src}
-                      alt={logo.alt}
-                      className="object-contain opacity-80"
-                      style={{ maxWidth: 56, maxHeight: 24 }}
-                      decoding="async"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="shrink-0 mb-1 sm:mb-3 md:mb-6">
+            <InfiniteLogoSlider logos={CLIENT_LOGOS} />
           </div>
 
           <div className="max-w-[1400px] mx-auto w-full flex-1 min-h-0 flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-6 px-3 sm:px-5 md:px-8">

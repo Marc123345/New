@@ -299,12 +299,43 @@ export function Navigation() {
               ))}
             </nav>
 
-            {/* Social links */}
-            <div
-              className="flex items-center gap-6 mt-8 sm:mt-12"
+            {/* Contact button */}
+            <a
+              href="#contact"
+              onClick={(e) => handleNavClick(e, "#contact")}
+              className="inline-flex items-center justify-center mt-8 sm:mt-12"
               style={{
+                fontFamily: "var(--font-stack-heading)",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "#ffffff",
+                background: "var(--color-secondary)",
+                padding: "16px 32px",
+                borderRadius: 8,
+                border: "none",
+                cursor: "pointer",
                 transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
                 transitionDelay: mounted ? `${NAV_LINKS.length * 60 + 100}ms` : "0ms",
+                transform: mounted ? "translateY(0)" : "translateY(20px)",
+                opacity: mounted ? 1 : 0,
+                boxShadow: "0 4px 16px rgba(164,108,252,0.3)",
+                textDecoration: "none",
+                alignSelf: "flex-start",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(164,108,252,0.5)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(164,108,252,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              Contact Us
+            </a>
+
+            {/* Social links */}
+            <div
+              className="flex items-center gap-6 mt-6 sm:mt-8"
+              style={{
+                transition: "all 0.6s cubic-bezier(0.76,0,0.24,1)",
+                transitionDelay: mounted ? `${NAV_LINKS.length * 60 + 160}ms` : "0ms",
                 transform: mounted ? "translateY(0)" : "translateY(20px)",
                 opacity: mounted ? 1 : 0,
               }}

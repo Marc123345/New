@@ -17,6 +17,7 @@ const TESTIMONIAL_CITIES = [
   { lat: -17.8252, lng: 31.0335,  name: 'Harare',       iso: 'ZW' }, // Untapped Africa
   { lat: 6.5244,   lng: 3.3792,   name: 'Lagos',        iso: 'NG' }, // YDPay
   { lat: -25.8560, lng: 28.1880,  name: 'Centurion',    iso: 'ZA' }, // ICE Tech
+  { lat: -25.7479, lng: 28.2293,  name: 'Pretoria',     iso: 'ZA' }, // Ask Africa
 ];
 
 const TOP_CITIES = worldPopulationData.slice(0, 18);

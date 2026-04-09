@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, memo, type RefCallback } from 'react';
 import { motion, useInView } from 'motion/react';
 import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, DIGITAL_HOME } from '../constants/ecosystem';
@@ -168,10 +168,13 @@ export function EcosystemServices() {
       {/* Background Video */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <video
+          ref={(el) => { if (el) { el.muted = true; el.play().catch(() => {}); } }}
           autoPlay
           muted
           loop
           playsInline
+          // @ts-ignore — needed for older iOS
+          webkit-playsinline=""
           preload="auto"
           src={VIDEO_URL}
           className="w-full h-full object-cover opacity-30"

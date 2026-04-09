@@ -155,7 +155,7 @@ export function Navigation() {
           {/* Left: Logo + tagline */}
           <div className={`flex items-center gap-4 sm:gap-6 transition-all duration-300 ${isOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
             <a href="/" onClick={handleLogoClick} aria-label="H2H Social Home" className="shrink-0">
-              <H2HLogo className="transition-all duration-500" style={{ height: 'clamp(43px, 8vw, 90px)' }} onDark={onDark} />
+              <H2HLogo className="transition-all duration-500" style={{ height: 'clamp(55px, 10vw, 90px)' }} onDark={onDark} />
             </a>
           </div>
 

@@ -85,7 +85,7 @@ const CONTACTS = [
   },
   {
     id: "icetech",
-    name: "Myles Donnolley",
+    name: "Myles Donnelly",
     company: "ICE Tech",
     country: "South Africa",
     countryCode: "ZA",

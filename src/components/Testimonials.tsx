@@ -16,6 +16,7 @@ const CLIENT_LOGOS = [
   { src: "https://ik.imagekit.io/qcvroy8xpd/GOLD%20TEXT%20LOGO%20NO%20GLOW%20EFFECT%20ADDED%201.png?updatedAt=1748753342858", alt: "Untapped Africa" },
   { src: "https://ik.imagekit.io/qcvroy8xpd/WhatsApp%20Image%202026-04-08%20at%2011.45.25.jpeg?updatedAt=1775647107094", alt: "YDPay" },
   { src: "https://ik.imagekit.io/qcvroy8xpd/2610dfc9-72f0-4a52-89b0-d277a1dc13c4.jpeg?updatedAt=1775656772352", alt: "Stallion Integrated" },
+  { src: "https://www.stallion.co.za/wp-content/uploads/2025/03/Stallion-Integrated-Logo-RGB_FC-Horizontal-Black.png", alt: "Stallion Security" },
 ];
 
 const CONTACTS = [
@@ -365,7 +366,7 @@ export function Testimonials() {
                               src={contact.logo}
                               alt={`${contact.company} logo`}
                               className="h-full w-auto object-contain"
-                              style={{ maxHeight: "clamp(20px, 3.5vw, 30px)" }}
+                              style={{ maxHeight: "clamp(20px, 3.5vw, 30px)", maxWidth: "clamp(60px, 15vw, 120px)" }}
                               loading="lazy"
                               decoding="async"
                             />

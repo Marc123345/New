@@ -33,7 +33,7 @@ function InfiniteLogoSlider({ logos }: { logos: typeof CLIENT_LOGOS }) {
         {duplicated.map((logo, i) => (
           <div
             key={`${logo.name}-${i}`}
-            className="flex-shrink-0 bg-white p-4 md:p-6 rounded-xl shadow-sm border border-black/5 flex items-center justify-center min-w-[140px] md:min-w-[180px] h-24 hover:border-[var(--color-secondary)] transition-colors duration-300"
+            className="flex-shrink-0 flex items-center justify-center min-w-[140px] md:min-w-[180px] h-24"
           >
             <img
               src={logo.url}

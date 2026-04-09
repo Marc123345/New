@@ -168,13 +168,15 @@ export function EcosystemServices() {
       {/* Background Video */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <video
-          autoPlay muted loop playsInline
+          autoPlay
+          muted
+          loop
+          playsInline
           preload="auto"
+          src={VIDEO_URL}
           className="w-full h-full object-cover opacity-30"
           style={{ filter: 'brightness(0.6) contrast(1.1)' }}
-        >
-          <source src={VIDEO_URL} type="video/mp4" />
-        </video>
+        />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(10,6,18,0.95) 0%, rgba(10,6,18,0.6) 40%, rgba(10,6,18,0.95) 100%)' }} />
       </div>
 

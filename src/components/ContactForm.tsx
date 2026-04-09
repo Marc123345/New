@@ -78,7 +78,7 @@ export function ContactForm() {
         style={{
           maxWidth: 720,
           margin: "0 auto",
-          padding: "clamp(40px, 8vw, 100px) clamp(16px, 5vw, 40px)",
+          padding: "clamp(40px, 8vw, 100px) clamp(16px, 5vw, 40px) clamp(60px, 10vw, 120px)",
           position: "relative",
           zIndex: 1,
         }}

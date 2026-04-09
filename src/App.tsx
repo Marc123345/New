@@ -431,9 +431,9 @@ function AppContent() {
       </div>
 
       {/* ═══ CONTACT ═══ */}
-      <Section id="contact" className="bg-[var(--color-background-light)]" delay={0.2} noPadding={true}>
+      <section id="contact" className="bg-[var(--color-background-light)]">
         <ContactForm />
-      </Section>
+      </section>
 
       {/* ═══ FOOTER ═══ */}
       <Footer />

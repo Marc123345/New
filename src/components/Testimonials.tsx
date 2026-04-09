@@ -331,7 +331,7 @@ export function Testimonials() {
                       willChange: "transform, opacity",
                     }}
                   >
-                    <div className="relative flex flex-col gap-4 md:gap-6 overflow-hidden">
+                    <div className="relative flex flex-col gap-4 md:gap-6">
                       <div className="flex items-center gap-3 flex-wrap">
                         <div
                           className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase px-2 py-1"

@@ -38,7 +38,7 @@ function InfiniteLogoSlider({ logos }: { logos: typeof CLIENT_LOGOS }) {
             <img
               src={logo.url}
               alt={logo.name}
-              className="w-auto h-8 md:h-10 object-contain opacity-80 hover:opacity-100 transition-opacity duration-500"
+              className="w-auto h-10 md:h-12 object-contain opacity-80 hover:opacity-100 transition-opacity duration-500"
             />
           </div>
         ))}

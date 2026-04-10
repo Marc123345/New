@@ -4,7 +4,7 @@ import { PillarOverlay } from './island/PillarOverlay';
 import { PILLARS, DIGITAL_HOME } from '../constants/ecosystem';
 
 
-const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation.mp4?updatedAt=1771520317965';
+const VIDEO_URL = 'https://ik.imagekit.io/qcvroy8xpd/Galaxy_Excosystem_Video_Generation%20(2).mp4';
 
 const ORBIT_RADIUS = 240;
 const ORBIT_DURATION = 20000;

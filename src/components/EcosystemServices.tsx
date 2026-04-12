@@ -107,17 +107,30 @@ export function EcosystemServices() {
   // iPad screen glow orb) when the section is off-screen.
   const sectionInView = useInView(sectionRef, { margin: "120px 0px" });
 
-  // Force video play when section becomes visible — mobile Safari needs this
+  // Force video play — retry on visibility change and user interaction
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (sectionInView) {
-      v.muted = true;
-      v.play().catch(() => {});
-    } else {
-      v.pause();
-    }
-  }, [sectionInView]);
+    v.muted = true;
+
+    const tryPlay = () => { v.play().catch(() => {}); };
+
+    // Play immediately
+    tryPlay();
+
+    // Retry on visibility change (tab switch, screen lock)
+    const onVisChange = () => { if (!document.hidden) tryPlay(); };
+    document.addEventListener('visibilitychange', onVisChange);
+
+    // Retry on first user interaction (iOS may need this)
+    const onInteract = () => { tryPlay(); window.removeEventListener('touchstart', onInteract); };
+    window.addEventListener('touchstart', onInteract, { passive: true });
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisChange);
+      window.removeEventListener('touchstart', onInteract);
+    };
+  }, []);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>(new Array(PILLARS.length).fill(null));
   const orbitAngleRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
@@ -188,7 +201,7 @@ export function EcosystemServices() {
           playsInline
           // @ts-ignore — needed for older iOS
           webkit-playsinline=""
-          preload="metadata"
+          preload="auto"
           src={VIDEO_URL}
           className="w-full h-full object-cover opacity-30"
           style={{ filter: 'brightness(0.6) contrast(1.1)' }}
